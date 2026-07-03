@@ -31,10 +31,19 @@
   /* chart */
   .chartwrap{position:relative; margin:10px 12px 0; border:1px solid var(--navy2); border-radius:12px;
     background:linear-gradient(180deg,#0b1120,#090d18); overflow:hidden}
-  #chart{display:block; width:100%; height:273px}
+  #chart{display:block; width:100%; height:273px; touch-action:none; cursor:grab}
+  #chart:active{cursor:grabbing}
   .chip-diff{position:absolute; left:10px; top:8px; font-size:10px; color:var(--tsec);
     background:rgba(8,11,20,.72); border:1px solid var(--navy2); padding:2px 8px; border-radius:6px; font-family:var(--mono)}
   .hint-hidden{position:absolute; right:56px; top:8px; font-size:10px; color:var(--golddim); font-family:var(--mono)}
+  .zoombtns{position:absolute; right:8px; bottom:8px; display:flex; gap:4px}
+  .zoombtns button{width:28px; height:28px; border-radius:8px; border:1px solid var(--navy2);
+    background:rgba(8,11,20,.82); color:var(--tsec); font-size:15px; font-weight:800; line-height:1; cursor:pointer;
+    font-family:inherit; display:flex; align-items:center; justify-content:center}
+  .zoombtns button:hover{color:var(--tprimary); border-color:var(--golddim)}
+  .zoombtns button:active{transform:translateY(1px)}
+  .panhint{position:absolute; left:10px; bottom:8px; font-size:9px; color:var(--tmuted); font-family:var(--mono);
+    background:rgba(8,11,20,.6); padding:2px 7px; border-radius:5px; pointer-events:none}
 
   /* indicator toggle bar */
   .indbar{display:flex; gap:6px; overflow-x:auto; padding:9px 12px 3px; scrollbar-width:none}
@@ -119,6 +128,12 @@
     <canvas id="chart"></canvas>
     <div class="chip-diff" id="diff">난이도 ●●●○○</div>
     <div class="hint-hidden" id="hiddenTag">▓ 미래 숨김</div>
+    <div class="panhint">↔ 드래그 · 휠/버튼 확대</div>
+    <div class="zoombtns">
+      <button id="zoomOut" type="button" aria-label="축소">－</button>
+      <button id="zoomIn" type="button" aria-label="확대">＋</button>
+      <button id="zoomReset" type="button" aria-label="최근으로">⟲</button>
+    </div>
   </div>
   <div class="indbar" id="indbar"></div>
 
@@ -261,6 +276,7 @@ const DIR_KO={LONG:'롱',SHORT:'숏',WATCH:'관망'};
 /* ---------- chart ---------- */
 const cv=$('chart'), ctx=cv.getContext('2d');
 let cssW=0, cssH=0;
+let view={count:60, start:0};   // count = candles shown (zoom), start = leftmost index (pan)
 function sizeCanvas(){
   const r=cv.getBoundingClientRect(); const dpr=window.devicePixelRatio||1;
   cssW=r.width; cssH=r.height;
@@ -316,14 +332,33 @@ function layout(){
 }
 function layoutCanvas(){ const L=layout(); cv.style.height=L.totalH+'px'; sizeCanvas(); return L; }
 
+/* ---------- viewport (zoom/pan) ---------- */
+function clampView(){ const total=P.candles.length;
+  view.count=Math.max(20, Math.min(view.count, total));
+  view.start=Math.max(0, Math.min(view.start, total-view.count)); }
+function setViewRecent(){ const total=P.candles.length;
+  view.count=Math.min(view.count||60, total);
+  const right=(P.vis-1)+Math.min(P.fut, 8);          // entry + a few reserved future slots on the right
+  view.start=right-view.count+1; clampView(); }
+function zoomBy(factor, anchorFrac){ const total=P.candles.length;
+  const f=(anchorFrac==null?0.5:anchorFrac);
+  const anchor=view.start+f*view.count;              // candle index under the anchor point
+  view.count=Math.max(20, Math.min(view.count*factor, total));
+  view.start=anchor-f*view.count; clampView(); drawChart(); }
+
 function drawChart(){
   if(!cssW) layoutCanvas();
   const L=layout(), W=cssW; ctx.clearRect(0,0,cssW,cssH);
   const C=P.candles, total=C.length, vis=P.vis;
   const axisW=52, padL=8, plotR=W-axisW;
   const priceTop=L.priceTop, priceBot=L.priceBot;
-  const cw=(plotR-padL)/total;
-  const cx=(i)=>padL+cw*(i+0.5);
+  clampView();
+  const cw=(plotR-padL)/view.count;
+  const cx=(i)=>padL+cw*(i - view.start + 0.5);
+  // visible revealed range [v0,v1); padded [l0,l1) for smooth line edges
+  const v0=Math.max(0, Math.floor(view.start));
+  const v1=Math.min(revealed, Math.ceil(view.start+view.count));
+  const l0=Math.max(0, v0-1), l1=Math.min(revealed, v1+1);
 
   // indicators over revealed slice only (leak-free)
   const rc=C.slice(0,revealed), closes=rc.map(c=>c[3]);
@@ -334,72 +369,75 @@ function drawChart(){
   const rsi= ind.rsi? rsiArr(closes,14):null;
   const mac= ind.macd? macdArr(closes):null;
 
-  // autoscale price over revealed (+ overlays)
+  // autoscale price over the VISIBLE window (+ overlays in view) → zoomed swings fill the pane
   let lo=Infinity,hi=-Infinity,vmax=0;
-  for(let i=0;i<revealed;i++){ if(C[i][2]<lo)lo=C[i][2]; if(C[i][1]>hi)hi=C[i][1]; if(C[i][4]>vmax)vmax=C[i][4]; }
+  for(let i=v0;i<v1;i++){ if(C[i][2]<lo)lo=C[i][2]; if(C[i][1]>hi)hi=C[i][1]; if(C[i][4]>vmax)vmax=C[i][4]; }
+  if(!isFinite(lo)){ const e=C[Math.max(0,revealed-1)]; lo=e[2]; hi=e[1]; }
   const ext=(x)=>{ if(x!=null){ if(x<lo)lo=x; if(x>hi)hi=x; } };
-  if(boll) for(let i=0;i<revealed;i++){ ext(boll.up[i]); ext(boll.lo[i]); }
-  if(ichi) for(let i=0;i<revealed;i++){ ext(ichi.spanA[i]); ext(ichi.spanB[i]); ext(ichi.tenkan[i]); ext(ichi.kijun[i]); }
-  for(const m of mas) for(let i=0;i<revealed;i++) ext(m.arr[i]);
-  const pad=(hi-lo)*0.06||hi*0.01||1; lo-=pad; hi+=pad;
+  if(boll) for(let i=v0;i<v1;i++){ ext(boll.up[i]); ext(boll.lo[i]); }
+  if(ichi) for(let i=v0;i<v1;i++){ ext(ichi.spanA[i]); ext(ichi.spanB[i]); ext(ichi.tenkan[i]); ext(ichi.kijun[i]); }
+  for(const m of mas) for(let i=v0;i<v1;i++) ext(m.arr[i]);
+  const pad=(hi-lo)*0.08||hi*0.01||1; lo-=pad; hi+=pad;
   const yOf=(p)=>priceBot-(p-lo)/(hi-lo)*(priceBot-priceTop);
   const vyOf=(v)=>L.volBot-(v/(vmax||1))*(L.volBot-L.volTop);
 
   ctx.font='10px '+getComputedStyle(document.body).fontFamily;
-  // price grid + axis
   ctx.textBaseline='middle'; ctx.textAlign='left';
   for(let g=0;g<=4;g++){ const py=priceTop+(priceBot-priceTop)*g/4; const price=hi-(hi-lo)*g/4;
     ctx.strokeStyle='#1B2436'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(plotR,py); ctx.stroke();
     ctx.fillStyle='#5A6478'; ctx.fillText(fmtP(price), plotR+5, py); }
 
-  // hidden-future shade across all panes
-  if(revealed<total){ const sx=padL+cw*revealed;
-    ctx.fillStyle='rgba(233,185,73,0.035)'; ctx.fillRect(sx,priceTop,plotR-sx,L.bottomAll-priceTop);
-    ctx.strokeStyle='rgba(233,185,73,0.25)'; ctx.setLineDash([3,4]); ctx.lineWidth=1;
+  // hidden-future shade (only if the reveal boundary is within view)
+  if(revealed<total && revealed<view.start+view.count){ const sx=Math.max(padL, cx(revealed)-cw/2);
+    ctx.fillStyle='rgba(233,185,73,0.05)'; ctx.fillRect(sx,priceTop,plotR-sx,L.bottomAll-priceTop);
+    ctx.strokeStyle='rgba(233,185,73,0.3)'; ctx.setLineDash([3,4]); ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(sx,priceTop); ctx.lineTo(sx,L.bottomAll); ctx.stroke(); ctx.setLineDash([]); }
 
-  // ichimoku cloud (behind candles; span shifted +26 into reserved slots)
+  // ichimoku cloud (forward +26), only segments overlapping the view
   if(ichi){ for(let i=51;i<revealed-1;i++){ const j=i+ichi.disp; if(j+1>total-1) break;
+      if(j+1<view.start-1 || j>view.start+view.count+1) continue;
       const a1=ichi.spanA[i],b1=ichi.spanB[i],a2=ichi.spanA[i+1],b2=ichi.spanB[i+1];
       if(a1==null||b1==null||a2==null||b2==null) continue;
       const x1=cx(j),x2=cx(j+1);
       ctx.beginPath(); ctx.moveTo(x1,yOf(a1)); ctx.lineTo(x2,yOf(a2)); ctx.lineTo(x2,yOf(b2)); ctx.lineTo(x1,yOf(b1)); ctx.closePath();
       ctx.fillStyle=((a1+a2)>=(b1+b2))?'rgba(53,196,106,0.16)':'rgba(229,72,77,0.16)'; ctx.fill(); } }
 
-  // volume pane
-  if(L.hasVol){ for(let i=0;i<revealed;i++){ const c=C[i]; const up=c[3]>=c[0];
-      ctx.fillStyle= up?'rgba(240,97,109,.5)':'rgba(76,141,246,.5)'; const bw=Math.max(0.8,cw*0.62);
+  // volume (visible)
+  if(L.hasVol){ for(let i=v0;i<v1;i++){ const c=C[i]; const up=c[3]>=c[0];
+      ctx.fillStyle= up?'rgba(240,97,109,.5)':'rgba(76,141,246,.5)'; const bw=Math.max(1,cw*0.66);
       ctx.fillRect(cx(i)-bw/2, vyOf(c[4]), bw, L.volBot-vyOf(c[4])); }
     ctx.fillStyle='#5A6478'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('거래량', padL+2, L.volTop+2); }
 
-  // candles
-  for(let i=0;i<revealed;i++){ const c=C[i]; const up=c[3]>=c[0]; const col= up?'#F0616D':'#4C8DF6';
-    const x=cx(i); ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,yOf(c[1])); ctx.lineTo(x,yOf(c[2])); ctx.stroke();
-    const bw=Math.max(0.8,cw*0.72); const yo=yOf(c[0]), yc=yOf(c[3]);
+  // candles (visible) — thicker with zoom
+  for(let i=v0;i<v1;i++){ const c=C[i]; const up=c[3]>=c[0]; const col= up?'#F0616D':'#4C8DF6';
+    const x=cx(i); ctx.strokeStyle=col; ctx.lineWidth=Math.max(1,cw*0.13); ctx.beginPath(); ctx.moveTo(x,yOf(c[1])); ctx.lineTo(x,yOf(c[2])); ctx.stroke();
+    const bw=Math.max(1.5,cw*0.72); const yo=yOf(c[0]), yc=yOf(c[3]);
     ctx.fillStyle=col; ctx.fillRect(x-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo))); }
 
-  // polyline helper over price pane
+  // polyline helper over padded visible range
   const plot=(arr,col,w)=>{ ctx.strokeStyle=col; ctx.lineWidth=w||1.3; ctx.beginPath(); let st=false;
-    for(let i=0;i<revealed;i++){ const v=arr[i]; if(v==null)continue; const x=cx(i),y=yOf(v);
+    for(let i=l0;i<l1;i++){ const v=arr[i]; if(v==null){st=false;continue;} const x=cx(i),y=yOf(v);
       if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); };
 
-  for(const m of mas) plot(m.arr, m.col, 1.3);
+  for(const m of mas) plot(m.arr, m.col, 1.4);
   if(boll){ plot(boll.up,'#5AA9E6',1); plot(boll.lo,'#5AA9E6',1); ctx.setLineDash([3,3]); plot(boll.mid,'#7C8AA5',1); ctx.setLineDash([]); }
-  if(ichi){ plot(ichi.tenkan,'#2BD4C4',1.1); plot(ichi.kijun,'#E0679F',1.1);
+  if(ichi){ plot(ichi.tenkan,'#2BD4C4',1.2); plot(ichi.kijun,'#E0679F',1.2);
     ctx.strokeStyle='#9AA7BD'; ctx.lineWidth=1; ctx.beginPath(); let st=false;
-    for(let i=26;i<revealed;i++){ const x=cx(i-26),y=yOf(closes[i]); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); }
+    for(let i=Math.max(26,l0+26);i<Math.min(revealed,l1+26);i++){ const x=cx(i-26),y=yOf(closes[i]); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); }
 
-  // active-overlay legend (price pane, bottom-left to avoid top chips)
+  // active-overlay legend (price pane, bottom-left)
   { let lx=padL+2, ly=priceBot-11; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.font='9px '+getComputedStyle(document.body).fontFamily;
     const leg=[]; if(ind.ma) leg.push(['MA5','#FFD54A'],['20','#4CC3FF'],['60','#B980FF'],['200','#FF8FB0']);
     if(ind.boll) leg.push(['BB','#5AA9E6']); if(ind.ichi) leg.push(['전환','#2BD4C4'],['기준','#E0679F'],['구름','#35C46A']);
     for(const t of leg){ ctx.fillStyle=t[1]; ctx.fillText(t[0],lx,ly); lx+=ctx.measureText(t[0]).width+7; } }
 
-  // entry line (vertical through panes + horizontal on price)
-  const entry=C[vis-1][3], exx=cx(vis-1);
+  // entry line (horizontal always; vertical only if entry in view)
+  const entry=C[vis-1][3];
   ctx.strokeStyle='rgba(233,185,73,.55)'; ctx.setLineDash([4,3]); ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(padL,yOf(entry)); ctx.lineTo(plotR,yOf(entry)); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(exx,priceTop); ctx.lineTo(exx,L.bottomAll); ctx.stroke(); ctx.setLineDash([]);
+  if(vis-1>=view.start-1 && vis-1<=view.start+view.count){ const exx=cx(vis-1);
+    ctx.beginPath(); ctx.moveTo(exx,priceTop); ctx.lineTo(exx,L.bottomAll); ctx.stroke(); }
+  ctx.setLineDash([]);
   tagPrice(ctx, plotR, yOf(entry), '진입 '+fmtP(entry), '#E9B949', '#080B14');
 
   // stop/take preview (bet phase)
@@ -413,7 +451,7 @@ function drawChart(){
   if(phase==='result' && outcome && outcome.reason!=='NO_POSITION'){
     const oy=yOf(outcome.exit); const oxi=vis-1+outcome.offset;
     line(ctx,padL,plotR,oy, outcome.points>=0?'#35C46A':'#E5484D');
-    const ox=cx(Math.min(oxi,total-1)); ctx.fillStyle= outcome.points>=0?'#35C46A':'#E5484D'; ctx.beginPath(); ctx.arc(ox,oy,3.5,0,7); ctx.fill(); }
+    if(oxi>=view.start-1 && oxi<=view.start+view.count){ const ox=cx(Math.min(oxi,total-1)); ctx.fillStyle= outcome.points>=0?'#35C46A':'#E5484D'; ctx.beginPath(); ctx.arc(ox,oy,3.5,0,7); ctx.fill(); } }
 
   // RSI pane
   if(rsi && L.hasRsi){ const t=L.rsiTop,b=L.rsiBot, ry=(v)=> b-(v/100)*(b-t);
@@ -422,19 +460,19 @@ function drawChart(){
     ctx.strokeStyle='rgba(53,196,106,.4)'; ctx.beginPath(); ctx.moveTo(padL,ry(30)); ctx.lineTo(plotR,ry(30)); ctx.stroke();
     ctx.setLineDash([]);
     ctx.strokeStyle='#C9B458'; ctx.lineWidth=1.2; ctx.beginPath(); let st=false;
-    for(let i=0;i<revealed;i++){ const v=rsi[i]; if(v==null)continue; const x=cx(i),y=ry(v); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke();
+    for(let i=l0;i<l1;i++){ const v=rsi[i]; if(v==null){st=false;continue;} const x=cx(i),y=ry(v); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke();
     ctx.fillStyle='#5A6478'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('RSI 14',padL+2,t+2);
     ctx.textBaseline='middle'; ctx.fillText('70',plotR+5,ry(70)); ctx.fillText('30',plotR+5,ry(30)); }
 
   // MACD pane
   if(mac && L.hasMacd){ const t=L.macdTop,b=L.macdBot, mid=(t+b)/2;
-    let mm=1e-9; for(let i=0;i<revealed;i++){ [mac.macd[i],mac.signal[i],mac.hist[i]].forEach(v=>{ if(v!=null&&Math.abs(v)>mm)mm=Math.abs(v); }); }
+    let mm=1e-9; for(let i=v0;i<v1;i++){ [mac.macd[i],mac.signal[i],mac.hist[i]].forEach(v=>{ if(v!=null&&Math.abs(v)>mm)mm=Math.abs(v); }); }
     const my=(v)=> mid-(v/mm)*((b-t)/2*0.86);
     ctx.strokeStyle='#1B2436'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,mid); ctx.lineTo(plotR,mid); ctx.stroke();
-    for(let i=0;i<revealed;i++){ const h=mac.hist[i]; if(h==null)continue; const x=cx(i), bw=Math.max(1,cw*0.6);
+    for(let i=v0;i<v1;i++){ const h=mac.hist[i]; if(h==null)continue; const x=cx(i), bw=Math.max(1,cw*0.66);
       ctx.fillStyle= h>=0?'rgba(53,196,106,.6)':'rgba(229,72,77,.6)'; const y0=my(0),y1=my(h); ctx.fillRect(x-bw/2,Math.min(y0,y1),bw,Math.max(1,Math.abs(y1-y0))); }
     const plotM=(arr,col)=>{ ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.beginPath(); let st=false;
-      for(let i=0;i<revealed;i++){ const v=arr[i]; if(v==null)continue; const x=cx(i),y=my(v); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); };
+      for(let i=l0;i<l1;i++){ const v=arr[i]; if(v==null){st=false;continue;} const x=cx(i),y=my(v); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); };
     plotM(mac.macd,'#4C8DF6'); plotM(mac.signal,'#E9A23B');
     ctx.fillStyle='#5A6478'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('MACD 12·26·9',padL+2,t+2); }
 }
@@ -514,7 +552,7 @@ function loadProblem(){
   $('bal').textContent=store.balance.toLocaleString()+'P';
   const d=P.diff; $('diff').textContent='난이도 '+'●'.repeat(d)+'○'.repeat(5-d);
   $('hiddenTag').classList.remove('hidden');
-  layoutCanvas(); sync(); drawChart();
+  layoutCanvas(); setViewRecent(); sync(); drawChart();
   document.querySelector('.scroll').scrollTop=0;
 }
 function submit(){
@@ -524,7 +562,9 @@ function submit(){
   if(reduce){ revealed=target; finishReveal(); return; }
   clearInterval(revealTimer);
   const iv=(target-revealed)>15?55:90;   // faster tick for long (30캔들) reveals
-  revealTimer=setInterval(()=>{ revealed++; drawChart(); if(revealed>=target){ clearInterval(revealTimer); finishReveal(); } }, iv);
+  revealTimer=setInterval(()=>{ revealed++;
+    if(revealed-1 >= view.start+view.count-2){ view.start = (revealed - view.count + 2); clampView(); }  // follow the newest candle
+    drawChart(); if(revealed>=target){ clearInterval(revealTimer); finishReveal(); } }, iv);
 }
 function finishReveal(){
   phase='result'; $('hiddenTag').classList.add('hidden'); drawChart(); renderResult();
@@ -568,7 +608,7 @@ function retry(){ // score-neutral
   phase='bet'; revealed=P.vis; outcome=null;
   $('betPane').classList.remove('hidden'); $('resPane').classList.add('hidden');
   $('hiddenTag').classList.remove('hidden');
-  sync(); drawChart(); document.querySelector('.scroll').scrollTop=0;
+  setViewRecent(); sync(); drawChart(); document.querySelector('.scroll').scrollTop=0;
 }
 
 /* ---------- wire ---------- */
@@ -576,6 +616,33 @@ $('submitBtn').addEventListener('click',()=>{ if(!$('submitBtn').disabled) submi
 $('nextBtn').addEventListener('click',commitNext);
 $('retryBtn').addEventListener('click',retry);
 let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{ layoutCanvas(); drawChart(); },120); });
+
+/* ---------- pan (drag) + zoom (wheel/pinch/buttons) ---------- */
+function cwNow(){ return (cssW-52-8)/view.count; }   // axisW=52, padL=8
+let dragging=false, dragX0=0, dragStart0=0;
+const pointers=new Map();  // for pinch
+cv.addEventListener('pointerdown',(e)=>{ pointers.set(e.pointerId,e); if(pointers.size===1){ dragging=true; dragX0=e.clientX; dragStart0=view.start; } });
+window.addEventListener('pointermove',(e)=>{
+  if(pointers.has(e.pointerId)) pointers.set(e.pointerId,e);
+  if(pointers.size>=2){ dragging=false; return; }      // pinch handled on pointerup delta below
+  if(!dragging) return;
+  view.start = dragStart0 - (e.clientX-dragX0)/cwNow(); clampView(); drawChart();
+});
+let pinchBase=null;
+window.addEventListener('pointermove',(e)=>{
+  if(pointers.size<2) { pinchBase=null; return; }
+  const pts=[...pointers.values()]; const d=Math.abs(pts[0].clientX-pts[1].clientX)+Math.abs(pts[0].clientY-pts[1].clientY);
+  if(pinchBase==null){ pinchBase={d, count:view.count}; return; }
+  if(d>4){ view.count=Math.max(20, Math.min(pinchBase.count*(pinchBase.d/d), P.candles.length)); clampView(); drawChart(); }
+});
+function releasePtr(e){ pointers.delete(e.pointerId); if(pointers.size<2) pinchBase=null; if(pointers.size===0) dragging=false; }
+window.addEventListener('pointerup',releasePtr); window.addEventListener('pointercancel',releasePtr);
+cv.addEventListener('wheel',(e)=>{ e.preventDefault(); const rect=cv.getBoundingClientRect();
+  const frac=Math.max(0,Math.min(1,(e.clientX-rect.left-8)/((cssW-52-8)||1)));
+  zoomBy(e.deltaY>0?1.18:0.85, frac); }, {passive:false});
+$('zoomIn').addEventListener('click',()=>zoomBy(0.78));
+$('zoomOut').addEventListener('click',()=>zoomBy(1.28));
+$('zoomReset').addEventListener('click',()=>{ view.count=60; setViewRecent(); drawChart(); });
 
 buildIndBar();
 loadProblem();
