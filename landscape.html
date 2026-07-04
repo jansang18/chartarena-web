@@ -16,39 +16,39 @@
   .cap .r{margin-top:7px; font-size:11px; color:var(--tm)}
 
   .scaler{transform-origin:top center}
-  .frame{width:940px; height:590px; border-radius:20px; overflow:hidden; display:flex;
+  .frame{width:1120px; height:516px; border-radius:20px; overflow:hidden; display:flex;
     background:radial-gradient(120% 90% at 30% 0%, #12203c, #0a1327 55%, #060c1a);
     box-shadow:0 30px 70px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
 
   /* 좌측 레일 */
-  .rail{width:246px; flex:0 0 auto; padding:16px 14px; border-right:1px solid var(--line);
+  .rail{width:240px; flex:0 0 auto; padding:12px 13px; overflow-y:auto; border-right:1px solid var(--line);
     background:linear-gradient(180deg,rgba(14,24,48,.7),rgba(8,14,30,.7)); display:flex; flex-direction:column}
-  .brand{font-weight:900; font-size:18px; margin-bottom:12px}
+  .brand{font-weight:900; font-size:17px; margin-bottom:8px}
   .brand .g{color:var(--gold)}
-  .avwrap{position:relative; border-radius:16px; padding:12px; background:#0a1122; border:1px solid var(--line); text-align:center}
-  .avwrap .ava{width:130px; height:130px; margin:0 auto; border-radius:14px; overflow:hidden; background:radial-gradient(circle at 50% 30%,#12203a,#070c16); border:1px solid var(--line); position:relative; display:flex; align-items:center; justify-content:center}
+  .avwrap{position:relative; border-radius:14px; padding:9px; background:#0a1122; border:1px solid var(--line); text-align:center}
+  .avwrap .ava{width:82px; height:82px; margin:0 auto; border-radius:12px; overflow:hidden; background:radial-gradient(circle at 50% 30%,#12203a,#070c16); border:1px solid var(--line); position:relative; display:flex; align-items:center; justify-content:center}
   .avwrap .ava img{width:100%; height:100%; object-fit:cover}
-  .avwrap .ava .em{font-size:70px}
-  .avwrap .ava .car{position:absolute; bottom:4px; left:50%; transform:translateX(-50%); font-size:26px}
+  .avwrap .ava .em{font-size:52px}
+  .avwrap .ava .car{position:absolute; bottom:3px; left:50%; transform:translateX(-50%); font-size:20px}
   .avwrap .edit{position:absolute; right:10px; top:10px; width:28px;height:28px;border-radius:50%;background:rgba(233,185,73,.12);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer}
-  .nickrow{display:flex; justify-content:center; align-items:center; gap:6px; margin-top:10px}
+  .nickrow{display:flex; justify-content:center; align-items:center; gap:6px; margin-top:6px}
   .nick{background:transparent; border:none; color:var(--tp); font-weight:900; font-size:17px; text-align:center; width:100%; font-family:inherit}
   .nick:focus{outline:none; border-bottom:1px dashed var(--gold)}
   .title{margin-top:5px; font-size:11px; font-weight:800; color:var(--gold)}
-  .chips{display:flex; gap:6px; justify-content:center; margin-top:8px}
+  .chips{display:flex; gap:6px; justify-content:center; margin-top:6px}
   .chip{font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; font-family:var(--mono)}
   .chip.lv{color:#2a2107; background:linear-gradient(180deg,var(--gold2),var(--gold))}
   .chip.fire{color:var(--tp); background:rgba(255,120,60,.14); border:1px solid rgba(255,120,60,.4)}
-  .assets{margin-top:14px; text-align:center; background:#0a1122; border:1px solid var(--line); border-radius:12px; padding:10px}
+  .assets{margin-top:8px; text-align:center; background:#0a1122; border:1px solid var(--line); border-radius:12px; padding:7px 10px}
   .assets .l{font-size:10px; letter-spacing:.14em; color:#8A6D2B; font-weight:800}
-  .assets .v{font-family:var(--mono); font-weight:900; font-size:26px; line-height:1.1;
+  .assets .v{font-family:var(--mono); font-weight:900; font-size:21px; line-height:1.1;
     background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
-  .nav{margin-top:14px; display:flex; flex-direction:column; gap:7px}
-  .nav a{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:var(--ts); font-weight:800; font-size:14px; background:#0d1730; border:1px solid var(--line); cursor:pointer}
-  .nav a .ic{font-size:17px}
+  .nav{margin-top:7px; display:flex; flex-direction:column; gap:3px}
+  .nav a{display:flex; align-items:center; gap:9px; padding:5px 11px; border-radius:9px; text-decoration:none; color:var(--ts); font-weight:800; font-size:12.5px; background:#0d1730; border:1px solid var(--line); cursor:pointer}
+  .nav a .ic{font-size:15px}
   .nav a.on{color:var(--gold); border-color:var(--gold); background:rgba(233,185,73,.08)}
   .nav a.batt{color:#04223f; background:linear-gradient(180deg,#8fd6ff,#4CA9FF); border-color:transparent}
-  .foot{margin-top:auto; color:var(--tm); font-size:9px; line-height:1.4}
+  .foot{margin-top:7px; color:var(--tm); font-size:8.5px; line-height:1.35}
 
   /* 메인 */
   .main{flex:1; min-width:0; padding:16px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent}
@@ -146,7 +146,7 @@
   <div class="k">ChartArena · 가로 앱</div>
   <h1>🖥️ 홈 · 랭킹 · 차고 (가로 3분할)</h1>
   <p>레퍼런스처럼 <b style="color:var(--tp)">좌측 프로필 레일 + 메인</b> 구조. 차고에서 사고 장착하면 좌측·랭킹에 바로 반영.</p>
-  <div class="r">📱 폰이면 가로로 · 폭에 맞게 축소됩니다</div>
+  <div class="r">📱 스마트폰 가로(19.5:9) 비율 · 폭에 맞게 축소됩니다</div>
 </div>
 
 <div class="scaler" id="scaler"><div class="frame">
@@ -221,7 +221,7 @@
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
-function fit(){var s=Math.min(1,(window.innerWidth-16)/940);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(590*s)+'px';sc.style.width='940px';}
+function fit(){var s=Math.min(1,(window.innerWidth-16)/1120);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(516*s)+'px';sc.style.width='1120px';}
 window.addEventListener('resize',fit);fit();
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1300);}
 var fmt=function(n){return Math.round(n).toLocaleString();};

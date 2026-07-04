@@ -16,7 +16,7 @@
 
   .scaler{transform-origin:top center}
   /* 가로 스튜디오 무대 (고정 크기 → JS로 화면폭에 맞춰 스케일) */
-  .frame{position:relative; width:940px; height:590px; border-radius:22px; overflow:hidden;
+  .frame{position:relative; width:1120px; height:516px; border-radius:22px; overflow:hidden;
     background:radial-gradient(120% 80% at 50% -10%, #1b3a6b 0%, #0c1a35 45%, #060d1e 100%);
     box-shadow:0 30px 70px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
   /* 스포트라이트 */
@@ -24,7 +24,7 @@
     background:radial-gradient(closest-side at 50% 0,rgba(120,180,255,.5),transparent 75%); filter:blur(4px); transform:skewX(0)}
   .spot.s1{left:6%} .spot.s2{left:30%} .spot.s3{left:62%} .spot.s4{right:6%}
 
-  .top{position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:14px 20px}
+  .top{position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:10px 22px}
   .logo{font-weight:900; font-size:20px; letter-spacing:.3px}
   .logo .g{color:var(--gold)}
   .live{font-size:11px; font-weight:900; color:#fff; background:#e5484d; padding:3px 9px; border-radius:6px; box-shadow:0 0 12px rgba(229,72,77,.6); animation:blink 1.2s infinite}
@@ -33,7 +33,7 @@
   .endbtn{margin-left:12px; background:#123; border:1px solid #2a4b7a; color:#9fc3ff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer}
 
   /* TV 스크린(차트) */
-  .tv{position:relative; z-index:2; margin:2px auto 0; width:600px; height:300px; border-radius:14px; padding:9px;
+  .tv{position:relative; z-index:2; margin:2px auto 0; width:660px; height:250px; border-radius:14px; padding:9px;
     background:linear-gradient(180deg,#0c2244,#08152b); border:2px solid #2f5c9e;
     box-shadow:0 0 26px -4px rgba(76,169,255,.5), 0 0 0 4px rgba(0,0,0,.3) inset}
   #chart{width:100%; height:100%; display:block; border-radius:8px; background:#050c1c}
@@ -47,31 +47,31 @@
   .verdict.show{opacity:1; transform:translate(-50%,-50%) scale(1)}
 
   /* 단상 4개 */
-  .podiums{position:absolute; left:0; right:0; bottom:96px; z-index:2; display:flex; justify-content:center; gap:16px; padding:0 18px}
-  .pod{width:180px; text-align:center; position:relative}
-  .pod .ava{height:78px; display:flex; align-items:flex-end; justify-content:center; position:relative}
-  .pod .ava img{height:78px; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
-  .pod .ava .em{font-size:52px; line-height:1; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .podiums{position:absolute; left:0; right:0; bottom:80px; z-index:2; display:flex; justify-content:center; gap:18px; padding:0 22px}
+  .pod{width:196px; text-align:center; position:relative}
+  .pod .ava{height:60px; display:flex; align-items:flex-end; justify-content:center; position:relative}
+  .pod .ava img{height:60px; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .pod .ava .em{font-size:42px; line-height:1; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
   .pod .pick{position:absolute; top:-6px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:900; padding:2px 10px; border-radius:999px; opacity:0; transition:all .2s}
   .pod .pick.on{opacity:1}
   .pick.L{background:rgba(53,208,122,.22); color:var(--green); border:1px solid var(--green)}
   .pick.S{background:rgba(255,92,138,.22); color:var(--pink); border:1px solid var(--pink)}
   .pick.W{background:rgba(233,185,73,.22); color:var(--gold); border:1px solid var(--gold)}
   .pick.Q{background:#0a1a33; color:#5a7099; border:1px solid #24406e}
-  .desk{margin-top:2px; border-radius:10px 10px 6px 6px; padding:8px 6px 9px; background:linear-gradient(180deg,#16305a,#0b1c38); border:1px solid #2a4b7a; position:relative}
+  .desk{margin-top:2px; border-radius:10px 10px 6px 6px; padding:6px 6px 7px; background:linear-gradient(180deg,#16305a,#0b1c38); border:1px solid #2a4b7a; position:relative}
   .desk.me{border-color:var(--gold); box-shadow:0 0 18px -4px rgba(233,185,73,.5)}
   .desk .nm{font-size:12px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-  .desk .led{margin-top:5px; background:#020814; border:1px solid #0d1f3a; border-radius:6px; padding:4px 0;
-    font-family:var(--mono); font-weight:900; font-size:22px; color:var(--green); text-shadow:0 0 8px rgba(53,208,122,.7); letter-spacing:1px}
+  .desk .led{margin-top:4px; background:#020814; border:1px solid #0d1f3a; border-radius:6px; padding:3px 0;
+    font-family:var(--mono); font-weight:900; font-size:18px; color:var(--green); text-shadow:0 0 8px rgba(53,208,122,.7); letter-spacing:1px}
   .desk .delta{position:absolute; right:6px; top:-14px; font-family:var(--mono); font-weight:900; font-size:14px; opacity:0; transition:all .5s}
   .desk .crown{position:absolute; left:50%; top:-30px; transform:translateX(-50%); font-size:18px; opacity:0}
   .desk.lead .crown{opacity:1}
 
   /* 하단 컨트롤 (내 선택) */
-  .ctrl{position:absolute; left:0; right:0; bottom:0; z-index:4; height:88px; display:flex; align-items:center; gap:10px; padding:0 18px;
+  .ctrl{position:absolute; left:0; right:0; bottom:0; z-index:4; height:74px; display:flex; align-items:center; gap:10px; padding:0 20px;
     background:linear-gradient(0deg,rgba(6,12,26,.96),rgba(6,12,26,.55)); border-top:1px solid #1a2c4e}
   .ctrl .lab{font-size:12px; color:#93A0BC; font-weight:700; margin-right:2px}
-  .dir{flex:1; max-width:150px; text-align:center; padding:12px 6px; border-radius:12px; cursor:pointer; border:2px solid transparent; background:#0e1c38; font-weight:900; font-size:16px}
+  .dir{flex:1; max-width:150px; text-align:center; padding:8px 6px; border-radius:12px; cursor:pointer; border:2px solid transparent; background:#0e1c38; font-weight:900; font-size:15px}
   .dir small{display:block; font-size:9px; font-weight:400; opacity:.75}
   .dir.long{color:var(--green)} .dir.long.on{background:rgba(53,208,122,.2); border-color:var(--green); box-shadow:0 0 16px -3px rgba(53,208,122,.6)}
   .dir.short{color:var(--pink)} .dir.short.on{background:rgba(255,92,138,.2); border-color:var(--pink); box-shadow:0 0 16px -3px rgba(255,92,138,.6)}
@@ -79,7 +79,7 @@
   .levs{display:flex; gap:5px}
   .lev{padding:8px 11px; border-radius:9px; background:#0e1c38; border:1px solid #24406e; color:#9fc3ff; font-weight:800; font-size:13px; cursor:pointer}
   .lev.on{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:#3a2c07; border-color:transparent}
-  .go{margin-left:auto; border:none; cursor:pointer; font-family:inherit; color:#3a2c07; font-weight:900; font-size:15px; padding:13px 22px; border-radius:12px;
+  .go{margin-left:auto; border:none; cursor:pointer; font-family:inherit; color:#3a2c07; font-weight:900; font-size:15px; padding:10px 20px; border-radius:12px;
     background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); box-shadow:0 6px 18px -4px rgba(233,185,73,.6)}
   .go.next{background:linear-gradient(180deg,#8fd6ff,#4CA9FF); color:#04223f}
   .go:disabled{background:#1a2c4e; color:#5a7099; box-shadow:none; cursor:default}
@@ -140,8 +140,8 @@ var hub={}; try{hub=JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}c
 var myCh=(hub.equip&&hub.equip.ch)||'shark', myNick=hub.nick||'차트고수';
 
 /* 화면폭에 맞춰 가로 무대 스케일 */
-function fit(){ var s=Math.min(1,(window.innerWidth-16)/940); var sc=$('scaler');
-  sc.style.transform='scale('+s+')'; sc.style.height=(590*s)+'px'; sc.style.width='940px'; }
+function fit(){ var s=Math.min(1,(window.innerWidth-16)/1120); var sc=$('scaler');
+  sc.style.transform='scale('+s+')'; sc.style.height=(516*s)+'px'; sc.style.width='1120px'; }
 window.addEventListener('resize',fit); fit();
 
 /* 플레이어 (나 + 봇3) */
