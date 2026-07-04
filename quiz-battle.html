@@ -227,7 +227,7 @@ function fmtScore(v){ var s=(v<0?'-':'')+('000'+Math.abs(v)).slice(-4); return s
 /* 컨트롤 */
 function renderCtrl(){
   ['L','S','W'].forEach(function(d){ $('d'+d).classList.toggle('on', mySel.dir===d); });
-  $('levs').innerHTML=[1,2,3].map(function(l){return '<div class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'">'+l+'배</div>';}).join('');
+  $('levs').innerHTML=[1,2,3,5,10].map(function(l){return '<div class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'">'+l+'배</div>';}).join('');
   var go=$('go');
   if(phase==='pick'){ go.className='go'; go.textContent='확정 ▶'; go.disabled=(mySel.dir===null); }
   else if(phase==='result'){ go.className='go next'; go.textContent=(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶'); go.disabled=false; }
