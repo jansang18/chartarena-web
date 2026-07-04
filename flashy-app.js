@@ -46,35 +46,46 @@ function renderHome(){
 
 /* ---------------- GAME ---------------- */
 var IND=[{k:'vol',l:'거래량',c:'#93A0BC',on:true},{k:'ma',l:'이평선',c:'#4CC3FF',on:true},{k:'boll',l:'볼린저',c:'#5AA9E6',on:true},{k:'rsi',l:'RSI',c:'#C9B458',on:true},{k:'macd',l:'MACD',c:'#4C8DF6',on:true},{k:'ichi',l:'일목',c:'#2BD4C4',on:false}];
-var LEV=[1,2,3,5,10], HOR=[5,10,30];
-var gsel={dir:null,lev:1,hor:10}, gameBuilt=false, cd=2316; // 0:38:36
+var LEV=[1,2,3,5,10], WAG=[500,1000,2000,5000], STOP=[null,3,5,10], TAKE=[null,5,10,20], HOR=[5,10,30];
+var GVIS=48, gSeed=12345;
+var gsel={dir:null,lev:1,wag:1000,stop:null,take:null,hor:10}, gameBuilt=false, cd=2316, gPhase='bet', gReveal=48, gOutcome=null, revTimer=null;
+function fmtStop(v){return v===null?'없음':v+'%';}
 function buildGameControls(){
   $('indrow').innerHTML=IND.map(function(x){return '<div class="ichip'+(x.on?' on':'')+'" data-ik="'+x.k+'"><span class="dot" style="background:'+(x.on?x.c:'#5A6478')+'"></span>'+x.l+'</div>';}).join('');
   $('lev').innerHTML=LEV.map(function(v){return '<div class="chip'+(v>=10?' warn':'')+(gsel.lev===v?' on':'')+'" data-lev="'+v+'" style="flex:1">'+v+'배</div>';}).join('');
+  $('wag').innerHTML=WAG.map(function(v){return '<div class="chip'+(gsel.wag===v?' on':'')+'" data-wag="'+v+'" style="flex:1">'+v.toLocaleString()+'</div>';}).join('');
+  $('stop').innerHTML=STOP.map(function(v){return '<div class="chip'+(gsel.stop===v?' on':'')+'" data-stop="'+v+'" style="flex:1">'+fmtStop(v)+'</div>';}).join('');
+  $('take').innerHTML=TAKE.map(function(v){return '<div class="chip'+(gsel.take===v?' on':'')+'" data-take="'+v+'" style="flex:1">'+fmtStop(v)+'</div>';}).join('');
   $('hor').innerHTML=HOR.map(function(v){return '<div class="chip'+(gsel.hor===v?' on':'')+'" data-hor="'+v+'" style="flex:1">'+v+'캔들</div>';}).join('');
   document.querySelectorAll('#v-game .dir').forEach(function(d){d.classList.toggle('on',gsel.dir===d.dataset.dir);});
   var st=$('subtxt'); st.textContent = gsel.dir===null?'방향을 선택하세요':(gsel.dir==='W'?'관망하고 결과 보기':'진입 · 채점 ▶');
   $('riskmsg').innerHTML = gsel.dir===null?'방향을 선택하면 리스크가 표시됩니다. 신중한 판단으로 전략을 완성하세요!'
     : gsel.dir==='W'?'관망: 포지션 없이 흐름을 지켜봅니다. <b style="color:var(--tprimary)">포인트 변동 없음.</b>'
-    : '최대 손실 <b style="color:var(--pink)">-'+(1000).toLocaleString()+'P</b> · 청산선 역방향 <b style="color:var(--tprimary)">'+(100/gsel.lev).toFixed(gsel.lev<10?1:0)+'%</b>';
+    : '최대 손실 <b style="color:var(--pink)">-'+gsel.wag.toLocaleString()+'P</b> · 청산선 역방향 <b style="color:var(--tprimary)">'+(100/gsel.lev).toFixed(gsel.lev<10?1:0)+'%</b>';
 }
 document.addEventListener('click',function(e){
-  var d=e.target.closest('#v-game .dir'); if(d){gsel.dir=d.dataset.dir; buildGameControls(); return;}
-  var l=e.target.closest('[data-lev]'); if(l){gsel.lev=+l.dataset.lev; buildGameControls(); return;}
+  if(e.target.closest('#again')){ resetGame(); return; }
+  if(e.target.closest('#submit')){ submitGame(); return; }
+  if(gPhase!=='bet') return;   // 베팅 단계에서만 컨트롤 반응
+  var d=e.target.closest('#v-game .dir'); if(d){gsel.dir=d.dataset.dir; buildGameControls(); drawChart(); return;}
+  var l=e.target.closest('[data-lev]'); if(l){gsel.lev=+l.dataset.lev; buildGameControls(); drawChart(); return;}
+  var w=e.target.closest('[data-wag]'); if(w){gsel.wag=+w.dataset.wag; buildGameControls(); return;}
+  var s=e.target.closest('[data-stop]'); if(s){gsel.stop=s.dataset.stop==='null'?null:+s.dataset.stop; buildGameControls(); drawChart(); return;}
+  var tk=e.target.closest('[data-take]'); if(tk){gsel.take=tk.dataset.take==='null'?null:+tk.dataset.take; buildGameControls(); drawChart(); return;}
   var h=e.target.closest('[data-hor]'); if(h){gsel.hor=+h.dataset.hor; buildGameControls(); return;}
-  var ic=e.target.closest('[data-ik]'); if(ic){var x=IND.find(function(z){return z.k===ic.dataset.ik;}); x.on=!x.on; buildGameControls(); drawChart(); return;}
-  if(e.target.closest('#submit')){ toast(gsel.dir===null?'방향을 먼저 선택하세요':'제출! (데모)'); }
+  var ic=e.target.closest('#v-game [data-ik]'); if(ic){var x=IND.find(function(z){return z.k===ic.dataset.ik;}); x.on=!x.on; buildGameControls(); drawChart(); return;}
 });
 var cdTimer=null;
 function renderGame(){
   if(!gameBuilt){ buildGameControls(); gameBuilt=true; }
+  var _b=document.querySelector('#v-game .bal .v'); if(_b)_b.textContent=state.bal.toLocaleString()+'P';
   drawChart();
   if(cdTimer)clearInterval(cdTimer);
-  cdTimer=setInterval(function(){ if($('v-game').classList.contains('on')){ cd=Math.max(0,cd-1); drawChart(); } },1000);
+  cdTimer=setInterval(function(){ if(gPhase==='bet' && $('v-game').classList.contains('on')){ cd=Math.max(0,cd-1); drawChart(); } },1000);
 }
 // deterministic candles
-function gen(){
-  var n=58,vis=48,s=12345,o=0.30,cs=[];
+function gen(seed){
+  var n=58,vis=48,s=seed,o=0.30,cs=[];
   var rnd=function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};
   var p=0.30;
   for(var i=0;i<n;i++){var drift=i<28?-0.006:(i<40?-0.001:0.004);var op=p;p=Math.max(0.09,op+(rnd()-0.5)*0.02+drift);
@@ -82,7 +93,7 @@ function gen(){
     cs.push([op,hi,lo,p,vv]);}
   return {cs:cs,vis:vis,n:n};
 }
-var GD=gen();
+var GD=gen(gSeed);
 function sma(cl,per,up){var out=[],sum=0;for(var i=0;i<up;i++){sum+=cl[i];if(i>=per)sum-=cl[i-per];out[i]=i>=per-1?sum/per:null;}return out;}
 function drawChart(){
   var cv=$('chart'),ctx=cv.getContext('2d');var r=cv.getBoundingClientRect();if(r.width<2)return;
@@ -90,38 +101,38 @@ function drawChart(){
   var W=r.width,H=r.height;ctx.clearRect(0,0,W,H);
   var padL=6,axisW=46,plotR=W-axisW;
   var priceT=20,priceB=H*0.52,volT=H*0.55,volB=H*0.66,rsiT=H*0.70,rsiB=H*0.82,macdT=H*0.85,macdB=H-6;
-  var cs=GD.cs,n=GD.n,vis=GD.vis,cw=(plotR-padL)/n,cx=function(i){return padL+cw*(i+0.5);};
+  var cs=GD.cs,n=GD.n,vis=GD.vis,rev=gReveal,cw=(plotR-padL)/n,cx=function(i){return padL+cw*(i+0.5);};
   var cl=cs.map(function(c){return c[3];});
-  var lo=1e9,hi=-1e9,vm=0;for(var i=0;i<vis;i++){if(cs[i][2]<lo)lo=cs[i][2];if(cs[i][1]>hi)hi=cs[i][1];if(cs[i][4]>vm)vm=cs[i][4];}
+  var lo=1e9,hi=-1e9,vm=0;for(var i=0;i<rev;i++){if(cs[i][2]<lo)lo=cs[i][2];if(cs[i][1]>hi)hi=cs[i][1];if(cs[i][4]>vm)vm=cs[i][4];}
   var pad=(hi-lo)*0.12;lo-=pad;hi+=pad;var yOf=function(p){return priceB-(p-lo)/(hi-lo)*(priceB-priceT);};
   // grid + price axis
   ctx.font='9px '+getComputedStyle(document.body).fontFamily;ctx.textBaseline='middle';ctx.textAlign='left';
   for(var g=0;g<=4;g++){var yy=priceT+(priceB-priceT)*g/4,pr=hi-(hi-lo)*g/4;ctx.strokeStyle='rgba(30,44,70,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(plotR,yy);ctx.stroke();ctx.fillStyle='#6b7a96';ctx.fillText(pr.toFixed(4),plotR+4,yy);}
-  // hidden future zone
-  var sx=cx(vis)-cw/2;
-  ctx.fillStyle='rgba(233,185,73,.06)';ctx.fillRect(sx,priceT,plotR-sx,macdB-priceT);
-  ctx.strokeStyle='rgba(233,185,73,.5)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(sx,priceT);ctx.lineTo(sx,macdB);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='#E9B949';ctx.textAlign='right';ctx.fillText('미래 예측 구간',plotR-2,priceT+2);
-  var hrs=Math.floor(cd/3600),mn=Math.floor(cd%3600/60),sc=cd%60;
-  ctx.fillStyle='#93A0BC';ctx.fillText('⏱ '+hrs+':'+('0'+mn).slice(-2)+':'+('0'+sc).slice(-2),plotR-2,priceT+14);
+  // hidden future zone (revealed edge)
+  if(rev<n){ var sx=cx(rev)-cw/2;
+    ctx.fillStyle='rgba(233,185,73,.06)';ctx.fillRect(sx,priceT,plotR-sx,macdB-priceT);
+    ctx.strokeStyle='rgba(233,185,73,.5)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(sx,priceT);ctx.lineTo(sx,macdB);ctx.stroke();ctx.setLineDash([]);
+    if(gPhase==='bet'){ ctx.fillStyle='#E9B949';ctx.textAlign='right';ctx.fillText('미래 예측 구간',plotR-2,priceT+2);
+      var hrs=Math.floor(cd/3600),mn=Math.floor(cd%3600/60),sc=cd%60;
+      ctx.fillStyle='#93A0BC';ctx.fillText('⏱ '+hrs+':'+('0'+mn).slice(-2)+':'+('0'+sc).slice(-2),plotR-2,priceT+14); } }
   // bollinger
   var glow=function(col,w,fn){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.shadowColor=col;ctx.shadowBlur=6;ctx.beginPath();fn();ctx.stroke();ctx.shadowBlur=0;};
   if(IND.find(function(x){return x.k==='boll';}).on){
-    var mid=sma(cl,20,vis),bu=[],bl=[];
-    for(var i=0;i<vis;i++){if(mid[i]==null){bu[i]=bl[i]=null;continue;}var ss=0;for(var j=i-19;j<=i;j++)ss+=Math.pow(cl[j]-mid[i],2);var sd=Math.sqrt(ss/20);bu[i]=mid[i]+2*sd;bl[i]=mid[i]-2*sd;}
+    var mid=sma(cl,20,rev),bu=[],bl=[];
+    for(var i=0;i<rev;i++){if(mid[i]==null){bu[i]=bl[i]=null;continue;}var ss=0;for(var j=i-19;j<=i;j++)ss+=Math.pow(cl[j]-mid[i],2);var sd=Math.sqrt(ss/20);bu[i]=mid[i]+2*sd;bl[i]=mid[i]-2*sd;}
     ctx.strokeStyle='rgba(90,169,230,.5)';ctx.lineWidth=1;
-    [bu,bl].forEach(function(arr){ctx.beginPath();var st=false;for(var i=0;i<vis;i++){if(arr[i]==null)continue;var x=cx(i),y=yOf(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();});
+    [bu,bl].forEach(function(arr){ctx.beginPath();var st=false;for(var i=0;i<rev;i++){if(arr[i]==null)continue;var x=cx(i),y=yOf(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();});
   }
   // MA glow lines
   if(IND.find(function(x){return x.k==='ma';}).on){
     [[5,'#FFD54A'],[20,'#4CC3FF'],[60,'#B980FF'],[200,'#FF8FB0']].forEach(function(m){
-      var a=sma(cl,m[0],vis);glow(m[1],1.4,function(){var st=false;for(var i=0;i<vis;i++){if(a[i]==null)continue;var x=cx(i),y=yOf(a[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
+      var a=sma(cl,m[0],rev);glow(m[1],1.4,function(){var st=false;for(var i=0;i<rev;i++){if(a[i]==null)continue;var x=cx(i),y=yOf(a[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
     });
   }
   // volume
-  if(IND.find(function(x){return x.k==='vol';}).on){for(var i=0;i<vis;i++){var c=cs[i],up=c[3]>=c[0];ctx.fillStyle=up?'rgba(240,97,109,.55)':'rgba(76,141,246,.55)';var bw=Math.max(1.4,cw*0.6);var vh=(c[4]/vm)*(volB-volT);ctx.fillRect(cx(i)-bw/2,volB-vh,bw,vh);}ctx.fillStyle='#6b7a96';ctx.textAlign='left';ctx.fillText('거래량',padL+2,volT+2);}
+  if(IND.find(function(x){return x.k==='vol';}).on){for(var i=0;i<rev;i++){var c=cs[i],up=c[3]>=c[0];ctx.fillStyle=up?'rgba(240,97,109,.55)':'rgba(76,141,246,.55)';var bw=Math.max(1.4,cw*0.6);var vh=(c[4]/vm)*(volB-volT);ctx.fillRect(cx(i)-bw/2,volB-vh,bw,vh);}ctx.fillStyle='#6b7a96';ctx.textAlign='left';ctx.fillText('거래량',padL+2,volT+2);}
   // candles (gradient + subtle glow)
-  for(var i=0;i<vis;i++){var c=cs[i],up=c[3]>=c[0],col=up?'#F0616D':'#4C8DF6';var x=cx(i);
+  for(var i=0;i<rev;i++){var c=cs[i],up=c[3]>=c[0],col=up?'#F0616D':'#4C8DF6';var x=cx(i);
     ctx.strokeStyle=col;ctx.lineWidth=1;ctx.shadowColor=col;ctx.shadowBlur=3;ctx.beginPath();ctx.moveTo(x,yOf(c[1]));ctx.lineTo(x,yOf(c[2]));ctx.stroke();ctx.shadowBlur=0;
     var bw=Math.max(2,cw*0.62),yo=yOf(c[0]),yc=yOf(c[3]),top=Math.min(yo,yc),bh=Math.max(1.5,Math.abs(yc-yo));
     var gr=ctx.createLinearGradient(0,top,0,top+bh);gr.addColorStop(0,up?'#F9899A':'#7EB0FF');gr.addColorStop(1,col);ctx.fillStyle=gr;ctx.fillRect(x-bw/2,top,bw,bh);}
@@ -135,25 +146,82 @@ function drawChart(){
   var entry=cs[vis-1][3],ey=yOf(entry),ex=cx(vis-1);
   ctx.strokeStyle='rgba(233,185,73,.6)';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,ey);ctx.lineTo(plotR,ey);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle='#E9B949';roundRect(ctx,plotR-58,ey-8,56,16,4);ctx.fill();ctx.fillStyle='#080B14';ctx.textAlign='left';ctx.fillText('진입 '+entry.toFixed(4),plotR-54,ey);
-  // prediction lines in future
-  glow('#35D07A',1.4,function(){ctx.moveTo(ex,ey);ctx.lineTo(cx(vis+4),ey-30);ctx.lineTo(cx(vis+9),ey-52);});
-  ctx.setLineDash([3,3]);glow('#F0616D',1.2,function(){ctx.moveTo(ex,ey);ctx.lineTo(cx(vis+5),ey+22);ctx.lineTo(cx(vis+9),ey+46);});ctx.setLineDash([]);
+  // 베팅 단계: 예측선 + 손절/익절 미리보기
+  if(gPhase==='bet'){
+    glow('#35D07A',1.4,function(){ctx.moveTo(ex,ey);ctx.lineTo(cx(vis+4),ey-30);ctx.lineTo(cx(vis+9),ey-52);});
+    ctx.setLineDash([3,3]);glow('#F0616D',1.2,function(){ctx.moveTo(ex,ey);ctx.lineTo(cx(vis+5),ey+22);ctx.lineTo(cx(vis+9),ey+46);});ctx.setLineDash([]);
+    if(gsel.dir&&gsel.dir!=='W'){ var lng=gsel.dir==='L',liq=100/gsel.lev,eff=Math.min(gsel.stop==null?1e9:gsel.stop,liq);
+      var sp=lng?entry*(1-eff/100):entry*(1+eff/100), isLiq=gsel.stop==null||gsel.stop>=liq;
+      if(sp>lo&&sp<hi){ ctx.strokeStyle='#E5484D';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,yOf(sp));ctx.lineTo(plotR,yOf(sp));ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#E5484D';roundRect(ctx,plotR-58,yOf(sp)-8,56,16,4);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='left';ctx.fillText((isLiq?'청산 ':'손절 ')+sp.toFixed(4),plotR-54,yOf(sp)); }
+      if(gsel.take){ var tp=lng?entry*(1+gsel.take/100):entry*(1-gsel.take/100); if(tp>lo&&tp<hi){ ctx.strokeStyle='#35C46A';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,yOf(tp));ctx.lineTo(plotR,yOf(tp));ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#35C46A';roundRect(ctx,plotR-58,yOf(tp)-8,56,16,4);ctx.fill();ctx.fillStyle='#062';ctx.textAlign='left';ctx.fillText('익절 '+tp.toFixed(4),plotR-54,yOf(tp)); } } }
+  }
+  // 결과: 종료 지점 마커
+  if(gPhase==='result'&&gOutcome&&gOutcome.dir!=='W'){ var oy=yOf(gOutcome.exit),oxi=vis-1+gOutcome.off;
+    ctx.strokeStyle=gOutcome.points>=0?'#35C46A':'#E5484D';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,oy);ctx.lineTo(plotR,oy);ctx.stroke();ctx.setLineDash([]);
+    var ox=cx(Math.min(oxi,n-1));ctx.fillStyle=gOutcome.points>=0?'#35C46A':'#E5484D';ctx.beginPath();ctx.arc(ox,oy,4,0,6.3);ctx.fill(); }
   // RSI
-  if(IND.find(function(x){return x.k==='rsi';}).on){var rsiv=rsi(cl,14,vis);ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(229,72,77,.35)';ctx.beginPath();ctx.moveTo(padL,rsiT+ (rsiB-rsiT)*0.3);ctx.lineTo(plotR,rsiT+(rsiB-rsiT)*0.3);ctx.stroke();ctx.strokeStyle='rgba(53,208,122,.35)';ctx.beginPath();ctx.moveTo(padL,rsiT+(rsiB-rsiT)*0.7);ctx.lineTo(plotR,rsiT+(rsiB-rsiT)*0.7);ctx.stroke();ctx.setLineDash([]);
-    glow('#C9B458',1.3,function(){var st=false;for(var i=0;i<vis;i++){if(rsiv[i]==null)continue;var x=cx(i),y=rsiB-(rsiv[i]/100)*(rsiB-rsiT);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
+  if(IND.find(function(x){return x.k==='rsi';}).on){var rsiv=rsi(cl,14,rev);ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(229,72,77,.35)';ctx.beginPath();ctx.moveTo(padL,rsiT+ (rsiB-rsiT)*0.3);ctx.lineTo(plotR,rsiT+(rsiB-rsiT)*0.3);ctx.stroke();ctx.strokeStyle='rgba(53,208,122,.35)';ctx.beginPath();ctx.moveTo(padL,rsiT+(rsiB-rsiT)*0.7);ctx.lineTo(plotR,rsiT+(rsiB-rsiT)*0.7);ctx.stroke();ctx.setLineDash([]);
+    glow('#C9B458',1.3,function(){var st=false;for(var i=0;i<rev;i++){if(rsiv[i]==null)continue;var x=cx(i),y=rsiB-(rsiv[i]/100)*(rsiB-rsiT);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
     ctx.fillStyle='#6b7a96';ctx.textAlign='left';ctx.fillText('RSI 14',padL+2,rsiT+2);ctx.textAlign='left';ctx.fillText('70',plotR+4,rsiT+(rsiB-rsiT)*0.3);ctx.fillText('30',plotR+4,rsiT+(rsiB-rsiT)*0.7);}
   // MACD
-  if(IND.find(function(x){return x.k==='macd';}).on){var mc=macd(cl,vis),mid=(macdT+macdB)/2,mm=1e-9;for(var i=0;i<vis;i++){[mc.m[i],mc.s[i],mc.h[i]].forEach(function(v){if(v!=null&&Math.abs(v)>mm)mm=Math.abs(v);});}
+  if(IND.find(function(x){return x.k==='macd';}).on){var mc=macd(cl,rev),mid=(macdT+macdB)/2,mm=1e-9;for(var i=0;i<rev;i++){[mc.m[i],mc.s[i],mc.h[i]].forEach(function(v){if(v!=null&&Math.abs(v)>mm)mm=Math.abs(v);});}
     var my=function(v){return mid-(v/mm)*((macdB-macdT)/2*0.8);};
-    for(var i=0;i<vis;i++){if(mc.h[i]==null)continue;var x=cx(i),bw=Math.max(1.4,cw*0.6);ctx.fillStyle=mc.h[i]>=0?'rgba(53,208,122,.6)':'rgba(240,97,109,.6)';var y0=my(0),y1=my(mc.h[i]);ctx.fillRect(x-bw/2,Math.min(y0,y1),bw,Math.max(1,Math.abs(y1-y0)));}
-    glow('#4C8DF6',1.2,function(){var st=false;for(var i=0;i<vis;i++){if(mc.m[i]==null)continue;var x=cx(i),y=my(mc.m[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
-    glow('#FF9A3C',1.2,function(){var st=false;for(var i=0;i<vis;i++){if(mc.s[i]==null)continue;var x=cx(i),y=my(mc.s[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
+    for(var i=0;i<rev;i++){if(mc.h[i]==null)continue;var x=cx(i),bw=Math.max(1.4,cw*0.6);ctx.fillStyle=mc.h[i]>=0?'rgba(53,208,122,.6)':'rgba(240,97,109,.6)';var y0=my(0),y1=my(mc.h[i]);ctx.fillRect(x-bw/2,Math.min(y0,y1),bw,Math.max(1,Math.abs(y1-y0)));}
+    glow('#4C8DF6',1.2,function(){var st=false;for(var i=0;i<rev;i++){if(mc.m[i]==null)continue;var x=cx(i),y=my(mc.m[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
+    glow('#FF9A3C',1.2,function(){var st=false;for(var i=0;i<rev;i++){if(mc.s[i]==null)continue;var x=cx(i),y=my(mc.s[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}});
     ctx.fillStyle='#6b7a96';ctx.textAlign='left';ctx.fillText('MACD 12·26·9',padL+2,macdT+2);}
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function ema(v,p){var out=[],k=2/(p+1),prev=0;if(v.length<p)return v.map(function(){return null;});for(var i=0;i<p;i++)prev+=v[i];prev/=p;for(var i=0;i<v.length;i++){if(i<p-1){out[i]=null;}else if(i===p-1){out[i]=prev;}else{prev=(v[i]-prev)*k+prev;out[i]=prev;}}return out;}
 function rsi(cl,p,up){var out=[],g=0,l=0;if(up<=p)return out;for(var i=1;i<=p;i++){var c=cl[i]-cl[i-1];if(c>=0)g+=c;else l-=c;}var ag=g/p,al=l/p;out[p]=al===0?100:100-100/(1+ag/al);for(var i=p+1;i<up;i++){var c=cl[i]-cl[i-1];ag=(ag*(p-1)+(c>0?c:0))/p;al=(al*(p-1)+(c<0?-c:0))/p;out[i]=al===0?100:100-100/(1+ag/al);}return out;}
 function macd(v,up){var ef=ema(v.slice(0,up),12),es=ema(v.slice(0,up),26),m=[],s2,h=[];for(var i=0;i<up;i++)m[i]=(ef[i]!=null&&es[i]!=null)?ef[i]-es[i]:null;var first=m.findIndex(function(x){return x!=null;});var sig=[];if(first>=0){var comp=m.slice(first).map(function(x){return x==null?0:x;});var e=ema(comp,9);for(var j=0;j<e.length;j++)sig[first+j]=e[j];}for(var i=0;i<up;i++)h[i]=(m[i]!=null&&sig[i]!=null)?m[i]-sig[i]:null;return {m:m,s:sig,h:h};}
+
+/* ---- 게임 진행(제출→미래 공개→손익 결과) ---- */
+function evalGame(){
+  var cs=GD.cs,entry=cs[GVIS-1][3],avail=GD.n-GVIS,hz=Math.min(gsel.hor,avail),exitIdx=Math.min(GVIS-1+hz,GD.n-1);
+  if(gsel.dir==='W') return {dir:'W',reason:'관망',points:0,raw:0,lev:0,exit:cs[exitIdx][3],entry:entry,hz:hz,off:hz};
+  var long=gsel.dir==='L',lev=gsel.lev,liq=100/lev,userStop=gsel.stop,effStop=Math.min(userStop==null?1e9:userStop,liq),stopIsLiq=userStop==null||userStop>=liq;
+  var sp=long?entry*(1-effStop/100):entry*(1+effStop/100),tp=gsel.take?(long?entry*(1+gsel.take/100):entry*(1-gsel.take/100)):null;
+  var exit=cs[exitIdx][3],reason='기간 종료',hitStop=false,hitTake=false,off=hz;
+  for(var k=0;k<hz;k++){var c=cs[GVIS+k];if(!c)break;var adv=long?c[2]<=sp:c[1]>=sp,fav=tp!=null&&(long?c[1]>=tp:c[2]<=tp);
+    if(adv){exit=sp;reason=stopIsLiq?'청산 💥':'손절';hitStop=true;off=k+1;break;}
+    if(fav){exit=tp;reason='익절';hitTake=true;off=k+1;break;}}
+  var sign=long?1:-1,raw=sign*(exit-entry)/entry*100,lr=Math.max(-100,raw*lev),points=Math.round(gsel.wag*lr/100);
+  return {dir:gsel.dir,reason:reason,points:points,raw:raw,lev:lr,exit:exit,entry:entry,hz:hz,off:off,hitStop:hitStop,hitTake:hitTake};
+}
+function submitGame(){
+  if(gPhase!=='bet') return;
+  if(gsel.dir===null){ toast('방향을 먼저 선택하세요'); return; }
+  gOutcome=evalGame(); gPhase='reveal';
+  var target=GVIS+Math.min(gsel.hor,GD.n-GVIS);
+  if(reduce){ gReveal=target; finishGame(); return; }
+  if(revTimer)clearInterval(revTimer);
+  revTimer=setInterval(function(){ gReveal++; drawChart(); if(gReveal>=target){ clearInterval(revTimer); finishGame(); } },70);
+}
+function finishGame(){
+  gPhase='result'; var o=gOutcome; state.bal=Math.max(0,state.bal+o.points);
+  var bv=document.querySelector('#v-game .bal .v'); if(bv)bv.textContent=state.bal.toLocaleString()+'P';
+  drawChart();
+  $('betpane').style.display='none'; var rp=$('respane'); rp.style.display='block';
+  var col=o.points>0?'var(--green)':(o.points<0?'var(--pink)':'var(--tsec)');
+  rp.innerHTML='<div class="rescard">'
+    +'<div style="display:flex;align-items:flex-end;justify-content:space-between">'
+      +'<div><div style="color:var(--tsec);font-size:12px">'+(o.dir==='W'?'관망 결과':'손익')+'</div>'
+      +'<div style="font-family:var(--mono);font-weight:900;font-size:32px;color:'+col+'">'+(o.points>=0?'+':'')+o.points.toLocaleString()+' P</div></div>'
+      +(o.dir!=='W'?'<div style="text-align:right"><div style="color:var(--tsec);font-size:11px">레버리지 수익률</div><div style="font-family:var(--mono);font-weight:800;font-size:18px;color:'+col+'">'+(o.lev>=0?'+':'')+o.lev.toFixed(2)+'%</div></div>':'')
+    +'</div>'
+    +'<div style="margin-top:10px;color:var(--gold);font-weight:700;font-size:13px">종료: '+o.reason+'</div>'
+    +'<div style="color:var(--tsec);font-size:12px;margin-top:2px;font-family:var(--mono)">진입 '+o.entry.toFixed(4)+' → 종료 '+o.exit.toFixed(4)+' ('+o.off+'캔들)</div>'
+    +'<button class="goldbtn" id="again" type="button" style="margin-top:14px">다음 문제 ▶</button></div>';
+}
+function resetGame(){
+  gSeed=(gSeed+7777)&0x7fffffff; GD=gen(gSeed);
+  gPhase='bet'; gReveal=GVIS; gsel.dir=null; gOutcome=null; cd=1800+(gSeed%3000);
+  $('respane').style.display='none'; $('betpane').style.display='block';
+  buildGameControls(); drawChart();
+}
 
 /* ---------------- RANKING ---------------- */
 var PER=[['day','일간'],['week','주간'],['month','월간']], MET=[['ret','수익률'],['assets','자산'],['win','승률']];

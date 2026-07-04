@@ -109,6 +109,8 @@
   .dir.short{color:var(--pink)} .dir.short.on{background:linear-gradient(180deg,rgba(255,92,138,.25),rgba(255,92,138,.05)); border-color:var(--pink); box-shadow:0 0 18px -4px rgba(255,92,138,.5)}
   .dir.watch{color:var(--gold)} .dir.watch.on{background:linear-gradient(180deg,rgba(233,185,73,.22),rgba(233,185,73,.05)); border-color:var(--gold); box-shadow:0 0 18px -4px rgba(233,185,73,.5)}
   .riskbox{margin-top:14px; display:flex; gap:10px; padding:12px; border-radius:12px; background:rgba(14,22,40,.7); border:1px solid var(--navy2); font-size:12px; color:var(--tsec); line-height:1.5}
+  .lbl .sub{color:var(--tmuted); font-weight:400; font-size:10px}
+  .rescard{background:linear-gradient(180deg,#10182b,#0a1120); border:1px solid var(--navy2); border-radius:16px; padding:16px; box-shadow:0 0 30px -10px rgba(233,185,73,.45)}
 
   /* ---------- RANKING ---------- */
   .vh{font-weight:900; font-size:20px; margin:2px 2px 12px; display:flex; align-items:center; gap:8px}
@@ -192,16 +194,22 @@
       </div>
       <div class="chartcard"><canvas id="chart"></canvas></div>
       <div class="indrow" id="indrow"></div>
-      <div class="lbl"><span class="ic">🎯</span>방향 선택 <span style="color:var(--tmuted);font-weight:400">· 차트만 보고 판단</span></div>
-      <div class="dirs" id="dirs">
-        <div class="dir long" data-dir="L"><div class="big">↗ 롱</div><div class="sm">상승 베팅</div></div>
-        <div class="dir short" data-dir="S"><div class="big">↘ 숏</div><div class="sm">하락 베팅</div></div>
-        <div class="dir watch" data-dir="W"><div class="big">◎ 관망</div><div class="sm">포인트 보존</div></div>
+      <div id="betpane">
+        <div class="lbl"><span class="ic">🎯</span>방향 선택 <span class="sub">· 차트만 보고 판단</span></div>
+        <div class="dirs" id="dirs">
+          <div class="dir long" data-dir="L"><div class="big">↗ 롱</div><div class="sm">상승 베팅</div></div>
+          <div class="dir short" data-dir="S"><div class="big">↘ 숏</div><div class="sm">하락 베팅</div></div>
+          <div class="dir watch" data-dir="W"><div class="big">◎ 관망</div><div class="sm">포인트 보존</div></div>
+        </div>
+        <div class="lbl">레버리지</div><div class="row" id="lev"></div>
+        <div class="lbl">베팅 포인트</div><div class="row" id="wag"></div>
+        <div class="lbl">손절 <span class="sub">역방향 도달 시 종료</span></div><div class="row" id="stop"></div>
+        <div class="lbl">익절 <span class="sub">순방향 도달 시 종료</span></div><div class="row" id="take"></div>
+        <div class="lbl">평가 기간</div><div class="row" id="hor"></div>
+        <div class="riskbox"><span>🛡️</span><span id="riskmsg">방향을 선택하면 리스크가 표시됩니다. 신중한 판단으로 전략을 완성하세요!</span></div>
+        <div style="margin-top:14px"><button class="goldbtn" id="submit" type="button"><span class="deco">◄◄</span>&nbsp; <span id="subtxt">방향을 선택하세요</span> &nbsp;<span class="deco">►►</span></button></div>
       </div>
-      <div class="lbl">레버리지</div><div class="row" id="lev"></div>
-      <div class="lbl">평가 기간</div><div class="row" id="hor"></div>
-      <div class="riskbox"><span>🛡️</span><span id="riskmsg">방향을 선택하면 리스크가 표시됩니다. 신중한 판단으로 전략을 완성하세요!</span></div>
-      <div style="margin-top:14px"><button class="goldbtn" id="submit"><span class="deco">◄◄</span>&nbsp; <span id="subtxt">방향을 선택하세요</span> &nbsp;<span class="deco">►►</span></button></div>
+      <div id="respane" style="display:none"></div>
       <div style="text-align:center;color:var(--tmuted);font-size:9.5px;line-height:1.5;margin-top:14px">본 앱은 실제 투자가 아닌 교육용 모의 트레이딩 게임입니다. 포인트는 환전되지 않으며 현실 가치가 없습니다.</div>
     </div>
 
