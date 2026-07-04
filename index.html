@@ -233,7 +233,8 @@ function getBal(){var g=lj(GS);return typeof g.balance==='number'?g.balance:2500
 function setBal(v){var g=lj(GS);g.balance=v;localStorage.setItem(GS,JSON.stringify(g));}
 var hs=lj(HS);
 var EMO={bull:'🐂',bear:'🐻',shark:'🦈',tiger:'🐯',dragon:'🐲',king:'🤴',bike:'🚲',scooter:'🛵',car:'🚗',taxi:'🚕',sports:'🏎️',rocket:'🚀'};
-var IMG={shark:'assets/char_shark.png', rocket:'assets/car_rocket.png'};
+var IMG={shark:'assets/char_shark.png', bull:'assets/char_bull.png', bear:'assets/char_bear.png', tiger:'assets/char_tiger.png', dragon:'assets/char_dragon.png', king:'assets/char_king.png',
+  bike:'assets/car_bike.png', scooter:'assets/car_scooter.png', car:'assets/car_car.png', taxi:'assets/car_taxi.png', sports:'assets/car_sports.png', rocket:'assets/car_rocket.png'};
 var st={nick:hs.nick||'차트고수', ch:(hs.equip&&hs.equip.ch)||'shark', car:(hs.equip&&hs.equip.car)||'bike', title:(hs.equip&&hs.equip.title)||'',
   owned:{char:new Set((hs.owned&&hs.owned.char)||['shark','bull']), car:new Set((hs.owned&&hs.owned.car)||['bike']), title:new Set((hs.owned&&hs.owned.title)||[''])}};
 var jstars = hs.jstars || {c0n0:3, c0n1:2};

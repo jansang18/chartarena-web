@@ -134,6 +134,11 @@
 var $=function(id){return document.getElementById(id);};
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* 허브(차고)에서 장착한 캐릭터·닉네임 공유 */
+var CHIMG={shark:'assets/char_shark.png',bull:'assets/char_bull.png',bear:'assets/char_bear.png',tiger:'assets/char_tiger.png',dragon:'assets/char_dragon.png',king:'assets/char_king.png'};
+var hub={}; try{hub=JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){}
+var myCh=(hub.equip&&hub.equip.ch)||'shark', myNick=hub.nick||'차트고수';
+
 /* 화면폭에 맞춰 가로 무대 스케일 */
 function fit(){ var s=Math.min(1,(window.innerWidth-16)/940); var sc=$('scaler');
   sc.style.transform='scale('+s+')'; sc.style.height=(590*s)+'px'; sc.style.width='940px'; }
@@ -141,7 +146,7 @@ window.addEventListener('resize',fit); fit();
 
 /* 플레이어 (나 + 봇3) */
 var players=[
-  {name:'차트고수', shark:true, score:0, strat:'me', pick:null, lev:2, dp:0},
+  {name:myNick, chImg:CHIMG[myCh]||CHIMG.shark, score:0, strat:'me', pick:null, lev:2, dp:0},
   {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},
   {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
   {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0},
@@ -182,7 +187,7 @@ function drawChart(){
 function renderPods(){
   var lead=Math.max.apply(null,players.map(function(p){return p.score;}));
   $('podiums').innerHTML=players.map(function(p,i){
-    var av=p.shark?'<img src="assets/char_shark.png" alt="">':'<span class="em">'+p.em+'</span>';
+    var av=p.chImg?'<img src="'+p.chImg+'" alt="">':'<span class="em">'+p.em+'</span>';
     var pk=p.pick, reveal=(phase!=='pick'), known=(i===0||reveal)&&pk;   // 봇 선택은 공개 단계에서만
     var pkc=known?pk:'Q', pklab=known?{L:'롱 ↗',S:'숏 ↘',W:'관망 ◎'}[pk]:'?';
     return '<div class="pod">'
