@@ -50,8 +50,8 @@
   /* ===== SIDEBAR ===== */
   .side{width:290px; flex:0 0 auto; padding:11px 13px; border-right:1px solid var(--line); background:linear-gradient(180deg,rgba(14,24,48,.6),rgba(8,14,30,.5)); display:flex; flex-direction:column; overflow-y:auto}
   .profcard{position:relative; border-radius:16px; padding:10px; background:#0a1122; border:1px solid var(--line)}
-  .profcard .ava{width:108px;height:108px;margin:0 auto;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 30%,#12203a,#070c16);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center}
-  .profcard .ava img{width:100%;height:100%;object-fit:cover}
+  .profcard .ava{width:108px;height:108px;margin:0 auto;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.18),rgba(140,160,200,.06) 52%,#0a1120 82%);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center}
+  .profcard .ava img{width:100%;height:100%;object-fit:contain;padding:6px}
   .profcard .ava .em{font-size:58px}
   .profcard .ava .car{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);font-size:22px}
   .profcard .edit{position:absolute;right:12px;top:12px;width:30px;height:30px;border-radius:50%;background:rgba(233,185,73,.12);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
@@ -173,8 +173,8 @@
   .gwrap{display:flex; gap:16px}
   .gleft{flex:0 0 260px}
   .gprev{border-radius:16px; padding:18px; text-align:center; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
-  .gprev .pv{width:170px;height:170px;margin:0 auto;border-radius:14px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 30%,#12203a,#070c16);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -6px rgba(178,102,255,.4)}
-  .gprev .pv img{width:100%;height:100%;object-fit:cover}.gprev .pv .em{font-size:90px}.gprev .pv .car{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:34px}
+  .gprev .pv{width:170px;height:170px;margin:0 auto;border-radius:14px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.2),rgba(140,160,200,.07) 52%,#0a1120 82%);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -6px rgba(178,102,255,.4)}
+  .gprev .pv img{width:100%;height:100%;object-fit:contain;padding:10px}.gprev .pv .em{font-size:90px}.gprev .pv .car{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:34px}
   .gprev .nm{font-weight:800;font-size:16px;margin-top:12px}
   .gprev .tt{color:var(--gold);font-size:12px;font-weight:700;margin-top:3px}
   .catcol{margin-top:14px; display:flex; flex-direction:column; gap:7px}
@@ -183,7 +183,8 @@
   .shop{flex:1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-content:start}
   .item{position:relative; border-radius:14px; padding:14px 8px; text-align:center; cursor:pointer; background:var(--p1); border:1.5px solid var(--line)}
   .item .em{font-size:40px}.item .em.tx{font-size:15px;font-weight:900;padding:10px 2px}
-  .item img{height:64px; object-fit:contain}
+  .item .pic{height:78px;display:flex;align-items:center;justify-content:center;border-radius:12px;margin-bottom:2px;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.16),rgba(150,168,205,.05) 55%,rgba(255,255,255,0) 76%)}
+  .item .pic img{height:66px; object-fit:contain}
   .item .nm{font-weight:800;font-size:13px;margin-top:5px}
   .item .rr{font-size:10px;font-weight:800;margin-top:2px}
   .item .pr{font-family:var(--mono);font-size:12px;margin-top:4px;color:var(--gold)}
@@ -372,6 +373,7 @@ var hs=lj(HS);
 var EMO={bull:'🐂',bear:'🐻',shark:'🦈',tiger:'🐯',dragon:'🐲',king:'🤴',bike:'🚲',scooter:'🛵',car:'🚗',taxi:'🚕',sports:'🏎️',rocket:'🚀'};
 var IMG={shark:'assets/char_shark.png', bull:'assets/char_bull.png', bear:'assets/char_bear.png', tiger:'assets/char_tiger.png', dragon:'assets/char_dragon.png', king:'assets/char_king.png',
   bike:'assets/car_bike.png', scooter:'assets/car_scooter.png', car:'assets/car_car.png', taxi:'assets/car_taxi.png', sports:'assets/car_sports.png', rocket:'assets/car_rocket.png'};
+for(var _pi=0;_pi<45;_pi++)IMG['pet'+_pi]='assets/pet'+_pi+'.png';
 var st={nick:hs.nick||'차트고수', ch:(hs.equip&&hs.equip.ch)||'shark', car:(hs.equip&&hs.equip.car)||'bike', title:(hs.equip&&hs.equip.title)||'',
   owned:{char:new Set((hs.owned&&hs.owned.char)||['shark','bull']), car:new Set((hs.owned&&hs.owned.car)||['bike']), title:new Set((hs.owned&&hs.owned.title)||[''])}};
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
@@ -426,7 +428,8 @@ function renderRank(){ refreshProfile();
 document.addEventListener('click',function(e){var p=e.target.closest('[data-per]');if(p){rp=p.dataset.per;renderRank();}var m=e.target.closest('[data-met]');if(m){rm=m.dataset.met;renderRank();}});
 
 /* GARAGE */
-var ITEMS={char:[['bull','황소',0],['bear','곰',3000],['shark','상어',8000],['tiger','호랑이',15000],['dragon','드래곤',35000],['king','킹',80000]],
+var PETS=[['pet8','토끼',2000],['pet7','아기돼지',2200],['pet1','젖소',2500],['pet6','생쥐',2500],['pet2','코기',3000],['pet4','아기곰',3000],['pet16','고양이',3200],['pet35','파랑고양이',3200],['pet24','강아지',3500],['pet17','퍼그',3500],['pet26','아기원숭이',3800],['pet27','거북이',4000],['pet3','코알라',5000],['pet10','하마',5500],['pet19','원숭이',6000],['pet21','조랑말',6500],['pet38','말',7000],['pet15','숫양',7500],['pet31','아기사슴',8000],['pet0','사슴',8500],['pet25','펭귄',9000],['pet12','갈색곰',9500],['pet13','불곰',10000],['pet11','순록',11000],['pet18','너구리',11500],['pet41','라쿤',12000],['pet42','수달',12500],['pet32','나무늘보',13000],['pet39','불독',14000],['pet5','판다',16000],['pet37','레서판다',18000],['pet36','기린',20000],['pet20','얼룩말',22000],['pet44','시바견',24000],['pet9','코끼리',26000],['pet14','붉은소',30000],['pet23','보라황소',34000],['pet30','멧돼지',36000],['pet28','흑마',40000],['pet43','스컹크',42000],['pet22','표범',48000],['pet33','북극곰',60000],['pet29','늑대',75000],['pet40','독수리',95000],['pet34','아기호랑이',120000]];
+var ITEMS={char:[['bull','황소',0],['bear','곰',3000],['shark','상어',8000],['tiger','호랑이',15000],['dragon','드래곤',35000],['king','킹',80000]].concat(PETS),
   car:[['bike','자전거',0],['scooter','스쿠터',2500],['car','경차',7000],['taxi','세단',16000],['sports','스포츠카',40000],['rocket','슈퍼카',90000]],
   title:[['','없음',0],['개미','개미 트레이더',2000],['존버의 신','존버의 신',12000],['청산 마스터','청산 마스터',22000],['🐋 고래','고래',60000],['전설','전설의 트레이더',120000]]};
 var gcat='char';
@@ -437,7 +440,7 @@ function renderGarage(){ refreshProfile();
   var CN=[['char','캐릭터'],['car','자동차'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<div class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</div>';}).join('');
   $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=st.owned[gcat].has(id),eq=(gcat==='char'?st.ch:gcat==='car'?st.car:st.title)===id;var rr=rar(pr);
-    var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':(IMG[id]?'<img src="'+IMG[id]+'" alt="">':'<div class="em">'+EMO[id]+'</div>');
+    var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':(IMG[id]?'<div class="pic"><img src="'+IMG[id]+'" alt=""></div>':'<div class="pic"><div class="em">'+EMO[id]+'</div></div>');
     var stt=eq?'<div class="st" style="background:var(--gold);color:#111">장착중</div>':own?'<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>':'';
     var price=pr===0?'<div class="pr" style="color:var(--ts)">기본</div>':own?'<div class="pr" style="color:var(--ts)">보유</div>':'<div class="pr">'+fmt(pr)+' P</div>';
     return '<div class="item" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':rr[1]+'55')+';box-shadow:'+(eq?'0 0 16px -6px '+rr[1]:'none')+'">'+stt+vis+'<div class="nm">'+nm+'</div><div class="rr" style="color:'+rr[1]+'">'+rr[0]+'</div>'+price+'</div>';
