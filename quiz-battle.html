@@ -252,7 +252,7 @@ function botPick(p){
 
 /* 라운드 시작 */
 function startRound(){
-  phase='pick'; GD=gen(round*99173+7); gRev=GD.vis; tleft=8; mySel={dir:null,lev:2};
+  phase='pick'; GD=gen(Math.floor(Math.random()*2e9)+1); gRev=GD.vis; tleft=8; mySel={dir:null,lev:2};
   players.forEach(function(p){p.pick=null;p.dp=0;});
   $('round').textContent='ROUND '+round+' / '+ROUNDS;
   $('tvtag').textContent='난이도 '+'◆'.repeat(3+(round%3))+'◇'.repeat(5-(3+(round%3)));
