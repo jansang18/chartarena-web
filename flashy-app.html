@@ -44,10 +44,10 @@
   .row{display:flex; gap:6px}
 
   /* ---------- HOME ---------- */
-  .hero{display:flex; gap:16px; align-items:center; position:relative}
+  .hero{display:flex; flex-direction:column; align-items:center; gap:10px; position:relative}
   .edit{position:absolute; right:0; top:0; width:34px; height:34px; border-radius:50%; background:rgba(233,185,73,.12); border:1px solid rgba(233,185,73,.5); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:14px}
   .ava{position:relative; width:104px; height:104px; flex:0 0 auto; display:flex; align-items:center; justify-content:center}
-  .ava .ring{position:absolute; inset:0; border-radius:50%; background:conic-gradient(from 0deg,#7a5a17,#F6D272,#8A6D2B,#F6D272,#7a5a17); animation:spin 7s linear infinite; filter:drop-shadow(0 0 10px rgba(233,185,73,.5))}
+  .ava .ring{position:absolute; inset:0; border-radius:50%; background:conic-gradient(from 0deg,#7a5a17,#F6D272,#8A6D2B,#F6D272,#7a5a17); filter:drop-shadow(0 0 8px rgba(233,185,73,.4))}
   @keyframes spin{to{transform:rotate(360deg)}}
   .ava .disk{position:absolute; inset:6px; border-radius:50%; background:radial-gradient(circle at 50% 35%,#12203a,#070c16 70%); border:1px solid rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center}
   .ava .ch{font-size:52px; filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
