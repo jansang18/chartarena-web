@@ -119,6 +119,25 @@
   .item .pr{font-family:var(--mono);font-size:11px;margin-top:3px;color:var(--gold)}
   .item .st{position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px}
 
+  /* JOURNEY */
+  .jstars{margin-left:auto; color:var(--gold); font-family:var(--mono); font-weight:800; font-size:14px}
+  .chapter{margin-bottom:12px}
+  .chhead{display:flex; align-items:center; gap:8px; margin-bottom:7px}
+  .chhead .num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px}
+  .chhead .nm{font-weight:800;font-size:14px} .chhead .sb{color:var(--ts);font-size:11px} .chhead .cnt{margin-left:auto;font-family:var(--mono);font-weight:800;font-size:12px}
+  .jrow{display:flex; align-items:center}
+  .jnode{display:flex; flex-direction:column; align-items:center; flex:0 0 auto; width:58px}
+  .jconn{flex:1; height:6px; border-radius:3px; min-width:12px}
+  .jcirc{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;border:2px solid}
+  .jstar{font-size:10px; height:13px; line-height:13px; color:var(--gold)}
+  .jtag{font-size:8px; font-weight:800; color:var(--gold); margin-top:1px}
+  /* TRAIN */
+  .trainGrid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .tcard{border-radius:14px; padding:14px; background:linear-gradient(135deg,var(--p2),var(--p1)); border:1px solid var(--line); display:flex; gap:12px; align-items:center}
+  .tcard .ic{font-size:34px} .tcard .b{flex:1; min-width:0} .tcard h4{margin:0;font-size:15px;font-weight:800} .tcard p{margin:3px 0 0;font-size:11px;color:var(--ts);line-height:1.4}
+  .tcard .rec{font-size:10px;color:var(--gold);font-family:var(--mono);margin-top:4px}
+  .tcard .start{border:none;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a2107;font-weight:800;font-size:12px;padding:9px 15px;border-radius:9px;cursor:pointer;font-family:inherit}
+
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) scale(.9);z-index:99;background:rgba(6,12,26,.96);border:1px solid var(--gold);color:var(--gold);font-weight:800;font-size:13px;padding:10px 18px;border-radius:11px;opacity:0;transition:.2s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
 </style>
@@ -145,6 +164,8 @@
     <div class="nav" id="nav">
       <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
       <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
+      <a data-go="journey"><span class="ic">🗺️</span>여정</a>
+      <a data-go="train"><span class="ic">🥷</span>훈련</a>
       <a data-go="garage"><span class="ic">🏎️</span>차고 · 꾸미기</a>
       <a class="batt" href="quiz-battle.html"><span class="ic">⚔️</span>차트배틀 LIVE</a>
     </div>
@@ -158,8 +179,8 @@
       <div class="rcards" id="rcards"></div>
       <div class="tiles">
         <div class="tile t-battle" data-href="quiz-battle.html"><div class="blob"></div><img class="art" src="assets/tile_battle.png" alt=""><h3>차트 배틀 LIVE</h3><p>4인 퀴즈쇼 대결</p></div>
-        <div class="tile t-journey" data-toast="여정 지도"><div class="blob"></div><img class="art" src="assets/tile_journey.png" alt=""><h3>여정</h3><p>챕터 지도 도전</p></div>
-        <div class="tile t-train" data-toast="훈련"><div class="blob"></div><img class="art" src="assets/tile_train.png" alt=""><h3>훈련</h3><p>생존·도장·아레나</p></div>
+        <div class="tile t-journey" data-go="journey"><div class="blob"></div><img class="art" src="assets/tile_journey.png" alt=""><h3>여정</h3><p>챕터 지도 도전</p></div>
+        <div class="tile t-train" data-go="train"><div class="blob"></div><img class="art" src="assets/tile_train.png" alt=""><h3>훈련</h3><p>생존·도장·아레나</p></div>
         <div class="tile t-garage" data-go="garage"><div class="blob"></div><img class="art" src="assets/car_rocket.png" alt=""><h3>차고 · 꾸미기</h3><p>캐릭터·자동차·칭호</p></div>
         <div class="tile wide t-rank" data-go="rank"><div class="blob"></div><img class="art" src="assets/tile_rank.png" alt=""><h3>랭킹</h3><p>수익률 · 자산 · 승률 / 일 · 주 · 월</p></div>
       </div>
@@ -181,6 +202,16 @@
         </div>
         <div class="shop" id="shop"></div>
       </div>
+    </div>
+
+    <div class="view" id="v-journey">
+      <div class="vh">🗺️ 여정 <span class="jstars" id="jstars">⭐ 0/75</span></div>
+      <div id="chapters"></div>
+    </div>
+
+    <div class="view" id="v-train">
+      <div class="vh">🥷 훈련</div>
+      <div class="trainGrid" id="trainGrid"></div>
     </div>
   </div>
 </div></div>
@@ -205,7 +236,8 @@ var EMO={bull:'🐂',bear:'🐻',shark:'🦈',tiger:'🐯',dragon:'🐲',king:'�
 var IMG={shark:'assets/char_shark.png', rocket:'assets/car_rocket.png'};
 var st={nick:hs.nick||'차트고수', ch:(hs.equip&&hs.equip.ch)||'shark', car:(hs.equip&&hs.equip.car)||'bike', title:(hs.equip&&hs.equip.title)||'',
   owned:{char:new Set((hs.owned&&hs.owned.char)||['shark','bull']), car:new Set((hs.owned&&hs.owned.car)||['bike']), title:new Set((hs.owned&&hs.owned.title)||[''])}};
-function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,equip:{ch:st.ch,car:st.car,title:st.title},owned:{char:[...st.owned.char],car:[...st.owned.car],title:[...st.owned.title]}}));}
+var jstars = hs.jstars || {c0n0:3, c0n1:2};
+function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,equip:{ch:st.ch,car:st.car,title:st.title},owned:{char:[...st.owned.char],car:[...st.owned.car],title:[...st.owned.title]},jstars:jstars}));}
 
 function avaHTML(){ var ch=st.ch,car=st.car;
   var inner = IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="em">'+EMO[ch]+'</span>';
@@ -224,7 +256,7 @@ function go(v){
   $('v-'+v).classList.add('on');
   document.querySelectorAll('#nav a[data-go]').forEach(function(a){a.classList.toggle('on',a.dataset.go===v);});
   document.querySelector('.main').scrollTop=0;
-  if(v==='home')renderHome(); if(v==='rank')renderRank(); if(v==='garage')renderGarage();
+  if(v==='home')renderHome(); if(v==='rank')renderRank(); if(v==='garage')renderGarage(); if(v==='journey')renderJourney(); if(v==='train')renderTrain();
 }
 document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return;}
@@ -288,6 +320,39 @@ document.addEventListener('click',function(e){
   else { var bal=getBal(); if(bal>=pr){ setBal(bal-pr); st.owned[gcat].add(id); equip(); saveHS(); toast('🛒 '+row[1]+' 구매 & 장착!'); } else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); return; } }
   renderGarage();
 });
+
+/* JOURNEY */
+var CH=[{n:'캔들 기초',s:'봉 읽기부터',c:'#E9B949'},{n:'추세와 이평선',s:'흐름을 읽어라',c:'#4CC3FF'},{n:'지표 읽기',s:'RSI·MACD',c:'#B980FF'},{n:'리스크 관리',s:'손절·레버리지',c:'#F0616D'},{n:'일목·실전',s:'구름과 실전',c:'#35D07A'}];
+var JN=[];(function(){for(var c=0;c<5;c++)for(var k=0;k<5;k++)JN.push('c'+c+'n'+k);})();
+function jClr(id){return (jstars[id]||0)>=1;}
+function jUnl(id){var i=JN.indexOf(id);return i<=0||jClr(JN[i-1]);}
+function jNext(){return JN.find(function(id){return jUnl(id)&&!jClr(id);});}
+function jTot(){return JN.reduce(function(s,id){return s+Math.min(3,jstars[id]||0);},0);}
+function renderJourney(){
+  $('jstars').textContent='⭐ '+jTot()+'/75';
+  var nx=jNext();
+  $('chapters').innerHTML=CH.map(function(ch,ci){
+    var earned=0;for(var k=0;k<5;k++)earned+=Math.min(3,jstars['c'+ci+'n'+k]||0);
+    var un0= ci===0||jClr('c'+(ci-1)+'n4'), row='';
+    for(var k=0;k<5;k++){var id='c'+ci+'n'+k,s=Math.min(3,jstars[id]||0),cl=jClr(id),un=jUnl(id),cur=nx===id;
+      var star='<div class="jstar">'+(cl?('★'.repeat(s)+'☆'.repeat(3-s)):'')+'</div>',circ,tag='';
+      if(cl) circ='<div class="jcirc" style="background:'+ch.c+';border-color:'+ch.c+';color:#081018;cursor:pointer" data-jn="'+id+'">'+(k+1)+'</div>';
+      else if(!un) circ='<div class="jcirc" style="background:#0e1830;border-color:var(--line);color:var(--tm)">🔒</div>';
+      else { circ='<div class="jcirc" style="background:#16223e;border-color:var(--gold);color:var(--gold);cursor:pointer" data-jn="'+id+'">'+(k+1)+'</div>'; if(cur)tag='<div class="jtag">도전!</div>'; }
+      var conn = k>0?'<div class="jconn" style="background:'+(jClr('c'+ci+'n'+(k-1))?ch.c:'#16223e')+'"></div>':'';
+      row+=conn+'<div class="jnode">'+star+circ+tag+'</div>';
+    }
+    return '<div class="chapter"><div class="chhead"><div class="num" style="color:'+ch.c+';background:'+ch.c+'22;border:1.5px solid '+ch.c+'">'+(ci+1)+'</div><div><div class="nm">'+ch.n+'</div><div class="sb">'+ch.s+'</div></div><div class="cnt" style="color:'+ch.c+'">'+(un0?('⭐ '+earned+'/15'):'🔒')+'</div></div><div class="jrow">'+row+'</div></div>';
+  }).join('');
+}
+document.addEventListener('click',function(e){var jn=e.target.closest('[data-jn]');if(!jn)return;var id=jn.dataset.jn;if(!jUnl(id))return;
+  var s=1+((id.charCodeAt(1)+id.charCodeAt(3)*3)%3); jstars[id]=Math.max(jstars[id]||0,s); saveHS();
+  toast('레벨 '+(+id[1]+1)+'-'+(+id[3]+1)+' 클리어! '+'★'.repeat(s)); renderJourney();});
+
+/* TRAIN */
+var TRAIN=[{ic:'💀',n:'생존 모드',d:'롱/숏만으로 연속 도전 — 손익<0이면 종료',rec:'최고 12라운드'},{ic:'🕯️',n:'캔들 도장',d:'강조된 캔들 패턴 4지선다(17종 감지)',rec:'정답률 78%'},{ic:'📐',n:'황금비율 던전',d:'피보나치 되돌림 위치 예측',rec:'정답률 64%'},{ic:'⚔️',n:'롱숏 아레나',d:'트레이딩 봇 6명과 레이팅 대결',rec:'레이팅 1180'}];
+function renderTrain(){ $('trainGrid').innerHTML=TRAIN.map(function(t){return '<div class="tcard"><div class="ic">'+t.ic+'</div><div class="b"><h4>'+t.n+'</h4><p>'+t.d+'</p><div class="rec">'+t.rec+'</div></div><button class="start" type="button" data-train="'+t.n+'">시작</button></div>';}).join(''); }
+document.addEventListener('click',function(e){var t=e.target.closest('[data-train]');if(t)toast(t.dataset.train+' — 데모');});
 
 renderHome();
 })();
