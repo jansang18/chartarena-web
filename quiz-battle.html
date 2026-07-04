@@ -87,6 +87,13 @@
     color:var(--gold); font-weight:800; font-size:13px; padding:8px 16px; border-radius:10px; opacity:0; transition:.2s; pointer-events:none}
   .msg.show{opacity:1}
   @media (prefers-reduced-motion: reduce){ .live{animation:none} }
+  .blogo{height:34px;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  #splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(closest-side at 50% 44%,#0f1c39,#05070f 82%);transition:opacity .5s ease}
+  #splash img{max-width:min(74%,820px);max-height:68%;object-fit:contain;filter:drop-shadow(0 24px 60px rgba(0,0,0,.75));animation:splashPop .85s cubic-bezier(.2,.8,.2,1) both}
+  #splash.out{opacity:0;pointer-events:none}
+  @keyframes splashPop{0%{transform:scale(.82);opacity:0}55%{opacity:1}100%{transform:scale(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){#splash img{animation:none}}
 </style>
 
 <div class="cap">
@@ -101,7 +108,7 @@
   <div class="spot s1"></div><div class="spot s2"></div><div class="spot s3"></div><div class="spot s4"></div>
 
   <div class="top">
-    <div class="logo">차트<span class="g">아레나</span></div>
+    <img class="blogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <span class="live">● LIVE</span>
     <span class="round" id="round">ROUND 1 / 5</span>
     <button class="endbtn" type="button" id="endbtn">종료</button>
@@ -128,11 +135,17 @@
 </div>
 </div>
 
+<div id="splash"><img src="assets/logo.png" alt="차트아레나"></div>
 <script>
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* 인트로 스플래시 (세션당 1회) */
+(function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash_b');}catch(e){}
+  if(seen){if(s.parentNode)s.parentNode.removeChild(s);return;}
+  try{sessionStorage.setItem('ca_splash_b','1');}catch(e){}
+  setTimeout(function(){s.classList.add('out');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},520);},reduce?500:1300);})();
 
 /* 허브(차고)에서 장착한 캐릭터·닉네임 공유 */
 var CHIMG={shark:'assets/char_shark.png',bull:'assets/char_bull.png',bear:'assets/char_bear.png',tiger:'assets/char_tiger.png',dragon:'assets/char_dragon.png',king:'assets/char_king.png'};

@@ -18,7 +18,13 @@
   .topbar{height:56px; flex:0 0 auto; display:flex; align-items:center; gap:14px; padding:0 22px; border-bottom:1px solid var(--line); background:rgba(8,14,30,.55)}
   .logo{font-weight:900; font-size:22px; letter-spacing:-.5px; display:flex; align-items:center; gap:9px}
   .logo .g{color:var(--gold)} .logo .lm{font-size:20px}
-  .brandlogo{height:48px; display:block; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  .brandlogo{height:34px; display:block; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+  #splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(closest-side at 50% 44%,#0f1c39,#05070f 82%);transition:opacity .5s ease}
+  #splash img{max-width:min(74%,820px);max-height:68%;object-fit:contain;filter:drop-shadow(0 24px 60px rgba(0,0,0,.75));animation:splashPop .85s cubic-bezier(.2,.8,.2,1) both}
+  #splash.out{opacity:0;pointer-events:none}
+  @keyframes splashPop{0%{transform:scale(.82);opacity:0}55%{opacity:1}100%{transform:scale(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){#splash img{animation:none}}
   .tsp{flex:1}
   .curr{display:flex; align-items:center; gap:10px}
   .pill{display:flex; align-items:center; gap:8px; background:#0a1122; border:1px solid var(--line); border-radius:999px; padding:5px 8px 5px 8px; font-weight:800; font-family:var(--mono); font-size:15px}
@@ -203,7 +209,7 @@
 
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
-    <img class="brandlogo" src="assets/logo.png" alt="차트아레나">
+    <img class="brandlogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <div class="tsp"></div>
     <div class="curr">
       <div class="pill coin"><span class="cico">$</span><span>12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
@@ -332,6 +338,7 @@
 
 </div></div>
 <div class="toast" id="toast"></div>
+<div id="splash"><img src="assets/logo.png" alt="차트아레나"></div>
 
 <script>
 (function(){
@@ -339,6 +346,12 @@
 var $=function(id){return document.getElementById(id);};
 function fit(){var s=Math.min(1,(window.innerWidth-12)/1672);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(770*s)+'px';sc.style.width='1672px';}
 window.addEventListener('resize',fit);fit();
+/* 인트로 스플래시 (세션당 1회) */
+(function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash');}catch(e){}
+  if(seen){if(s.parentNode)s.parentNode.removeChild(s);return;}
+  try{sessionStorage.setItem('ca_splash','1');}catch(e){}
+  var reduce=false;try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  setTimeout(function(){s.classList.add('out');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},520);},reduce?500:1300);})();
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1300);}
 var fmt=function(n){return Math.round(n).toLocaleString();};
 
