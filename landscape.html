@@ -1,0 +1,294 @@
+<title>차트아레나 — 가로 앱 (홈·랭킹·차고)</title>
+<style>
+  :root{
+    --bg:#070d1c; --p1:#0e1830; --p2:#16223e; --line:#22335a;
+    --gold:#E9B949; --gold2:#F6D272; --green:#35D07A; --blue:#4CA9FF; --pink:#FF5C8A; --purple:#B266FF; --teal:#2FE6C4; --orange:#FF9A3C;
+    --tp:#EAF0FA; --ts:#93A0BC; --tm:#5A6478;
+    --sans:"Segoe UI",-apple-system,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+    --mono:"Cascadia Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#05070f; color:var(--tp); font-family:var(--sans); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:16px 8px; overflow-x:hidden}
+  .cap{max-width:560px; text-align:center; margin-bottom:10px}
+  .cap .k{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#8A6D2B; font-weight:700}
+  .cap h1{margin:.3em 0 .1em; font-size:20px; font-weight:800}
+  .cap p{margin:0; color:var(--ts); font-size:12.5px}
+  .cap .r{margin-top:7px; font-size:11px; color:var(--tm)}
+
+  .scaler{transform-origin:top center}
+  .frame{width:940px; height:590px; border-radius:20px; overflow:hidden; display:flex;
+    background:radial-gradient(120% 90% at 30% 0%, #12203c, #0a1327 55%, #060c1a);
+    box-shadow:0 30px 70px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
+
+  /* 좌측 레일 */
+  .rail{width:246px; flex:0 0 auto; padding:16px 14px; border-right:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(14,24,48,.7),rgba(8,14,30,.7)); display:flex; flex-direction:column}
+  .brand{font-weight:900; font-size:18px; margin-bottom:12px}
+  .brand .g{color:var(--gold)}
+  .avwrap{position:relative; border-radius:16px; padding:12px; background:#0a1122; border:1px solid var(--line); text-align:center}
+  .avwrap .ava{width:130px; height:130px; margin:0 auto; border-radius:14px; overflow:hidden; background:radial-gradient(circle at 50% 30%,#12203a,#070c16); border:1px solid var(--line); position:relative; display:flex; align-items:center; justify-content:center}
+  .avwrap .ava img{width:100%; height:100%; object-fit:cover}
+  .avwrap .ava .em{font-size:70px}
+  .avwrap .ava .car{position:absolute; bottom:4px; left:50%; transform:translateX(-50%); font-size:26px}
+  .avwrap .edit{position:absolute; right:10px; top:10px; width:28px;height:28px;border-radius:50%;background:rgba(233,185,73,.12);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer}
+  .nickrow{display:flex; justify-content:center; align-items:center; gap:6px; margin-top:10px}
+  .nick{background:transparent; border:none; color:var(--tp); font-weight:900; font-size:17px; text-align:center; width:100%; font-family:inherit}
+  .nick:focus{outline:none; border-bottom:1px dashed var(--gold)}
+  .title{margin-top:5px; font-size:11px; font-weight:800; color:var(--gold)}
+  .chips{display:flex; gap:6px; justify-content:center; margin-top:8px}
+  .chip{font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; font-family:var(--mono)}
+  .chip.lv{color:#2a2107; background:linear-gradient(180deg,var(--gold2),var(--gold))}
+  .chip.fire{color:var(--tp); background:rgba(255,120,60,.14); border:1px solid rgba(255,120,60,.4)}
+  .assets{margin-top:14px; text-align:center; background:#0a1122; border:1px solid var(--line); border-radius:12px; padding:10px}
+  .assets .l{font-size:10px; letter-spacing:.14em; color:#8A6D2B; font-weight:800}
+  .assets .v{font-family:var(--mono); font-weight:900; font-size:26px; line-height:1.1;
+    background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+  .nav{margin-top:14px; display:flex; flex-direction:column; gap:7px}
+  .nav a{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; text-decoration:none; color:var(--ts); font-weight:800; font-size:14px; background:#0d1730; border:1px solid var(--line); cursor:pointer}
+  .nav a .ic{font-size:17px}
+  .nav a.on{color:var(--gold); border-color:var(--gold); background:rgba(233,185,73,.08)}
+  .nav a.batt{color:#04223f; background:linear-gradient(180deg,#8fd6ff,#4CA9FF); border-color:transparent}
+  .foot{margin-top:auto; color:var(--tm); font-size:9px; line-height:1.4}
+
+  /* 메인 */
+  .main{flex:1; min-width:0; padding:16px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent}
+  .main::-webkit-scrollbar{width:7px}.main::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  .view{display:none} .view.on{display:block}
+  .vh{font-weight:900; font-size:19px; margin:0 0 12px; display:flex; align-items:center; gap:8px}
+
+  /* HOME */
+  .rcards{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+  .rc{border-radius:14px; padding:12px; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line); position:relative; overflow:hidden}
+  .rc .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .rc .t{font-size:11px; color:var(--ts); margin-top:6px}
+  .rc .rk{font-size:22px; font-weight:900; margin-top:1px}
+  .rc .d{font-size:11px; font-weight:800; font-family:var(--mono)}
+  .up{color:var(--green)} .dn{color:var(--pink)} .fl{color:var(--ts)}
+  .tiles{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
+  .tile{position:relative; border-radius:16px; padding:15px; min-height:96px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.07)}
+  .tile.wide{grid-column:1/-1; min-height:74px}
+  .tile h3{margin:0; font-size:17px; font-weight:900; position:relative; z-index:1}
+  .tile p{margin:3px 0 0; font-size:11px; color:rgba(255,255,255,.72); position:relative; z-index:1}
+  .tile .blob{position:absolute; width:150px;height:150px;border-radius:50%;right:-40px;bottom:-50px;filter:blur(6px);opacity:.5}
+  .tile img.art{position:absolute; right:-8px; bottom:-10px; height:118px; filter:drop-shadow(0 8px 14px rgba(0,0,0,.55)); z-index:1}
+  .tile.wide img.art{height:80px; right:8px; bottom:6px}
+  .t-battle{background:linear-gradient(135deg,#0d3a34,#0b1b2a)} .t-battle .blob{background:var(--teal)}
+  .t-journey{background:linear-gradient(135deg,#0e2a52,#0b1730)} .t-journey .blob{background:var(--blue)}
+  .t-train{background:linear-gradient(135deg,#3a2410,#1b1428)} .t-train .blob{background:var(--orange)}
+  .t-rank{background:linear-gradient(110deg,#2a2410,#12162a)} .t-rank .blob{background:var(--gold)}
+  .t-garage{background:linear-gradient(135deg,#2a184a,#141033)} .t-garage .blob{background:var(--purple)}
+
+  /* RANKING */
+  .tabs{display:flex; gap:6px; margin-bottom:8px}
+  .tab{padding:8px 14px; border-radius:9px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:13px; cursor:pointer}
+  .tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:#2a2107; border-color:transparent}
+  .tab.sm.on{background:var(--p2); color:var(--gold); border-color:var(--gold)}
+  .rankwrap{display:flex; gap:14px}
+  .podium{flex:0 0 300px; display:flex; align-items:flex-end; gap:8px}
+  .ped{flex:1; text-align:center; border-radius:12px 12px 8px 8px; padding:10px 4px; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
+  .ped.p1{border-color:var(--gold); box-shadow:0 0 22px -6px rgba(233,185,73,.5); padding-bottom:18px}
+  .ped .med{font-size:20px}.ped .pav{font-size:26px;margin:2px 0}.ped .pcar{font-size:14px}
+  .ped .pn{font-size:11px;font-weight:800;margin-top:2px} .ped .pt{font-size:8px;color:var(--gold)} .ped .ps{font-size:12px;font-weight:900;font-family:var(--mono);margin-top:2px}
+  .rlist{flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; align-content:start}
+  .rrow{display:flex; align-items:center; gap:8px; padding:7px 9px; border-radius:9px; background:var(--p1); border:1px solid var(--line)}
+  .rrow.me{border-color:var(--gold); background:rgba(233,185,73,.07)}
+  .rrow .rk{width:18px;text-align:center;font-weight:900;font-family:var(--mono);color:var(--ts);font-size:12px}
+  .rrow .rav{font-size:17px;width:20px;text-align:center}
+  .rrow .rn{flex:1;min-width:0}
+  .rrow .rn .n{font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rrow .rn .s{font-size:9px;color:var(--tm);font-family:var(--mono)}
+  .rrow .rv{font-family:var(--mono);font-weight:900;font-size:13px}
+
+  /* GARAGE */
+  .gwrap{display:flex; gap:14px}
+  .gleft{flex:0 0 240px}
+  .gprev{border-radius:16px; padding:16px; text-align:center; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
+  .gprev .pv{width:150px;height:150px;margin:0 auto;border-radius:14px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 30%,#12203a,#070c16);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -6px rgba(178,102,255,.4)}
+  .gprev .pv img{width:100%;height:100%;object-fit:cover}.gprev .pv .em{font-size:78px}.gprev .pv .car{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:30px}
+  .gprev .nm{font-weight:800;font-size:15px;margin-top:10px}
+  .gprev .tt{color:var(--gold);font-size:11px;font-weight:700;margin-top:3px}
+  .catcol{margin-top:12px; display:flex; flex-direction:column; gap:6px}
+  .cat{padding:9px 12px; border-radius:10px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:13px; cursor:pointer; text-align:center}
+  .cat.on{background:var(--p2); color:var(--gold); border-color:var(--gold)}
+  .shop{flex:1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; align-content:start}
+  .item{position:relative; border-radius:14px; padding:12px 6px; text-align:center; cursor:pointer; background:var(--p1); border:1.5px solid var(--line)}
+  .item .em{font-size:34px}.item .em.tx{font-size:14px;font-weight:900;padding:8px 2px}
+  .item img{height:52px; object-fit:contain}
+  .item .nm{font-weight:800;font-size:12px;margin-top:4px}
+  .item .rr{font-size:9px;font-weight:800;margin-top:1px}
+  .item .pr{font-family:var(--mono);font-size:11px;margin-top:3px;color:var(--gold)}
+  .item .st{position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) scale(.9);z-index:99;background:rgba(6,12,26,.96);border:1px solid var(--gold);color:var(--gold);font-weight:800;font-size:13px;padding:10px 18px;border-radius:11px;opacity:0;transition:.2s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+</style>
+
+<div class="cap">
+  <div class="k">ChartArena · 가로 앱</div>
+  <h1>🖥️ 홈 · 랭킹 · 차고 (가로 3분할)</h1>
+  <p>레퍼런스처럼 <b style="color:var(--tp)">좌측 프로필 레일 + 메인</b> 구조. 차고에서 사고 장착하면 좌측·랭킹에 바로 반영.</p>
+  <div class="r">📱 폰이면 가로로 · 폭에 맞게 축소됩니다</div>
+</div>
+
+<div class="scaler" id="scaler"><div class="frame">
+  <!-- 좌측 레일 -->
+  <div class="rail">
+    <div class="brand">차트<span class="g">아레나</span></div>
+    <div class="avwrap">
+      <div class="ava" id="railAva"></div>
+      <div class="edit">✏️</div>
+    </div>
+    <div class="nickrow"><input class="nick" id="nick" value="차트고수" maxlength="10" aria-label="닉네임"></div>
+    <div class="title" id="railTitle"></div>
+    <div class="chips"><span class="chip lv">Lv.12</span><span class="chip fire">🔥 7일</span></div>
+    <div class="assets"><div class="l">보유 자산</div><div class="v" id="railAmt">25,000 P</div></div>
+    <div class="nav" id="nav">
+      <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
+      <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
+      <a data-go="garage"><span class="ic">🏎️</span>차고 · 꾸미기</a>
+      <a class="batt" href="quiz-battle.html"><span class="ic">⚔️</span>차트배틀 LIVE</a>
+    </div>
+    <div class="foot">포인트/자산은 가상 재화이며 환전되지 않습니다.</div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main">
+    <div class="view on" id="v-home">
+      <div class="vh">🏠 홈</div>
+      <div class="rcards" id="rcards"></div>
+      <div class="tiles">
+        <div class="tile t-battle" data-href="quiz-battle.html"><div class="blob"></div><img class="art" src="assets/tile_battle.png" alt=""><h3>차트 배틀 LIVE</h3><p>4인 퀴즈쇼 대결</p></div>
+        <div class="tile t-journey" data-toast="여정 지도"><div class="blob"></div><img class="art" src="assets/tile_journey.png" alt=""><h3>여정</h3><p>챕터 지도 도전</p></div>
+        <div class="tile t-train" data-toast="훈련"><div class="blob"></div><img class="art" src="assets/tile_train.png" alt=""><h3>훈련</h3><p>생존·도장·아레나</p></div>
+        <div class="tile t-garage" data-go="garage"><div class="blob"></div><img class="art" src="assets/car_rocket.png" alt=""><h3>차고 · 꾸미기</h3><p>캐릭터·자동차·칭호</p></div>
+        <div class="tile wide t-rank" data-go="rank"><div class="blob"></div><img class="art" src="assets/tile_rank.png" alt=""><h3>랭킹</h3><p>수익률 · 자산 · 승률 / 일 · 주 · 월</p></div>
+      </div>
+    </div>
+
+    <div class="view" id="v-rank">
+      <div class="vh">🏆 랭킹</div>
+      <div class="tabs" id="pTabs"></div>
+      <div class="tabs" id="mTabs" style="margin-bottom:14px"></div>
+      <div class="rankwrap"><div class="podium" id="podium"></div><div class="rlist" id="rlist"></div></div>
+    </div>
+
+    <div class="view" id="v-garage">
+      <div class="vh">🏎️ 차고 · 꾸미기</div>
+      <div class="gwrap">
+        <div class="gleft">
+          <div class="gprev"><div class="pv" id="gpv"></div><div class="nm" id="gpNick">차트고수</div><div class="tt" id="gpTitle"></div></div>
+          <div class="catcol" id="catbar"></div>
+        </div>
+        <div class="shop" id="shop"></div>
+      </div>
+    </div>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+function fit(){var s=Math.min(1,(window.innerWidth-16)/940);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(590*s)+'px';sc.style.width='940px';}
+window.addEventListener('resize',fit);fit();
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1300);}
+var fmt=function(n){return Math.round(n).toLocaleString();};
+
+/* 공유 자산(게임과 동일 키) + 꾸미기 */
+var GS='chartarena_web_v1', HS='chartarena_hub_v1';
+function lj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return{};}}
+function getBal(){var g=lj(GS);return typeof g.balance==='number'?g.balance:25000;}
+function setBal(v){var g=lj(GS);g.balance=v;localStorage.setItem(GS,JSON.stringify(g));}
+var hs=lj(HS);
+var EMO={bull:'🐂',bear:'🐻',shark:'🦈',tiger:'🐯',dragon:'🐲',king:'🤴',bike:'🚲',scooter:'🛵',car:'🚗',taxi:'🚕',sports:'🏎️',rocket:'🚀'};
+var IMG={shark:'assets/char_shark.png', rocket:'assets/car_rocket.png'};
+var st={nick:hs.nick||'차트고수', ch:(hs.equip&&hs.equip.ch)||'shark', car:(hs.equip&&hs.equip.car)||'bike', title:(hs.equip&&hs.equip.title)||'',
+  owned:{char:new Set((hs.owned&&hs.owned.char)||['shark','bull']), car:new Set((hs.owned&&hs.owned.car)||['bike']), title:new Set((hs.owned&&hs.owned.title)||[''])}};
+function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,equip:{ch:st.ch,car:st.car,title:st.title},owned:{char:[...st.owned.char],car:[...st.owned.car],title:[...st.owned.title]}}));}
+
+function avaHTML(){ var ch=st.ch,car=st.car;
+  var inner = IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="em">'+EMO[ch]+'</span>';
+  return inner+'<span class="car">'+EMO[car]+'</span>';
+}
+function refreshProfile(){
+  $('railAva').innerHTML=avaHTML();
+  $('railAmt').textContent=fmt(getBal())+' P';
+  $('railTitle').textContent=st.title?('👑 '+st.title):'';
+  $('nick').value=st.nick;
+}
+
+/* nav */
+function go(v){
+  document.querySelectorAll('.view').forEach(function(e){e.classList.remove('on');});
+  $('v-'+v).classList.add('on');
+  document.querySelectorAll('#nav a[data-go]').forEach(function(a){a.classList.toggle('on',a.dataset.go===v);});
+  document.querySelector('.main').scrollTop=0;
+  if(v==='home')renderHome(); if(v==='rank')renderRank(); if(v==='garage')renderGarage();
+}
+document.addEventListener('click',function(e){
+  var g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return;}
+  var h=e.target.closest('[data-href]'); if(h){location.href=h.dataset.href;return;}
+  var t=e.target.closest('[data-toast]'); if(t){toast(t.dataset.toast+' — 데모');return;}
+});
+$('nick').addEventListener('input',function(e){st.nick=e.target.value||'무명';saveHS();$('gpNick').textContent=st.nick;});
+
+/* HOME */
+var RC=[{ic:'📈',col:'#35D07A',t:'주간 수익률',rk:'7위',d:'▲2',dc:'up'},{ic:'🪙',col:'#4CA9FF',t:'주간 자산',rk:'16위',d:'—',dc:'fl'},{ic:'🎯',col:'#FF5C8A',t:'주간 승률',rk:'8위',d:'▼1',dc:'dn'}];
+function renderHome(){ refreshProfile();
+  $('rcards').innerHTML=RC.map(function(c){return '<div class="rc"><div class="ic" style="background:'+c.col+'22;border:1px solid '+c.col+'66;color:'+c.col+'">'+c.ic+'</div><div class="t">'+c.t+'</div><div class="rk">'+c.rk+'</div><div class="d '+c.dc+'">'+c.d+'</div></div>';}).join('');
+}
+
+/* RANKING */
+var PER=[['day','일간'],['week','주간'],['month','월간']],MET=[['ret','수익률'],['assets','자산'],['win','승률']];
+var rp='day',rm='ret';
+var BN=['존버왕','숏충이','불장러','캔들도사','존리형','물타기장인','추매요정','매수의신','청산킹','우상향고고','따상가자','칼손절'];
+var BCH=['🤴','🐲','🐯','🦈','🐻','🐂','🦈','🐻','🐲','🐯','🐂','🐻'],BCA=['🚀','🏎️','🚕','🚗','🛵','🚗','🛵','🚲','🚕','🏎️','🚗','🛵'],BT=['🐋 고래','전설','청산 마스터','존버의 신','','개미','','','청산 마스터','존버의 신','',''];
+var BR=[24,19,31,-8,15,12,22,-3,9,17,5,-12],BW=[64,58,71,44,60,55,67,48,53,62,50,41],BA=[520,410,360,300,265,235,205,180,160,140,120,104];
+function rmul(p){return p==='day'?1:p==='week'?2.4:5.1;} function amul(p){return p==='day'?1:p==='week'?3.2:9.5;}
+function build(){var rows=BN.map(function(n,i){return {n:n,ch:BCH[i],ca:BCA[i],t:BT[i],ret:+(BR[i]*rmul(rp)).toFixed(1),assets:Math.round(BA[i]*1000*amul(rp)),win:BW[i],me:false};});
+  rows.push({n:st.nick,ch:EMO[st.ch],ca:EMO[st.car],t:st.title,ret:+(15.5*rmul(rp)).toFixed(1),assets:getBal(),win:57,me:true});
+  rows.sort(function(a,b){return b[rm]-a[rm];});return rows;}
+function kf(v){return v>=100000?Math.round(v/1000)+'K':v>=10000?(v/1000).toFixed(1)+'K':v.toLocaleString();}
+function mv(e){return rm==='ret'?(e.ret>=0?'+':'')+e.ret.toFixed(1)+'%':rm==='assets'?kf(e.assets)+'P':e.win+'%';}
+function mc(e){return rm==='ret'?(e.ret>=0?'up':'dn'):'';}
+function sub(e){var a=[];if(rm!=='ret')a.push('수익 '+(e.ret>=0?'+':'')+e.ret.toFixed(1)+'%');if(rm!=='assets')a.push('자산 '+kf(e.assets)+'P');if(rm!=='win')a.push('승률 '+e.win+'%');return a.join(' · ');}
+function renderRank(){ refreshProfile();
+  $('pTabs').innerHTML=PER.map(function(p){return '<div class="tab'+(rp===p[0]?' on':'')+'" data-per="'+p[0]+'">'+p[1]+'</div>';}).join('');
+  $('mTabs').innerHTML=MET.map(function(m){return '<div class="tab sm'+(rm===m[0]?' on':'')+'" data-met="'+m[0]+'">'+m[1]+'</div>';}).join('');
+  var L=build();
+  $('podium').innerHTML=[[1,'🥈','p2'],[0,'🥇','p1'],[2,'🥉','p3']].map(function(o){var e=L[o[0]];return '<div class="ped '+o[2]+'"><div class="med">'+o[1]+'</div><div class="pav">'+e.ch+'</div><div class="pcar">'+e.ca+'</div><div class="pn" style="'+(e.me?'color:var(--gold)':'')+'">'+e.n+'</div><div class="pt">'+(e.t||'')+'</div><div class="ps '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
+  $('rlist').innerHTML=L.slice(3).map(function(e,i){return '<div class="rrow'+(e.me?' me':'')+'"><div class="rk">'+(i+4)+'</div><div class="rav">'+e.ch+'</div><div class="rn"><div class="n">'+e.n+' '+e.ca+(e.t?' · <span style="color:var(--gold)">'+e.t+'</span>':'')+'</div><div class="s">'+sub(e)+'</div></div><div class="rv '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
+}
+document.addEventListener('click',function(e){var p=e.target.closest('[data-per]');if(p){rp=p.dataset.per;renderRank();}var m=e.target.closest('[data-met]');if(m){rm=m.dataset.met;renderRank();}});
+
+/* GARAGE */
+var ITEMS={char:[['bull','황소',0],['bear','곰',3000],['shark','상어',8000],['tiger','호랑이',15000],['dragon','드래곤',35000],['king','킹',80000]],
+  car:[['bike','자전거',0],['scooter','스쿠터',2500],['car','경차',7000],['taxi','세단',16000],['sports','스포츠카',40000],['rocket','슈퍼카',90000]],
+  title:[['','없음',0],['개미','개미 트레이더',2000],['존버의 신','존버의 신',12000],['청산 마스터','청산 마스터',22000],['🐋 고래','고래',60000],['전설','전설의 트레이더',120000]]};
+var gcat='char';
+function rar(p){return p===0?['기본','#5A6478']:p<5000?['일반','#9AA7BD']:p<15000?['레어','#4CC3FF']:p<45000?['에픽','#B980FF']:['전설','#E9B949'];}
+function renderGarage(){ refreshProfile();
+  $('gpv').innerHTML=avaHTML();
+  $('gpNick').textContent=st.nick; $('gpTitle').textContent=st.title?('👑 '+st.title):'';
+  var CN=[['char','캐릭터'],['car','자동차'],['title','칭호']];
+  $('catbar').innerHTML=CN.map(function(c){return '<div class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</div>';}).join('');
+  $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=st.owned[gcat].has(id),eq=(gcat==='char'?st.ch:gcat==='car'?st.car:st.title)===id;var rr=rar(pr);
+    var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':(IMG[id]?'<img src="'+IMG[id]+'" alt="">':'<div class="em">'+EMO[id]+'</div>');
+    var stt=eq?'<div class="st" style="background:var(--gold);color:#111">장착중</div>':own?'<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>':'';
+    var price=pr===0?'<div class="pr" style="color:var(--ts)">기본</div>':own?'<div class="pr" style="color:var(--ts)">보유</div>':'<div class="pr">'+fmt(pr)+' P</div>';
+    return '<div class="item" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':rr[1]+'55')+';box-shadow:'+(eq?'0 0 16px -6px '+rr[1]:'none')+'">'+stt+vis+'<div class="nm">'+nm+'</div><div class="rr" style="color:'+rr[1]+'">'+rr[0]+'</div>'+price+'</div>';
+  }).join('');
+}
+document.addEventListener('click',function(e){
+  var c=e.target.closest('[data-cat]'); if(c){gcat=c.dataset.cat;renderGarage();return;}
+  var it=e.target.closest('#shop .item'); if(!it)return; var id=it.dataset.id; var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var pr=row[2]; var own=st.owned[gcat].has(id);
+  function equip(){ if(gcat==='char')st.ch=id;else if(gcat==='car')st.car=id;else st.title=id; }
+  if(own){ equip(); saveHS(); toast(row[1]+' 장착!'); }
+  else { var bal=getBal(); if(bal>=pr){ setBal(bal-pr); st.owned[gcat].add(id); equip(); saveHS(); toast('🛒 '+row[1]+' 구매 & 장착!'); } else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); return; } }
+  renderGarage();
+});
+
+renderHome();
+})();
+</script>
