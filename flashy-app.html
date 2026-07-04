@@ -1,0 +1,237 @@
+<title>차트아레나 — 화려한 앱 (홈·게임·랭킹·차고)</title>
+<style>
+  :root{
+    --bg:#070B16; --navy:#0E1628; --navy2:#16203a;
+    --gold:#E9B949; --gold2:#F6D272; --golddim:#8A6D2B;
+    --tprimary:#EAF0FA; --tsec:#93A0BC; --tmuted:#5A6478;
+    --green:#35D07A; --blue:#4CA9FF; --pink:#FF5C8A; --purple:#B266FF; --teal:#2FE6C4; --orange:#FF9A3C;
+    --up:#F0616D; --down:#4C8DF6;
+    --sans:"Segoe UI",-apple-system,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+    --mono:"Cascadia Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#04060E; color:var(--tprimary); font-family:var(--sans);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:22px 12px}
+  .cap{max-width:440px; text-align:center; margin-bottom:14px}
+  .cap .k{font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--golddim); font-weight:700}
+  .cap h1{margin:.3em 0 .2em; font-size:22px; font-weight:800}
+  .cap p{margin:0; color:var(--tsec); font-size:13px; line-height:1.6}
+  .cap .note{margin-top:10px; display:inline-block; font-size:11px; color:var(--tmuted); border:1px solid var(--navy2); background:rgba(20,28,48,.5); padding:6px 12px; border-radius:999px}
+
+  .phone{width:100%; max-width:400px; border-radius:40px; padding:9px; background:linear-gradient(160deg,#20304e,#080d18);
+    box-shadow:0 40px 80px -24px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.05) inset}
+  .screen{position:relative; width:100%; height:764px; background:var(--bg); border-radius:32px; overflow:hidden; display:flex; flex-direction:column}
+  #bg{position:absolute; inset:0; z-index:0}
+  .body{position:relative; z-index:1; flex:1; overflow-y:auto; scrollbar-width:none}
+  .body::-webkit-scrollbar{display:none}
+  .view{display:none; padding:16px 16px 14px}
+  .view.on{display:block}
+  @keyframes rise{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+  .rise{animation:rise .45s both}
+
+  /* ---------- shared bits ---------- */
+  .goldbtn{position:relative; width:100%; border:none; cursor:pointer; font-family:inherit; color:#3a2c07; font-weight:900; font-size:16px;
+    padding:16px; border-radius:14px; background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A);
+    box-shadow:0 8px 24px -6px rgba(233,185,73,.55), 0 0 0 1px rgba(255,255,255,.4) inset}
+  .goldbtn:active{transform:translateY(1px)}
+  .goldbtn .deco{color:rgba(58,44,7,.5); font-weight:900}
+  .chip{padding:11px 4px; border-radius:11px; background:rgba(14,22,40,.8); border:1px solid var(--navy2); color:var(--tsec);
+    font-weight:800; font-size:13px; text-align:center; cursor:pointer; user-select:none}
+  .chip.on{color:#2a2107; background:linear-gradient(180deg,var(--gold2),var(--gold)); border-color:transparent; box-shadow:0 3px 12px rgba(233,185,73,.4)}
+  .chip.warn.on{background:linear-gradient(180deg,#ff8a97,#e5484d); color:#fff; box-shadow:0 3px 12px rgba(229,72,77,.4)}
+  .lbl{display:flex; align-items:center; gap:6px; color:var(--tsec); font-size:12px; font-weight:700; margin:14px 2px 7px}
+  .lbl .ic{opacity:.9}
+  .row{display:flex; gap:6px}
+
+  /* ---------- HOME ---------- */
+  .hero{display:flex; gap:16px; align-items:center; position:relative}
+  .edit{position:absolute; right:0; top:0; width:34px; height:34px; border-radius:50%; background:rgba(233,185,73,.12); border:1px solid rgba(233,185,73,.5); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:14px}
+  .ava{position:relative; width:104px; height:104px; flex:0 0 auto; display:flex; align-items:center; justify-content:center}
+  .ava .ring{position:absolute; inset:0; border-radius:50%; background:conic-gradient(from 0deg,#7a5a17,#F6D272,#8A6D2B,#F6D272,#7a5a17); animation:spin 7s linear infinite; filter:drop-shadow(0 0 10px rgba(233,185,73,.5))}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .ava .disk{position:absolute; inset:6px; border-radius:50%; background:radial-gradient(circle at 50% 35%,#12203a,#070c16 70%); border:1px solid rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center}
+  .ava .ch{font-size:52px; filter:drop-shadow(0 4px 6px rgba(0,0,0,.6))}
+  .ava .car{position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:20px}
+  .who .nm{font-size:25px; font-weight:900}
+  .who .r2{display:flex; gap:8px; margin-top:8px}
+  .lv{font-size:12px; font-weight:900; padding:4px 12px; border-radius:999px; color:#3a2c07; background:linear-gradient(180deg,var(--gold2),var(--gold)); box-shadow:0 2px 10px rgba(233,185,73,.4)}
+  .streak{font-size:12px; font-weight:800; padding:4px 12px; border-radius:999px; color:var(--tprimary); background:rgba(255,120,60,.14); border:1px solid rgba(255,120,60,.4)}
+  .wealth{margin-top:18px; text-align:center}
+  .wealth .l{font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--golddim); font-weight:800}
+  .wealth .amt{font-family:var(--mono); font-weight:900; font-size:46px; line-height:1.05;
+    background:linear-gradient(180deg,#FCE9A6,#F6D272 40%,#D8A63A 70%,#B9841F); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; filter:drop-shadow(0 3px 14px rgba(233,185,73,.45))}
+  .wealth .g{height:2px; width:70%; margin:4px auto 0; border-radius:2px; background:linear-gradient(90deg,transparent,rgba(233,185,73,.8),transparent)}
+  .rcards{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:18px}
+  .rc{position:relative; border-radius:16px; padding:12px 8px 8px; overflow:hidden; background:linear-gradient(180deg,rgba(22,32,58,.9),rgba(10,16,30,.9)); border:1px solid var(--navy2)}
+  .rc .ic{width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; margin:0 auto}
+  .rc .t{font-size:10.5px; color:var(--tsec); text-align:center; margin-top:6px}
+  .rc .rk{font-size:22px; font-weight:900; text-align:center; margin-top:1px}
+  .rc .d{font-size:11px; font-weight:800; text-align:center; font-family:var(--mono)}
+  .rc svg{position:absolute; left:0; right:0; bottom:0; width:100%; height:32px; opacity:.9}
+  .up{color:var(--green)} .dn{color:var(--pink)} .fl{color:var(--tsec)}
+  .tiles{margin-top:16px; display:flex; flex-direction:column; gap:12px}
+  .tile{position:relative; border-radius:18px; padding:16px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.07); box-shadow:0 10px 30px -14px rgba(0,0,0,.7)}
+  .tile.half{flex:1; min-height:112px}
+  .tile .blob{position:absolute; width:150px; height:150px; border-radius:50%; right:-40px; bottom:-50px; filter:blur(6px); opacity:.5}
+  .tile .art{position:absolute; right:10px; bottom:6px; font-size:48px; filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)); opacity:.92}
+  .tile .artimg{position:absolute; right:-6px; bottom:-8px; height:104px; filter:drop-shadow(0 8px 14px rgba(0,0,0,.55)); pointer-events:none; z-index:1}
+  .tile.rankwide .artimg{height:70px; right:8px; bottom:8px}
+  .ava .disk img{width:100%; height:100%; object-fit:cover; border-radius:50%}
+  .gprev .pv img{width:100%;height:100%;object-fit:cover;border-radius:16px}
+  .tile h3{margin:0; font-size:18px; font-weight:900; position:relative; z-index:1}
+  .tile p{margin:4px 0 0; font-size:11px; color:rgba(255,255,255,.7); position:relative; z-index:1}
+  .tile .chev{position:absolute; right:12px; bottom:12px; width:24px; height:24px; border-radius:50%; background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:12px; z-index:2}
+  .t-rank{background:linear-gradient(110deg,#2a2410,#12162a)} .t-rank .blob{background:var(--gold)}
+  .t-garage{background:linear-gradient(135deg,#2a184a,#141033)} .t-garage .blob{background:var(--purple)}
+  .t-journey{background:linear-gradient(135deg,#0e2a52,#0b1730)} .t-journey .blob{background:var(--blue)}
+  .t-battle{background:linear-gradient(135deg,#0d3a34,#0b1b2a)} .t-battle .blob{background:var(--teal)}
+  .t-train{background:linear-gradient(135deg,#3a2410,#1b1428)} .t-train .blob{background:var(--orange)}
+
+  /* ---------- GAME ---------- */
+  .gtop{display:flex; align-items:center; gap:8px; margin-bottom:10px}
+  .gtop .back{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--navy2);display:flex;align-items:center;justify-content:center;color:var(--tsec)}
+  .gtop .title{font-weight:900; font-size:17px} .gtop .title .g{color:var(--gold)}
+  .gtop .pill{font-size:10px;color:var(--tsec);background:var(--navy2);padding:3px 8px;border-radius:6px}
+  .gtop .bal{margin-left:auto; text-align:right}
+  .gtop .bal .l{font-size:9px;color:var(--tmuted)}
+  .gtop .bal .v{font-family:var(--mono); font-weight:800; color:var(--gold); font-size:15px}
+  .chartcard{border:1px solid var(--navy2); border-radius:16px; padding:8px; background:linear-gradient(180deg,#0a1122,#070c16); box-shadow:0 0 24px -8px rgba(76,169,255,.15) inset; position:relative}
+  #chart{width:100%; height:300px; display:block; border-radius:10px}
+  .indrow{display:flex; gap:6px; overflow-x:auto; margin-top:10px; scrollbar-width:none}
+  .indrow::-webkit-scrollbar{display:none}
+  .ichip{flex:0 0 auto; font-size:11px; font-weight:700; padding:6px 11px; border-radius:999px; background:rgba(14,22,40,.9); border:1px solid var(--navy2); color:var(--tsec); white-space:nowrap; cursor:pointer}
+  .ichip.on{color:var(--tprimary); border-color:var(--golddim)}
+  .ichip .dot{display:inline-block; width:7px;height:7px;border-radius:2px; margin-right:4px; vertical-align:middle}
+  .dirs{display:flex; gap:8px; margin-top:8px}
+  .dir{flex:1; border-radius:14px; padding:14px 6px; text-align:center; cursor:pointer; border:1.5px solid transparent; background:rgba(14,22,40,.8)}
+  .dir .big{font-size:19px; font-weight:900} .dir .sm{font-size:10px; opacity:.8; margin-top:2px}
+  .dir.long{color:var(--green)} .dir.long.on{background:linear-gradient(180deg,rgba(53,208,122,.25),rgba(53,208,122,.05)); border-color:var(--green); box-shadow:0 0 18px -4px rgba(53,208,122,.5)}
+  .dir.short{color:var(--pink)} .dir.short.on{background:linear-gradient(180deg,rgba(255,92,138,.25),rgba(255,92,138,.05)); border-color:var(--pink); box-shadow:0 0 18px -4px rgba(255,92,138,.5)}
+  .dir.watch{color:var(--gold)} .dir.watch.on{background:linear-gradient(180deg,rgba(233,185,73,.22),rgba(233,185,73,.05)); border-color:var(--gold); box-shadow:0 0 18px -4px rgba(233,185,73,.5)}
+  .riskbox{margin-top:14px; display:flex; gap:10px; padding:12px; border-radius:12px; background:rgba(14,22,40,.7); border:1px solid var(--navy2); font-size:12px; color:var(--tsec); line-height:1.5}
+
+  /* ---------- RANKING ---------- */
+  .vh{font-weight:900; font-size:20px; margin:2px 2px 12px; display:flex; align-items:center; gap:8px}
+  .tabs{display:flex; gap:6px; margin-bottom:8px}
+  .subtabs{display:flex; gap:6px; margin-bottom:14px}
+  .podium{display:flex; align-items:flex-end; gap:8px; justify-content:center; margin-bottom:16px}
+  .ped{flex:1; text-align:center; border-radius:14px 14px 10px 10px; padding:10px 4px 8px; background:linear-gradient(180deg,rgba(22,32,58,.9),rgba(10,16,30,.95)); border:1px solid var(--navy2); position:relative}
+  .ped.p1{border-color:var(--gold); box-shadow:0 0 26px -6px rgba(233,185,73,.55); padding-bottom:18px}
+  .ped.p2,.ped.p3{padding-bottom:10px}
+  .ped .med{font-size:22px} .ped .pav{font-size:28px; margin:2px 0} .ped .pcar{font-size:15px}
+  .ped .pn{font-size:11px; font-weight:800; margin-top:3px}
+  .ped .ps{font-size:12px; font-weight:900; font-family:var(--mono); margin-top:2px}
+  .rrow{display:flex; align-items:center; gap:10px; padding:10px; border-radius:12px; margin-bottom:7px; background:rgba(14,22,40,.7); border:1px solid var(--navy2)}
+  .rrow.me{border-color:var(--gold); background:rgba(233,185,73,.08); box-shadow:0 0 18px -8px rgba(233,185,73,.5)}
+  .rrow .rk{width:22px;text-align:center;font-weight:900;font-family:var(--mono);color:var(--tsec)}
+  .rrow .rav{font-size:20px;width:24px;text-align:center}
+  .rrow .rn{flex:1;min-width:0}
+  .rrow .rn .n{font-weight:800;font-size:13px} .rrow .rn .s{font-size:9.5px;color:var(--tmuted);font-family:var(--mono)}
+  .rrow .rv{font-family:var(--mono);font-weight:900;font-size:14px}
+
+  /* ---------- GARAGE ---------- */
+  .gbal{display:flex;align-items:center;gap:8px;background:rgba(14,22,40,.7);border:1px solid var(--navy2);border-radius:12px;padding:11px 14px;margin-bottom:14px}
+  .gbal .v{margin-left:auto;font-family:var(--mono);font-weight:900;color:var(--gold);font-size:18px}
+  .gprev{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:14px;border-radius:16px;background:linear-gradient(135deg,#16203a,#0b1120);border:1px solid var(--navy2)}
+  .gprev .pv{width:84px;height:84px;border-radius:16px;position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 auto;background:radial-gradient(circle at 50% 35%,#12203a,#070c16 70%);border:1px solid var(--navy2);box-shadow:0 0 20px -6px rgba(178,102,255,.4)}
+  .gprev .pv .c{font-size:40px}.gprev .pv .cr{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:20px}
+  .shop{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .item{position:relative;border-radius:16px;padding:14px 8px;text-align:center;cursor:pointer;background:rgba(14,22,40,.8);border:1.5px solid var(--navy2)}
+  .item .em{font-size:34px}.item .em.tx{font-size:15px;font-weight:900;padding:8px 2px}
+  .item .nm{font-weight:800;font-size:13px;margin-top:5px}
+  .item .rr{font-size:9px;font-weight:800;margin-top:2px}
+  .item .pr{font-family:var(--mono);font-size:12px;margin-top:3px;color:var(--gold)}
+  .item .st{position:absolute;top:7px;right:7px;font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
+
+  /* nav */
+  .nav{position:relative; z-index:2; display:flex; background:linear-gradient(180deg,rgba(14,22,40,.6),rgba(8,12,22,.96)); border-top:1px solid var(--navy2); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+  .nav div{flex:1; text-align:center; padding:9px 0 11px; color:var(--tsec); font-size:10px; cursor:pointer}
+  .nav div .ic{font-size:19px; display:block; margin-bottom:2px}
+  .nav div.on{color:var(--gold)} .nav div.on .ic{filter:drop-shadow(0 0 8px rgba(233,185,73,.7))}
+  .toast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.85);z-index:9;background:rgba(8,11,20,.95);border:1px solid var(--gold);color:var(--gold);font-weight:800;font-size:14px;padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:all .2s;text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  @media (prefers-reduced-motion: reduce){ .ava .ring{animation:none} .rise{animation:none} }
+</style>
+
+<div class="cap">
+  <div class="k">ChartArena · 화려한 앱 (코드 전용)</div>
+  <h1>✨ 홈 · 게임 · 랭킹 · 차고</h1>
+  <p>하단 탭으로 4화면을 오가며 <b style="color:var(--tprimary)">같은 프리미엄 톤</b>을 확인하세요. 3D 일러스트 자리는 이모지 placeholder(실제로는 아트 에셋).</p>
+  <div class="note">🎨 에셋 0개 · 순수 코드(별빛·글로우·네온·금색)</div>
+</div>
+
+<div class="phone"><div class="screen">
+  <canvas id="bg"></canvas>
+  <div class="body">
+    <!-- HOME -->
+    <div class="view on" id="v-home">
+      <div class="hero rise"><div class="ava"><div class="ring"></div><div class="disk"><img src="assets/char_shark.png" alt="아바타"></div></div>
+        <div class="who"><div class="nm">차트고수</div><div class="r2"><span class="lv">Lv.12</span><span class="streak">🔥 7일</span></div></div>
+        <div class="edit">✏️</div></div>
+      <div class="wealth rise"><div class="l">보유 자산</div><div class="amt" id="hAmt">2,694 P</div><div class="g"></div></div>
+      <div class="rcards rise" id="rcards"></div>
+      <div class="tiles">
+        <div class="tile t-rank rankwide rise" data-go="rank" style="width:100%"><div class="blob"></div><img class="artimg" src="assets/tile_rank.png" alt=""><h3>랭킹</h3><p>수익률 · 자산 · 승률 / 일 · 주 · 월</p><div class="chev">›</div></div>
+        <div class="row" style="gap:12px">
+          <div class="tile half t-garage rise" data-go="garage"><div class="blob"></div><img class="artimg" src="assets/car_rocket.png" alt=""><h3>차고 · 꾸미기</h3><p>캐릭터·자동차·칭호</p><div class="chev">›</div></div>
+          <div class="tile half t-journey rise" data-toast="여정 지도"><div class="blob"></div><img class="artimg" src="assets/tile_journey.png" alt=""><h3>여정</h3><p>챕터 지도 도전</p><div class="chev">›</div></div>
+        </div>
+        <div class="row" style="gap:12px">
+          <div class="tile half t-battle rise" data-go="game"><div class="blob"></div><img class="artimg" src="assets/tile_battle.png" alt=""><h3>차트 배틀</h3><p>랜덤 실전 · 자산 벌기</p><div class="chev">›</div></div>
+          <div class="tile half t-train rise" data-toast="훈련"><div class="blob"></div><img class="artimg" src="assets/tile_train.png" alt=""><h3>훈련</h3><p>생존·도장·아레나</p><div class="chev">›</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME -->
+    <div class="view" id="v-game">
+      <div class="gtop">
+        <div class="back" data-go="home">←</div>
+        <div class="title">차트<span class="g">아레나</span></div><div class="pill">문제 1</div>
+        <div class="bal"><div class="l">보유 자산</div><div class="v">2,694P</div></div>
+      </div>
+      <div class="chartcard"><canvas id="chart"></canvas></div>
+      <div class="indrow" id="indrow"></div>
+      <div class="lbl"><span class="ic">🎯</span>방향 선택 <span style="color:var(--tmuted);font-weight:400">· 차트만 보고 판단</span></div>
+      <div class="dirs" id="dirs">
+        <div class="dir long" data-dir="L"><div class="big">↗ 롱</div><div class="sm">상승 베팅</div></div>
+        <div class="dir short" data-dir="S"><div class="big">↘ 숏</div><div class="sm">하락 베팅</div></div>
+        <div class="dir watch" data-dir="W"><div class="big">◎ 관망</div><div class="sm">포인트 보존</div></div>
+      </div>
+      <div class="lbl">레버리지</div><div class="row" id="lev"></div>
+      <div class="lbl">평가 기간</div><div class="row" id="hor"></div>
+      <div class="riskbox"><span>🛡️</span><span id="riskmsg">방향을 선택하면 리스크가 표시됩니다. 신중한 판단으로 전략을 완성하세요!</span></div>
+      <div style="margin-top:14px"><button class="goldbtn" id="submit"><span class="deco">◄◄</span>&nbsp; <span id="subtxt">방향을 선택하세요</span> &nbsp;<span class="deco">►►</span></button></div>
+      <div style="text-align:center;color:var(--tmuted);font-size:9.5px;line-height:1.5;margin-top:14px">본 앱은 실제 투자가 아닌 교육용 모의 트레이딩 게임입니다. 포인트는 환전되지 않으며 현실 가치가 없습니다.</div>
+    </div>
+
+    <!-- RANKING -->
+    <div class="view" id="v-rank">
+      <div class="vh">🏆 랭킹</div>
+      <div class="tabs" id="pTabs"></div>
+      <div class="subtabs" id="mTabs"></div>
+      <div class="podium" id="podium"></div>
+      <div id="rlist"></div>
+    </div>
+
+    <!-- GARAGE -->
+    <div class="view" id="v-garage">
+      <div class="vh">🏎️ 차고 · 꾸미기</div>
+      <div class="gbal">💰 <span>보유 자산</span><span class="v" id="gAmt">25,000 P</span></div>
+      <div class="gprev"><div class="pv"><span class="c" id="gvCh">🦈</span><span class="cr" id="gvCar">🚲</span></div>
+        <div><div style="font-weight:800;font-size:15px">차트고수</div><div id="gvTitle" style="color:var(--gold);font-size:11px;font-weight:700;margin-top:3px"></div><div style="color:var(--tsec);font-size:11px;margin-top:4px">장착 세트가 홈·랭킹에 표시됩니다</div></div></div>
+      <div class="row" id="catbar" style="gap:5px;margin-bottom:12px"></div>
+      <div class="shop" id="shop"></div>
+    </div>
+  </div>
+
+  <div class="nav" id="nav">
+    <div class="on" data-go="home"><span class="ic">🏠</span>홈</div>
+    <div data-go="game"><span class="ic">📈</span>차트배틀</div>
+    <div data-go="rank"><span class="ic">🏆</span>랭킹</div>
+    <div data-go="garage"><span class="ic">🏎️</span>차고</div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div></div>
+
+<script src="flashy-app.js"></script>
