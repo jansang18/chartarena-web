@@ -1,650 +1,375 @@
-<title>차트아레나 — 웹 플레이</title>
+<title>차트아레나 — 홈·랭킹·차고 미리보기</title>
 <style>
   :root{
     --bg:#080B14; --navy:#0E1424; --navy2:#141C30;
     --gold:#E9B949; --golddim:#8A6D2B;
     --tprimary:#E6EAF2; --tsec:#8A93A6; --tmuted:#5A6478;
-    --up:#F0616D; --down:#4C8DF6; --watch:#7C8AA5;
-    --profit:#35C46A; --loss:#E5484D;
-    --grid:#1B2436;
+    --up:#F0616D; --down:#4C8DF6; --profit:#35C46A; --loss:#E5484D;
+    --rc-basic:#5A6478; --rc-common:#9AA7BD; --rc-rare:#4CC3FF; --rc-epic:#B980FF; --rc-legend:#E9B949;
     --sans:"Segoe UI",-apple-system,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
-    --mono:"Cascadia Mono",ui-monospace,"Consolas",monospace;
+    --mono:"Cascadia Mono",ui-monospace,Consolas,monospace;
   }
   *{box-sizing:border-box}
-  html,body{margin:0}
-  body{background:radial-gradient(900px 500px at 50% -8%,rgba(233,185,73,.05),transparent 60%),#04060B;
-    color:var(--tprimary); font-family:var(--sans); min-height:100vh;
-    display:flex; justify-content:center; padding:0}
-  .app{width:100%; max-width:470px; background:var(--bg); min-height:100vh; display:flex; flex-direction:column;
-    box-shadow:0 0 0 1px rgba(255,255,255,.03), 0 30px 80px -30px #000}
+  body{margin:0; background:radial-gradient(900px 500px at 50% -8%,rgba(233,185,73,.05),transparent 60%),#04060B;
+    color:var(--tprimary); font-family:var(--sans); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:24px 14px}
+  .cap{max-width:440px; text-align:center; margin-bottom:14px}
+  .cap .k{font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--golddim); font-weight:700}
+  .cap h1{margin:.3em 0 .2em; font-size:23px; font-weight:800}
+  .cap p{margin:0; color:var(--tsec); font-size:13px; line-height:1.6}
+  .cap .note{margin-top:10px; display:inline-block; font-size:11px; color:var(--tmuted); border:1px solid var(--navy2);
+    background:rgba(20,28,48,.5); padding:6px 12px; border-radius:999px}
 
-  /* top bar */
-  .top{display:flex; align-items:center; gap:10px; padding:14px 16px 10px; border-bottom:1px solid var(--navy2)}
-  .logo{font-weight:900; font-size:17px}
-  .logo .a{color:var(--gold)}
-  .top .spacer{flex:1}
-  .bal{text-align:right; line-height:1.1}
-  .bal .k{font-size:9px; letter-spacing:.14em; color:var(--tmuted); text-transform:uppercase}
-  .bal .v{font-family:var(--mono); font-weight:800; color:var(--gold); font-size:16px}
-  .qtag{font-size:10px; color:var(--tsec); font-family:var(--mono); background:var(--navy2); padding:3px 8px; border-radius:6px}
+  .phone{width:100%; max-width:412px; border-radius:38px; padding:10px; background:linear-gradient(160deg,#1b2233,#0a0e18);
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04) inset}
+  .screen{position:relative; width:100%; height:730px; background:var(--bg); border-radius:28px; overflow:hidden; display:flex; flex-direction:column}
+  .body{flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--navy2) transparent}
+  .body::-webkit-scrollbar{width:6px}.body::-webkit-scrollbar-thumb{background:var(--navy2);border-radius:3px}
+  .view{display:none; padding:14px 14px 20px}
+  .view.on{display:block}
 
-  /* chart */
-  .chartwrap{position:relative; margin:10px 12px 0; border:1px solid var(--navy2); border-radius:12px;
-    background:linear-gradient(180deg,#0b1120,#090d18); overflow:hidden}
-  #chart{display:block; width:100%; height:273px; touch-action:none; cursor:grab}
-  #chart:active{cursor:grabbing}
-  .chip-diff{position:absolute; left:10px; top:8px; font-size:10px; color:var(--tsec);
-    background:rgba(8,11,20,.72); border:1px solid var(--navy2); padding:2px 8px; border-radius:6px; font-family:var(--mono)}
-  .hint-hidden{position:absolute; right:56px; top:8px; font-size:10px; color:var(--golddim); font-family:var(--mono)}
-  .zoombtns{position:absolute; right:8px; bottom:8px; display:flex; gap:4px}
-  .zoombtns button{width:28px; height:28px; border-radius:8px; border:1px solid var(--navy2);
-    background:rgba(8,11,20,.82); color:var(--tsec); font-size:15px; font-weight:800; line-height:1; cursor:pointer;
-    font-family:inherit; display:flex; align-items:center; justify-content:center}
-  .zoombtns button:hover{color:var(--tprimary); border-color:var(--golddim)}
-  .zoombtns button:active{transform:translateY(1px)}
-  .panhint{position:absolute; left:10px; bottom:8px; font-size:9px; color:var(--tmuted); font-family:var(--mono);
-    background:rgba(8,11,20,.6); padding:2px 7px; border-radius:5px; pointer-events:none}
+  /* HOME */
+  .hero{position:relative; border-radius:18px; padding:16px; overflow:hidden;
+    background:linear-gradient(135deg,#16203a,#0b1120); border:1px solid var(--navy2)}
+  .hero::after{content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; border-radius:50%;
+    background:radial-gradient(circle,rgba(233,185,73,.18),transparent 70%)}
+  .hero-row{display:flex; align-items:center; gap:14px; position:relative; z-index:1}
+  .avatar{width:92px; height:92px; border-radius:18px; background:#0A0F1C; border:1px solid var(--navy2);
+    display:flex; align-items:center; justify-content:center; position:relative; flex:0 0 auto}
+  .avatar .ch{font-size:44px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+  .avatar .acc{position:absolute; top:6px; right:8px; font-size:18px}
+  .avatar .car{position:absolute; bottom:2px; left:50%; transform:translateX(-50%); font-size:24px}
+  .who{flex:1; min-width:0}
+  .who .nickrow{display:flex; align-items:center; gap:6px}
+  .who input.nick{background:transparent; border:none; color:var(--tprimary); font-weight:900; font-size:19px; width:100%; font-family:inherit; padding:0}
+  .who input.nick:focus{outline:none; border-bottom:1px dashed var(--golddim)}
+  .who .edit{color:var(--tmuted); font-size:12px}
+  .titlechip{display:inline-block; margin-top:5px; font-size:11px; font-weight:800; padding:2px 9px; border-radius:999px;
+    background:rgba(233,185,73,.14); color:var(--gold); border:1px solid rgba(233,185,73,.4)}
+  .chips{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap}
+  .chip{font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; background:var(--navy2); color:var(--tsec); font-family:var(--mono)}
+  .chip.gold{background:rgba(233,185,73,.16); color:var(--gold)}
+  .wealth{margin-top:14px; position:relative; z-index:1}
+  .wealth .lb{font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--golddim); font-weight:700}
+  .wealth .amt{font-family:var(--mono); font-weight:900; font-size:34px; line-height:1;
+    background:linear-gradient(180deg,#F6D272,#C9972B); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
 
-  /* indicator toggle bar */
-  .indbar{display:flex; gap:6px; overflow-x:auto; padding:9px 12px 3px; scrollbar-width:none}
-  .indbar::-webkit-scrollbar{display:none}
-  .itog{flex:0 0 auto; display:flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:var(--tmuted);
-    background:var(--navy); border:1px solid var(--navy2); border-radius:999px; padding:5px 11px; cursor:pointer;
-    user-select:none; white-space:nowrap; font-family:inherit; -webkit-tap-highlight-color:transparent}
-  .itog .dot{width:8px; height:8px; border-radius:2px; background:var(--tmuted)}
-  .itog.on{color:var(--tprimary); border-color:var(--golddim)}
-  .itog:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+  .ranksum{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:14px}
+  .ranksum .rc{background:var(--navy); border:1px solid var(--navy2); border-radius:12px; padding:10px; text-align:center; cursor:pointer}
+  .ranksum .rc .t{font-size:10px; color:var(--tsec)}
+  .ranksum .rc .r{font-family:var(--mono); font-weight:900; font-size:17px; margin-top:2px}
+  .ranksum .rc .d{font-size:9px; margin-top:2px; font-family:var(--mono)}
 
-  .scroll{flex:1; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--navy2) transparent; padding:12px 12px 20px}
-  .scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:var(--navy2);border-radius:3px}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px}
+  .tile{background:var(--navy); border:1px solid var(--navy2); border-radius:14px; padding:14px; cursor:pointer; transition:border-color .12s}
+  .tile:hover{border-color:var(--golddim)}
+  .tile .ic{font-size:24px}
+  .tile .nm{font-weight:800; font-size:15px; margin-top:6px}
+  .tile .sb{color:var(--tsec); font-size:11px; margin-top:2px}
+  .tile.wide{grid-column:1 / -1; display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#1a2340,#101830)}
+  .tile.wide .ic{font-size:30px}
+  .disc{color:var(--tmuted); font-size:9.5px; line-height:1.5; margin-top:16px; text-align:center}
 
-  .lbl{font-size:11px; color:var(--tsec); font-weight:700; letter-spacing:.02em; margin:14px 2px 7px; display:flex; align-items:center; gap:6px}
-  .lbl .sub{color:var(--tmuted); font-weight:400; font-size:10px}
-  .row{display:flex; gap:6px}
-  .row.wrap{flex-wrap:wrap}
-  .chip{flex:1; text-align:center; padding:11px 4px; border-radius:9px; background:var(--navy); border:1px solid var(--navy2);
-    color:var(--tsec); font-size:13px; font-weight:700; cursor:pointer; user-select:none; transition:all .12s;
-    font-family:inherit; -webkit-tap-highlight-color:transparent}
-  .chip small{display:block; font-size:9px; font-weight:400; color:var(--tmuted); margin-top:2px; font-family:var(--mono)}
-  .chip:hover{border-color:var(--golddim)}
-  .chip.on{color:var(--bg); border-color:transparent}
-  .chip.on small{color:rgba(8,11,20,.7)}
-  .chip.dir-LONG.on{background:var(--up)} .chip.dir-SHORT.on{background:var(--down)} .chip.dir-WATCH.on{background:var(--watch)}
-  .chip.gold.on{background:var(--gold)}
-  .chip:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+  .vh{font-weight:900; font-size:18px; margin:2px 2px 12px}
 
-  .risk{margin-top:12px; font-size:11px; color:var(--tsec); font-family:var(--mono); background:var(--navy);
-    border:1px solid var(--navy2); border-radius:9px; padding:9px 12px; line-height:1.6}
-  .risk .warn{color:var(--loss)} .risk b{color:var(--tprimary)}
+  /* RANKING */
+  .tabs{display:flex; gap:6px; margin-bottom:8px}
+  .tab{flex:1; text-align:center; padding:9px 0; border-radius:9px; background:var(--navy); border:1px solid var(--navy2);
+    color:var(--tsec); font-weight:700; font-size:13px; cursor:pointer}
+  .tab.on{background:var(--gold); color:var(--bg); border-color:transparent}
+  .subtabs{display:flex; gap:6px; margin-bottom:12px}
+  .subtab{flex:1; text-align:center; padding:7px 0; border-radius:8px; background:var(--navy); border:1px solid var(--navy2);
+    color:var(--tsec); font-weight:700; font-size:12px; cursor:pointer}
+  .subtab.on{background:var(--navy2); color:var(--gold); border-color:var(--golddim)}
+  .podium{display:flex; align-items:flex-end; gap:8px; justify-content:center; margin:6px 0 14px}
+  .ped{flex:1; text-align:center; background:var(--navy); border:1px solid var(--navy2); border-radius:12px 12px 8px 8px; padding:8px 4px}
+  .ped.p1{border-color:var(--gold)}
+  .ped .medal{font-size:20px}
+  .ped .pav{font-size:26px; margin:2px 0}
+  .ped .pcar{font-size:15px}
+  .ped .pn{font-size:11px; font-weight:800; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .ped .pt{font-size:8px; color:var(--gold); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .ped .ps{font-size:11px; font-weight:800; font-family:var(--mono); margin-top:2px}
+  .ped.h1{padding-bottom:20px} .ped.h2{padding-bottom:10px}
+  .rrow{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; margin-bottom:6px; background:var(--navy); border:1px solid var(--navy2)}
+  .rrow.me{border-color:var(--gold); background:rgba(233,185,73,.08)}
+  .rrow .rk{width:22px; text-align:center; font-weight:800; font-family:var(--mono); color:var(--tsec)}
+  .rrow .rav{font-size:20px; width:24px; text-align:center}
+  .rrow .rnm{flex:1; min-width:0}
+  .rrow .rnm .n{font-weight:700; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .rrow .rnm .n .car{font-size:12px; margin-left:3px}
+  .rrow .rnm .sub{font-size:9.5px; color:var(--tmuted); font-family:var(--mono)}
+  .rrow .rsc{font-family:var(--mono); font-weight:800; font-size:14px; text-align:right}
 
-  .submit{width:100%; margin-top:14px; border:none; background:var(--gold); color:var(--bg); font-weight:900; font-size:16px;
-    padding:15px; border-radius:12px; cursor:pointer; font-family:inherit}
-  .submit:disabled{background:var(--navy2); color:var(--tmuted); cursor:not-allowed}
-  .submit:not(:disabled):active{transform:translateY(1px)}
+  /* GARAGE */
+  .balance{display:flex; align-items:center; gap:8px; background:var(--navy); border:1px solid var(--navy2); border-radius:12px; padding:10px 14px; margin-bottom:12px}
+  .balance .amt{margin-left:auto; font-family:var(--mono); font-weight:900; color:var(--gold); font-size:18px}
+  .preview{display:flex; align-items:center; gap:12px; background:linear-gradient(135deg,#141c30,#0b1120); border:1px solid var(--navy2); border-radius:14px; padding:12px; margin-bottom:14px}
+  .preview .av{width:74px;height:74px;border-radius:14px;background:#0A0F1C;border:1px solid var(--navy2);position:relative;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .preview .av .ch{font-size:36px}.preview .av .acc{position:absolute;top:4px;right:6px;font-size:15px}.preview .av .car{position:absolute;bottom:1px;left:50%;transform:translateX(-50%);font-size:20px}
+  .catbar{display:flex; gap:5px; margin-bottom:10px}
+  .cat{flex:1; text-align:center; padding:8px 0; border-radius:9px; background:var(--navy); border:1px solid var(--navy2); color:var(--tsec); font-weight:700; font-size:12px; cursor:pointer}
+  .cat.on{background:var(--navy2); color:var(--gold); border-color:var(--golddim)}
+  .shop{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .item{background:var(--navy); border:1.5px solid var(--navy2); border-radius:14px; padding:12px 10px; text-align:center; cursor:pointer; position:relative}
+  .item.eq{box-shadow:0 0 0 1px var(--gold) inset}
+  .item .em{font-size:32px; line-height:1.1}
+  .item .em.txt{font-size:15px; font-weight:900; padding:8px 0}
+  .item .nm{font-weight:800; font-size:13px; margin-top:5px}
+  .item .rr{font-size:9px; font-weight:800; margin-top:2px}
+  .item .pr{font-family:var(--mono); font-size:12px; margin-top:3px; color:var(--gold)}
+  .item .pr.free{color:var(--tsec)}
+  .item .st{position:absolute; top:7px; right:7px; font-size:9px; font-weight:800; padding:2px 6px; border-radius:6px}
+  .item .st.eq{background:var(--gold); color:var(--bg)}
+  .item .st.owned{background:rgba(53,196,106,.2); color:var(--profit)}
+  @keyframes pop{0%{transform:scale(.6);opacity:.3} 60%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1}}
+  .item.just{animation:pop .32s ease}
 
-  .disc{margin:16px 4px 4px; font-size:9.5px; color:var(--tmuted); line-height:1.5; text-align:center}
-
-  /* result */
-  .res-head{display:flex; align-items:flex-end; justify-content:space-between; padding:6px 4px 2px}
-  .res-reason{font-size:13px; font-weight:800}
-  .res-pts{font-family:var(--mono); font-weight:900; font-size:30px; line-height:1}
-  .res-sub{font-family:var(--mono); font-size:12px; margin-top:3px}
-  .up{color:var(--profit)} .dn{color:var(--loss)} .flat{color:var(--tsec)}
-  .badges{display:flex; gap:6px; margin:10px 0 4px; flex-wrap:wrap}
-  .badge{font-size:10px; font-weight:700; padding:3px 9px; border-radius:999px; font-family:var(--mono)}
-  .badge.stop{background:rgba(229,72,77,.16); color:var(--loss); border:1px solid rgba(229,72,77,.4)}
-  .badge.take{background:rgba(53,196,106,.16); color:var(--profit); border:1px solid rgba(53,196,106,.4)}
-  .badge.dir{background:var(--navy2); color:var(--tsec)}
-  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px}
-  .cell{background:var(--navy); border:1px solid var(--navy2); border-radius:9px; padding:9px 11px}
-  .cell .k{font-size:10px; color:var(--tmuted)}
-  .cell .v{font-family:var(--mono); font-weight:700; font-size:14px; margin-top:2px}
-  .reveal{margin-top:12px; background:var(--navy); border:1px solid var(--navy2); border-radius:11px; padding:13px}
-  .reveal .sym{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
-  .reveal .sym b{color:var(--gold); font-weight:800; font-size:15px}
-  .reveal .sym .meta{font-size:10px; color:var(--tmuted); font-family:var(--mono)}
-  .reveal .tags{display:flex; gap:5px; flex-wrap:wrap; margin:9px 0}
-  .reveal .tags span{font-size:10px; color:var(--tsec); background:var(--navy2); padding:2px 8px; border-radius:6px}
-  .reveal .ex{font-size:12px; color:var(--tsec); line-height:1.65}
-  .res-btns{display:flex; gap:8px; margin-top:14px}
-  .res-btns button{flex:1; border:none; padding:14px; border-radius:11px; font-weight:800; font-size:14px; cursor:pointer; font-family:inherit}
-  .btn-next{background:var(--gold); color:var(--bg)}
-  .btn-retry{background:var(--navy2); color:var(--tsec)}
-  .res-btns button:active{transform:translateY(1px)}
-  .foot{display:flex; justify-content:center; gap:16px; margin-top:12px; font-size:10px; color:var(--tmuted); font-family:var(--mono)}
-  .hidden{display:none}
-  @media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+  .nav{display:flex; background:var(--navy); border-top:1px solid var(--navy2)}
+  .nav div{flex:1; text-align:center; padding:8px 0 10px; color:var(--tsec); font-size:10px; cursor:pointer}
+  .nav div.on{color:var(--gold)}
+  .nav div .ic{font-size:18px; display:block; margin-bottom:2px}
+  .toast{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.85); z-index:9;
+    background:rgba(8,11,20,.95); border:1px solid var(--gold); color:var(--gold); font-weight:800; font-size:14px;
+    padding:12px 20px; border-radius:12px; opacity:0; pointer-events:none; transition:all .2s; text-align:center; max-width:80%}
+  .toast.show{opacity:1; transform:translate(-50%,-50%) scale(1)}
+  .up{color:var(--profit)} .dn{color:var(--loss)} .fl{color:var(--tsec)}
 </style>
 
-<div class="app">
-  <div class="top">
-    <div class="logo">차트<span class="a">아레나</span></div>
-    <span class="qtag" id="qtag">문제 1</span>
-    <div class="spacer"></div>
-    <div class="bal"><div class="k">보유 포인트</div><div class="v" id="bal">10,000P</div></div>
-  </div>
-
-  <div class="chartwrap">
-    <canvas id="chart"></canvas>
-    <div class="chip-diff" id="diff">난이도 ●●●○○</div>
-    <div class="hint-hidden" id="hiddenTag">▓ 미래 숨김</div>
-    <div class="panhint">↔ 드래그 · 휠/버튼 확대</div>
-    <div class="zoombtns">
-      <button id="zoomOut" type="button" aria-label="축소">－</button>
-      <button id="zoomIn" type="button" aria-label="확대">＋</button>
-      <button id="zoomReset" type="button" aria-label="최근으로">⟲</button>
-    </div>
-  </div>
-  <div class="indbar" id="indbar"></div>
-
-  <div class="scroll">
-    <!-- ===== BET PHASE ===== -->
-    <div id="betPane">
-      <div class="lbl">방향 선택 <span class="sub">차트만 보고 판단</span></div>
-      <div class="row" id="dirRow">
-        <div class="chip dir-LONG" data-dir="LONG" tabindex="0">롱 <small>상승 베팅</small></div>
-        <div class="chip dir-SHORT" data-dir="SHORT" tabindex="0">숏 <small>하락 베팅</small></div>
-        <div class="chip dir-WATCH" data-dir="WATCH" tabindex="0">관망 <small>포인트 불변</small></div>
-      </div>
-
-      <div id="posOnly">
-        <div class="lbl">레버리지</div>
-        <div class="row" id="levRow"></div>
-
-        <div class="lbl">베팅 포인트</div>
-        <div class="row wrap" id="wagerRow"></div>
-
-        <div class="lbl">손절 <span class="sub">역방향 도달 시 종료</span></div>
-        <div class="row" id="stopRow"></div>
-
-        <div class="lbl">익절 <span class="sub">순방향 도달 시 종료</span></div>
-        <div class="row" id="takeRow"></div>
-      </div>
-
-      <div class="lbl">평가 기간</div>
-      <div class="row" id="horRow"></div>
-
-      <div class="risk" id="risk"></div>
-      <button class="submit" id="submitBtn" disabled>방향을 선택하세요</button>
-      <div class="disc">본 앱은 실제 투자가 아닌 교육용 모의 트레이딩 게임입니다. 포인트는 환전되지 않으며 현실 가치가 없습니다. 특정 종목의 매수·매도 추천이 아닙니다.</div>
-    </div>
-
-    <!-- ===== RESULT PHASE ===== -->
-    <div id="resPane" class="hidden">
-      <div class="res-head">
-        <div>
-          <div class="res-reason" id="rReason">—</div>
-          <div class="res-sub" id="rRet">—</div>
-        </div>
-        <div style="text-align:right">
-          <div class="res-pts" id="rPts">—</div>
-          <div class="res-sub flat">획득 포인트</div>
-        </div>
-      </div>
-      <div class="badges" id="rBadges"></div>
-      <div class="grid2">
-        <div class="cell"><div class="k">진입가</div><div class="v" id="rEntry">—</div></div>
-        <div class="cell"><div class="k">종료가</div><div class="v" id="rExit">—</div></div>
-        <div class="cell"><div class="k">최대 상승 / 낙폭</div><div class="v" id="rMax">—</div></div>
-        <div class="cell"><div class="k" id="rMktK">시장 수익률</div><div class="v" id="rMkt">—</div></div>
-      </div>
-      <div class="reveal">
-        <div class="sym"><b id="rSym">—</b><span class="meta" id="rPeriod">—</span></div>
-        <div class="tags" id="rTags"></div>
-        <div class="ex" id="rEx">—</div>
-      </div>
-      <div class="res-btns">
-        <button class="btn-retry" id="retryBtn">다시 풀기</button>
-        <button class="btn-next" id="nextBtn">다음 문제 ▶</button>
-      </div>
-      <div class="foot"><span id="fPlayed">0판</span><span id="fWin">승률 –</span><span id="fBest">최고 –</span></div>
-    </div>
-  </div>
+<div class="cap">
+  <div class="k">ChartArena · 홈 · 랭킹 · 차고</div>
+  <h1>🏠 메인 화면 & 돈자랑 (튜닝)</h1>
+  <p>랭킹을 <b style="color:var(--tprimary)">수익률·자산·승률</b> 3종으로, 차고에 <b style="color:var(--tprimary)">칭호</b> 추가, 아이템 <b style="color:var(--tprimary)">등급 색상</b>까지. 사고 장착하면 홈·랭킹에 바로 반영됩니다.</p>
+  <div class="note">⚠︎ 랭킹은 봇 닉네임 목업 — 실제 유저 순위는 백엔드 연동 후. 그 외 UI·경제·꾸미기는 로컬 동작</div>
 </div>
 
+<div class="phone"><div class="screen">
+  <div class="body">
+    <!-- HOME -->
+    <div class="view on" id="v-home">
+      <div class="hero">
+        <div class="hero-row">
+          <div class="avatar"><span class="ch" id="hCh">🐂</span><span class="acc" id="hAcc"></span><span class="car" id="hCar">🚲</span></div>
+          <div class="who">
+            <div class="nickrow"><input class="nick" id="nick" value="차트고수" maxlength="10" aria-label="닉네임"><span class="edit">✏️</span></div>
+            <span class="titlechip" id="hTitle" style="display:none"></span>
+            <div class="chips">
+              <span class="chip gold">Lv.12</span>
+              <span class="chip">🔥 7일</span>
+            </div>
+          </div>
+        </div>
+        <div class="wealth"><div class="lb">보유 자산</div><div class="amt" id="hAmt">25,000 P</div></div>
+        <div class="ranksum" id="ranksum"></div>
+      </div>
+
+      <div class="grid">
+        <div class="tile wide" data-go="rank"><span class="ic">🏆</span><div><div class="nm">랭킹</div><div class="sb">수익률 · 자산 · 승률 / 일 · 주 · 월</div></div></div>
+        <div class="tile" data-go="garage"><div class="ic">🏎️</div><div class="nm">차고 · 꾸미기</div><div class="sb">캐릭터·자동차·꾸미기·칭호</div></div>
+        <div class="tile" data-toast="여정 지도는 별도 미리보기 참고!"><div class="ic">🗺️</div><div class="nm">여정</div><div class="sb">챕터 지도 도전</div></div>
+        <div class="tile" data-href="game.html"><div class="ic">📈</div><div class="nm">차트 배틀</div><div class="sb">랜덤 실전 게임 · 자산 벌기</div></div>
+        <div class="tile" data-toast="앱에서 플레이하세요"><div class="ic">🥷</div><div class="nm">훈련</div><div class="sb">생존·도장·아레나</div></div>
+      </div>
+      <div class="disc">게임 내 포인트/자산은 가상 재화이며 환전되지 않습니다. 순위·자랑은 교육용 재미 요소입니다.</div>
+    </div>
+
+    <!-- RANKING -->
+    <div class="view" id="v-rank">
+      <div class="vh">🏆 랭킹</div>
+      <div class="tabs" id="periodTabs">
+        <div class="tab on" data-p="day">일간</div><div class="tab" data-p="week">주간</div><div class="tab" data-p="month">월간</div>
+      </div>
+      <div class="subtabs" id="metricTabs">
+        <div class="subtab on" data-m="ret">수익률</div><div class="subtab" data-m="assets">자산</div><div class="subtab" data-m="win">승률</div>
+      </div>
+      <div class="podium" id="podium"></div>
+      <div id="rankList"></div>
+    </div>
+
+    <!-- GARAGE -->
+    <div class="view" id="v-garage">
+      <div class="vh">🏎️ 차고 · 꾸미기</div>
+      <div class="balance">💰 <span>보유 자산</span><span class="amt" id="gAmt">25,000 P</span></div>
+      <div class="preview">
+        <div class="av"><span class="ch" id="pCh">🐂</span><span class="acc" id="pAcc"></span><span class="car" id="pCar">🚲</span></div>
+        <div><div style="font-weight:800;font-size:14px" id="pNick">차트고수</div>
+          <span class="titlechip" id="pTitle" style="display:none;margin-top:6px"></span>
+          <div style="color:var(--tsec);font-size:11px;margin-top:5px">장착 세트가 홈·랭킹에 표시됩니다</div></div>
+      </div>
+      <div class="catbar" id="catbar">
+        <div class="cat on" data-c="char">캐릭터</div><div class="cat" data-c="car">자동차</div>
+        <div class="cat" data-c="acc">꾸미기</div><div class="cat" data-c="title">칭호</div>
+      </div>
+      <div class="shop" id="shop"></div>
+    </div>
+  </div>
+
+  <div class="nav" id="nav">
+    <div class="on" data-go="home"><span class="ic">🏠</span>홈</div>
+    <div data-href="game.html"><span class="ic">📈</span>차트배틀</div>
+    <div data-go="rank"><span class="ic">🏆</span>랭킹</div>
+    <div data-go="garage"><span class="ic">🏎️</span>차고</div>
+  </div>
+  <div class="toast" id="toast"></div>
+</div></div>
+
 <script>
-const PROBLEMS = /*__PROBLEMS__*/[{"id":"BINANCE_BTCUSDT_1d_2","symbol":"BTCUSDT","tf":"1d","period":"2025-10-06 ~ 2026-01-03","source":"Binance","vis":250,"fut":30,"diff":4,"bias":"LONG","tags":["하락추세","아래꼬리"],"explain":"공개 구간은 '하락추세' 흐름이고 마지막 캔들 특징은 [하락추세, 아래꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 3.4% (상승) 움직였고, 최대 +3.8% / 최저 -1.2% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[84474.7,85677.99,84364.45,85077.01,9667],[85077,85320.76,83949.52,85179.24,8092],[85179.24,88465.99,85144.76,87516.23,31773],[87516.22,93888,87076.03,93442.99,43873],[93442.99,94696.05,91935.41,93691.08,27404],[93691.07,94005,91660.01,93980.47,19497],[93980.47,95758.04,92855.96,94638.68,27501],[94638.68,95199,93870.69,94628,9415],[94628,95369,93602.58,93749.3,11163],[93749.29,95630,92800.01,95011.18,22158],[95011.18,95461.53,93742.54,94256.82,16955],[94256.82,95228.45,92910,94172,17661],[94172,97424.02,94130.43,96489.91,21380],[96489.9,97895.68,96350,96887.14,14906],[96887.13,96935.67,95753.01,95856.42,9723],[95856.42,96304.48,94151.38,94277.62,11036],[94277.61,95199,93514.1,94733.68,17251],[94733.68,96920.65,93377,96834.02,16123],[96834.02,97732,95784.61,97030.5,16645],[97030.5,104145.8,96876.29,103261.6,34962],[103261.6,104361.3,102315.1,102972,27617],[102972,104984.6,102818.8,104809.5,15325],[104809.5,104972,103345.1,104118,17987],[104118,105819.4,100718.4,102791.3,31273],[102791.3,104976.3,101429.7,104103.7,21253],[104103.7,104356.9,102602.1,103507.8,16453],[103507.8,104192.7,101383.1,103763.7,17999],[103763.7,104550.3,103100.5,103463.9,15684],[103463.9,103709.9,102612.5,103126.6,11251],[103126.6,106660,103105.1,106454.3,21600],[106454.3,107108.6,102000,105573.7,30260],[105573.7,107320,104184.7,106850,23705],[106850,110797.4,106100,109644,45531],[109644,111980,109177.4,111696.2,31631],[111696.2,111800,106800,107318.3,31738],[107318.3,109506,106875.4,107761.9,16783],[107761.9,109300,106600.6,109004.2,17710],[109004.2,110422.2,108670.6,109434.8,14649],[109434.8,110718,107516.6,108938.2,21277],[108938.2,109284.7,106769.4,107781.8,15634],[107781.8,108891.9,105322.9,105589.8,19835],[105589.8,106313.1,103621,103985.5,23706],[103985.5,104900,103068.6,104591.9,11289],[104591.9,105866.9,103752.5,105642.9,9710],[105642.9,105935.6,103659.9,105858,13454],[105858,106794.7,104872.5,105376.9,13260],[105376.9,106000,104179,104696.9,14035],[104696.9,105909.7,100372.3,101508.7,22322],[101508.7,105333,101095.8,104288.4,15839],[104288.4,105900,103871.1,105552.1,8345],[105552.1,106488.1,104964.1,105734,8048],[105734,110530.2,105318.4,110263,19975],[110263,110400,108331,110274.4,17072],[110274.4,110392,108064,108645.1,13116],[108645.1,108813.6,105671.7,105671.7,17779],[105671.7,106179.5,102664.3,106066.6,26181],[106066.6,106252,104300,105414.6,8799],[105414.6,106128.6,104494.5,105594,7164],[105594,108952.4,104980.4,106794.5,14923],[106794.5,107771.3,103371,104551.2,17866],[104551.2,105550.3,103500,104886.8,13969],[104886.8,105226.2,103929.3,104658.6,7679],[104658.6,106524.6,102345,103298,16419],[103298,103982.6,100837.9,102120,11154],[102120,103399.6,98200,100963.9,28746],[100963.9,106074.2,99613.33,105333.9,27667],[105333.9,106290,104622,106083,14652],[106083,108135.3,105808,107340.6,16701],[107340.6,108272.4,106562.5,106947.1,10573],[106947.1,107735.3,106356.8,107047.6,12232],[107047.6,107577.8,106811.5,107296.8,3282],[107296.8,108528.5,107172.5,108356.9,6832],[108356.9,108790,106733.3,107146.5,9754],[107146.5,107540,105250.9,105681.1,10506],[105681.1,109730,105100.2,108849.6,17692],[108849.6,110529.2,108530.4,109584.8,13047],[109584.8,109767.6,107245,107984.2,11794],[107984.3,108420.6,107756.3,108198.1,3737],[108198.1,109700,107800,109203.8,6448],[109203.9,109700,107513.2,108262.9,9405],[108262.9,109216.6,107429.6,108923,9216],[108923,111999.8,108324.5,111234,17282],[111234,116868,110500,116010,24883],[116010,118870,115222.2,117527.7,25874],[117527.7,118200,116900.1,117420,8447],[117420,119488,117224.8,119086.6,9551],[119086.6,123218,118905.2,119841.2,27269],[119841.2,119940.8,115736.9,117758.1,32018],[117758.1,120063.8,117017.3,118630.4,17040],[118630.4,120998.7,117453.6,119177.6,15729],[119177.6,120820.7,116812.8,117924.8,19925],[117924.8,118499.9,117277.3,117840,6636],[117840,118856.8,116467,117265.1,12963],[117265.1,119676.7,116515,117380.4,17107],[117380.4,120247.8,116128,119954.4,20959],[119954.4,120090,117301,118756,14559],[118756,119450,117103.1,118341,15807],[118341,118451.6,114723.2,117614.3,38406],[117614.3,118297.4,117138.4,117920,6992],[117920,119766.6,117825.5,119415.6,9328],[119415.6,119800,117427.5,118062.3,13962],[118062.3,119273.4,116950.8,117950.8,15138],[117950.8,118792,115796.2,117840.3,15587],[117840.3,118922.4,115500,115764.1,17010],[115764.1,116052,112722.6,113297.9,24487],[113297.9,114063.5,112003,112546.4,11507],[112546.4,114800,111920,114208.8,7398],[114208.8,115720,114107.6,115055,9668],[115055,115127.8,112650,114129.8,12043],[114129.8,115716,113355.1,114992.3,9761],[114992.3,117621,114259,117472,13469],[117472,117630,115878.7,116674.7,10045],[116674.7,117944.1,116299.1,116462.3,9514],[116462.3,119311.1,116460.6,119294,14323],[119294.3,122335.2,118050.1,118686,26494],[118686,120324.4,118207.5,120134.1,16720],[120134.1,123667.8,118920.9,123306.4,23210],[123306.4,124474,117180,118295.1,27981],[118295.1,119216.8,116804,117342.1,13623],[117342,117899,117144,117380.7,6394],[117380.7,118575,117172.2,117405,5899],[117405,117543.8,114640.1,116227.1,17746],[116227.1,116725.7,112732.6,112872.9,18065],[112872.9,114615.4,112380,114271.2,15636],[114271.2,114821.8,112015.7,112500,10840],[112500,117429.1,111684.8,116936,23128],[116936,117030,114560,115438.1,11329],[115438.1,115666.7,110680,113493.6,21176],[113493.6,113667.3,109274.1,110112,25183],[110112,112371,108666.7,111763.2,18452],[111763.2,112625,110345.4,111262,13393],[111262,113485.9,110862.4,112566.9,11104],[112566.9,112638.6,107463.9,108377.4,22580],[108377.4,108926.1,107350.1,108816.3,10708],[108816.3,109480,108076.9,108246.4,9490],[108246.4,109912.4,107255,109237.4,16054],[109237.4,111771.5,108393.4,111240,18510],[111240,112575.3,110528.7,111705.7,11774],[111705.7,112180,109329.1,110730.9,12203],[110730.9,113384.6,110207,110660,21587],[110660,111307.7,109977,110188,5000],[110188,111600,110180,111137.3,5681],[111137.4,112924.4,110621.8,112065.2,11582],[112065.2,113293.3,110766.7,111546.4,15379],[111546.4,114313.1,110917.4,113960,17517],[113960,115488.1,113430,115482.7,13677],[115482.7,116665.6,114741,116029.4,15324],[116029.4,116298.8,115127.3,115918.3,8269],[115918.3,116165.2,115135,115268,6708],[115268,116758,114384,115349.7,13213],[115349.7,116964.3,114737.1,116789,10927],[116789,117286.7,114720.8,116447.6,16754],[116447.6,117900,116092.8,117073.5,11657],[117073.5,117460,115100,115632.4,8992],[115632.4,116121.8,115408.5,115685.6,4675],[115685.6,115819.1,115188,115232.3,4512],[115232.3,115379.3,111800,112651,20782],[112651,113290.5,111458.7,111998.8,12301],[111998.8,113940,111042.7,113307,12369],[113307,113510.2,108631.5,108994.5,21231],[108994.5,110300,108620.1,109643.5,14243],[109643.5,109743.9,109064.4,109635.9,5502],[109635.9,112350,109190,112163.9,7542],[112164,114400,111560.6,114312,15541],[114312,114792,112656.3,114048.9,15044],[114048.9,118649.1,113966.7,118595,20036],[118595,121022.1,118279.3,120529.4,19671],[120529.4,123895,119248.3,122232,23936],[122232.2,122800,121510,122391,8208],[122391,125708.4,122136,123482.3,22043],[123482.3,126199.6,123084,124658.5,19495],[124658.5,125126,120574.9,121332.9,21634],[121333,124197.3,121066.1,123306,17013],[123306,123762.9,119651.5,121662.4,21559],[121662.4,122550,102000,112774.5,64172],[112774.5,113322.4,109561.6,110644.4,35449],[110644.4,115770,109565.1,114958.8,32255],[114958.8,115963.8,113616.5,115166,22557],[115166,115410,109866,113028.1,31870],[113028.1,113612.4,110164,110763.3,22986],[110763.3,111982.4,107427,108194.3,29857],[108194.3,109240,103528.2,106431.7,37921],[106431.7,107499,106322.2,107185,11123],[107185,109450.1,106103.4,108642.8,15481],[108642.8,111705.6,107402.5,110532.1,19193],[110532.1,114000,107473.7,108297.7,37228],[108297.7,109163.9,106666.7,107567.4,28611],[107567.4,111293.6,107500,110078.2,17573],[110078.2,112105,109700,111004.9,15005],[111004.9,111943.2,110672.9,111646.3,6408],[111646.3,115466.8,111260.4,114559.4,13454],[114559.4,116400,113830,114107.6,21450],[114107.6,116086,112211,112898.4,15523],[112898.4,113643.7,109200,110021.3,21080],[110021.3,111592,106304.3,108322.9,25989],[108322.9,111190,108275.3,109608,21518],[109608,110564.5,109394.8,110098.1,7379],[110098.1,111250,109471.3,110540.7,12107],[110540.7,110750,105306.6,106583,28681],[106583.1,107299,98944.36,101497.2,50535],[101497.2,104534.7,98966.8,103885.2,33779],[103885.2,104200,100300.9,101346,25815],[101346,104096.4,99260.86,103339.1,32060],[103339.1,103406.2,101454,102312.9,12391],[102312.9,105495.6,101400,104723,16339],[104722.9,106670.1,104265,106011.1,22682],[106011.1,107500,102476.1,103059,24197],[103059,105333.3,100813.6,101654.4,20458],[101654.4,104085,98000.4,99692.02,36199],[99692.03,99866.02,94012.45,94594,47288],[94594,96846.68,94558.49,95596.24,15111],[95596.23,96635.11,93005.55,94261.44,23889],[94261.45,96043,91220,92215.14,39219],[92215.14,93836.01,89253.78,92960.83,39835],[92960.83,92980.22,88608,91554.96,32287],[91554.96,93160,86100,86637.23,39733],[86637.22,87498.94,80600,85129.43,72256],[85129.42,85620,83500,84739.74,14194],[84739.75,88127.64,84667.57,86830,19734],[86830,89228,85272,88300.01,24663],[88300.01,88519.99,86116,87369.96,19567],[87369.97,90656.08,86306.77,90484.02,21676],[90484.01,91950,90089.91,91333.95,16834],[91333.94,93092,90180.63,90890.7,18831],[90890.71,91165.65,90155.47,90802.44,7430],[90802.44,92000.01,90336.9,90360,9688],[90360.01,90417,83822.76,86286.01,34509],[86286.01,92307.65,86184.39,91277.88,28210],[91277.88,94150,90990.23,93429.95,25713],[93429.95,94080,90889,92078.06,19804],[92078.06,92692.36,88056,89330.04,19793],[89330.04,90289.97,88908.01,89236.79,8410],[89236.8,91760,87719.28,90395.31,13021],[90395.32,92287.15,89612,90634.34,15794],[90634.35,94588.99,89500,92678.8,21240],[92678.81,94476,91563.15,92015.37,18999],[92015.38,93555,89260.63,92513.38,19973],[92513.38,92754,89480,90268.42,16679],[90268.43,90634.55,89766.39,90240.01,5896],[90240,90472.4,87577.36,88172.17,9417],[88172.16,90052.64,85146.64,86432.08,19779],[86432.08,88175.98,85266,87863.42,18456],[87863.43,90365.85,85314,86243.22,19834],[86243.23,89477.61,84450.01,85516.41,25405],[85516.41,89399.97,85110.24,88136.94,21257],[88136.95,88573.07,87795.76,88360.9,5123],[88360.91,89081.77,87600.04,88658.86,7133],[88658.87,90588.23,87900,88620.79,14673],[88620.79,88940,86601.9,87486,13910],[87486,88049.89,86420,87669.45,9141],[87669.44,88592.74,86934.72,87225.27,7097],[87225.27,89567.75,86655.08,87369.56,18345],[87369.56,87984,87253.05,87877.01,4470],[87877,88088.75,87435,87952.71,4446],[87952.71,90406.08,86806.5,87237.13,19895],[87237.13,89400,86845.66,88485.49,13106],[88485.5,89200,87250,87648.22,11559],[87648.21,88919.45,87550.43,88839.04,6280],[88839.05,90961.81,88379.88,89995.13,17397],[89995.14,90741.16,89314.01,90628.01,7057],[90628.01,91810,90628,91529.73,10427],[91529.74,94789.08,91514.81,93859.71,20674],[93859.71,94444.44,91262.94,93747.97,18546],[93747.97,93747.97,90675.52,91364.16,14276],[91364.16,91687.99,89311,91099.99,16133],[91100,92082.55,89694.66,90641.28,15590],[90641.27,90832,90404,90504.7,3104],[90504.7,91283.89,90236,91013.65,5477],[91013.66,92519.95,90128.44,91296.2,16188],[91296.2,96495,91042.66,95414,23022],[95413.99,97924.49,94559.28,96951.78,22852],[96951.78,97193.34,95134.48,95604.8,21726],[95604.81,95871.47,94293.46,95550.94,11168],[95550.94,95639.45,95021.67,95147.77,4281],[95147.77,95531.12,93615.4,93673.14,6895],[93673.14,93673.14,91910.2,92631,14296],[92630.99,92870,87895.98,88427.66,22007],[88427.66,90574,87263.53,89454.73,20618],[89454.73,90359.99,88515.37,89559.67,10826],[89559.68,91224.99,88578.36,89600.26,13918]]},{"id":"BINANCE_ETHUSDT_1d_2","symbol":"ETHUSDT","tf":"1d","period":"2025-10-06 ~ 2026-01-03","source":"Binance","vis":250,"fut":30,"diff":4,"bias":"LONG","tags":["하락추세","아래꼬리"],"explain":"공개 구간은 '하락추세' 흐름이고 마지막 캔들 특징은 [하락추세, 아래꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 6.1% (상승) 움직였고, 최대 +6.9% / 최저 -1.9% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[1588.6,1631.81,1585.01,1613.27,223096],[1613.26,1619.19,1565.59,1587.36,276052],[1587.36,1658.75,1564.07,1579.57,691487],[1579.57,1778,1537.26,1756.26,1103037],[1756.25,1834.86,1744.95,1795.07,887546],[1795.08,1802.82,1722.9,1769.65,483465],[1769.64,1827.32,1738.6,1784.6,595611],[1784.6,1841.16,1778.94,1820.88,355068],[1820.87,1857.47,1781.9,1791.29,340333],[1791.29,1827.98,1744.71,1799.88,587270],[1799.88,1842.99,1780.47,1797.81,480456],[1797.81,1816.8,1731.7,1793.61,473524],[1793.62,1873.17,1792.52,1838.11,537199],[1838.1,1871,1813,1842.2,410668],[1842.2,1848.6,1810,1833.52,213752],[1833.52,1849.95,1803,1808.86,238254],[1808.86,1833.55,1781.85,1820.19,342341],[1820.19,1820.9,1752,1817,384584],[1817,1850,1787.01,1811.11,456170],[1811.11,2226,1808.71,2207.39,1473153],[2207.39,2490.77,2184.33,2345.04,1667041],[2345.04,2600,2317,2583.23,979350],[2583.22,2608.13,2435.51,2514.57,831584],[2514.58,2624,2406.63,2495.47,1068681],[2495.48,2738.5,2415.3,2679.71,1031356],[2679.71,2725.99,2547.26,2609.74,830047],[2609.75,2647.03,2476.03,2548.69,768954],[2548.7,2649.31,2529.4,2537.12,605954],[2537.13,2538.16,2446.42,2475.08,494333],[2475.09,2587.61,2323.21,2497.78,810103],[2497.78,2547.36,2348.38,2528.14,861748],[2528.14,2588.63,2442.4,2524.19,676989],[2524.19,2615.95,2452.2,2550.99,1095890],[2551,2692.99,2544.83,2664.82,852556],[2664.83,2734.23,2498.3,2526.5,971442],[2526.49,2575.85,2515.08,2530.4,257544],[2530.41,2554.26,2463,2551.22,359890],[2551.22,2599,2525.86,2563.7,362971],[2563.7,2712.36,2509.46,2660.81,798431],[2660.81,2689.14,2608.5,2681.6,560096],[2681.61,2788,2619.05,2631.39,811567],[2631.39,2649.23,2507.35,2531.34,763045],[2531.35,2550.34,2475.33,2528.06,394537],[2528.06,2547.79,2468.56,2539.21,332022],[2539.2,2615,2475,2607.41,468890],[2607.42,2655.38,2575,2593.36,454383],[2593.35,2679.88,2583.5,2607.68,502495],[2607.68,2640.86,2391.66,2414.01,808938],[2414.02,2531.36,2381.49,2476.1,578843],[2476.1,2544.36,2457,2524.63,264788],[2524.64,2548.63,2490.58,2509.83,266475],[2509.84,2693.99,2477.73,2680.13,568726],[2680.13,2827,2655.61,2816.4,1138405],[2816.41,2879.22,2743.75,2771.61,850211],[2771.6,2784.83,2616.24,2642.65,699593],[2642.66,2645.45,2436.98,2579.19,1202176],[2579.19,2579.43,2488.72,2530.76,331439],[2530.77,2559.51,2492,2547.61,299702],[2547.62,2680.34,2514.85,2544.17,680430],[2544.17,2618.6,2453.8,2509.95,715930],[2509.95,2548.42,2465.78,2525,504532],[2525,2546.91,2485.03,2521.12,252646],[2521.13,2569,2367.36,2406.49,632028],[2406.49,2448.8,2216,2295.73,496784],[2295.72,2314.48,2111.89,2227.7,840156],[2227.7,2438.68,2188,2411.66,744584],[2411.66,2482.04,2376.11,2448.45,516761],[2448.46,2468.69,2389.69,2418.49,414895],[2418.5,2520.92,2394.32,2415.96,463704],[2415.96,2463.54,2382.53,2423.17,381475],[2423.17,2447.8,2405.81,2435.62,155815],[2435.62,2525,2412,2500.09,284292],[2500.09,2524.3,2431,2485.47,440456],[2485.47,2500.8,2386.52,2405.01,351951],[2405.01,2619.28,2373,2570.41,634967],[2570.41,2635.5,2556.12,2591.25,504944],[2591.26,2603.17,2474.24,2508.04,452593],[2508.04,2529.81,2487.95,2516.41,157198],[2516.42,2605,2503.5,2570.35,277594],[2570.35,2590.57,2512,2542.29,315708],[2542.3,2628.21,2523.59,2615.25,370916],[2615.25,2795.74,2589.78,2768.74,686119],[2768.74,3000,2755.5,2951.29,951896],[2951.29,3040.15,2913.75,2958.22,906839],[2958.21,2979.78,2903.85,2943.28,348885],[2943.29,3020.31,2936.49,2972.03,357334],[2972.03,3083,2962.81,3013.62,815553],[3013.61,3144.14,2932.46,3137.89,863584],[3137.9,3425,3101,3371.35,1135951],[3371.35,3523.44,3310.77,3476.87,974066],[3476.88,3673.84,3458.68,3546.92,1163823],[3546.92,3608.3,3506.79,3592.01,381792],[3592,3824.56,3579.13,3756.69,852357],[3756.69,3860,3701.01,3762.33,812074],[3762.32,3798.65,3616.54,3746.21,870127],[3746.21,3764.2,3527,3628.29,800259],[3628.29,3771,3502.85,3706.94,749459],[3706.95,3747,3573.76,3724.96,764607],[3724.97,3793,3697.66,3741.1,407260],[3741.11,3879.82,3731,3872.1,457352],[3872.11,3941,3754,3799,620995],[3799,3886.44,3716.04,3793.79,584210],[3793.79,3834.03,3677.65,3810,525425],[3810,3878.67,3684.33,3698.39,516088],[3698.39,3724.02,3431.75,3488.2,783869],[3488.21,3537.69,3368.29,3393.94,494196],[3393.94,3521.79,3354.28,3496.74,296348],[3496.75,3736.73,3490.73,3720.99,463350],[3720.99,3722.24,3546,3612,489071],[3612.01,3698.6,3564.19,3683.31,365310],[3683.31,3927.77,3647.63,3910.31,631679],[3910.3,4071,3880,4009.5,723300],[4009.51,4326.2,4006.63,4260.62,691932],[4260.63,4332.6,4153.07,4250.57,494844],[4250.58,4366.46,4166.77,4223.22,722664],[4223.22,4639.7,4219.04,4590.52,885288],[4590.52,4783.85,4564.33,4749.3,925931],[4749.31,4788,4451.33,4546.84,1265449],[4546.84,4672.67,4368,4439.47,880409],[4439.47,4490.42,4372.54,4421.99,358677],[4422,4576,4393.98,4472.33,442461],[4472.34,4481.88,4225.86,4312.99,823188],[4312.99,4355,4067.34,4075.59,831223],[4075.58,4378,4060,4336.16,728325],[4336.16,4340.26,4204.2,4225.3,433836],[4225.3,4887.59,4207.39,4832.07,1277977],[4832.07,4832.07,4659.7,4778.4,512442],[4778.4,4956.78,4711,4780.15,780669],[4780.15,4797.97,4334.13,4376.18,1043917],[4376.17,4633.46,4311.04,4600.63,834750],[4600.63,4663.93,4481.53,4506.71,606669],[4506.71,4633.97,4430,4511.21,485243],[4511.2,4516.75,4265,4360.18,679064],[4360.18,4415.61,4257.2,4373.7,340319],[4373.7,4498.47,4372.63,4391.83,356586],[4391.83,4491.84,4210.61,4314.5,513830],[4314.5,4416.78,4257.85,4326.5,524605],[4326.49,4490.64,4283.23,4450.46,487092],[4450.46,4482.05,4265.33,4297.55,471796],[4297.56,4490,4256.03,4307.45,624170],[4307.46,4329.3,4236,4273.14,191166],[4273.15,4336.02,4270.81,4306.19,169621],[4306.19,4384.06,4279,4306.37,372882],[4306.36,4381.87,4276.76,4310.09,405486],[4310.08,4453.57,4285.1,4349.32,506634],[4349.33,4481.09,4338.82,4458.82,441260],[4458.83,4748.4,4450.71,4712.16,510778],[4712.16,4769.36,4605,4666.53,394394],[4666.54,4692.36,4576.89,4604.49,278244],[4604.48,4670.28,4466,4523.74,412292],[4523.74,4538.25,4424,4501.29,293307],[4501.3,4616.77,4412,4590.53,476981],[4590.54,4644.47,4553.7,4587.66,290660],[4587.66,4620.72,4435.7,4468.59,331611],[4468.59,4508.71,4454.45,4480.42,130782],[4480.41,4498.16,4443,4444.97,149350],[4444.98,4455.76,4077,4199.08,708243],[4199.09,4229.03,4114.39,4164.26,315228],[4164.25,4206.9,4073.74,4152.81,353666],[4152.81,4161.04,3815,3874.36,930328],[3874.35,4068.3,3867.65,4032.24,575711],[4032.24,4039.01,3972.98,4018.38,172693],[4018.39,4144.88,3966,4142.16,240332],[4142.16,4235.86,4082.25,4215.07,380729],[4215.07,4245,4092.1,4145.15,391127],[4145.15,4355.46,4123.08,4348.03,507026],[4348.03,4516.74,4332.73,4484.35,526411],[4484.35,4591.59,4428,4512.87,485684],[4512.88,4517.93,4440,4487.15,199733],[4487.16,4618.17,4467.05,4514.32,506588],[4514.32,4735.93,4488.25,4684.01,456201],[4684.02,4755,4430.43,4447.7,640686],[4447.7,4558,4410.08,4525.72,399904],[4525.72,4531.52,4265.06,4368.09,515978],[4368.09,4393.63,3435,3829.72,1493971],[3829.72,3878.3,3643.33,3746.79,789886],[3746.8,4197.7,3694.74,4152.29,811308],[4152.29,4292,4042.29,4240.85,622814],[4240.86,4263.38,3888.74,4125.02,962997],[4125.01,4217.6,3926.74,3985.61,626082],[3985.61,4086.49,3826.04,3894.51,643805],[3894.5,3950.45,3674.5,3831.57,830127],[3831.58,3927.73,3819.07,3889.21,250711],[3889.2,4030.94,3827.04,3982.58,408538],[3982.58,4085.3,3908.73,3979.22,511382],[3979.22,4110,3840.24,3873.05,590594],[3873.04,3889.27,3710,3805.53,593130],[3805.53,3934.86,3796.54,3856.8,477231],[3856.8,4026.39,3845.86,3934.88,425927],[3934.88,3969.22,3912.4,3953.82,138526],[3953.81,4178.78,3919.03,4158.46,344698],[4158.46,4253.72,4095,4120.15,487131],[4120.16,4175.55,3931.33,3979.2,472966],[3979.19,4036.66,3840.37,3902.99,486452],[3903,3948.74,3680,3805.09,531456],[3804.95,3906.09,3796.36,3847.99,478636],[3848,3909.39,3831,3873.77,152998],[3873.78,3918.23,3839.12,3906.58,216083],[3906.58,3914.29,3558.82,3603.83,877187],[3603.84,3654.54,3057,3287.05,1568004],[3287.05,3480.46,3166.66,3424.29,809592],[3424.29,3456.46,3245.45,3315.14,566364],[3315.14,3473,3194.2,3436.05,683417],[3436.04,3488,3355.58,3401.51,291532],[3401.51,3623.25,3358.66,3583.46,464098],[3583.46,3658.98,3507.3,3567.85,595273],[3567.85,3648.27,3405.24,3417.76,660283],[3417.76,3588.19,3371.65,3414.92,553102],[3414.91,3565.84,3154.22,3231.54,951989],[3231.55,3256.71,3070,3112.4,890446],[3112.4,3230,3110.68,3167.88,338463],[3167.87,3249,3004,3095.29,570634],[3095.29,3223.38,2959.46,3031.44,762500],[3031.44,3169.95,2946.56,3123.66,766640],[3123.65,3125.54,2873.64,3025.48,737927],[3025.48,3063.61,2790.01,2834.22,912524],[2834.21,2886.73,2623.57,2765.85,1180475],[2765.86,2799.01,2704.33,2770.12,264691],[2770.12,2858.16,2768.29,2802.16,409809],[2802.16,2987,2763,2953.38,715280],[2953.38,2980.82,2857.32,2959.36,427686],[2959.36,3045,2888.69,3026.56,364535],[3026.56,3071.37,2985.78,3015.23,274980],[3015.23,3099,2994.36,3031.15,346616],[3031.14,3052.64,2961.91,2989.16,217904],[2989.17,3053.02,2975.3,2991.26,182722],[2991.25,2999.47,2716.04,2799.07,849003],[2799.07,3033.76,2782.19,2996.07,523707],[2996.07,3214.99,2985.58,3188.36,553670],[3188.39,3240.35,3066.37,3133.26,486698],[3133.26,3193.33,2983.08,3021.78,530383],[3021.77,3069,3012.58,3038.06,159721],[3038.06,3150,2907.52,3059.85,391130],[3059.86,3180.51,3040.87,3124.16,452820],[3124.16,3397.85,3090.8,3318.04,603860],[3318.04,3447.44,3288.1,3324.14,539585],[3324.14,3327.37,3145.28,3237.39,504114],[3237.38,3265.5,3045.31,3084.86,435686],[3084.86,3135.68,3078.6,3114.64,136466],[3114.64,3129.54,3024.44,3063.5,279058],[3063.49,3177.5,2894.57,2964.85,520510],[2964.85,2981.87,2876,2962.3,378293],[2962.3,3030.92,2791.02,2833.49,497630],[2833.5,2997.4,2775.19,2828.57,595254],[2828.56,3020,2808.63,2979.5,531703],[2979.49,2994.41,2964.17,2977.93,91784],[2977.93,3013.4,2944,3002.02,162245],[3002.03,3077.39,2963.43,3009.49,298444],[3009.48,3035.79,2900.93,2965.02,386466],[2965.03,2978.15,2888.7,2947.47,197036],[2947.48,2971.46,2891.2,2903.95,188721],[2903.9,2994.38,2894.26,2927.99,314831],[2928,2960.89,2917.13,2949.05,95040],[2949.05,2961.23,2924.54,2950.91,128834],[2950.91,3057.78,2910.25,2937.9,485959],[2937.91,3009.8,2919.44,2973.69,286583],[2973.69,3028.08,2958.91,2971.64,233730],[2971.65,3010,2971.15,3004.19,136089],[3004.19,3150.01,2992.49,3125.45,369891],[3125.46,3136.71,3076,3127.11,134405],[3127.11,3167.22,3118.75,3144.7,181576],[3144.71,3265.66,3135.02,3224.99,382447],[3224.99,3308.86,3183.27,3296.84,412504],[3296.83,3296.84,3125.42,3168.72,321350],[3168.72,3184.39,3054.65,3106.65,343616],[3106.66,3148.41,3058.69,3088.4,274587],[3088.4,3104.12,3077.99,3086.72,82341],[3086.72,3147.27,3084.46,3123.45,149381],[3123.46,3171.49,3065.55,3095.75,297373],[3095.75,3367.79,3091.96,3325.82,457782],[3325.83,3402.89,3280.48,3354.92,503440],[3354.92,3384.19,3273.72,3318.69,389994],[3318.7,3326.79,3253.01,3296.28,223922],[3296.28,3330.26,3283.96,3310.56,124325],[3310.56,3368.82,3278.86,3284.03,173354],[3284.04,3284.58,3165.38,3189.55,442541],[3189.56,3200.5,2920,2939.88,518166],[2939.88,3069.07,2866.11,2982.27,577800],[2982.28,3038.33,2906.02,2952.69,291661],[2952.7,3019.26,2892.4,2956.41,318415]]},{"id":"BINANCE_BNBUSDT_1d_2","symbol":"BNBUSDT","tf":"1d","period":"2025-10-06 ~ 2026-01-03","source":"Binance","vis":250,"fut":30,"diff":4,"bias":"LONG","tags":["하락추세","아래꼬리"],"explain":"공개 구간은 '하락추세' 흐름이고 마지막 캔들 특징은 [하락추세, 아래꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 3.8% (상승) 움직였고, 최대 +5.3% / 최저 -3% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[591.7,594.49,587.7,591.73,96609],[591.74,595.23,587.5,592.77,115344],[592.77,608.52,592.53,597.34,171926],[597.32,619.9,595,618.51,285468],[618.5,619.99,601.38,605.71,314125],[605.72,606.78,592.59,601.55,204214],[601.56,610.35,597.2,599.91,257427],[599.9,609.25,599.34,607.23,137533],[607.23,608.68,597,603.46,121784],[603.46,608.27,598.2,606.16,143778],[606.16,610.75,598.1,601,236810],[601,604.44,591.42,599.88,210581],[599.88,605.28,598.14,599.63,156229],[599.64,603.61,595.12,600.69,141345],[600.69,601.2,595.23,599.36,100770],[599.36,600.49,584.7,586.03,143961],[586.02,599.98,583.55,597.61,201101],[597.61,603.18,593.23,602.57,214613],[602.57,609.07,597.89,602.7,194089],[602.7,629.33,600.8,629.17,384268],[629.17,671.15,623.12,666.29,480735],[666.29,678.95,648.83,663.9,444595],[663.9,668.49,647.83,651.15,319999],[651.15,693,647.31,660.07,586387],[660.08,672,640.66,664.13,416310],[664.12,667.33,647.15,652.47,290030],[652.47,661,642.29,651.88,313561],[651.88,659.97,644,646.76,200794],[646.76,646.9,635.05,639.51,141778],[639.5,655.19,634.39,651.53,189475],[651.54,653.53,633.51,649.62,210902],[649.62,653.75,640.14,650,169584],[650,678,648.49,673.31,470532],[673.31,690.02,673,686.57,390008],[686.57,691.35,652.19,656.98,343669],[656.99,677.47,655.4,668.01,165142],[668,671.67,657.1,669.44,169208],[669.45,678.33,668.22,674.29,180148],[674.3,697.73,666.56,686.91,326163],[686.9,689.22,680.04,686.89,211876],[686.89,691.24,673.33,675.02,260985],[675.02,678.5,653.22,655.36,218724],[655.36,661.42,645.04,658.01,158379],[658.01,662.48,647.58,660.77,131807],[660.77,667,650.05,665.93,143786],[665.93,673.43,657.11,661.59,158377],[661.6,671.76,660.84,663.23,124474],[663.24,670.92,625.44,633.32,271543],[633.33,651.51,629.38,642.7,169536],[642.71,653.81,639.69,650.82,90666],[650.82,656.39,646.49,652,72300],[652,667.74,648.01,665.58,127272],[665.58,674,657.26,673.51,176645],[673.51,674.8,662.2,667.43,177934],[667.42,669.93,651.91,654.75,152794],[654.76,659.42,639.01,655.35,223304],[655.35,655.36,639,645.61,93690],[645.61,652,642.77,648.19,79325],[648.19,659.46,646.26,650.74,124204],[650.74,659,640.11,648.08,182982],[648.09,654.31,637.35,644.77,143726],[644.77,646.5,638.66,644.65,80405],[644.65,651.02,638,641.61,143280],[641.61,644.84,621.94,628.97,143508],[628.98,635.51,601.25,615.81,243515],[615.81,642.79,615.05,640.49,219674],[640.5,644.09,636.17,643.53,131607],[643.53,652.64,641.85,646.07,169433],[646.06,650,641.12,642.3,103057],[642.3,648.44,639.16,645.71,81303],[645.72,649.18,644.25,648.6,57715],[648.61,656,646.72,654.9,73236],[654.9,660,651.17,656.9,110702],[656.9,659.1,644,646.33,85803],[646.34,664.85,643.71,659.71,112808],[659.7,664.57,656.7,663.59,99001],[663.58,664.17,650.21,653.6,89027],[653.6,656.75,652,656.16,51648],[656.17,664.99,653.54,663.13,82399],[663.13,663.5,656.77,661.06,83233],[661.06,662.6,657.36,660.63,86374],[660.63,671.5,659.05,668.68,123552],[668.69,687.7,667.25,685.8,214968],[685.8,697.24,682.83,689.99,268354],[689.98,697,679.63,685.86,134785],[685.86,694.12,685.12,692,84926],[692.01,707.54,686.05,689.12,253635],[689.13,693.21,675.3,689.92,188962],[689.93,715.56,685.2,708.61,238335],[708.61,727.85,706.14,720.65,409573],[720.64,765.56,718.73,729.92,556430],[729.92,742.5,718.76,733.2,188096],[733.2,761.29,731.5,756.82,253255],[756.82,781.99,746.06,766.22,338420],[766.22,788.35,745,786.68,359074],[786.69,809.84,752.47,776.74,709087],[776.74,786.16,742.62,770.74,363437],[770.74,786,752.22,785.45,284068],[785.44,798,778.28,793.29,128764],[793.3,847.12,791.04,844,397296],[844,861.1,820.64,824.07,517735],[824.07,835.06,800.12,805.1,427366],[805.11,811.64,766.21,793.51,369599],[793.51,814.8,781.38,783.14,335026],[783.13,795.4,744.69,757.08,393832],[757.08,770.11,732.36,736.42,209283],[736.43,755.53,730.01,751.21,142701],[751.21,770,750.47,768.63,171505],[768.62,769.79,745.11,755.13,179459],[755.13,774.84,746.26,769.55,163685],[769.55,788.68,764.17,788.67,188107],[788.67,798.5,780.74,793.5,195310],[793.5,819.44,792.81,798.83,202385],[798.83,815.5,793.68,807.22,162735],[807.22,827.59,792,805.09,316221],[805.09,839.9,797.73,832.47,268762],[832.48,858.89,828.23,848.01,395861],[848.02,869.4,820.6,840.42,592657],[840.42,853.53,812.57,827.81,252091],[827.8,839.79,825.06,838.71,114512],[838.71,864,838.04,855.38,164954],[855.38,858.51,825,846.99,233742],[847,851.95,823,824.11,211802],[824.1,881.02,818.57,869.05,392160],[869.05,883.86,833.46,839.49,277890],[839.49,900.71,839.23,900.21,430843],[900.2,900.21,875.55,880.42,209280],[880.42,886.66,859.34,876.51,289492],[876.51,880.75,832.76,839.32,320570],[839.32,868,829.59,863.7,194882],[863.7,867.1,852.9,855.18,135243],[855.18,881.36,850.85,873.47,232415],[873.48,878,850.19,862.3,180524],[862.3,864,851.61,862,101040],[862,867.7,857,857.65,94241],[857.66,869.15,840,845.68,254186],[845.68,856.68,840.71,851.8,164333],[851.8,864.06,848.91,854.76,116453],[854.76,856.72,841.1,843.63,108196],[843.62,857.73,842.22,850.14,120857],[850.14,865,849.55,860.85,144234],[860.86,884.05,860.55,880.05,136538],[880.05,885.85,870.01,878.08,177575],[878.08,884.83,871.38,880.01,150610],[880,907.38,877.04,893.77,306830],[893.77,904.53,888.38,902.77,179913],[902.77,929.9,901.41,924.8,240268],[924.81,943.86,922.11,933.68,251751],[933.68,944.95,921.91,926.51,159815],[926.51,935.72,910.64,919.68,175249],[919.68,959,916.66,955.65,284919],[955.65,995.44,946.1,989.98,362193],[989.97,1006.88,979.48,981.04,402673],[981.05,1002.99,973.9,984.1,333583],[984.1,1048,982.9,1043.77,380966],[1043.77,1083.47,1039.2,1047.8,464411],[1047.8,1050.55,976.89,992.9,588730],[992.9,1027.37,962.38,1015.98,420071],[1015.98,1034.5,991.46,1018.49,363050],[1018.49,1019.9,939.55,945.9,635121],[945.9,966.23,932.01,960.8,384758],[960.81,985.79,955.56,968.45,245246],[968.46,993.65,962.68,993.01,188486],[993.01,1036,991.12,1029.79,291983],[1029.79,1034.01,992.93,1008.51,258831],[1008.51,1036.2,1003.35,1026.5,269008],[1026.5,1099.22,1022.01,1090.22,380679],[1090.22,1192.42,1083.84,1189.4,744997],[1189.4,1190.47,1134.93,1150.75,337439],[1150.75,1189,1143.14,1167.38,306730],[1167.38,1239.94,1161.85,1223.19,587478],[1223.17,1349.99,1204.61,1304.43,1351678],[1304.43,1334.19,1264.32,1307.4,826555],[1307.4,1320,1224.38,1255.35,925628],[1255.35,1278.52,860.11,1102.47,1505026],[1102.57,1182.76,1073,1135.07,1050905],[1135.07,1319.8,1107.43,1302.65,1205248],[1302.65,1375.11,1251.28,1294.55,1483077],[1294.54,1318.26,1143.01,1208.52,1398660],[1208.55,1222.76,1148.92,1162.57,707328],[1162.57,1195,1122.31,1144.83,716827],[1144.83,1156.3,1021,1071.15,1066222],[1071.15,1131.05,1069.41,1092.43,419997],[1092.42,1133.76,1068.04,1109.88,409988],[1109.88,1143.2,1088.19,1100.19,481311],[1100.2,1114.53,1052.46,1057.16,541525],[1057.16,1083.8,1053.25,1071.82,397249],[1071.83,1161.9,1071.83,1126.72,774947],[1126.71,1144.17,1097.39,1109.01,342713],[1109,1120.89,1100.96,1116.53,162717],[1116.53,1143.35,1114.48,1138.19,240940],[1138.19,1182.6,1131.44,1138.88,494468],[1138.88,1148.94,1074,1103.45,351579],[1103.45,1121.35,1082.59,1107.7,459714],[1107.7,1129.55,1043.48,1079.05,508292],[1079.06,1104.93,1071.43,1088.9,537670],[1088.9,1096.93,1081.8,1094.53,163494],[1094.54,1094.92,1071.74,1083.25,132403],[1083.25,1087.24,960.18,993.54,685199],[993.54,1002.12,880.8,936.77,985276],[936.79,969.27,900.39,959.33,526144],[959.32,965.23,925.07,950.4,312622],[950.4,995.6,925.7,991.15,452714],[991.14,1007.41,980.05,991.03,301706],[991.01,1007.16,975.84,996.63,256661],[996.63,1019.56,976.22,991.98,281129],[991.99,1008.6,956.08,958.08,283952],[958.08,978.61,937.9,952.86,216987],[952.87,972.2,905.72,927.15,334345],[927.15,934.04,887.88,915.25,438193],[915.26,945.22,914.91,932.28,161985],[932.27,949.77,908.16,926.56,252158],[926.59,939.55,891.72,907.36,332892],[907.36,939.99,884.4,932.79,357275],[932.79,941.06,872.38,897.77,296358],[897.78,917,865.57,866.51,301803],[866.51,877.33,790.79,830.46,654486],[830.47,842.93,813.77,833.78,167226],[833.78,855.46,833.28,843.6,167524],[843.6,876.3,830.01,864.92,248465],[864.9,867.66,837.47,862.57,158751],[862.58,897.25,851.72,891.78,159649],[891.77,904.86,883.8,895.74,141249],[895.75,906.5,876.15,887.19,174844],[887.2,889,868.25,872.9,80060],[872.9,899.75,869.56,875.31,106231],[875.3,877.12,801.7,826.61,342746],[826.6,885,820.46,876.61,233150],[876.6,922.63,873.6,920.76,227310],[920.77,928.24,886.79,899.92,165780],[899.92,907.92,870.18,883.57,137494],[883.57,897.9,878.01,890.38,81290],[890.38,906,870.23,894.37,131889],[894.38,913.29,888.93,897.12,121354],[897.13,928,881.78,897.3,209646],[897.3,915,884.27,893.43,186333],[893.43,894.7,859.54,885.91,182477],[885.92,896.07,870.58,881.58,110640],[881.59,904.22,880.32,896.82,92401],[896.82,899.5,870.11,877.27,110914],[877.27,895.42,840.75,858.6,210868],[858.61,878.44,847,875.63,240835],[875.64,876.16,833.39,843.07,378073],[843.07,853.49,818.39,830.07,432025],[830.08,862.33,822.38,856.17,1227347],[856.17,859.7,850.9,854.17,57015],[854.17,859.91,845.5,858.64,69987],[858.63,871,850.85,858.66,147276],[858.67,861.46,838.24,844.3,103895],[844.3,850,835.21,846.58,84918],[846.57,847.99,826.81,829.64,72777],[829.63,847.16,821.21,834.72,120233],[834.72,846.54,834,845.04,89882],[845.05,867.22,839.2,859.32,91602],[859.32,872.12,846,852.46,127151],[852.46,864.05,848.7,861.65,73233],[861.66,877.29,857.69,864.3,149995],[864.31,874.51,856.14,864.39,80714],[864.4,891.14,859.64,881.25,129072],[881.25,884.24,868.65,878.63,79965],[878.64,902.85,878.47,895.43,118687],[895.43,916.55,890.59,910.31,140353],[910.31,923.93,891.66,917.64,166897],[917.64,920.27,892.64,900.3,148652],[900.31,905,875.1,892.26,134523],[892.27,901.06,885.28,896.86,81581],[896.87,915.91,896.81,907.93,124912],[907.93,917.33,898.75,904.32,98621],[904.32,910.81,894,905.78,108522],[905.79,952.96,902.25,943.73,311915],[943.73,954.68,928.5,948.47,183209],[948.48,948.85,924.05,931.2,131201],[931.21,939.43,923.69,938.16,77470],[938.17,959.52,935.5,947.12,86187],[947.11,953.33,931.7,932.51,76848],[932.51,932.51,901,923.6,209441],[923.6,933.13,884,884.2,163760],[884.19,893.69,864.54,883.36,201618],[883.35,897.58,878.18,888.06,98786],[888.06,904.99,883.1,891.63,96136]]},{"id":"BINANCE_SOLUSDT_1d_0","symbol":"SOLUSDT","tf":"1d","period":"2026-04-04 ~ 2026-07-02","source":"Binance","vis":250,"fut":10,"diff":3,"bias":"LONG","tags":["상승추세","윗꼬리"],"explain":"공개 구간은 '상승추세' 흐름이고 마지막 캔들 특징은 [상승추세, 윗꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 10.9% (상승) 움직였고, 최대 +10.9% / 최저 -11% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[193.84,198.42,182.03,184.85,5404641],[184.84,187.55,174.06,181.96,6102909],[181.97,188.26,181.75,187.56,2105841],[187.55,192.29,183.19,187.86,2483965],[187.86,194.5,183.82,189.71,3178001],[189.71,197.71,182.72,185.63,4651083],[185.62,187.45,177.04,180.12,3977005],[180.13,193.45,179.68,191.35,3501959],[191.36,197,188.83,193.59,3356763],[193.58,195.25,191.19,193.84,1626839],[193.84,202.43,191.9,200.03,2577750],[200.03,205.33,197.34,198.7,3515609],[198.71,203.99,190.22,194.15,4329170],[194.16,201.7,189.37,193.88,4620888],[193.89,198.19,178.65,184.69,5054538],[184.69,190.26,183.7,187.21,3193394],[187.21,187.55,183.79,186.35,1484505],[186.35,188.34,182,187.71,1761298],[187.71,189.13,163.15,166.06,7327613],[166.06,168.42,145.85,155.03,8288578],[155.04,163.97,147.29,162.37,4650532],[162.37,162.91,153.45,155.28,3576753],[155.27,164.48,149.82,161.79,4213078],[161.8,164.89,155.8,158.02,2502927],[158.01,166.57,155.11,164.53,3231790],[164.53,170.48,163.42,167.31,3628961],[167.31,171.94,153.93,154.63,4702104],[154.63,161.14,151.2,153.42,4139205],[153.43,157.2,141.04,144.73,5418190],[144.74,145.68,135.76,138.92,6176425],[138.93,144.69,138.61,139.61,2351478],[139.6,143.38,134.42,137.17,3385434],[137.17,143.28,128.82,130.99,5624721],[131,142.17,129,140.69,5528849],[140.68,142.84,130.53,137.06,4268467],[137.06,144.8,131.11,133.67,7048254],[133.67,135.06,121.66,128.68,8285886],[128.69,129.94,125.08,127.59,2612488],[127.6,133.54,127.56,130.58,2818715],[130.58,139.87,128.44,138.44,4744857],[138.43,140.5,133.13,138.96,2994820],[138.96,144.75,135.5,143.02,4021863],[143.01,144.29,140.47,140.85,2331673],[140.85,143.6,136.01,137.33,3502510],[137.33,138.1,134.76,135.91,1859321],[135.92,140.19,133.26,133.48,2608165],[133.48,133.74,123.11,126.66,5007504],[126.66,140.88,126.01,138.68,5022857],[138.67,146.08,137.76,144.67,3954145],[144.67,146.91,137.8,139.01,2694242],[139.01,140.75,130.73,133.29,3367359],[133.29,134.13,131.28,132.19,1341595],[132.2,136.35,127.7,132.24,3131804],[132.25,139.36,131.52,133.25,3245115],[133.24,144.93,131.62,137.88,4508522],[137.87,142.57,135.39,136.26,4520230],[136.26,137.79,129,136.41,4377697],[136.41,140.12,130.35,132.27,4005608],[132.28,134.28,131.6,133.14,1472484],[133.13,133.66,127.98,129.4,1731615],[129.39,135.43,123.63,127.81,3922431],[127.81,130.14,124.87,129.15,2884784],[129.15,133.99,121.36,123.27,4525580],[123.28,129.05,116.88,119.6,4790795],[119.6,127.87,117.61,126.27,4090549],[126.27,126.89,125.3,125.81,1229354],[125.8,126.62,123.4,126.03,1812103],[126.03,128.78,124.2,125.93,2667589],[125.93,126.93,122.16,124.01,2440031],[124.02,124.3,120.63,122.53,1605450],[122.52,124.46,119.71,120.06,1818325],[120.05,125.14,119.24,122.26,3326517],[122.27,125.08,121.86,124.73,1357802],[124.74,125.64,123.08,125.27,1828960],[125.27,130.16,122.36,123.28,4307595],[123.28,126.52,122.58,125.01,2480632],[125.02,132.75,122.99,124.65,2941644],[124.64,127.25,124.15,126.9,1733665],[126.91,133.25,125.84,132.29,2924227],[132.28,133.99,129.6,133.37,1520623],[133.37,135.54,133.12,134.12,1809269],[134.12,139.87,133.18,137.9,3327567],[137.91,143.48,136.19,141.08,3771795],[141.08,141.4,134.41,136.39,2321642],[136.39,140.07,132.67,138.37,3113438],[138.37,141.17,134.98,135.97,3778548],[135.96,137.05,135.37,135.84,1000837],[135.85,141.6,135.75,139.7,2209913],[139.69,144.4,138.34,139.22,4160120],[139.21,148.74,137.82,145.51,4195082],[145.52,148.44,143.37,146.69,3695077],[146.7,146.73,140.9,142.4,2462143],[142.41,145.55,140.26,144.89,1900879],[144.9,144.99,143.32,143.72,835155],[143.73,144,137.74,137.87,1877439],[137.87,137.87,130,133.44,2972525],[133.44,134.63,124.68,125.8,3532424],[125.81,132.17,125.26,129.54,3161736],[129.53,130.94,126.73,128.47,1811586],[128.47,130.2,125.28,127.43,2044063],[127.43,128.12,126.64,127.21,807420],[127.22,127.46,117.15,118.85,4540879],[118.85,125.6,118.53,124.24,2355751],[124.24,127.84,123.12,127.19,2036509],[127.18,128.34,124.78,125.35,1997864],[125.34,125.51,115.39,117.82,3730613],[117.82,119.12,112.14,117.59,4761007],[117.6,118.85,96.4,105.58,8567398],[105.58,106.69,98.02,100.79,4204256],[100.78,106.12,95.95,104.55,5574033],[104.54,105.1,96.64,97.89,4514018],[97.89,99.67,89.3,92.12,6251459],[92.11,93.43,77.6,78.35,10243355],[78.34,89.84,67.5,87.46,11811096],[87.45,89.2,84.16,87.59,4486649],[87.59,89.08,85.77,86.99,2534999],[86.99,88.69,82.86,86.77,3667652],[86.77,87.49,81.91,82.99,2975212],[82.99,84.39,78.04,79.3,3814913],[79.31,82.25,76.6,78.4,3196230],[78.39,85.63,77.53,84.33,3370390],[84.34,88.9,84.21,88.06,2698607],[88.06,91.26,84.89,86.16,3929085],[86.15,86.93,82.55,86.45,3559752],[86.45,87.69,82.92,85.08,2774656],[85.09,86.09,80.48,81.61,3137604],[81.61,82.67,79.61,82.5,2848277],[82.5,85.49,81.77,84.67,3754557],[84.68,86.72,83.97,85.17,1780749],[85.17,85.6,82.48,82.79,1798853],[82.8,82.85,77.15,77.9,5163373],[77.91,79.62,75.63,78.99,3592828],[78.99,92.1,78.73,88.06,5632749],[88.05,89.27,84.34,85.91,3356891],[85.91,88.29,80.32,81.85,3370499],[81.84,85.65,77.12,84.35,4737700],[84.35,88.9,81.69,83.6,4435194],[83.61,90.29,82.37,86.64,5123433],[86.65,87.46,82.5,86.97,4136743],[86.98,94.05,84.78,90.85,6329931],[90.86,92.96,87.91,88.77,3753711],[88.78,89.31,83.64,84.7,3135325],[84.69,85.07,82.28,83.22,1465282],[83.22,84.13,80.26,81.59,2102966],[81.6,87.06,81.54,84.96,3594057],[84.95,88.8,84.83,85.88,3643895],[85.88,88.09,84.36,86.58,3182176],[86.58,87.69,84.72,86.84,2913681],[86.83,92.98,86.71,88.18,4940379],[88.17,88.71,86.51,88.03,1498143],[88.04,93.23,87.36,92.3,2614547],[92.31,97.68,91.18,96.2,5621651],[96.19,96.95,93.15,94.62,2833558],[94.61,95.65,88.55,90.08,3293862],[90.07,91.41,87,88.89,2609543],[88.9,90.45,88.13,89.84,2201412],[89.85,90.81,87.14,87.56,1241845],[87.55,89.2,85.14,86.2,2138087],[86.21,92.26,85.11,91.43,4561706],[91.44,92.22,88.42,90.8,3086043],[90.8,93.47,90.71,91.7,2652535],[91.7,91.98,85.45,86.53,3566193],[86.52,87.04,81.86,83.11,2840562],[83.11,84.29,81.69,82.09,1667010],[82.09,83.24,78.96,81.44,1624673],[81.45,84.99,81.15,82.54,3025855],[82.55,84.62,80.08,83.2,4272567],[83.19,86.65,80.77,81.18,4676736],[81.19,81.77,76.7,78.94,4210024],[78.95,80.91,78.85,80.4,2230840],[80.39,81.61,79.57,80.83,1562931],[80.84,82.13,78.52,81.89,1732439],[81.89,83.2,79.6,80.03,2730371],[80.03,87.02,78.38,85.56,4312599],[85.56,85.9,82.24,82.57,2952759],[82.56,85.95,81.4,83.33,2775928],[83.33,85.67,82.62,84.83,2186078],[84.83,86.26,83.8,84.93,1570902],[84.94,85,81.27,81.53,2174792],[81.54,86.81,81.4,86.51,2950390],[86.51,87.67,83.3,83.72,3532985],[83.72,85.83,82.65,84.9,2602449],[84.9,90.53,83.8,89.05,3940291],[89.06,90.73,87.34,88.76,4237208],[88.77,89.16,85.78,86.16,1893191],[86.15,87.12,82.94,83.47,2594849],[83.47,86.22,83.34,85.28,2300347],[85.29,86.89,84.31,86.03,2111587],[86.04,89.32,86.01,86.87,3154872],[86.86,87.18,84.48,86.12,2894663],[86.12,86.94,84.92,86.18,1818575],[86.18,86.8,85.53,86.18,1033932],[86.19,87.32,85.84,86.93,1453501],[86.93,88.08,83.63,84.82,3009102],[84.82,84.93,82.98,84.06,1664394],[84.06,85.56,81.4,83.04,2576064],[83.05,84.01,82.16,83.09,1372592],[83.09,84.86,83.08,83.76,1798068],[83.76,84.97,83.44,84.26,1027760],[84.26,84.97,83.58,83.91,1268648],[83.91,85.9,83.23,84.1,3469307],[84.11,86.98,84.04,86.29,2478888],[86.29,90.03,86.1,89.16,3483256],[89.16,90.44,87.63,88.42,2892181],[88.43,92.8,87.6,92.01,2644435],[92.02,94.17,91.85,93.13,1974273],[93.12,97,92.6,96.47,2559169],[96.46,98.41,94.3,97.37,3078050],[97.37,97.68,93.55,94.28,2810037],[94.28,95.99,90.27,91.17,3192572],[91.17,93.68,89.82,92.15,2709126],[92.16,92.66,88.55,89.24,2675844],[89.23,89.44,85.52,86.54,1963022],[86.53,87.29,83.5,85.24,1914165],[85.23,85.8,83.5,85.38,2771861],[85.38,85.97,83.7,84.29,1662986],[84.3,87.09,83.85,86.17,2365152],[86.17,88,85.32,87.36,2654322],[87.35,87.85,84,84.4,2208485],[84.4,87.5,81.5,85.75,2973102],[85.76,87,83.7,85.27,2086657],[85.27,86.52,84.71,85.06,1562235],[85.06,86.13,83.15,83.72,2358777],[83.73,84.84,82.1,82.44,2119456],[82.43,83.01,80,82.11,2306915],[82.12,83.24,80.35,82.04,2064278],[82.04,83.17,81.86,82.73,1018490],[82.74,83.42,81.33,82.44,993881],[82.45,83.1,79.11,81.28,2309147],[81.28,81.3,72.73,74.23,3642537],[74.23,75.71,70.93,71.61,3655246],[71.61,72.09,66.8,68.88,4928249],[68.87,69.1,61.48,63.64,7041593],[63.64,64.86,60.13,62.2,3570841],[62.21,67.92,61.96,66.5,2941571],[66.5,68.17,64.98,66.82,3058995],[66.82,67.47,63.54,64.96,3082150],[64.97,65.77,62.34,63.19,2937918],[63.19,67.42,63.19,66.93,2881561],[66.93,68.82,65.95,66.82,2839587],[66.83,69.59,66.59,68.94,1525015],[68.94,71.29,66.94,71.28,1851822],[71.29,76.09,70.66,73.98,3102777],[73.99,75.65,72.29,73.52,2185906],[73.53,74.69,70.83,72.05,2443239],[72.05,72.68,68.23,69.71,2263712],[69.72,70.09,67.92,69.74,1884571],[69.73,74.3,69.48,73.22,2267615],[73.22,74.68,72.31,72.46,2122686],[72.47,75,71.37,71.95,2567224],[71.95,72.06,68.16,69.71,2202519],[69.7,70.44,64.71,68.11,3368668],[68.12,69.66,64.04,67.72,3716901],[67.72,73.93,65.91,71.9,4422869],[71.9,73.19,70.25,70.5,1921833],[70.49,72.41,69.74,71.38,1709275],[71.39,76.49,70.35,75.16,3861722],[75.17,75.8,71.9,73.67,2668784],[73.67,78.96,72.25,77.46,3613325],[77.46,79.8,76.9,79.79,1025902]]},{"id":"BINANCE_BTCUSDT_1d_0","symbol":"BTCUSDT","tf":"1d","period":"2026-04-04 ~ 2026-07-02","source":"Binance","vis":250,"fut":10,"diff":4,"bias":"SHORT","tags":["횡보","20일선근처","윗꼬리"],"explain":"공개 구간은 '횡보' 흐름이고 마지막 캔들 특징은 [횡보, 20일선근처, 윗꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 -4.5% (하락) 움직였고, 최대 +0.4% / 최저 -9.7% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[110763.3,111982.4,107427,108194.3,29857],[108194.3,109240,103528.2,106431.7,37921],[106431.7,107499,106322.2,107185,11123],[107185,109450.1,106103.4,108642.8,15481],[108642.8,111705.6,107402.5,110532.1,19193],[110532.1,114000,107473.7,108297.7,37228],[108297.7,109163.9,106666.7,107567.4,28611],[107567.4,111293.6,107500,110078.2,17573],[110078.2,112105,109700,111004.9,15005],[111004.9,111943.2,110672.9,111646.3,6408],[111646.3,115466.8,111260.4,114559.4,13454],[114559.4,116400,113830,114107.6,21450],[114107.6,116086,112211,112898.4,15523],[112898.4,113643.7,109200,110021.3,21080],[110021.3,111592,106304.3,108322.9,25989],[108322.9,111190,108275.3,109608,21518],[109608,110564.5,109394.8,110098.1,7379],[110098.1,111250,109471.3,110540.7,12107],[110540.7,110750,105306.6,106583,28681],[106583.1,107299,98944.36,101497.2,50535],[101497.2,104534.7,98966.8,103885.2,33779],[103885.2,104200,100300.9,101346,25815],[101346,104096.4,99260.86,103339.1,32060],[103339.1,103406.2,101454,102312.9,12391],[102312.9,105495.6,101400,104723,16339],[104722.9,106670.1,104265,106011.1,22682],[106011.1,107500,102476.1,103059,24197],[103059,105333.3,100813.6,101654.4,20458],[101654.4,104085,98000.4,99692.02,36199],[99692.03,99866.02,94012.45,94594,47288],[94594,96846.68,94558.49,95596.24,15111],[95596.23,96635.11,93005.55,94261.44,23889],[94261.45,96043,91220,92215.14,39219],[92215.14,93836.01,89253.78,92960.83,39835],[92960.83,92980.22,88608,91554.96,32287],[91554.96,93160,86100,86637.23,39733],[86637.22,87498.94,80600,85129.43,72256],[85129.42,85620,83500,84739.74,14194],[84739.75,88127.64,84667.57,86830,19734],[86830,89228,85272,88300.01,24663],[88300.01,88519.99,86116,87369.96,19567],[87369.97,90656.08,86306.77,90484.02,21676],[90484.01,91950,90089.91,91333.95,16834],[91333.94,93092,90180.63,90890.7,18831],[90890.71,91165.65,90155.47,90802.44,7430],[90802.44,92000.01,90336.9,90360,9688],[90360.01,90417,83822.76,86286.01,34509],[86286.01,92307.65,86184.39,91277.88,28210],[91277.88,94150,90990.23,93429.95,25713],[93429.95,94080,90889,92078.06,19804],[92078.06,92692.36,88056,89330.04,19793],[89330.04,90289.97,88908.01,89236.79,8410],[89236.8,91760,87719.28,90395.31,13021],[90395.32,92287.15,89612,90634.34,15794],[90634.35,94588.99,89500,92678.8,21240],[92678.81,94476,91563.15,92015.37,18999],[92015.38,93555,89260.63,92513.38,19973],[92513.38,92754,89480,90268.42,16679],[90268.43,90634.55,89766.39,90240.01,5896],[90240,90472.4,87577.36,88172.17,9417],[88172.16,90052.64,85146.64,86432.08,19779],[86432.08,88175.98,85266,87863.42,18456],[87863.43,90365.85,85314,86243.22,19834],[86243.23,89477.61,84450.01,85516.41,25405],[85516.41,89399.97,85110.24,88136.94,21257],[88136.95,88573.07,87795.76,88360.9,5123],[88360.91,89081.77,87600.04,88658.86,7133],[88658.87,90588.23,87900,88620.79,14673],[88620.79,88940,86601.9,87486,13910],[87486,88049.89,86420,87669.45,9141],[87669.44,88592.74,86934.72,87225.27,7097],[87225.27,89567.75,86655.08,87369.56,18345],[87369.56,87984,87253.05,87877.01,4470],[87877,88088.75,87435,87952.71,4446],[87952.71,90406.08,86806.5,87237.13,19895],[87237.13,89400,86845.66,88485.49,13106],[88485.5,89200,87250,87648.22,11559],[87648.21,88919.45,87550.43,88839.04,6280],[88839.05,90961.81,88379.88,89995.13,17397],[89995.14,90741.16,89314.01,90628.01,7057],[90628.01,91810,90628,91529.73,10427],[91529.74,94789.08,91514.81,93859.71,20674],[93859.71,94444.44,91262.94,93747.97,18546],[93747.97,93747.97,90675.52,91364.16,14276],[91364.16,91687.99,89311,91099.99,16133],[91100,92082.55,89694.66,90641.28,15590],[90641.27,90832,90404,90504.7,3104],[90504.7,91283.89,90236,91013.65,5477],[91013.66,92519.95,90128.44,91296.2,16188],[91296.2,96495,91042.66,95414,23022],[95413.99,97924.49,94559.28,96951.78,22852],[96951.78,97193.34,95134.48,95604.8,21726],[95604.81,95871.47,94293.46,95550.94,11168],[95550.94,95639.45,95021.67,95147.77,4281],[95147.77,95531.12,93615.4,93673.14,6895],[93673.14,93673.14,91910.2,92631,14296],[92630.99,92870,87895.98,88427.66,22007],[88427.66,90574,87263.53,89454.73,20618],[89454.73,90359.99,88515.37,89559.67,10826],[89559.68,91224.99,88578.36,89600.26,13918],[89600.26,89957.39,89162.08,89225.34,4227],[89225.34,89319.13,86074.72,86670.36,14426],[86670.36,88860,86509.63,88347.08,17767],[88347.08,89523.16,87304.33,89250,13125],[89249.99,90600,88833.65,89299.99,14332],[89300,89348,83383.33,84650.16,30431],[84650.16,84735.75,81118,84260.49,35196],[84260.5,84270.02,75719.9,78741.09,39492],[78741.1,79424,75700,76968.21,25395],[76968.22,79360,74604,78738.61,42274],[78738.6,79186.81,72945.5,75770.21,39120],[75770.21,76971.52,71888,73165.83,38375],[73165.84,73341.18,62345,62909.86,106299],[62909.87,71751.33,60000,70580.26,92539],[70580.26,71690.07,67300,69289.38,44255],[69289.37,72271.41,68888,70330.38,21421],[70330.38,71453.53,68308,70138,29153],[70138,70527.59,67800,68841.29,20374],[68841.28,69292.88,65756,67082.52,28718],[67082.52,68410.52,65118,66272.17,24272],[66272.17,69482.97,65872.46,68853.96,20245],[68853.97,70560.01,68730.13,69822.95,18115],[69822.94,70983,68000,68832.58,22290],[68832.59,70126.67,67294.11,68892.43,15516],[68892.43,69241.5,66621.06,67503.52,16489],[67503.52,68476.22,65870,66461,15492],[66461,67320,65631.83,67003.73,14542],[67003.73,68318.39,66280.2,68020.01,35352],[68020,68698.7,67534.69,67975.93,8033],[67975.93,68245,67190,67643.4,8175],[67643.39,67684.86,63888.79,64656.02,33076],[64656.01,65026.75,62510.28,64058.15,23103],[64058.15,69988.83,63913.27,67988.04,30750],[67988.04,68860,66500,67485.18,20738],[67485.19,68216.8,64914.46,65872.1,21229],[65872.09,67760,63030,66973.26,22549],[66973.26,68199.99,65056,65776.47,23202],[65776.48,70096,65259.21,68830.06,32010],[68830.06,69258.08,66158,68338,24972],[68338.01,74050,67400,72666.77,44919],[72666.77,73558.15,70645.47,70890.72,26591],[70891.02,71419.98,67744.78,68114.02,22630],[68114.02,68551.04,66915.26,67262.91,12720],[67262.91,68200,65618.49,65971.2,21594],[65971.2,69516.65,65821.97,68432.16,28897],[68432.16,71777,68391.41,69948.63,32603],[69948.64,71321,68977.91,70191.86,27249],[70191.86,70800,69205.91,70541.34,21997],[70541.34,73913.74,70386.01,70930,35997],[70930.01,71307.92,70317,71211.95,13017],[71211.95,73199,70858.82,72815.24,14037],[72815.25,74909.08,72270.41,74884.67,28410],[74884.67,76000,73399.19,73909.36,24521],[73909.37,74672.34,70500,71246.54,23393],[71246.55,71613.79,68793.35,69930,22365],[69930.01,71367,69388,70510.73,18121],[70510.73,71100.94,68571.42,68918.12,13397],[68918.12,69588.79,67360.66,67859,14844],[67859,71817.09,67445.18,70906.45,28335],[70906.45,71400,68923.07,70556.74,20702],[70556.74,72026.09,70408,71336.53,17720],[71336.53,71436.82,68153,68820.31,20820],[68820.31,69179.05,65548.25,66407.28,28604],[66407.28,67288.94,65932.09,66377.03,11462],[66377.04,67130.5,65000,66010.93,10053],[66010.93,68169.65,65800.59,66797.37,18353],[66797.38,68589.49,65998.05,68284.48,22105],[68284.49,69310,67578.75,68113.92,19020],[68113.92,68653.38,65712.12,66901.99,20203],[66901.99,67370.42,66282,66964.3,11429],[66964.29,67562.93,66775.91,67300.42,7374],[67300.42,69136.2,66611.66,69034.18,11733],[69034.18,70351.46,68300,68853.66,20282],[68853.66,72761,67732.01,71924.22,23751],[71924.22,72857,70707.23,71069.93,19803],[71069.93,73145,70466,71787.97,18158],[71787.98,73434,71426.15,72962.7,17373],[72962.71,73790,72513.09,73043.16,9071],[73043.16,73137.24,70505.88,70740.98,13472],[70741.56,74900,70566.99,74417.99,24230],[74418,76038,73795.47,74131.55,26533],[74131.55,75425,73514,74809.99,14425],[74809.99,75534.76,73309.85,75154.29,17089],[75154.28,78333,74529.4,77072,25941],[77072.01,77420.08,75445.16,75691.76,9142],[75691.76,76240.66,73762.9,73801.79,11370],[73801.8,76558.62,73724.31,75840.97,16993],[75840.97,76927.57,74821.57,76336.15,14913],[76336.14,79472.82,76132.95,78178.23,19738],[78178.22,78662.5,76960,78257.48,16971],[78257.48,78581.93,77264.08,77437.13,12675],[77437.13,77885.35,77140.23,77625,5685],[77625,78961,77326.51,78657.55,7964],[78657.55,79485.66,76459.64,77371.32,16047],[77371.32,77478,75666.6,76342.77,13211],[76342.78,77904.93,74937.52,75780,18280],[75780,76669.14,75323.65,76346.57,10382],[76346.58,78914.12,76320.42,78231.13,17315],[78231.13,79199.48,78040,78686.85,6151],[78686.84,79447,78084.08,78568.57,7426],[78568.58,80776.99,78202,79861.01,26043],[79861.01,81791.48,79808.72,80905.52,16947],[80905.53,82850,80731.14,81447.01,18799],[81447.01,81708.32,79500,80006,16155],[80006,80500,79181.48,80193.17,16001],[80193.18,81080,80129.85,80678.4,7548],[80678.41,82479.32,80279.77,82210.07,12034],[82210.07,82380,80462.97,81745.65,12952],[81745.66,81788,79843.59,80504.47,12386],[80504.47,81324.64,78754.65,79313.61,14810],[79313.61,82048.13,78922,81089.99,19728],[81090,81664.45,78659,79113.21,17351],[79113.2,79227.77,77640,78148.05,12133],[78148.05,78599.99,76735.16,77457.67,8443],[77457.67,77800,76051,77001.87,18746],[77001.88,77414.62,76144.71,76834.36,11025],[76834.36,77853.04,76516.74,77552.23,11296],[77552.24,78200,76719.47,77615.52,11318],[77615.52,77900,75359.18,75539.5,11272],[75539.5,77404.18,74289.6,76752.01,15087],[76752,77543.15,76108,77064.96,8398],[77064.96,77905.52,76914.25,77322.01,7672],[77322.01,78080,75677.97,75930.01,16953],[75930.01,76174.15,74243.99,74449.3,16878],[74449.31,74590.77,72582.82,73617.51,21274],[73617.52,74514.1,72512.49,73460.78,18687],[73460.78,74143.76,73216,73884.38,7515],[73884.38,74275.66,73400,73674.39,6986],[73674.39,74092,70686.68,71408.9,23921],[71408.9,71408.9,66193,66760.83,32858],[66760.84,67516,64092.49,64142.75,30138],[64142.75,64764.32,61383.56,63885.99,43577],[63885.99,63978,59130.91,61056.47,55027],[61056.47,61530.05,59500,60884.62,19796],[60884.62,64234.68,60746,63332.01,26612],[63332.01,64200,62408,63085.99,23053],[63086,63526.01,60780,61730,21636],[61730,62857.99,60755,61510.99,15999],[61510.99,63933.02,61510.99,63625.99,17381],[63626,64394.44,62829.81,63580.01,16397],[63580,64762.77,63418.66,64458.01,9961],[64458.01,65800,63678.83,65746.45,13203],[65746.45,67292.15,65354,66328.74,18560],[66328.74,66992,65360.92,65675.01,14302],[65675.02,66445.93,63915.77,64509.4,19049],[64509.4,64806,62272.07,62958.01,16936],[62958.01,63666,62316.44,63543.91,14247],[63543.9,64388,63184.21,64298.01,9522],[64298.01,64588,63270,63311.99,8035],[63312,65622.83,63312,64020.01,15423],[64020.01,64275.38,61938,62734.57,20223],[62734.57,63239.06,59102.7,61077.99,30678],[61078,61962.4,58115.01,59794,30386],[59794.64,60759.99,58337,60097.27,27404],[60097.27,60941.17,59855.16,60029,9587],[60029.01,60545.01,58905,59577.01,8907],[59577.01,60780.57,58900.01,60260.21,20203],[60260.2,60276.54,58201,58624.71,19640],[58624.71,61334,57800.19,60024,25093],[60024,61156.13,59588,61149.23,7317]]},{"id":"BINANCE_ETHUSDT_1d_0","symbol":"ETHUSDT","tf":"1d","period":"2026-04-04 ~ 2026-07-02","source":"Binance","vis":250,"fut":10,"diff":4,"bias":"SHORT","tags":["횡보","윗꼬리"],"explain":"공개 구간은 '횡보' 흐름이고 마지막 캔들 특징은 [횡보, 윗꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 -4.7% (하락) 움직였고, 최대 +0.5% / 최저 -12.5% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[3985.61,4086.49,3826.04,3894.51,643805],[3894.5,3950.45,3674.5,3831.57,830127],[3831.58,3927.73,3819.07,3889.21,250711],[3889.2,4030.94,3827.04,3982.58,408538],[3982.58,4085.3,3908.73,3979.22,511382],[3979.22,4110,3840.24,3873.05,590594],[3873.04,3889.27,3710,3805.53,593130],[3805.53,3934.86,3796.54,3856.8,477231],[3856.8,4026.39,3845.86,3934.88,425927],[3934.88,3969.22,3912.4,3953.82,138526],[3953.81,4178.78,3919.03,4158.46,344698],[4158.46,4253.72,4095,4120.15,487131],[4120.16,4175.55,3931.33,3979.2,472966],[3979.19,4036.66,3840.37,3902.99,486452],[3903,3948.74,3680,3805.09,531456],[3804.95,3906.09,3796.36,3847.99,478636],[3848,3909.39,3831,3873.77,152998],[3873.78,3918.23,3839.12,3906.58,216083],[3906.58,3914.29,3558.82,3603.83,877187],[3603.84,3654.54,3057,3287.05,1568004],[3287.05,3480.46,3166.66,3424.29,809592],[3424.29,3456.46,3245.45,3315.14,566364],[3315.14,3473,3194.2,3436.05,683417],[3436.04,3488,3355.58,3401.51,291532],[3401.51,3623.25,3358.66,3583.46,464098],[3583.46,3658.98,3507.3,3567.85,595273],[3567.85,3648.27,3405.24,3417.76,660283],[3417.76,3588.19,3371.65,3414.92,553102],[3414.91,3565.84,3154.22,3231.54,951989],[3231.55,3256.71,3070,3112.4,890446],[3112.4,3230,3110.68,3167.88,338463],[3167.87,3249,3004,3095.29,570634],[3095.29,3223.38,2959.46,3031.44,762500],[3031.44,3169.95,2946.56,3123.66,766640],[3123.65,3125.54,2873.64,3025.48,737927],[3025.48,3063.61,2790.01,2834.22,912524],[2834.21,2886.73,2623.57,2765.85,1180475],[2765.86,2799.01,2704.33,2770.12,264691],[2770.12,2858.16,2768.29,2802.16,409809],[2802.16,2987,2763,2953.38,715280],[2953.38,2980.82,2857.32,2959.36,427686],[2959.36,3045,2888.69,3026.56,364535],[3026.56,3071.37,2985.78,3015.23,274980],[3015.23,3099,2994.36,3031.15,346616],[3031.14,3052.64,2961.91,2989.16,217904],[2989.17,3053.02,2975.3,2991.26,182722],[2991.25,2999.47,2716.04,2799.07,849003],[2799.07,3033.76,2782.19,2996.07,523707],[2996.07,3214.99,2985.58,3188.36,553670],[3188.39,3240.35,3066.37,3133.26,486698],[3133.26,3193.33,2983.08,3021.78,530383],[3021.77,3069,3012.58,3038.06,159721],[3038.06,3150,2907.52,3059.85,391130],[3059.86,3180.51,3040.87,3124.16,452820],[3124.16,3397.85,3090.8,3318.04,603860],[3318.04,3447.44,3288.1,3324.14,539585],[3324.14,3327.37,3145.28,3237.39,504114],[3237.38,3265.5,3045.31,3084.86,435686],[3084.86,3135.68,3078.6,3114.64,136466],[3114.64,3129.54,3024.44,3063.5,279058],[3063.49,3177.5,2894.57,2964.85,520510],[2964.85,2981.87,2876,2962.3,378293],[2962.3,3030.92,2791.02,2833.49,497630],[2833.5,2997.4,2775.19,2828.57,595254],[2828.56,3020,2808.63,2979.5,531703],[2979.49,2994.41,2964.17,2977.93,91784],[2977.93,3013.4,2944,3002.02,162245],[3002.03,3077.39,2963.43,3009.49,298444],[3009.48,3035.79,2900.93,2965.02,386466],[2965.03,2978.15,2888.7,2947.47,197036],[2947.48,2971.46,2891.2,2903.95,188721],[2903.9,2994.38,2894.26,2927.99,314831],[2928,2960.89,2917.13,2949.05,95040],[2949.05,2961.23,2924.54,2950.91,128834],[2950.91,3057.78,2910.25,2937.9,485959],[2937.91,3009.8,2919.44,2973.69,286583],[2973.69,3028.08,2958.91,2971.64,233730],[2971.65,3010,2971.15,3004.19,136089],[3004.19,3150.01,2992.49,3125.45,369891],[3125.46,3136.71,3076,3127.11,134405],[3127.11,3167.22,3118.75,3144.7,181576],[3144.71,3265.66,3135.02,3224.99,382447],[3224.99,3308.86,3183.27,3296.84,412504],[3296.83,3296.84,3125.42,3168.72,321350],[3168.72,3184.39,3054.65,3106.65,343616],[3106.66,3148.41,3058.69,3088.4,274587],[3088.4,3104.12,3077.99,3086.72,82341],[3086.72,3147.27,3084.46,3123.45,149381],[3123.46,3171.49,3065.55,3095.75,297373],[3095.75,3367.79,3091.96,3325.82,457782],[3325.83,3402.89,3280.48,3354.92,503440],[3354.92,3384.19,3273.72,3318.69,389994],[3318.7,3326.79,3253.01,3296.28,223922],[3296.28,3330.26,3283.96,3310.56,124325],[3310.56,3368.82,3278.86,3284.03,173354],[3284.04,3284.58,3165.38,3189.55,442541],[3189.56,3200.5,2920,2939.88,518166],[2939.88,3069.07,2866.11,2982.27,577800],[2982.28,3038.33,2906.02,2952.69,291661],[2952.7,3019.26,2892.4,2956.41,318415],[2956.41,2970.41,2943.84,2953.22,92083],[2953.23,2960.29,2787,2816.89,380187],[2816.9,2951.21,2812.37,2930.35,485169],[2930.35,3035.08,2899.77,3026.77,478792],[3026.77,3045.78,2983.67,3010.78,296608],[3010.78,3013.5,2754.53,2822.59,561289],[2822.6,2828.65,2636.01,2707.38,793280],[2707.37,2714.64,2250,2451.95,1113098],[2451.96,2475.98,2222,2270.15,1026574],[2270.16,2396.62,2157.14,2347.02,1248535],[2347.01,2359.88,2110,2233.72,1321099],[2233.72,2295.74,2076.68,2148.26,1264743],[2148.25,2173.77,1818.18,1826.83,1952287],[1826.83,2093.94,1747.8,2063.38,2102312],[2063.37,2121.7,1994.57,2087.08,1142616],[2087.08,2152.03,2064.1,2089.74,482837],[2089.73,2147.73,2008.62,2105.02,625379],[2105.02,2124.71,1989.38,2022.67,574322],[2022.67,2032.31,1903.19,1941.18,529656],[1941.19,2001.42,1897.24,1947.85,427567],[1947.85,2073.68,1924.72,2048.72,425650],[2048.72,2107.67,2042.37,2086.59,220677],[2086.59,2103.32,1928.88,1966.58,834778],[1966.59,2023.51,1937.24,1998.33,351348],[1998.34,2015.33,1941.66,1991.66,406247],[1991.67,2039.05,1923.78,1955.91,393639],[1955.9,1987.55,1907,1949.08,300257],[1949.08,1981.18,1922.97,1968.88,386254],[1968.88,1995.56,1955.62,1973.35,179174],[1973.35,1983.13,1935,1957.82,155326],[1957.82,1958.33,1837.13,1856.3,547359],[1856.3,1869.58,1800,1851.94,438064],[1851.95,2148.39,1846.74,2057.48,682979],[2057.48,2083.33,1975.35,2027.68,439783],[2027.68,2063.52,1887,1929.84,428687],[1929.84,1984.99,1835.36,1964.51,461681],[1964.51,2054.8,1907.41,1939.71,529197],[1939.71,2090,1920,2027.35,577406],[2027.34,2041.48,1929.56,1982.8,509330],[1982.81,2199,1945.08,2127.28,737645],[2127.28,2163.66,2054.75,2072.86,432158],[2072.86,2093.33,1955.95,1978.68,411598],[1978.68,1996.04,1948.09,1969.59,184460],[1969.6,1979.8,1916.14,1937.1,391190],[1937.11,2053.52,1929.65,1992.98,550825],[1992.97,2088.19,1991,2036.51,463412],[2036.5,2085.58,2007.17,2051.97,350061],[2051.97,2095,2017.59,2073.52,400508],[2073.51,2209.03,2070.12,2092.22,599657],[2092.21,2106.09,2061.6,2096.16,152501],[2096.16,2202.87,2083.35,2178.3,280826],[2178.29,2386.02,2164.73,2352.97,845893],[2352.97,2376.66,2294.15,2317.39,493831],[2317.38,2350,2153.21,2203.39,488041],[2203.39,2233.72,2099.38,2137.81,490792],[2137.82,2176.84,2116.88,2146.22,300156],[2146.21,2168.27,2070.78,2084.87,132559],[2084.86,2127.21,2026,2053.89,313071],[2053.9,2198.57,2023.04,2152.03,614508],[2152.03,2175.16,2103.02,2156.23,316703],[2156.22,2199.02,2146.35,2169.02,275642],[2169.02,2172.19,2034.54,2060.43,338011],[2060.43,2077.19,1970.93,1992.75,394874],[1992.76,2047.45,1983.17,1994.74,154832],[1994.74,2019.65,1938.82,1984.64,166727],[1984.65,2085,1980.28,2026.48,338304],[2026.48,2124.03,2012.64,2105.43,421898],[2105.43,2167.85,2082.08,2140.35,399227],[2140.35,2159.37,2017.04,2057.17,346873],[2057.18,2081.76,2040.66,2053.83,136267],[2053.83,2084,2044.63,2065.52,86504],[2065.51,2123.49,2021.5,2110.17,157353],[2110.17,2174.79,2087.5,2107.16,356054],[2107.16,2273.87,2060.24,2240.01,460095],[2240.01,2270.55,2179.78,2190,404718],[2190,2246,2157.31,2190.2,275318],[2190.17,2257.99,2176.1,2245.05,272899],[2245.06,2329.93,2229,2284.99,214785],[2285,2288.57,2175,2191.65,258157],[2191.64,2394.71,2175.68,2369.46,453871],[2369.46,2415.5,2302.9,2322.44,460107],[2322.44,2385.61,2308.5,2359.95,268191],[2359.94,2369.59,2285.1,2348.17,328961],[2348.16,2464.91,2317.43,2419,491731],[2419,2427.64,2339.92,2350.32,221741],[2350.33,2355.3,2252.72,2263.27,256087],[2263.28,2346.78,2259.67,2313.85,301000],[2313.84,2338.75,2284.19,2327.14,226646],[2327.15,2423.75,2312.95,2374.07,379707],[2374.08,2382,2285.42,2330.26,356646],[2330.27,2337.5,2300.22,2314.99,183888],[2314.98,2323.21,2300.55,2319.5,68139],[2319.49,2380,2306.72,2369.44,154592],[2369.45,2404.37,2266.09,2303.67,300364],[2303.66,2310.88,2258.24,2289.42,187932],[2289.42,2346.95,2220.36,2252.9,355078],[2252.9,2279,2231.64,2257.51,167194],[2257.51,2325.28,2257.21,2295.63,191083],[2295.63,2343.6,2292.91,2316.97,85588],[2316.97,2356.92,2297.59,2322.65,151074],[2322.65,2398.93,2309.24,2347.16,453021],[2347.17,2399.5,2344.93,2360.77,286637],[2360.76,2423.74,2338,2350.84,420667],[2350.84,2352.3,2280.1,2291.06,469522],[2291.06,2321.22,2265.61,2307.06,421035],[2307.07,2338.37,2300,2326.44,230431],[2326.43,2382.53,2311.83,2371.27,398123],[2371.26,2374.92,2304,2339.87,236962],[2339.88,2340.85,2256.27,2274.96,252981],[2274.97,2323.36,2234.13,2258.65,258456],[2258.66,2319.33,2238.64,2283.25,256681],[2283.26,2300.29,2205.11,2224.66,288537],[2224.65,2231.51,2162.55,2180.77,199289],[2180.77,2198.14,2091.48,2131,175117],[2131,2157.24,2077.23,2130.08,381878],[2130.08,2146.95,2094.47,2111.93,186945],[2111.93,2149,2103.29,2129.44,189088],[2129.44,2157.5,2105.15,2133.76,232889],[2133.77,2141.39,2057.79,2065.85,221783],[2065.86,2149.95,2009.3,2117.68,350546],[2117.69,2132.14,2063,2099.85,197749],[2099.86,2141.98,2092.26,2113.01,166429],[2113.01,2140.49,2055.06,2073.77,282553],[2073.77,2097.4,2016,2024.84,267963],[2024.83,2030,1967,2009.9,363835],[2009.89,2046.59,1976.48,2014.54,283146],[2014.54,2032,2002,2022.44,97978],[2022.44,2038,1993.75,2007.01,163736],[2007.02,2021.5,1956.04,2006.73,374428],[2006.73,2006.78,1839.02,1859.84,556886],[1859.84,1893.07,1769.62,1813.05,584760],[1813.05,1820.5,1717.28,1770.77,648306],[1770.76,1774.99,1540.19,1583.4,1257013],[1583.4,1601.22,1505.68,1569.69,558458],[1569.68,1721.93,1564.1,1690.51,458281],[1690.5,1714.5,1645,1690.49,480027],[1690.48,1696.88,1614.02,1639.52,384147],[1639.52,1667.96,1603.44,1621.59,290791],[1621.6,1693.59,1621.6,1673.46,278508],[1673.46,1691.07,1652.09,1666.41,201888],[1666.42,1697.28,1662.2,1681.18,106752],[1681.19,1732.28,1654.9,1725.62,178010],[1725.63,1849.54,1709.66,1796.13,464135],[1796.14,1839.77,1758,1792.99,353578],[1793,1810.21,1725.34,1750.6,334498],[1750.61,1762.99,1671.79,1711.11,312481],[1711.11,1719.51,1679.11,1711.19,165078],[1711.18,1749.55,1704.06,1741.08,159792],[1741.08,1741.45,1702,1706.94,123762],[1706.94,1779.9,1706.94,1728.19,262657],[1728.19,1736.25,1635.65,1667.13,248262],[1667.13,1693.67,1552.95,1622.17,355728],[1622.18,1660.54,1532.9,1567.84,440671],[1567.86,1594.7,1512,1578.68,423691],[1578.68,1611.02,1562.86,1573.99,131592],[1574,1588.82,1548.37,1571.96,140181],[1571.96,1637.58,1550.43,1613.07,309969],[1613.07,1614.41,1550.2,1572.01,222057],[1572,1646.26,1552.92,1609.58,306536],[1609.59,1651.95,1597.22,1647.6,110682]]},{"id":"BINANCE_BNBUSDT_1d_0","symbol":"BNBUSDT","tf":"1d","period":"2026-04-04 ~ 2026-07-02","source":"Binance","vis":250,"fut":10,"diff":4,"bias":"SHORT","tags":["하락추세","윗꼬리"],"explain":"공개 구간은 '하락추세' 흐름이고 마지막 캔들 특징은 [하락추세, 윗꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 -5.8% (하락) 움직였고, 최대 +0.5% / 최저 -9% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[1162.57,1195,1122.31,1144.83,716826],[1144.83,1156.3,1021,1071.15,1066222],[1071.15,1131.05,1069.41,1092.43,419997],[1092.42,1133.76,1068.04,1109.88,409988],[1109.88,1143.2,1088.19,1100.19,481311],[1100.2,1114.53,1052.46,1057.16,541525],[1057.16,1083.8,1053.25,1071.82,397249],[1071.83,1161.9,1071.83,1126.72,774947],[1126.71,1144.17,1097.39,1109.01,342713],[1109,1120.89,1100.96,1116.53,162717],[1116.53,1143.35,1114.48,1138.19,240940],[1138.19,1182.6,1131.44,1138.88,494468],[1138.88,1148.94,1074,1103.45,351579],[1103.45,1121.35,1082.59,1107.7,459713],[1107.7,1129.55,1043.48,1079.05,508292],[1079.06,1104.93,1071.43,1088.9,537670],[1088.9,1096.93,1081.8,1094.53,163494],[1094.54,1094.92,1071.74,1083.25,132403],[1083.25,1087.24,960.18,993.54,685199],[993.54,1002.12,880.8,936.77,985276],[936.79,969.27,900.39,959.33,526144],[959.32,965.23,925.07,950.4,312622],[950.4,995.6,925.7,991.15,452714],[991.14,1007.41,980.05,991.03,301706],[991.01,1007.16,975.84,996.63,256661],[996.63,1019.56,976.22,991.98,281129],[991.99,1008.6,956.08,958.08,283952],[958.08,978.61,937.9,952.86,216987],[952.87,972.2,905.72,927.15,334345],[927.15,934.04,887.88,915.25,438193],[915.26,945.22,914.91,932.28,161985],[932.27,949.77,908.16,926.56,252158],[926.59,939.55,891.72,907.36,332892],[907.36,939.99,884.4,932.79,357275],[932.79,941.06,872.38,897.77,296358],[897.78,917,865.57,866.51,301803],[866.51,877.33,790.79,830.46,654486],[830.47,842.93,813.77,833.78,167226],[833.78,855.46,833.28,843.6,167524],[843.6,876.3,830.01,864.92,248465],[864.9,867.66,837.47,862.57,158751],[862.58,897.25,851.72,891.78,159649],[891.77,904.86,883.8,895.74,141249],[895.75,906.5,876.15,887.19,174844],[887.2,889,868.25,872.9,80060],[872.9,899.75,869.56,875.31,106231],[875.3,877.12,801.7,826.61,342746],[826.6,885,820.46,876.61,233150],[876.6,922.63,873.6,920.76,227310],[920.77,928.24,886.79,899.92,165780],[899.92,907.92,870.18,883.57,137494],[883.57,897.9,878.01,890.38,81290],[890.38,906,870.23,894.37,131889],[894.38,913.29,888.93,897.12,121354],[897.13,928,881.78,897.3,209646],[897.3,915,884.27,893.43,186333],[893.43,894.7,859.54,885.91,182477],[885.92,896.07,870.58,881.58,110640],[881.59,904.22,880.32,896.82,92401],[896.82,899.5,870.11,877.27,110914],[877.27,895.42,840.75,858.6,210868],[858.61,878.44,847,875.63,240835],[875.64,876.16,833.39,843.07,378073],[843.07,853.49,818.39,830.07,432025],[830.08,862.33,822.38,856.17,1227347],[856.17,859.7,850.9,854.17,57015],[854.17,859.91,845.5,858.64,69987],[858.63,871,850.85,858.66,147276],[858.67,861.46,838.24,844.3,103895],[844.3,850,835.21,846.58,84918],[846.57,847.99,826.81,829.64,72777],[829.63,847.16,821.21,834.72,120233],[834.72,846.54,834,845.04,89882],[845.05,867.22,839.2,859.32,91602],[859.32,872.12,846,852.46,127151],[852.46,864.05,848.7,861.65,73233],[861.66,877.29,857.69,864.3,149995],[864.31,874.51,856.14,864.39,80714],[864.4,891.14,859.64,881.25,129072],[881.25,884.24,868.65,878.63,79965],[878.64,902.85,878.47,895.43,118687],[895.43,916.55,890.59,910.31,140353],[910.31,923.93,891.66,917.64,166897],[917.64,920.27,892.64,900.3,148652],[900.31,905,875.1,892.26,134523],[892.27,901.06,885.28,896.86,81581],[896.87,915.91,896.81,907.93,124912],[907.93,917.33,898.75,904.32,98621],[904.32,910.81,894,905.78,108522],[905.79,952.96,902.25,943.73,311915],[943.73,954.68,928.5,948.47,183209],[948.48,948.85,924.05,931.2,131201],[931.21,939.43,923.69,938.16,77470],[938.17,959.52,935.5,947.12,86187],[947.11,953.33,931.7,932.51,76848],[932.51,932.51,901,923.6,209441],[923.6,933.13,884,884.2,163760],[884.19,893.69,864.54,883.36,201618],[883.35,897.58,878.18,888.06,98786],[888.06,904.99,883.1,891.63,96136],[891.62,894.24,886.53,887.17,51273],[887.18,887.75,856,866.02,120780],[866.02,881.44,864.91,879.41,102701],[879.41,901.22,876.2,898.36,138530],[898.35,909.43,894.41,902.91,110273],[902.92,906.67,852.81,868.69,270229],[868.69,869.77,831.83,858.81,295951],[858.81,860.85,750,781.38,407306],[781.39,789.72,739.63,758.54,259126],[758.54,781.58,728.44,773.94,306663],[773.94,783.57,736.08,754.78,243949],[754.78,765.33,687.3,697.27,424472],[697.27,703,602.17,608.3,799179],[608.3,669.65,570.06,657.21,593323],[657.21,663.88,630.83,647,217521],[647.01,653,632.3,639.93,124172],[639.93,646.15,616.01,636.39,148751],[636.38,642,613.8,619.85,153549],[619.85,624.14,587.14,608.11,236352],[608.11,620.87,600.6,614.29,121298],[614.29,622.81,592.49,618.94,211420],[618.93,637.24,615.7,632.77,113846],[632.77,642.49,608.82,615.16,132427],[615.17,631.24,604.49,627.19,105661],[627.19,631.86,609.3,617.74,91934],[617.76,626.57,601.3,604.8,97256],[604.8,614.8,596,607.83,109354],[607.82,629.74,601.23,625.91,159591],[625.9,634.8,624,625.61,81657],[625.61,626.87,610.02,614.8,68569],[614.8,616,583.13,596.41,245063],[596.4,602.9,577.06,583.6,168286],[583.61,640.55,581.51,629.42,221645],[629.42,633.83,614.2,625.74,126675],[625.74,633.65,605.25,614.03,128168],[614.03,621.49,588.64,617.14,172105],[617.14,632.16,610.89,617.96,169961],[617.96,652.87,612.96,637.79,202581],[637.79,643.29,621,633.56,150191],[633.57,666.16,626.2,657.99,199920],[658,665.42,646.14,647.85,128038],[647.85,651.62,624.77,627.31,115032],[627.31,630.19,617.8,620.26,63119],[620.27,624.27,607.86,611.98,81940],[611.99,643,611.01,634.64,121341],[634.64,652.36,634.38,642,100783],[642.01,656.29,635.02,651.46,120146],[651.47,657.7,641.63,651.72,101534],[651.72,679,650.34,655.73,231981],[655.72,658.27,650.11,657.7,55240],[657.7,679,654.46,673.77,92999],[673.77,687.82,670.13,679.71,226915],[679.7,686.53,663.4,668.61,147117],[668.62,676.47,644.43,652.27,144505],[652.28,656.4,633.32,639.15,117680],[639.16,647.65,636.38,642.11,96688],[642.11,646.38,627.76,630.7,54237],[630.7,637.7,622.16,626.41,102354],[626.41,650.85,620.33,639.11,257557],[639.12,640.17,626.99,638.3,101174],[638.31,652.8,637.5,647.66,117519],[647.67,648.47,623.01,628.86,94718],[628.86,631.87,605.86,613.95,131735],[613.95,619,609.9,611.08,70088],[611.08,615.3,596.42,606.09,83412],[606.09,621.4,605.09,609.29,122880],[609.29,619.77,598.82,617.43,139131],[617.42,621.9,609.58,610.81,126558],[610.81,613.6,570.31,583.52,297618],[583.52,590.31,581.93,588.31,76506],[588.32,596.58,587.1,593.36,59665],[593.36,604.06,587.13,601.5,78032],[601.5,610.29,596.25,600.11,104960],[600.1,624.85,592.2,620.1,163527],[620.11,621.46,599.45,601.16,162115],[601.15,612.1,596.94,603.03,107305],[603.03,610.34,597.4,605.54,104266],[605.54,614.12,603.4,607.05,94267],[607.06,607.44,589.1,592.19,103774],[592.19,617.97,591.6,614.71,138505],[614.71,625.38,610.86,613.75,173382],[613.75,627.64,610.45,622.59,114943],[622.58,637.4,614.89,635.77,131547],[635.77,645.67,626.66,643.12,153487],[643.12,648.79,628.03,629.9,119665],[629.9,630.43,615,616.06,100591],[616.07,632.08,615.97,629.26,92148],[629.26,640.7,625,631.72,105373],[631.73,654.19,631.19,637.47,134986],[637.47,640.38,631,638.54,98409],[638.55,640.49,632.04,636.21,70626],[636.21,638.5,627.15,628.53,58918],[628.52,638.06,627,635.76,54446],[635.77,639.81,618.38,626.83,103945],[626.83,627.58,619,624.55,62348],[624.56,629.61,610.26,617.39,101813],[617.39,620.53,613.47,615.38,78612],[615.38,622.84,613.79,615.34,88054],[615.34,621.81,614.15,618.03,51974],[618.03,622.27,615.09,617.27,72850],[617.28,639,615.61,622.63,206649],[622.64,635,622.58,630.42,147022],[630.41,664.26,628.97,647.74,241695],[647.74,653.49,633.68,637.02,144174],[637.02,651.53,634.76,649.36,107753],[649.37,656,646.23,649.75,98353],[649.76,666.66,644.84,663.55,119277],[663.56,673,649.46,670.6,183665],[670.6,671.47,650.49,664.95,161617],[664.95,685.68,663.77,671.68,226063],[671.68,687.66,665.42,678.27,159800],[678.28,689.98,669.16,672.38,166504],[672.37,674.92,650.7,656.2,129778],[656.2,657.6,640.01,649.48,95812],[649.48,649.7,634.3,643.53,126181],[643.53,647.19,636.1,640.02,80954],[640.03,651.77,637.52,649.5,82943],[649.5,659.82,646.33,658.58,103056],[658.58,664.2,648.31,650.44,123908],[650.45,663.93,635.29,656.26,113010],[656.26,662.6,649.68,656.57,73668],[656.58,673.07,655.76,663.15,114245],[663.15,668.01,653.45,656.43,122333],[656.43,659.9,646.57,648.84,101738],[648.83,649.38,628.22,638.24,145258],[638.23,645,630.86,643.1,115255],[643.11,729,642.66,718.74,566381],[718.74,745.74,703,710.55,380166],[710.54,729.57,674.07,693.1,533343],[693.1,695.51,642.47,650.69,310137],[650.7,657.51,616.21,620.63,300913],[620.63,624.57,588.1,604.53,401432],[604.5,608,556.46,572.22,534838],[572.17,584.43,559.68,574.53,226191],[574.54,610.54,573.6,604.44,192844],[604.44,610.44,591.55,601.86,121476],[601.86,605.68,583.84,593.44,134637],[593.44,598.52,580.68,586.53,114846],[586.51,607.33,586.51,605.76,115806],[605.77,613.39,596.58,603.83,105336],[603.84,612.33,599.33,609.65,73491],[609.66,617.24,602.79,616.79,122028],[616.79,632.9,612.66,617.87,170538],[617.87,619.5,601.33,604.94,192189],[604.94,612.5,595.11,601.63,169384],[601.63,604.31,573,578.48,151569],[578.48,583.29,570.82,581.42,94343],[581.41,589.43,580.12,588.03,84540],[588.03,592.56,583.6,584.23,63361],[584.23,602.31,584.07,590.15,105432],[590.14,592.83,570.57,578.08,108855],[578.09,582.21,546.6,564.67,160908],[564.66,572.72,540.6,560.62,156268],[560.63,570.34,550.37,567.64,186203],[567.65,568.66,554.53,557.2,81412],[557.19,558.89,545.62,551.07,76868],[551.07,563.16,546.17,559.52,105794],[559.51,560.4,543.68,546.52,106316],[546.52,559.55,537.25,550.44,162073],[550.45,561.19,546.21,555.83,51671]]},{"id":"BINANCE_SOLUSDT_1d_1","symbol":"SOLUSDT","tf":"1d","period":"2026-01-04 ~ 2026-04-03","source":"Binance","vis":250,"fut":30,"diff":4,"bias":"SHORT","tags":["상승추세","아래꼬리"],"explain":"공개 구간은 '상승추세' 흐름이고 마지막 캔들 특징은 [상승추세, 아래꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 -11.5% (하락) 움직였고, 최대 +2.9% / 최저 -15.5% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[175.88,184.67,173.24,177.28,5191853],[177.28,178.61,174,176.96,2059315],[176.97,183.66,176.33,181.43,3694855],[181.44,199.28,178.25,195.72,6495907],[195.72,206.3,193.75,205.7,8635627],[205.7,205.75,183.97,189.4,5548137],[189.4,191.87,179.21,182.87,5217065],[182.88,186.85,175.63,186.76,4481310],[186.75,189.78,184.29,184.88,1773454],[184.89,190.7,184.53,188.64,2233060],[188.64,195.26,182.16,183.11,4067872],[183.1,186.68,178.3,181.48,2541912],[181.47,182.56,170.29,177.77,3297250],[177.77,182.7,171.44,172.22,2624842],[172.22,172.26,159.2,162.71,4317529],[162.71,165.3,155.83,158.48,2208175],[158.49,163.14,156.28,161.97,2297909],[161.98,169.8,161.26,169.55,2688954],[169.55,171.73,161.3,164.09,2554958],[164.09,169.93,161.13,168.09,1797491],[168.1,175.51,166.7,175.36,3014663],[175.37,179.66,173.43,176.78,3678791],[176.79,183.45,176.64,179.95,3325504],[179.96,186.18,177.51,182.66,4197287],[182.67,186.8,173.43,174.84,3960744],[174.83,193.76,173.6,191.78,5074348],[191.77,204.96,191.48,201.51,7148726],[201.51,209.86,186.68,192.47,8965607],[192.46,198.07,183.3,185.72,4360287],[185.71,190.06,185.2,189.6,2099818],[189.61,195.89,187.35,190.99,2261556],[191,191.33,180,182.94,3374075],[182.94,185.87,175.69,176.22,3260090],[176.22,187.97,176.04,187.94,3464958],[187.95,190.1,179.43,180.29,2914512],[180.3,202.4,177.27,200.69,6594118],[200.69,208.62,195.26,204.14,4788641],[204.15,211.99,201.09,205.98,7165649],[205.99,213.6,185.33,187.2,7953101],[187.19,198.1,185.58,195.86,4734420],[195.85,212.08,193.78,202.95,7835140],[202.95,216.89,201.72,214.43,7247307],[214.43,218,199.85,205.08,8607487],[205.09,207.06,197.52,202.7,3894576],[202.7,206.66,200.28,200.62,3303224],[200.62,204.58,194.19,197.32,4464768],[197.32,209.68,196.77,209.65,4894638],[209.64,213.02,207.42,210.77,4063192],[210.77,211.94,201.84,202.32,2726779],[202.32,210,200.95,203.36,4121395],[203.37,204.68,199.32,200.16,1481501],[200.17,207.95,200.12,206.35,2217511],[206.35,217.11,205.59,214.11,5729679],[214.11,219.79,210.79,217.21,4979305],[217.22,226,215.09,224.07,4824185],[224.06,228.95,221.72,228.73,4352357],[228.73,244.04,228.11,242.18,5891654],[242.18,244.14,235.73,242.38,3305661],[242.38,249.6,239.23,239.76,4165171],[239.75,244,230.15,234.31,4733590],[234.32,240.95,231.26,236.96,3181627],[236.96,246.62,232.23,244.84,4771529],[244.84,253.51,242.58,247.5,3916891],[247.5,248.57,235.12,238.53,3384986],[238.53,241.22,236.91,239.48,1550489],[239.48,241.82,235.32,236.16,1392438],[236.16,236.96,214.5,220.38,5836594],[220.39,221.71,212.34,213.3,3448908],[213.29,216.45,204.81,211.6,4427458],[211.61,212.44,191.32,192.74,6761257],[192.73,205.52,190.8,205.17,5623203],[205.16,205.43,199.88,203.46,2104933],[203.47,211,198,210.83,2194260],[210.83,214.74,204.58,212.75,3213099],[212.74,213.67,204.29,208.68,3264781],[208.68,222.77,206.31,222.04,4050261],[222.04,234.99,219.52,234.74,4590696],[234.74,237,227.13,232.84,4216612],[232.84,234.05,224.07,227.86,1841411],[227.86,237.22,226.45,228.56,3099634],[228.56,237.79,227.55,232.35,2981928],[232.35,235.21,219.7,219.97,4401046],[219.98,229.72,217.3,229.02,3103761],[229.03,229.69,216.53,220.93,3272953],[220.93,224.46,168.79,188.43,9622835],[188.43,191.05,172.58,177.62,7292387],[177.63,199,173,197,6487000],[196.99,209.28,190.02,208.69,6253162],[208.69,211.25,191.03,202.44,7349168],[202.45,208.91,192.04,193.84,5369155],[193.84,198.42,182.03,184.85,5404641],[184.84,187.55,174.06,181.96,6102909],[181.97,188.26,181.75,187.56,2105841],[187.55,192.29,183.19,187.86,2483965],[187.86,194.5,183.82,189.71,3178001],[189.71,197.71,182.72,185.63,4651083],[185.62,187.45,177.04,180.12,3977005],[180.13,193.45,179.68,191.35,3501959],[191.36,197,188.83,193.59,3356763],[193.58,195.25,191.19,193.84,1626839],[193.84,202.43,191.9,200.03,2577750],[200.03,205.33,197.34,198.7,3515609],[198.71,203.99,190.22,194.15,4329170],[194.16,201.7,189.37,193.88,4620888],[193.89,198.19,178.65,184.69,5054538],[184.69,190.26,183.7,187.21,3193394],[187.21,187.55,183.79,186.35,1484505],[186.35,188.34,182,187.71,1761298],[187.71,189.13,163.15,166.06,7327613],[166.06,168.42,145.85,155.03,8288578],[155.04,163.97,147.29,162.37,4650532],[162.37,162.91,153.45,155.28,3576753],[155.27,164.48,149.82,161.79,4213078],[161.8,164.89,155.8,158.02,2502927],[158.01,166.57,155.11,164.53,3231790],[164.53,170.48,163.42,167.31,3628961],[167.31,171.94,153.93,154.63,4702104],[154.63,161.14,151.2,153.42,4139205],[153.43,157.2,141.04,144.73,5418190],[144.74,145.68,135.76,138.92,6176425],[138.93,144.69,138.61,139.61,2351478],[139.6,143.38,134.42,137.17,3385434],[137.17,143.28,128.82,130.99,5624721],[131,142.17,129,140.69,5528849],[140.68,142.84,130.53,137.06,4268467],[137.06,144.8,131.11,133.67,7048254],[133.67,135.06,121.66,128.68,8285886],[128.69,129.94,125.08,127.59,2612488],[127.6,133.54,127.56,130.58,2818715],[130.58,139.87,128.44,138.44,4744857],[138.43,140.5,133.13,138.96,2994820],[138.96,144.75,135.5,143.02,4021863],[143.01,144.29,140.47,140.85,2331673],[140.85,143.6,136.01,137.33,3502510],[137.33,138.1,134.76,135.91,1859321],[135.92,140.19,133.26,133.48,2608165],[133.48,133.74,123.11,126.66,5007504],[126.66,140.88,126.01,138.68,5022857],[138.67,146.08,137.76,144.67,3954145],[144.67,146.91,137.8,139.01,2694242],[139.01,140.75,130.73,133.29,3367359],[133.29,134.13,131.28,132.19,1341595],[132.2,136.35,127.7,132.24,3131804],[132.25,139.36,131.52,133.25,3245115],[133.24,144.93,131.62,137.88,4508522],[137.87,142.57,135.39,136.26,4520230],[136.26,137.79,129,136.41,4377697],[136.41,140.12,130.35,132.27,4005608],[132.28,134.28,131.6,133.14,1472484],[133.13,133.66,127.98,129.4,1731615],[129.39,135.43,123.63,127.81,3922431],[127.81,130.14,124.87,129.15,2884784],[129.15,133.99,121.36,123.27,4525580],[123.28,129.05,116.88,119.6,4790795],[119.6,127.87,117.61,126.27,4090549],[126.27,126.89,125.3,125.81,1229354],[125.8,126.62,123.4,126.03,1812103],[126.03,128.78,124.2,125.93,2667589],[125.93,126.93,122.16,124.01,2440031],[124.02,124.3,120.63,122.53,1605450],[122.52,124.46,119.71,120.06,1818325],[120.05,125.14,119.24,122.26,3326517],[122.27,125.08,121.86,124.73,1357802],[124.74,125.64,123.08,125.27,1828960],[125.27,130.16,122.36,123.28,4307595],[123.28,126.52,122.58,125.01,2480632],[125.02,132.75,122.99,124.65,2941644],[124.64,127.25,124.15,126.9,1733665],[126.91,133.25,125.84,132.29,2924227],[132.28,133.99,129.6,133.37,1520623],[133.37,135.54,133.12,134.12,1809269],[134.12,139.87,133.18,137.9,3327567],[137.91,143.48,136.19,141.08,3771795],[141.08,141.4,134.41,136.39,2321642],[136.39,140.07,132.67,138.37,3113438],[138.37,141.17,134.98,135.97,3778548],[135.96,137.05,135.37,135.84,1000837],[135.85,141.6,135.75,139.7,2209913],[139.69,144.4,138.34,139.22,4160120],[139.21,148.74,137.82,145.51,4195082],[145.52,148.44,143.37,146.69,3695077],[146.7,146.73,140.9,142.4,2462143],[142.41,145.55,140.26,144.89,1900879],[144.9,144.99,143.32,143.72,835155],[143.73,144,137.74,137.87,1877439],[137.87,137.87,130,133.44,2972525],[133.44,134.63,124.68,125.8,3532424],[125.81,132.17,125.26,129.54,3161736],[129.53,130.94,126.73,128.47,1811586],[128.47,130.2,125.28,127.43,2044063],[127.43,128.12,126.64,127.21,807420],[127.22,127.46,117.15,118.85,4540879],[118.85,125.6,118.53,124.24,2355751],[124.24,127.84,123.12,127.19,2036509],[127.18,128.34,124.78,125.35,1997864],[125.34,125.51,115.39,117.82,3730613],[117.82,119.12,112.14,117.59,4761007],[117.6,118.85,96.4,105.58,8567398],[105.58,106.69,98.02,100.79,4204256],[100.78,106.12,95.95,104.55,5574033],[104.54,105.1,96.64,97.89,4514018],[97.89,99.67,89.3,92.12,6251459],[92.11,93.43,77.6,78.35,10243355],[78.34,89.84,67.5,87.46,11811096],[87.45,89.2,84.16,87.59,4486649],[87.59,89.08,85.77,86.99,2534999],[86.99,88.69,82.86,86.77,3667652],[86.77,87.49,81.91,82.99,2975212],[82.99,84.39,78.04,79.3,3814913],[79.31,82.25,76.6,78.4,3196230],[78.39,85.63,77.53,84.33,3370390],[84.34,88.9,84.21,88.06,2698607],[88.06,91.26,84.89,86.16,3929085],[86.15,86.93,82.55,86.45,3559752],[86.45,87.69,82.92,85.08,2774656],[85.09,86.09,80.48,81.61,3137604],[81.61,82.67,79.61,82.5,2848277],[82.5,85.49,81.77,84.67,3754557],[84.68,86.72,83.97,85.17,1780749],[85.17,85.6,82.48,82.79,1798853],[82.8,82.85,77.15,77.9,5163373],[77.91,79.62,75.63,78.99,3592828],[78.99,92.1,78.73,88.06,5632749],[88.05,89.27,84.34,85.91,3356891],[85.91,88.29,80.32,81.85,3370499],[81.84,85.65,77.12,84.35,4737700],[84.35,88.9,81.69,83.6,4435194],[83.61,90.29,82.37,86.64,5123433],[86.65,87.46,82.5,86.97,4136743],[86.98,94.05,84.78,90.85,6329931],[90.86,92.96,87.91,88.77,3753711],[88.78,89.31,83.64,84.7,3135325],[84.69,85.07,82.28,83.22,1465282],[83.22,84.13,80.26,81.59,2102966],[81.6,87.06,81.54,84.96,3594057],[84.95,88.8,84.83,85.88,3643895],[85.88,88.09,84.36,86.58,3182176],[86.58,87.69,84.72,86.84,2913681],[86.83,92.98,86.71,88.18,4940379],[88.17,88.71,86.51,88.03,1498143],[88.04,93.23,87.36,92.3,2614547],[92.31,97.68,91.18,96.2,5621651],[96.19,96.95,93.15,94.62,2833558],[94.61,95.65,88.55,90.08,3293862],[90.07,91.41,87,88.89,2609543],[88.9,90.45,88.13,89.84,2201412],[89.85,90.81,87.14,87.56,1241845],[87.55,89.2,85.14,86.2,2138087],[86.21,92.26,85.11,91.43,4561706],[91.44,92.22,88.42,90.8,3086043],[90.8,93.47,90.71,91.7,2652535],[91.7,91.98,85.45,86.53,3566193],[86.52,87.04,81.86,83.11,2840562],[83.11,84.29,81.69,82.09,1667010],[82.09,83.24,78.96,81.44,1624673],[81.45,84.99,81.15,82.54,3025855],[82.55,84.62,80.08,83.2,4272567],[83.19,86.65,80.77,81.18,4676736],[81.19,81.77,76.7,78.94,4210024],[78.95,80.91,78.85,80.4,2230840],[80.39,81.61,79.57,80.83,1562931],[80.84,82.13,78.52,81.89,1732439],[81.89,83.2,79.6,80.03,2730371],[80.03,87.02,78.38,85.56,4312599],[85.56,85.9,82.24,82.57,2952759],[82.56,85.95,81.4,83.33,2775928],[83.33,85.67,82.62,84.83,2186078],[84.83,86.26,83.8,84.93,1570902],[84.94,85,81.27,81.53,2174792],[81.54,86.81,81.4,86.51,2950390],[86.51,87.67,83.3,83.72,3532985],[83.72,85.83,82.65,84.9,2602449],[84.9,90.53,83.8,89.05,3940291],[89.06,90.73,87.34,88.76,4237208],[88.77,89.16,85.78,86.16,1893191],[86.15,87.12,82.94,83.47,2594849],[83.47,86.22,83.34,85.28,2300347],[85.29,86.89,84.31,86.03,2111587],[86.04,89.32,86.01,86.87,3154872],[86.86,87.18,84.48,86.12,2894663]]},{"id":"BINANCE_BTCUSDT_1d_4","symbol":"BTCUSDT","tf":"1d","period":"2025-04-09 ~ 2025-07-07","source":"Binance","vis":250,"fut":30,"diff":4,"bias":"NEUTRAL","tags":["상승추세"],"explain":"공개 구간은 '상승추세' 흐름이고 마지막 캔들 특징은 [상승추세] 입니다. 제출 이후 10캔들 동안 종가 기준 1.1% (뚜렷한 방향 없이 등락) 움직였고, 최대 +3.3% / 최저 -1.8% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[69032,69519.52,66840.67,67377.5,31374],[67377.5,67836.01,66571.42,67426,24599],[67426.01,67472.83,65260,66668.65,25530],[66668.65,68850,66510,68198.28,22590],[68198.27,68771.49,65596.29,66698.33,34480],[66698.32,67454.55,66439.9,67092.76,11843],[67092.76,68332.05,66913.73,68021.7,8653],[68021.69,70270,67618,69962.21,29047],[69962.21,73620.12,69760,72736.42,50129],[72736.41,72961,71436,72344.74,26886],[72344.75,72700,69685.76,70292.01,29352],[70292.01,71632.95,68820.14,69496.01,38302],[69496,69914.37,69000.14,69374.74,10522],[69374.74,69391,67478.73,68775.99,24996],[68775.99,69500,66835,67850.01,29800],[67850.01,70577.91,67476.63,69372.01,33355],[69372.01,76400,69298,75571.99,104127],[75571.99,76849.99,74416,75857.89,44869],[75857.89,77199.99,75555,76509.78,36521],[76509.78,76900,75714.66,76677.46,16942],[76677.46,81500,76492,80370.01,61830],[80370.01,89530.54,80216.01,88647.99,82324],[88648,89940,85072,87952.01,97300],[87952,93265.64,86127.99,90375.2,86764],[90375.21,91790,86668.21,87325.59,56730],[87325.59,91850,87073.38,91032.07,47928],[91032.08,91779.66,90056.17,90586.92,22718],[90587.98,91449.99,88722,89855.99,23868],[89855.98,92594,89376.9,90464.08,46545],[90464.07,93905.51,90357,92310.79,43660],[92310.8,94831.97,91500,94286.56,42203],[94286.56,98988,94040,98317.12,69228],[98317.12,99588.01,97122.11,98892,46189],[98892,98908.85,97136,97672.4,24758],[97672.4,98564,95734.77,97900.04,31201],[97900.05,98871.8,92600.19,93010.01,50847],[93010.01,94973.37,90791.1,91965.16,57859],[91965.16,97208.21,91792.14,95863.11,41153],[95863.11,96564,94640,95643.98,28815],[95643.99,98619.99,95364.99,97460,27702],[97460,97463.95,96092.01,96407.99,14504],[96407.99,97836,95693.88,97185.18,16939],[97185.17,98130,94395,95840.62,37959],[95840.61,96305.52,93578.17,95849.69,35827],[95849.69,99000,94587.83,98587.32,43851],[98587.32,104088,90500,96945.63,109922],[96945.63,101899,95981.72,99740.84,45050],[99740.84,100439.2,98844,99831.99,14932],[99831.99,101351,98657.7,101109.6,14613],[101109.6,101215.9,94150.05,97276.47,53949],[97276.48,98270,94256.54,96593,51709],[96593,101888,95658.24,101125,37754],[101125,102540,99311.64,100004.3,29232],[100004.3,101895.3,99205,101424.3,21904],[101424.2,102650,100609.4,101420,14192],[101420,105250,101237.1,104464,22229],[104464,107793.1,103333,106058.7,41302],[106058.6,108353,105321.5,106133.7,29065],[106133.7,106525,100000,100204,50308],[100204,102800.1,95700,97461.86,55147],[97461.86,98233,92232.54,97805.44,62884],[97805.44,99540.61,96398.39,97291.99,23484],[97292,97448.08,94250.35,95186.27,19354],[95186.28,96538.92,92520,94881.47,32811],[94881.47,99487.99,93569.02,98663.58,23674],[98663.58,99569.15,97632.02,99429.6,14474],[99429.61,99963.7,95199.14,95791.6,21192],[95791.6,97544.58,93500.01,94299.03,26501],[94299.03,95733.99,94135.66,95300,8386],[95300,95340,93009.52,93738.2,13576],[93738.19,95024.5,91530.45,92792.05,27619],[92792.05,96250,92033.73,93576,19612],[93576,95151.15,92888,94591.79,10373],[94591.78,97839.5,94392,96984.79,21970],[96984.79,98976.91,96100.01,98174.18,15254],[98174.17,98778.43,97514.79,98220.5,8990],[98220.51,98836.85,97276.79,98363.61,8096],[98363.61,102480,97920,102235.6,25263],[102235.6,102724.4,96181.81,96954.61,32060],[96954.6,97268.65,92500.9,95060.61,33705],[95060.61,95382.32,91203.67,92552.49,34545],[92552.49,95836,92206.02,94726.11,31483],[94726.1,95050.94,93831.73,94599.99,7048],[94599.99,95450.1,93711.19,94545.06,8607],[94545.07,95940,89256.69,94536.1,42620],[94536.11,97371,94346.22,96560.86,27847],[96560.85,100681.9,96500,100497.4,30510],[100497.4,100866.7,97335.13,99987.3,27833],[99987.3,105865.2,99950.77,104077.5,39172],[104077.5,104988.9,102277.6,104556.2,24308],[104556.2,106422.4,99651.6,101331.6,43397],[101331.6,109588,99550,102260,89529],[102260,107240.8,100119,106143.8,45941],[106143.8,106394.5,103339.1,103706.7,22249],[103706.7,106850,101262.3,103910.3,53953],[103910.4,107120,102750,104870.5,23609],[104870.5,105286.5,104106.1,104746.9,9068],[104746.9,105500,102520.4,102620,9813],[102620,103260,97777.77,102082.8,50758],[102082.8,103800,100272.7,101335.5,22022],[101335.5,104782.7,101328,103733.2,23155],[103733.3,106457.4,103278.5,104722.9,19374],[104722.9,106012,101560,102429.6,21983],[102429.6,102783.7,100279.5,100635.6,12291],[100635.7,101456.6,96150,97700.59,34619],[97700.59,102500,91231,101328.5,75165],[101328.5,101732.3,96150,97763.13,40268],[97763.14,99149,96155,96612.43,26233],[96612.44,99120,95676.64,96554.35,23515],[96554.35,100138,95620.34,96506.8,31794],[96506.8,96880,95688,96444.74,10147],[96444.75,97323.09,94713,96462.75,14121],[96462.75,98345,95256,97430.82,20573],[97430.82,98478.42,94876.88,95778.2,18648],[95778.21,98119.99,94088.23,97869.99,29151],[97870,98083.91,95217.36,96608.14,19922],[96608.13,98826,96252.82,97500.48,18173],[97500.47,97972.26,97223.58,97569.66,7349],[97569.67,97704.47,96046.18,96118.12,8191],[96118.12,97046.59,95205,95780,16492],[95780.01,96753.91,93388.09,95671.74,23368],[95671.74,96899.99,95029.99,96644.37,16439],[96644.37,98711.36,96415.09,98305,17057],[98305.01,99475,94871.95,96181.98,32249],[96181.99,96980,95770.49,96551.01,11268],[96551.01,96650,95227.94,96258,10885],[96258,96500,91349.26,91552.88,31550],[91552.88,92540.69,86050.99,88680.4,78333],[88680.39,89414.15,82256.01,84250.09,56894],[84250.09,87078.46,82716.49,84708.58,42505],[84708.57,85120,78258.52,84349.94,83648],[84349.95,86558,83824.78,86064.53,25785],[86064.54,95000,85050.6,94270,54889],[94269.99,94416.46,85117.11,86220.61,59171],[86221.16,88967.52,81500,87281.98,55609],[87281.98,91000,86334.53,90606.01,38264],[90606,92810.64,87836,89931.89,34342],[89931.88,91283.02,84667.03,86801.75,57980],[86801.74,86897.25,85218.47,86222.45,12989],[86222.46,86500,80000,80734.37,26115],[80734.48,84123.46,77459.91,78595.86,47633],[78595.86,83617.4,76606,82932.99,48770],[82932.99,84539.85,80607.65,83680.12,31934],[83680.12,84336.33,79939.9,81115.78,27546],[81115.78,85309.71,80818.84,83983.2,26859],[83983.19,84676.28,83618,84338.44,11325],[84338.44,85117.04,81981.12,82574.53,17596],[82574.52,84756.83,82456,84010.03,17215],[84010.02,84021.74,81134.66,82715.03,17611],[82715.03,87000,82547.16,86845.94,28151],[86845.93,87453.67,83655.23,84223.39,22090],[84223.38,84850.33,83175.25,84088.79,11957],[84088.79,84539.17,83625.1,83840.59,5420],[83840.59,86129.64,83809.75,86082.5,8462],[86082.5,88765.43,85519.09,87498.16,30116],[87498.16,88539.63,86310,87392.87,22643],[87392.88,88275,85860,86909.17,18409],[86909.17,87756.39,85800,87232.01,17098],[87232.01,87515.67,83585,84424.38,27183],[84424.38,84624.73,81644.81,82648.54,11696],[82648.53,83534.64,81565,82389.99,9864],[82390,83943.08,81278.52,82550.01,20569],[82550,85579.46,82432.74,85158.34,20190],[85158.35,88500,82320,82516.29,39931],[82516.28,83998.02,81211.24,83213.09,27338],[83213.09,84720,81659,83889.87,32916],[83889.87,84266,82379.95,83537.99,9360],[83537.99,83817.63,77153.83,78430,27943],[78430,81243.58,74508,79163.24,78388],[79163.24,80867.99,76239.9,76322.42,35317],[76322.42,83588,74620,82615.22,75488],[82615.22,82753.21,78464.36,79607.3,33285],[79607.3,84300,78969.58,83423.84,34435],[83423.83,85905,82792.95,85276.9,18471],[85276.91,86100,83034.23,83760,24680],[83760,85799.99,83678,84591.58,28659],[84591.58,86496.42,83600,83643.99,20911],[83643.99,85500,83111.64,84030.38,20867],[84030.38,85470.01,83736.26,84947.91,13729],[84947.92,85132.08,84303.96,84474.69,6530],[84474.7,85677.99,84364.45,85077.01,9667],[85077,85320.76,83949.52,85179.24,8092],[85179.24,88465.99,85144.76,87516.23,31773],[87516.22,93888,87076.03,93442.99,43873],[93442.99,94696.05,91935.41,93691.08,27404],[93691.07,94005,91660.01,93980.47,19497],[93980.47,95758.04,92855.96,94638.68,27501],[94638.68,95199,93870.69,94628,9415],[94628,95369,93602.58,93749.3,11163],[93749.29,95630,92800.01,95011.18,22158],[95011.18,95461.53,93742.54,94256.82,16955],[94256.82,95228.45,92910,94172,17661],[94172,97424.02,94130.43,96489.91,21380],[96489.9,97895.68,96350,96887.14,14906],[96887.13,96935.67,95753.01,95856.42,9723],[95856.42,96304.48,94151.38,94277.62,11036],[94277.61,95199,93514.1,94733.68,17251],[94733.68,96920.65,93377,96834.02,16123],[96834.02,97732,95784.61,97030.5,16645],[97030.5,104145.8,96876.29,103261.6,34962],[103261.6,104361.3,102315.1,102972,27617],[102972,104984.6,102818.8,104809.5,15325],[104809.5,104972,103345.1,104118,17987],[104118,105819.4,100718.4,102791.3,31273],[102791.3,104976.3,101429.7,104103.7,21253],[104103.7,104356.9,102602.1,103507.8,16453],[103507.8,104192.7,101383.1,103763.7,17999],[103763.7,104550.3,103100.5,103463.9,15684],[103463.9,103709.9,102612.5,103126.6,11251],[103126.6,106660,103105.1,106454.3,21600],[106454.3,107108.6,102000,105573.7,30260],[105573.7,107320,104184.7,106850,23705],[106850,110797.4,106100,109644,45531],[109644,111980,109177.4,111696.2,31631],[111696.2,111800,106800,107318.3,31738],[107318.3,109506,106875.4,107761.9,16783],[107761.9,109300,106600.6,109004.2,17710],[109004.2,110422.2,108670.6,109434.8,14649],[109434.8,110718,107516.6,108938.2,21277],[108938.2,109284.7,106769.4,107781.8,15634],[107781.8,108891.9,105322.9,105589.8,19835],[105589.8,106313.1,103621,103985.5,23707],[103985.5,104900,103068.6,104591.9,11289],[104591.9,105866.9,103752.5,105642.9,9710],[105642.9,105935.6,103659.9,105858,13454],[105858,106794.7,104872.5,105376.9,13260],[105376.9,106000,104179,104696.9,14035],[104696.9,105909.7,100372.3,101508.7,22322],[101508.7,105333,101095.8,104288.4,15839],[104288.4,105900,103871.1,105552.1,8345],[105552.1,106488.1,104964.1,105734,8048],[105734,110530.2,105318.4,110263,19975],[110263,110400,108331,110274.4,17072],[110274.4,110392,108064,108645.1,13116],[108645.1,108813.6,105671.7,105671.7,17779],[105671.7,106179.5,102664.3,106066.6,26181],[106066.6,106252,104300,105414.6,8799],[105414.6,106128.6,104494.5,105594,7164],[105594,108952.4,104980.4,106794.5,14923],[106794.5,107771.3,103371,104551.2,17866],[104551.2,105550.3,103500,104886.8,13969],[104886.8,105226.2,103929.3,104658.6,7679],[104658.6,106524.6,102345,103298,16419],[103298,103982.6,100837.9,102120,11154],[102120,103399.6,98200,100963.9,28746],[100963.9,106074.2,99613.33,105333.9,27667],[105333.9,106290,104622,106083,14652],[106083,108135.3,105808,107340.6,16701],[107340.6,108272.4,106562.5,106947.1,10573],[106947.1,107735.3,106356.8,107047.6,12232],[107047.6,107577.8,106811.5,107296.8,3282],[107296.8,108528.5,107172.5,108356.9,6832],[108356.9,108790,106733.3,107146.5,9754],[107146.5,107540,105250.9,105681.1,10506],[105681.1,109730,105100.2,108849.6,17692],[108849.6,110529.2,108530.4,109584.8,13047],[109584.8,109767.6,107245,107984.2,11794],[107984.3,108420.6,107756.3,108198.1,3737],[108198.1,109700,107800,109203.8,6448],[109203.9,109700,107513.2,108262.9,9405],[108262.9,109216.6,107429.6,108923,9216],[108923,111999.8,108324.5,111234,17282],[111234,116868,110500,116010,24883],[116010,118870,115222.2,117527.7,25874],[117527.7,118200,116900.1,117420,8447],[117420,119488,117224.8,119086.6,9551],[119086.6,123218,118905.2,119841.2,27269],[119841.2,119940.8,115736.9,117758.1,32018],[117758.1,120063.8,117017.3,118630.4,17040],[118630.4,120998.7,117453.6,119177.6,15729],[119177.6,120820.7,116812.8,117924.8,19925],[117924.8,118499.9,117277.3,117840,6636],[117840,118856.8,116467,117265.1,12963],[117265.1,119676.7,116515,117380.4,17107],[117380.4,120247.8,116128,119954.4,20959],[119954.4,120090,117301,118756,14559],[118756,119450,117103.1,118341,15807],[118341,118451.6,114723.2,117614.3,38406],[117614.3,118297.4,117138.4,117920,6992],[117920,119766.6,117825.5,119415.6,9328]]},{"id":"BINANCE_ETHUSDT_1d_6","symbol":"ETHUSDT","tf":"1d","period":"2024-10-11 ~ 2025-01-08","source":"Binance","vis":250,"fut":30,"diff":2,"bias":"NEUTRAL","tags":["하락추세"],"explain":"공개 구간은 '하락추세' 흐름이고 마지막 캔들 특징은 [하락추세] 입니다. 제출 이후 10캔들 동안 종가 기준 -0.9% (뚜렷한 방향 없이 등락) 움직였고, 최대 +11.6% / 최저 -4.4% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[3219.46,3293.56,3104.9,3140.8,393314],[3140.79,3191.64,3072.2,3155.8,352289],[3155.81,3167.7,3102,3131.3,252523],[3131.3,3285,3066.74,3255.56,323811],[3255.55,3357.4,3250.45,3263.45,304766],[3263.44,3286.95,3115.13,3216.73,421831],[3216.74,3250.95,2921,3014.05,561717],[3014.04,3023.24,2817,2972.46,624964],[2972.46,3016.72,2893.26,2986.19,365940],[2986.19,3126.99,2958.32,3102.61,355826],[3102.61,3168,3092.85,3117.23,196264],[3117.24,3171.93,3072.99,3136.41,218760],[3136.4,3221.4,3046.35,3062.6,355135],[3062.59,3129.85,2998,3005.69,298797],[3005.69,3038.15,2936.48,2974.21,266935],[2974.2,3059,2950.77,3036.23,238562],[3036.24,3053.89,2878.03,2909.99,327856],[2909.98,2945.67,2886.46,2912.45,138163],[2912.45,2955.2,2901.17,2929.29,107671],[2929.3,2996.4,2864.76,2950.99,368665],[2950.99,2960.6,2862,2881.93,269675],[2881.93,3041.36,2863.75,3032.55,350254],[3032.55,3041.24,2922.8,2944.7,293874],[2944.7,3120,2933.06,3092.01,357725],[3092,3146.98,3083.61,3122.94,199977],[3122.94,3136.64,3053.38,3071.19,166145],[3071.2,3694,3047.67,3661.78,847108],[3661.79,3841.54,3624.28,3789.6,952437],[3789.59,3813.69,3653.15,3737.73,574938],[3737.72,3949.29,3498,3783.61,1127866],[3783.6,3829.61,3626.1,3728.28,479418],[3728.28,3779.43,3709.03,3749.26,158712],[3749.25,3884.2,3731.17,3826.47,292208],[3826.47,3977,3823.37,3894.22,363718],[3894.21,3931.09,3773.9,3844.69,416250],[3844.69,3888.55,3742.59,3767.43,334760],[3767.44,3825.35,3702.58,3747.91,277034],[3747.9,3849.94,3723.75,3762.29,273407],[3762.29,3833.3,3752.67,3815.82,132687],[3815.82,3838.59,3752.62,3780.91,210295],[3780.92,3849.99,3758.43,3767.06,248849],[3767.07,3831.65,3730,3810.23,232064],[3810.23,3887.47,3777.33,3865.99,273739],[3866,3878.6,3760,3813.46,237504],[3813.47,3841.39,3600,3678.32,362223],[3678.31,3709.5,3660.08,3681.57,140551],[3681.58,3721.52,3666.36,3706.4,103451],[3706.4,3713.67,3642.74,3667.85,156363],[3667.85,3673,3432,3497.33,439569],[3497.33,3659.01,3462.07,3560.12,387044],[3560.13,3561.65,3428,3469.4,300231],[3469.4,3532.61,3362.26,3481.8,322316],[3481.8,3594.39,3473.1,3568.74,246650],[3568.75,3653.79,3541.05,3624.41,149840],[3624.41,3638.37,3463.39,3511.46,337806],[3511.47,3517.2,3355,3483.42,449913],[3483.42,3590.01,3465.65,3560.51,321500],[3560.51,3625.96,3486,3513.08,329118],[3513.08,3547.55,3446.82,3518.5,342155],[3518.5,3521.19,3475.09,3495.75,115775],[3495.76,3521.45,3406.38,3420.91,133411],[3420.91,3435.76,3240,3352.73,543370],[3352.74,3430.88,3336.76,3394.91,240036],[3394.91,3426.75,3325.01,3371.44,206949],[3371.77,3477,3361.74,3450.44,201042],[3450.44,3487.7,3365.22,3380.15,221634],[3380.15,3408.32,3371.86,3378.8,88330],[3378.8,3460,3352.66,3438.16,141222],[3438.16,3524.94,3423.78,3442.2,224273],[3442.2,3464.12,3402,3421.35,137933],[3421.35,3432.1,3251,3295.48,310408],[3295.49,3313.45,3050.34,3059.7,450403],[3059.7,3110,2810,2981.78,886994],[2981.79,3081.78,2955.06,3066.83,214488],[3066.83,3073.08,2922.24,2931,179893],[2930.99,3097.06,2822.8,3019.01,500445],[3019.01,3115.2,3004,3066.65,280358],[3066.65,3151.51,3024,3101.05,270827],[3101.06,3217.24,3054.76,3099.57,289229],[3099.57,3157.89,3045.58,3133.88,185745],[3133.89,3201.8,3113.37,3175.93,119302],[3175.93,3268.72,3163.67,3245.08,165431],[3245.2,3493.63,3233.22,3483.39,314297],[3483.2,3498.59,3346.55,3444.13,376129],[3444.14,3517,3376,3387.05,297813],[3387.05,3489.98,3367.2,3426.5,241950],[3426.49,3540.27,3377,3503.53,299512],[3503.53,3539.65,3480,3517.5,147511],[3517.5,3547,3411.4,3535.92,218891],[3535.93,3562.82,3422.34,3439.6,207860],[3439.61,3541,3389,3482.51,500569],[3482.51,3487.82,3300,3335.81,275479],[3335.82,3342.5,3087.53,3175.48,494283],[3175.47,3286.36,3171,3274.61,260237],[3274.6,3327.59,3191.01,3249.01,231992],[3249,3284.3,3198.11,3270.16,103530],[3270.16,3396.77,3258,3317.66,318472],[3317.66,3366.4,3233.18,3279.21,197277],[3279.2,3350,3213.75,3232.74,233711],[3232.74,3242.57,3080.02,3203.4,323286],[3203.4,3218.6,2967,2989.61,385704],[2989.61,3018.02,2859,2903.64,344595],[2903.65,2935.46,2630,2688.92,512064],[2688.91,2697.44,2111,2419.59,2670604],[2419.76,2556.23,2414.19,2461.33,642284],[2461.33,2551.32,2309.04,2342.8,630115],[2342.79,2724.1,2320.4,2682.5,586503],[2682.5,2707.98,2552.61,2598.78,406740],[2598.79,2644.7,2576.49,2609.92,171012],[2609.92,2720,2540,2555.38,297099],[2555.38,2750,2510.05,2722.3,483414],[2722.3,2738.4,2611.37,2702.44,325669],[2702.44,2780,2632.2,2661.45,338809],[2661.45,2675.6,2515.71,2569.89,356547],[2569.9,2630.97,2550.04,2592.73,270684],[2592.72,2629.69,2587.5,2614.51,89349],[2614.51,2689.16,2594.53,2612.15,174074],[2612.15,2648.08,2563.58,2636.36,224867],[2636.36,2695,2555,2572.82,281316],[2572.81,2663.74,2536.22,2630.71,245287],[2630.71,2644.69,2584.2,2622.88,199063],[2622.89,2799.13,2621.4,2762.48,401786],[2762.49,2820,2731.26,2768,263543],[2768.01,2792.28,2733.21,2746.13,154527],[2746.12,2762,2666.66,2680.49,211708],[2680.49,2699.98,2392.96,2457.33,412661],[2457.33,2554.6,2418.8,2528.33,451267],[2528.33,2595.4,2505.88,2527.61,237003],[2527.6,2552.17,2431.14,2526,338379],[2525.99,2533.95,2491.92,2513.01,97946],[2513,2516.28,2400,2425.72,223128],[2425.71,2564.83,2423.52,2538.01,262633],[2538,2553.6,2411.12,2425.29,224793],[2425.28,2490,2306.65,2450.71,384179],[2450.71,2466,2348.04,2368.81,278549],[2368.81,2408.83,2150.55,2225.23,643027],[2225.24,2311.27,2220.98,2273.58,219453],[2273.58,2333.58,2240.94,2297.3,192776],[2297.3,2381.41,2272.8,2359.5,321699],[2359.51,2400,2320.41,2388.52,224382],[2388.52,2389.32,2277.68,2340.55,282898],[2340.54,2391.93,2315.39,2361.76,202611],[2361.75,2464.82,2337.35,2439.19,253889],[2439.19,2440.6,2376.72,2417.79,122931],[2417.8,2430.32,2283.75,2316.1,174364],[2316.09,2335.7,2252.39,2295.68,330555],[2295.67,2393.63,2263.29,2341.8,274206],[2341.79,2376.14,2277.34,2374.75,292918],[2374.74,2494.95,2372.6,2465.21,326746],[2465.21,2571.93,2437.31,2561.4,340755],[2561.4,2623.34,2528.97,2612.4,154758],[2612.4,2632.57,2524.58,2581,214266],[2580.99,2702.82,2539.49,2646.97,333282],[2646.98,2670.96,2591.56,2653.2,288600],[2653.2,2673.5,2554.05,2579.95,220343],[2580.09,2666.22,2559.2,2632.26,278686],[2632.25,2728.6,2615.21,2694.43,281827],[2694.43,2704.35,2650,2675.21,137230],[2675.21,2683.7,2629.73,2657.62,160554],[2657.62,2663.5,2575,2602.23,282476],[2602.24,2659,2414,2447.79,502829],[2447.78,2499,2352,2364.1,317485],[2364.09,2403.38,2310,2349.8,314636],[2349.8,2441.64,2339.15,2414.41,239383],[2414.41,2428.23,2390.05,2414.66,103740],[2414.66,2457.8,2407,2440.03,105753],[2440.02,2521,2403,2422.71,300460],[2422.7,2466.66,2401.18,2440.89,201358],[2440.88,2473.61,2351.42,2370.47,242082],[2370.47,2421.36,2330.66,2386.49,257863],[2386.49,2471.45,2381.86,2439.5,235441],[2439.49,2490.51,2434.35,2476.4,139638],[2476.4,2484.92,2436.4,2468.91,120023],[2468.92,2654,2443.39,2629.79,435900],[2629.79,2688.6,2537.36,2607.41,416286],[2607.41,2647.79,2588.67,2611.1,260322],[2611.1,2648.37,2575.4,2605.8,221625],[2605.79,2675.58,2596.49,2642.17,292444],[2642.17,2663.49,2631.02,2648.2,105414],[2648.2,2759,2635.54,2746.91,256911],[2746.91,2769.48,2655.01,2666.7,310675],[2666.71,2671.92,2606.56,2622.81,265748],[2622.81,2628.2,2450,2524.61,352648],[2524.6,2562.65,2507.31,2535.82,290852],[2535.82,2566.33,2382.59,2440.62,514800],[2440.63,2508,2430.12,2482.51,248725],[2482.51,2527.99,2464.13,2507.8,137581],[2507.8,2589.67,2471.67,2567.48,360605],[2567.49,2681.86,2561.2,2638.8,451916],[2638.8,2722.3,2599.66,2659.19,460627],[2659.19,2669,2503,2518.61,403427],[2518.61,2586.8,2467.67,2511.49,430249],[2511.49,2523.45,2470,2494.23,145961],[2494.23,2496.39,2411,2457.73,276009],[2457.73,2491.39,2357.59,2398.21,306317],[2398.21,2480,2380.74,2422.55,331619],[2422.6,2744.7,2420.3,2721.87,1002141],[2721.88,2916.11,2699.49,2895.47,730846],[2895.47,2981.69,2886.4,2961.75,568864],[2961.75,3157.4,2953.71,3126.21,526719],[3126.2,3248.52,3069,3183.21,865537],[3183.2,3387.61,3105,3371.59,1000094],[3371.59,3442.5,3207.67,3243.8,973216],[3243.79,3331,3116.69,3187.16,919686],[3187.16,3240.4,3028.56,3058.82,605781],[3058.81,3131.06,3014.5,3090.01,519624],[3090.01,3219.97,3072,3132.87,423639],[3132.88,3162.11,3034.99,3076,449819],[3075.99,3224.94,3050.01,3207.8,640658],[3207.81,3221.2,3065.4,3107.44,500112],[3107.45,3159.2,3029.41,3069.97,503608],[3069.97,3386.73,3032.59,3355.81,974923],[3355.88,3425.92,3257.54,3327.78,603274],[3327.78,3497.51,3312.72,3393.91,721024],[3393.91,3450,3281.4,3361.2,479098],[3361.21,3546.66,3300.01,3414.49,949330],[3414.49,3462.49,3252,3324.73,672367],[3324.74,3684.92,3302.4,3653.28,754574],[3653.27,3661.92,3529.76,3578.79,560976],[3578.8,3647.98,3534.28,3592.21,425493],[3592.22,3738.98,3568.4,3703.6,503685],[3703.59,3746.8,3659.2,3707.61,429089],[3707.61,3760,3554.32,3643.42,737131],[3643.43,3670,3500,3614.51,678400],[3614.51,3887.24,3614.51,3837.8,968744],[3837.8,3956,3677,3785.2,946493],[3785.21,4087.73,3777.26,3998.87,803855],[3998.87,4024.46,3968,3996.22,283920],[3996.22,4015.58,3923.5,4004.15,251362],[4004.15,4006.17,3509,3712,939642],[3712,3780.76,3515.89,3628.25,942206],[3628.24,3848.64,3562.34,3831.81,461819],[3831.82,3987.41,3796.8,3881.61,572099],[3881.6,3968.47,3852.94,3906.8,387766],[3906.8,3945,3825.03,3870.29,265539],[3870.3,3974.61,3831.5,3959.09,253833],[3959.09,4107.8,3884,3986.24,673351],[3986.24,4041.82,3847.96,3893.01,450826],[3893.01,3907.19,3617.42,3626.8,722505],[3626.8,3720,3326.8,3417.01,1078153],[3417.01,3497.84,3101.9,3472.21,1332784],[3472.2,3555.18,3293.11,3338.92,475276],[3338.92,3403,3221.1,3281.83,361920],[3281.83,3466.99,3216.97,3422.53,488253],[3422.53,3539.65,3358.19,3493.18,315724],[3493.17,3547.95,3440.93,3497,219846],[3497,3514.94,3304.63,3335.05,310170],[3335.04,3444.16,3306.6,3333.51,342530],[3333.51,3428.68,3322.23,3404,175964],[3404.01,3413.78,3326.17,3356.48,156257],[3356.48,3437.59,3305,3361.84,420795],[3361.83,3451,3315.59,3337.78,303053],[3337.78,3374.85,3313.88,3360.38,190239],[3360.39,3509.99,3354.5,3455.67,338633],[3455.68,3630,3423.44,3609.01,334041],[3609,3671.6,3572.42,3656.88,229266],[3656.88,3675.25,3593.7,3635.99,155444],[3636,3744.83,3610.63,3687.45,329642],[3687.44,3700.86,3356.31,3381.31,541543],[3381.31,3415.1,3208.2,3327.29,584750],[3327.29,3357.27,3158,3219.2,501818],[3219.2,3322.49,3193.97,3267.04,454142],[3267.05,3320.18,3217.56,3282.83,151680],[3282.83,3300,3224.49,3267.3,164880],[3267.3,3339,2920,3137.51,845908],[3137.51,3256.67,3125.65,3225.63,374308],[3225.63,3473.75,3186.36,3451.52,464188],[3451.51,3460.79,3265.44,3308.05,471283],[3308.04,3525.72,3307.5,3473.63,518550],[3473.64,3494.39,3227,3307.71,634197],[3307.71,3448.99,3130.48,3215.12,1342302],[3215.2,3453.69,3142.78,3284,1158355],[3283.99,3368,3204.6,3327.54,548706],[3327.55,3365.99,3222.85,3242.6,349241],[3242.61,3347.97,3185,3338.21,605593],[3338.22,3428,3275.9,3310.09,451524],[3310.1,3350.68,3268.66,3318.77,208559],[3318.76,3362,3230,3232.61,272165],[3232.61,3253.91,3020.01,3182.44,753005],[3182.44,3223.01,3040.03,3077.72,350960]]},{"id":"BINANCE_BNBUSDT_1d_6","symbol":"BNBUSDT","tf":"1d","period":"2024-10-11 ~ 2025-01-08","source":"Binance","vis":250,"fut":30,"diff":5,"bias":"NEUTRAL","tags":["횡보","20일선근처","장대음봉"],"explain":"공개 구간은 '횡보' 흐름이고 마지막 캔들 특징은 [횡보, 20일선근처, 장대음봉] 입니다. 제출 이후 10캔들 동안 종가 기준 0.2% (뚜렷한 방향 없이 등락) 움직였고, 최대 +7.3% / 최저 -2.9% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[606.2,618.5,592.6,608.8,656954],[608.8,617.9,600.7,613.2,453746],[613.3,615,597,598,302120],[598,599.7,585,596.2,268784],[596.2,609,596.2,600.2,258059],[600.2,602.8,581.3,592.8,330474],[592.8,604.3,555.7,578.4,766513],[578.4,580.4,536.7,561.8,669027],[561.8,565.9,539.5,560.5,359794],[560.5,590,558.9,587,342906],[587,593.6,582.5,585.7,197129],[585.7,595,579.3,592,180458],[592,602.3,583.1,588.2,278669],[588.2,600.4,576,576.5,289489],[576.5,590,574.4,588.6,297017],[588.6,605.8,586.3,596.8,464858],[596.8,597,581.5,585.6,296216],[585.7,594.5,580.8,592.2,210698],[592.2,600.1,587.3,594.8,191191],[594.8,598.4,585.2,591.7,389810],[591.7,593.1,562,567.1,453308],[567.1,587.3,560,581,402813],[581,586.6,565.1,569.2,411937],[569.2,584.5,568.6,580.9,236920],[580.9,581.9,574.2,580.3,168075],[580.3,581.9,571.3,574.5,142157],[574.6,602,568.8,599.6,469253],[599.6,631.4,593.3,618.5,1023560],[618.5,626.3,610.1,614.8,404848],[614.8,617.5,580,599.3,607672],[599.4,605.5,588.3,600.3,251965],[600.3,606.7,599.5,602.4,121539],[602.3,605.4,598,600.2,122984],[600.3,614.4,599.6,603.9,229302],[603.9,606,593.8,601.7,284863],[601.7,603.6,593.1,595.7,212706],[595.7,602.2,586.5,595.1,225452],[595.1,599,590,593.7,168608],[593.8,608.4,593.1,601.9,156465],[601.9,606,596,602.9,198300],[602.8,638.8,601.2,626.4,654161],[626.4,688.2,624.8,685.7,736323],[685.7,716,684.7,698.8,673821],[698.8,721.8,692,711.2,544043],[711.1,712,658.9,684,594754],[684,694.9,677.9,682.7,216849],[682.7,684.8,670.3,673,173566],[673.1,674.8,613.3,625.1,692123],[625.1,629,595.8,602.5,640656],[602.5,635.4,591.3,619.4,454149],[619.4,619.9,595.6,599.8,313465],[599.8,612.5,590,603.3,279802],[603.3,609.7,601.3,608.2,122650],[608.2,611.8,601.1,610.8,104827],[610.9,612.6,591.4,604.3,235509],[604.3,605.2,575,588.6,459143],[588.6,605.9,586.6,599.3,260529],[599.3,608,584.6,587.7,289499],[587.7,589.3,577.8,586.1,191183],[586.2,591.4,581,591.1,100440],[591.1,593.2,576,577.5,141026],[577.5,582,551.2,568.1,356915],[568.1,580,566.4,578.2,177301],[578.3,584.7,567.4,573,154770],[573.1,584.7,566.4,581.7,199582],[581.8,585.3,565.6,567.4,210309],[567.4,573.9,566.9,570,99951],[570,585.3,568.3,582.2,169894],[582.3,588.3,576.2,576.9,188482],[576.9,582,573.9,580.1,144562],[580.1,581,550.5,556.7,288319],[556.7,558.1,511.6,513.6,511359],[513.5,516.1,454.8,497.7,992708],[497.8,530.7,496,526,226597],[526,526.6,488.4,490.7,279027],[490.7,524.2,471,510.6,580970],[510.5,520.8,506.5,516.9,203359],[516.9,529.4,511.3,524.7,205460],[524.7,545.1,520.1,524.8,262789],[524.9,537.5,517,533.8,207871],[533.9,539.4,527.3,532.4,161128],[532.5,547.7,531.2,544.8,148566],[544.9,586.8,543.8,585.3,335373],[585.3,587.5,554.4,576.2,347825],[576.3,584,564.3,568.9,198271],[568.9,579.6,561.6,571.9,153122],[572,598.7,565,593.4,331878],[593.4,597.9,586.7,593.1,144679],[593.2,603.4,581.5,602.5,243932],[602.5,605.6,580.3,587.2,212453],[587.3,593.5,577.2,581.9,214355],[582,589.1,570.4,574.9,160535],[574.9,576.6,553.1,570.6,286998],[570.7,582.8,570.2,580.9,155493],[580.9,592.8,572.6,581.6,184469],[581.6,584.9,574.5,583.9,92607],[583.9,598,572.2,574.3,213824],[574.3,588.3,566.6,588.2,165024],[588.1,592.9,574.7,576.5,194702],[576.5,578,553.7,575.1,280419],[575.2,577.6,540.2,542.9,283605],[542.9,545.3,521.3,529.6,245778],[529.7,532.2,486.5,496.9,390238],[496.9,499.9,400,464.2,2114680],[464.3,494.4,463.5,484.8,458815],[484.9,497.7,468.1,475,322182],[475,521.7,467.5,517.1,286745],[517.2,518.4,498.7,508.7,195125],[508.7,525.4,507.2,523.1,126212],[523.2,535.8,502.3,503.4,206039],[503.5,524,499.2,518.2,285951],[518.3,527,513.1,524.2,255029],[524.2,531.9,515.4,523.4,220850],[523.4,533.9,510,519.2,229628],[519.2,524.5,509.9,519.7,174036],[519.7,547.7,518.3,541.6,196366],[541.7,542.6,530.8,531.2,148890],[531.3,560.7,529.1,558.4,233275],[558.5,574.9,558.2,569.4,422054],[569.4,575.1,546.1,570.1,345602],[570.2,590,559.7,582.9,365020],[583,600.6,574.3,591.7,387773],[591.7,592.4,574.6,580.5,325169],[580.5,583.9,569,573.9,195985],[573.9,575.6,546.7,548.2,280986],[548.3,558.3,520.5,533.3,298074],[533.3,546.8,522.4,537,269795],[537,545.5,530.9,536.4,166187],[536.4,543.4,522,535.2,197826],[535.2,541.5,531.1,532.9,95954],[532.9,533.2,507.7,512.4,203699],[512.3,530.2,501.5,526.3,262984],[526.4,538.4,517.9,518.7,224482],[518.8,523.7,495.8,507.6,435892],[507.6,512.9,496.7,502.4,177237],[502.4,509.9,471.3,487.2,357705],[487.3,499.5,482.9,493.5,140367],[493.6,506.9,490.7,503.1,135677],[503.2,525.7,501.7,518.7,207529],[518.7,524.3,509.2,517,161418],[517,535.4,506.5,530.1,204080],[530.2,548.7,530,544.5,273878],[544.6,559.7,538.7,556.4,276743],[556.4,559.2,547.5,553.3,138433],[553.4,561.9,546,553.4,205255],[553.4,555.2,527,533.7,267954],[533.7,552.7,529,546.2,195288],[546.2,559.7,536.8,559.5,201183],[559.5,572.2,553,567,308428],[566.9,577.1,555,569,257078],[569.1,590,566.4,588.6,208752],[588.7,594.6,576.4,588.7,202979],[588.7,616,583.4,604.5,376010],[604.5,613.4,598.5,605.9,261622],[605.8,608.3,584.2,587.4,220794],[587.5,609,580.8,596.3,334337],[596.3,614.7,596,606.8,356902],[606.9,618.6,594.5,601.1,262593],[601.1,602.8,592.4,595.6,160103],[595.6,595.8,563.5,567.4,324087],[567.4,583.1,536.8,547.3,476373],[547.2,558.3,535.4,542.5,282194],[542.5,550.8,534.3,544.8,220702],[544.8,557.8,541.8,555.3,186170],[555.3,565.2,551.6,563,124906],[563,571.9,561.1,570.3,106787],[570.4,581.8,563.5,564.3,213047],[564.4,586.8,559.5,580.8,286276],[580.8,586,566.2,570.7,324396],[570.8,572.9,551.5,563.9,178198],[563.8,577.5,560.1,573.6,185095],[573.7,579.2,573.6,576.6,135774],[576.6,578.5,564.9,572.2,118780],[572.3,592.3,558.9,589.1,252803],[589,599.9,577.7,594.5,324306],[594.6,605.5,589.7,600.9,259951],[601,606.3,585.1,592.9,194199],[592.9,602.4,591.8,599.2,136744],[599.3,601.4,595.4,597.7,78940],[597.8,607.3,593.1,605.9,123572],[605.9,611.8,591.5,598.8,275881],[598.8,609,587,593.8,203757],[593.8,595,573,584.9,225698],[584.9,598,583.3,594.5,145782],[594.5,597.6,565.8,575.3,254215],[575.3,587.1,571.6,583.4,119987],[583.4,591,581.7,589.2,94455],[589.3,604.6,585.5,601.1,189816],[601.1,612.2,599.9,606.3,301555],[606.3,606.7,594.1,595.6,186706],[595.5,596.5,571.1,576.6,279156],[576.5,585.5,567.7,573.1,242255],[573.1,577.2,562.4,568.6,143717],[568.6,569.3,547,557.7,217508],[557.7,564.8,543.6,552.5,264952],[552.51,572.8,551.22,563.21,211438],[563.21,595,563,592.22,535935],[592.22,611.2,587.01,598.26,377601],[598.27,605.9,588.1,597.82,318753],[597.82,638,597.51,624.66,772173],[624.67,644.2,611.62,627.33,812784],[627.34,665.54,613,659.63,1006385],[659.63,667.4,610,625.33,1166459],[625.42,638.06,598.6,620.68,1034672],[620.68,660.4,610.5,622.3,1060650],[622.3,628.3,603.4,619.37,654908],[619.37,633.7,617.5,622.69,447888],[622.69,647.6,605.2,618.9,595820],[618.93,630.91,612.1,618.93,483382],[618.93,621.41,605.21,615.5,420441],[615.49,620.78,600,605.39,411143],[605.39,629.37,593.05,621.86,647295],[621.86,639.64,615.05,633,582666],[633,680,631.1,650.42,1071185],[650.42,687.75,637.08,659.65,914571],[659.65,676.79,626.43,636.2,783511],[636.16,645.57,600.02,613.51,814622],[613.5,646.75,607.79,644.14,629624],[644.15,664.68,639.79,653.83,684790],[653.84,663.8,648.42,654.67,429894],[654.67,677.2,648,653.43,545813],[653.44,664.17,645.16,655.99,434417],[656,667.2,627.99,647.82,771630],[647.83,750.01,622.85,734.64,1575648],[734.64,793.86,720,739.53,2092976],[739.54,739.9,690,717.1,1159099],[717.1,745.93,705.06,730.22,747138],[730.22,761,729.69,749.72,445276],[749.71,757.26,727.47,742,343121],[742,742.5,642,689.19,1068110],[689.2,704.92,649.13,676.8,984802],[676.8,713,658.54,711.21,526819],[711.2,725.61,699.36,705.77,576877],[705.77,729.88,696.8,725.72,548598],[725.73,732.11,705.01,715.79,341929],[715.8,724.08,702.66,718.87,282458],[718.87,730,704.16,720.58,483845],[720.58,737.37,712.24,717.69,502869],[717.7,722,681,686.38,726576],[686.39,705.57,648.63,665.62,840266],[665.61,680.58,618.69,678.6,982349],[678.6,693.39,652,663.49,529438],[663.5,669.71,639.37,649.77,333704],[649.77,698.5,638.1,694.16,606364],[694.16,699,682.68,696.9,386936],[696.89,713.28,695.94,702.72,232510],[702.71,719.99,683,689.4,381100],[689.4,718.88,685.73,691.85,347156],[691.86,731.24,691.3,722.13,344252],[722.13,724.7,690,694.71,241528],[694.71,712.2,687.75,705.36,297267],[705.35,714.99,698.48,702.3,235465],[702.31,711.5,700.3,707.84,135703],[707.84,715.8,698.04,706.25,292534],[706.24,715.69,697.03,714.88,291702],[714.87,721.84,707.82,713.41,167274],[713.41,713.93,702.51,709.29,115144],[709.29,745.29,705.91,729.42,357348],[729.42,733.33,691.2,698.01,436097],[698,707.46,674.72,696.03,427278],[696.03,701.72,675.12,685.48,331907],[685.47,700.69,683.18,693.21,234590],[693.21,701.47,690.39,696.7,87735],[696.71,698.63,689.8,693.34,78211],[693.35,700,660,688.64,386630],[688.64,699.97,686.3,698.89,159724],[698.89,715,688.45,714.59,282719],[714.59,717.5,700.5,708.1,268105],[708.1,729.97,708.1,721.76,289751],[721.76,723.32,695,709.52,370480],[709.52,714.6,676,683.19,712985],[683.2,709.38,671,682.51,668236],[682.51,697,675.01,692.21,294203],[692.21,704.13,689.93,695.52,218410],[695.52,697.65,680.26,689.74,331191],[689.73,691.31,678.75,680.45,280584],[680.45,689.56,677.68,686.4,140203],[686.4,690.82,664.64,667.37,195887],[667.36,680.53,637.79,679.74,486668],[679.75,682.88,659.4,661.29,202591]]},{"id":"BINANCE_ADAUSDT_1d_0","symbol":"ADAUSDT","tf":"1d","period":"2026-04-04 ~ 2026-07-02","source":"Binance","vis":250,"fut":10,"diff":2,"bias":"NEUTRAL","tags":["하락추세","윗꼬리"],"explain":"공개 구간은 '하락추세' 흐름이고 마지막 캔들 특징은 [하락추세, 윗꼬리] 입니다. 제출 이후 10캔들 동안 종가 기준 -0.1% (뚜렷한 방향 없이 등락) 움직였고, 최대 +1% / 최저 -12.8% 를 기록했습니다. 지표(이동평균선/RSI)와 지지·저항을 함께 보고 판단하세요.","candles":[[0.6685,0.6847,0.6332,0.6453,200052556],[0.6452,0.656,0.5923,0.6245,268779634],[0.6246,0.6409,0.623,0.6343,59384502],[0.6342,0.6652,0.6225,0.6528,109620437],[0.6527,0.676,0.6391,0.6625,144735123],[0.6626,0.6855,0.6369,0.6428,154145939],[0.6428,0.6468,0.6061,0.6238,155613633],[0.6238,0.654,0.6227,0.6428,93548863],[0.6429,0.6643,0.6387,0.656,99367743],[0.6559,0.6595,0.648,0.6542,40616598],[0.6542,0.6884,0.6466,0.6812,92318118],[0.6812,0.6938,0.6634,0.667,95122619],[0.6669,0.6755,0.6359,0.6459,116651080],[0.6459,0.6604,0.6252,0.6401,139267473],[0.6401,0.6486,0.5864,0.6016,164661705],[0.6016,0.62,0.5978,0.6091,99474430],[0.6091,0.6178,0.6033,0.6128,44683725],[0.6129,0.6189,0.5922,0.6106,53815345],[0.6105,0.6122,0.5259,0.5528,237564734],[0.5529,0.5633,0.4898,0.5208,336980947],[0.5208,0.5503,0.4947,0.5453,165359662],[0.5453,0.5456,0.5168,0.5318,121971447],[0.5319,0.5863,0.5196,0.5763,194941325],[0.5763,0.5932,0.5539,0.5688,99118952],[0.5688,0.5844,0.5478,0.579,91372352],[0.5789,0.6031,0.5737,0.5928,102827833],[0.5929,0.6069,0.5535,0.5564,115705245],[0.5565,0.5809,0.5394,0.5458,99390469],[0.5457,0.5716,0.5144,0.5298,149664298],[0.5298,0.5336,0.4901,0.4984,190803666],[0.4984,0.5154,0.4979,0.5036,109102129],[0.5035,0.5093,0.4735,0.4845,174030141],[0.4845,0.4997,0.4576,0.4663,224051284],[0.4664,0.4823,0.4562,0.4752,195617143],[0.4752,0.4775,0.4381,0.464,189011037],[0.464,0.4722,0.4288,0.4324,181640032],[0.4323,0.4397,0.3876,0.4091,451803310],[0.4091,0.4132,0.3907,0.4046,98873707],[0.4045,0.4185,0.4016,0.4085,112961442],[0.4085,0.4342,0.402,0.4276,156866959],[0.4276,0.4291,0.4046,0.4218,116535815],[0.4219,0.4373,0.4104,0.4356,94689426],[0.4357,0.439,0.4265,0.4331,69670176],[0.433,0.4371,0.4148,0.4199,102762431],[0.42,0.422,0.4114,0.4147,51363457],[0.4147,0.4274,0.4135,0.4143,62005649],[0.4142,0.4158,0.3707,0.3856,209371177],[0.3856,0.439,0.3848,0.4335,160318643],[0.4335,0.4541,0.4265,0.4499,130407203],[0.45,0.4558,0.4346,0.4394,103549487],[0.4394,0.4429,0.4091,0.4157,97619818],[0.4156,0.4213,0.4099,0.4138,47479004],[0.4138,0.435,0.4057,0.4173,104457360],[0.4174,0.4414,0.4144,0.4328,105431201],[0.4328,0.4842,0.4239,0.4697,256310735],[0.4697,0.4761,0.4522,0.4536,188573523],[0.4536,0.455,0.4093,0.4255,255024361],[0.4255,0.4293,0.4035,0.4091,145597966],[0.409,0.4157,0.4061,0.4105,43464503],[0.4106,0.4116,0.3915,0.3963,93578124],[0.3963,0.4077,0.3773,0.3882,116687960],[0.3882,0.3916,0.3775,0.3859,94171731],[0.3859,0.4001,0.3639,0.3673,134900622],[0.3673,0.3794,0.3468,0.3514,154461801],[0.3513,0.3809,0.3466,0.3767,111249234],[0.3767,0.3806,0.3723,0.373,45059248],[0.3731,0.3747,0.3576,0.3662,80041767],[0.3662,0.3822,0.3619,0.3711,115017172],[0.3712,0.3744,0.3552,0.3628,87389612],[0.3629,0.3652,0.3523,0.3566,80682772],[0.3566,0.3614,0.3393,0.3434,117381757],[0.3434,0.3584,0.3418,0.3496,118134191],[0.3496,0.3711,0.3488,0.37,74514742],[0.3699,0.3771,0.3614,0.3688,89973452],[0.3689,0.3847,0.3506,0.3532,153538419],[0.3531,0.3568,0.3481,0.3514,95781881],[0.3513,0.3538,0.3294,0.3335,132046716],[0.3336,0.361,0.332,0.3565,105331508],[0.3565,0.3963,0.3544,0.3949,213113135],[0.3949,0.3992,0.3826,0.3893,98584928],[0.3893,0.4055,0.3887,0.4007,120743426],[0.4006,0.425,0.3939,0.4211,181780250],[0.4211,0.4374,0.4011,0.4194,188828807],[0.4194,0.4228,0.3976,0.4022,96467278],[0.4023,0.4049,0.3849,0.3956,113377671],[0.3957,0.4052,0.3874,0.3914,84580865],[0.3914,0.3925,0.3846,0.3886,37390636],[0.3886,0.3972,0.3839,0.391,71303671],[0.391,0.4036,0.3815,0.3862,130152763],[0.3862,0.4267,0.385,0.4218,161630854],[0.4219,0.4273,0.4097,0.4143,148337663],[0.4144,0.4144,0.3891,0.3936,137830357],[0.3937,0.3987,0.3788,0.3955,104596038],[0.3956,0.4042,0.3935,0.3973,50553374],[0.3973,0.3988,0.3747,0.3758,79257525],[0.3757,0.3757,0.3421,0.3703,259117950],[0.3703,0.3706,0.3467,0.3507,175909564],[0.3506,0.3739,0.3466,0.3659,147138457],[0.366,0.369,0.3554,0.3594,71544611],[0.3594,0.3707,0.3525,0.3602,75367610],[0.3603,0.3625,0.3564,0.3583,26339864],[0.3583,0.3603,0.3327,0.3391,113052720],[0.339,0.3584,0.3388,0.3521,92774867],[0.3521,0.3636,0.3476,0.3608,97654476],[0.3607,0.365,0.3546,0.3583,90291773],[0.3583,0.3592,0.3272,0.3347,144899415],[0.3346,0.3359,0.3161,0.3208,174442171],[0.3208,0.3224,0.2685,0.2936,435875677],[0.2937,0.2992,0.279,0.2858,183603922],[0.2859,0.3034,0.2757,0.2991,218106615],[0.2991,0.305,0.2817,0.2917,178853177],[0.2917,0.3027,0.2803,0.2864,171757424],[0.2864,0.2899,0.2436,0.2455,468424079],[0.2455,0.2843,0.2205,0.2762,683935774],[0.2761,0.2798,0.2656,0.2721,472274318],[0.2722,0.2766,0.267,0.2701,266592420],[0.2701,0.274,0.2596,0.2699,167317250],[0.27,0.2705,0.2597,0.262,93925925],[0.2619,0.2648,0.2504,0.2559,104876034],[0.2559,0.2696,0.2559,0.2643,111146005],[0.2643,0.2747,0.2582,0.2728,101650803],[0.2729,0.3007,0.2727,0.295,111883698],[0.2949,0.302,0.2775,0.2818,145050167],[0.2818,0.2892,0.2769,0.2858,77055679],[0.2859,0.2899,0.2773,0.2811,75061039],[0.2811,0.2874,0.2714,0.2735,80666064],[0.2735,0.2774,0.267,0.2729,77148346],[0.273,0.2938,0.2699,0.2849,122779233],[0.2849,0.2865,0.279,0.28,50536615],[0.2799,0.2802,0.2688,0.2717,50269611],[0.2717,0.2755,0.2571,0.2623,124604796],[0.2623,0.2646,0.2536,0.2587,92728975],[0.2587,0.3136,0.2579,0.2971,327144352],[0.2971,0.301,0.2822,0.287,163971345],[0.287,0.2963,0.2726,0.2776,106326379],[0.2776,0.2843,0.2594,0.281,194232341],[0.281,0.2922,0.2691,0.2735,150933798],[0.2735,0.2887,0.2685,0.2771,148447902],[0.2771,0.2771,0.2604,0.2625,202430461],[0.2626,0.285,0.2584,0.2763,296011815],[0.2763,0.278,0.2651,0.2692,147095503],[0.2691,0.272,0.2555,0.259,131627809],[0.259,0.261,0.2517,0.2544,98383928],[0.2545,0.2574,0.2458,0.2493,112913739],[0.2493,0.2629,0.2489,0.2552,138499676],[0.2551,0.2739,0.255,0.2621,189954647],[0.262,0.2679,0.2566,0.2626,148385303],[0.2626,0.2659,0.258,0.2636,86072960],[0.2635,0.2816,0.2629,0.2656,192614226],[0.2656,0.2666,0.2585,0.2634,97657453],[0.2634,0.272,0.2612,0.2702,86867872],[0.2702,0.2936,0.2687,0.2904,335341607],[0.2904,0.2932,0.2819,0.2891,157227353],[0.2891,0.2955,0.2696,0.2742,148954789],[0.2743,0.2767,0.2625,0.2675,106763798],[0.2676,0.273,0.2616,0.2661,85114941],[0.2661,0.2674,0.2554,0.2574,67993352],[0.2573,0.2601,0.248,0.2506,113197441],[0.2507,0.267,0.2476,0.2616,200282840],[0.2617,0.2684,0.2581,0.2664,106579954],[0.2665,0.2769,0.2657,0.2705,120674371],[0.2704,0.2708,0.2526,0.2547,147438669],[0.2547,0.2562,0.2442,0.2461,145629064],[0.2461,0.253,0.244,0.246,73268961],[0.2459,0.2474,0.2328,0.2398,124643884],[0.2398,0.2529,0.2394,0.2434,112413628],[0.2435,0.2494,0.2342,0.2418,142217643],[0.2418,0.2548,0.2413,0.2484,146570155],[0.2484,0.2507,0.2348,0.2394,195533260],[0.2394,0.2514,0.2388,0.2463,106986717],[0.2463,0.25,0.2432,0.2479,50294176],[0.2479,0.251,0.24,0.2508,68508777],[0.2509,0.2601,0.2448,0.2461,147829075],[0.246,0.2664,0.24,0.2627,169339295],[0.2627,0.2644,0.2498,0.2508,135051386],[0.2507,0.2611,0.2477,0.2541,89381916],[0.2541,0.2589,0.2498,0.2542,103032306],[0.2542,0.2554,0.2464,0.2495,134061034],[0.2495,0.2506,0.2354,0.2361,181777310],[0.2362,0.249,0.2358,0.2486,152262729],[0.2487,0.2496,0.2386,0.2396,146334486],[0.2396,0.2505,0.2381,0.246,128399212],[0.2461,0.2615,0.2438,0.2591,222466113],[0.2591,0.268,0.252,0.2586,211624429],[0.2586,0.2596,0.2473,0.2491,104449900],[0.2492,0.2509,0.2408,0.2424,135317750],[0.2424,0.2514,0.2419,0.2479,102731799],[0.2479,0.2525,0.2441,0.2499,105185837],[0.2499,0.2576,0.2481,0.2484,126865124],[0.2483,0.2508,0.2446,0.2499,126408668],[0.2499,0.253,0.2472,0.2503,69159740],[0.2503,0.2539,0.2482,0.2503,77350522],[0.2503,0.2544,0.2485,0.2522,60764130],[0.2522,0.2561,0.243,0.2482,106081991],[0.2481,0.2488,0.2443,0.2468,60552565],[0.2468,0.254,0.2383,0.2446,157720773],[0.2446,0.2484,0.2445,0.2463,67383110],[0.2463,0.2515,0.246,0.2482,73825160],[0.2483,0.2528,0.247,0.2501,45671904],[0.2502,0.2518,0.2475,0.2495,58596127],[0.2495,0.255,0.247,0.2499,131302889],[0.25,0.2657,0.2497,0.262,156164575],[0.2619,0.2738,0.26,0.267,173010919],[0.2669,0.2704,0.2596,0.2627,108901847],[0.2627,0.2788,0.2601,0.2734,97412467],[0.2735,0.2785,0.2695,0.2708,59998404],[0.2708,0.2887,0.2682,0.2824,140362485],[0.2824,0.2836,0.274,0.2804,96921131],[0.2803,0.2819,0.2672,0.2711,96913527],[0.2712,0.2777,0.2612,0.2648,110717180],[0.2648,0.2804,0.2623,0.2706,119669866],[0.2705,0.2729,0.2568,0.2616,102766483],[0.2615,0.2625,0.2521,0.2551,75171226],[0.255,0.2582,0.2452,0.2521,83123086],[0.2521,0.2531,0.2462,0.2516,113758098],[0.2517,0.2536,0.2471,0.2482,77865177],[0.2482,0.2515,0.2469,0.2492,83224294],[0.2492,0.2537,0.2458,0.2507,107153046],[0.2507,0.2546,0.241,0.2424,134704138],[0.2424,0.2508,0.2358,0.246,138898973],[0.2461,0.247,0.2385,0.2423,62248053],[0.2424,0.248,0.2404,0.2437,72533146],[0.2436,0.2473,0.2381,0.2401,109743049],[0.2401,0.2435,0.236,0.2372,105109761],[0.2372,0.2384,0.228,0.2349,138043214],[0.2349,0.2381,0.2298,0.2329,84015640],[0.233,0.2394,0.2327,0.236,81695155],[0.236,0.2388,0.2319,0.2357,63179398],[0.2357,0.2376,0.2254,0.2311,124301992],[0.2311,0.2313,0.2094,0.213,237914634],[0.213,0.2184,0.2001,0.2004,244854964],[0.2004,0.2019,0.1788,0.1798,379945841],[0.1798,0.1798,0.1544,0.1567,562584510],[0.1567,0.1624,0.1486,0.1573,331126153],[0.1574,0.1688,0.1568,0.1653,250738456],[0.1653,0.1745,0.16,0.1704,199922093],[0.1704,0.1711,0.1608,0.1653,163317889],[0.1653,0.1669,0.1582,0.1607,186140630],[0.1607,0.172,0.1607,0.1707,185526550],[0.1707,0.1744,0.1677,0.1697,169266473],[0.1697,0.1758,0.169,0.1718,105801602],[0.1718,0.1839,0.1654,0.183,152782397],[0.183,0.19,0.1768,0.1786,254858173],[0.1785,0.1814,0.1719,0.1724,151143548],[0.1723,0.175,0.1637,0.1669,217297433],[0.1669,0.1689,0.1598,0.1637,124026092],[0.1637,0.1651,0.1586,0.1621,86919770],[0.1621,0.1651,0.16,0.1633,72279077],[0.1633,0.1636,0.1563,0.1566,84784926],[0.1566,0.1633,0.1566,0.1585,100861666],[0.1586,0.1601,0.1493,0.1515,191411271],[0.1514,0.1544,0.1396,0.1477,285453352],[0.1477,0.1508,0.1382,0.1438,174022332],[0.1438,0.15,0.1385,0.1484,179752809],[0.1485,0.1497,0.1438,0.1453,89605280],[0.1453,0.1465,0.1412,0.1438,61450829],[0.1438,0.1488,0.1419,0.1458,104875333],[0.1458,0.1465,0.1421,0.1444,105845080],[0.1444,0.1581,0.142,0.1539,256945857],[0.1539,0.1585,0.1526,0.1584,57695778]]}];
 (function(){
 "use strict";
-const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const $ = (id)=>document.getElementById(id);
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString();
+const kfmt=n=>{ n=Math.round(n); return n>=100000?Math.round(n/1000)+'K':n>=10000?(n/1000).toFixed(1)+'K':fmt(n); };
+const pct=v=>(v>=0?'+':'')+v.toFixed(1)+'%';
+const scls=v=>v>0?'up':v<0?'dn':'fl';
 
-/* ---------- persistence ---------- */
-const LS='chartarena_web_v1';
-function loadS(){ try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return {}} }
-function saveS(s){ try{localStorage.setItem(LS,JSON.stringify(s))}catch(e){} }
-let store = Object.assign({balance:10000, played:0, wins:0, losses:0, best:0}, loadS());
-let ind = Object.assign({volume:true, ma:true, boll:false, rsi:false, macd:false, ichi:false}, store.ind||{});
+/* 아이템(등급 포함). title 은 텍스트형(em=칩 글자). */
+const RARITY=[['기본','var(--rc-basic)'],['일반','var(--rc-common)'],['레어','var(--rc-rare)'],['에픽','var(--rc-epic)'],['전설','var(--rc-legend)']];
+function rarity(p){ return p===0?0:p<5000?1:p<15000?2:p<45000?3:4; }
+const ITEMS = {
+  char:[{id:'bull',em:'🐂',nm:'황소',price:0},{id:'bear',em:'🐻',nm:'곰',price:3000},{id:'shark',em:'🦈',nm:'상어',price:8000},
+    {id:'tiger',em:'🐯',nm:'호랑이',price:15000},{id:'dragon',em:'🐲',nm:'드래곤',price:35000},{id:'king',em:'🤴',nm:'킹',price:80000}],
+  car:[{id:'bike',em:'🚲',nm:'자전거',price:0},{id:'scooter',em:'🛵',nm:'스쿠터',price:2500},{id:'car',em:'🚗',nm:'경차',price:7000},
+    {id:'taxi',em:'🚕',nm:'세단',price:16000},{id:'sports',em:'🏎️',nm:'스포츠카',price:40000},{id:'rocket',em:'🚀',nm:'슈퍼카',price:90000}],
+  acc:[{id:'none',em:'🚫',nm:'없음',price:0},{id:'glasses',em:'🕶️',nm:'선글라스',price:1800},{id:'hat',em:'🎩',nm:'모자',price:3200},
+    {id:'chain',em:'📿',nm:'골드체인',price:9000},{id:'fire',em:'🔥',nm:'오라',price:14000},{id:'crown',em:'👑',nm:'왕관',price:50000}],
+  title:[{id:'none',em:'—',nm:'없음',price:0,txt:true},{id:'ant',em:'개미',nm:'개미 트레이더',price:2000,txt:true},
+    {id:'jonber',em:'존버의 신',nm:'존버의 신',price:12000,txt:true},{id:'liq',em:'청산 마스터',nm:'청산 마스터',price:22000,txt:true},
+    {id:'whale',em:'🐋 고래',nm:'고래',price:60000,txt:true},{id:'legend',em:'전설의 트레이더',nm:'전설',price:120000,txt:true}],
+};
+const byId=(cat,id)=>ITEMS[cat].find(x=>x.id===id);
 
-/* ---------- deterministic-ish shuffle (browser Math.random ok) ---------- */
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-let order = shuffle(PROBLEMS.map((_,i)=>i));
-let qi=0;
+/* 공유 저장소: 게임(game.html)과 '보유 자산(balance)' 을 공유. 꾸미기는 별도 키. */
+const GS='chartarena_web_v1', HS='chartarena_hub_v1';
+function loadJSON(k){ try{ return JSON.parse(localStorage.getItem(k))||{}; }catch(e){ return {}; } }
+function getBalance(){ const g=loadJSON(GS); return (typeof g.balance==='number')?g.balance:10000; }
+function setBalance(v){ const g=loadJSON(GS); g.balance=v; localStorage.setItem(GS, JSON.stringify(g)); }
+const _hs=loadJSON(HS);
+const state = {
+  nick: _hs.nick || '차트고수',
+  owned:{ char:new Set((_hs.owned&&_hs.owned.char)||['bull']), car:new Set((_hs.owned&&_hs.owned.car)||['bike']),
+          acc:new Set((_hs.owned&&_hs.owned.acc)||['none']), title:new Set((_hs.owned&&_hs.owned.title)||['none']) },
+  equip: Object.assign({ char:'bull', car:'bike', acc:'none', title:'none' }, _hs.equip||{}),
+};
+function saveHS(){ localStorage.setItem(HS, JSON.stringify({ nick:state.nick,
+  owned:{ char:[...state.owned.char], car:[...state.owned.car], acc:[...state.owned.acc], title:[...state.owned.title] },
+  equip:state.equip })); }
+let curCat='char', curPeriod='day', curMetric='ret';
 
-/* ---------- state ---------- */
-const LEVS=[1,2,3,5,10];
-const WAGERS=[500,1000,2000,5000];
-const STOPS=[{l:'없음',v:null},{l:'3%',v:3},{l:'5%',v:5},{l:'10%',v:10}];
-const TAKES=[{l:'없음',v:null},{l:'5%',v:5},{l:'10%',v:10},{l:'20%',v:20}];
-const HORS=[5,10,30];
-let P, sel, phase, revealed, outcome, revealTimer=null;
+/* mock leaderboard */
+const NAMES=['존버왕','숏충이','불장러','캔들도사','존리형','물타기장인','추매요정','매수의신','청산킹','우상향고고','따상가자','칼손절','풀매수맨','존버또존버','횡보지옥'];
+const CARS=['🚀','🏎️','🚕','🚗','🛵','🚗','🛵','🚲','🚕','🏎️','🚗','🛵','🚲','🚗','🛵'];
+const CHARS=['🤴','🐲','🐯','🦈','🐻','🐂','🦈','🐻','🐲','🐯','🐂','🐻','🐂','🦈','🐻'];
+const TITLES=['🐋 고래','전설의 트레이더','청산 마스터','존버의 신','','개미','','','청산 마스터','존버의 신','','','','개미',''];
+const RET_BASE=[24,19,31,-8,15,12,22,-3,9,17,5,-12,28,7,-5];
+const WIN_BASE=[64,58,71,44,60,55,67,48,53,62,50,41,69,52,46];
+function retMul(p){ return p==='day'?1:p==='week'?2.4:5.1; }
+const ASSET_BASE=[520,410,360,300,265,235,205,180,160,140,120,104,90,78,66];
+function metrics(i,p){ return { ret:+(RET_BASE[i]*retMul(p)).toFixed(1), assets:Math.round(ASSET_BASE[i]*1000*(p==='day'?1:p==='week'?3.2:9.5)), win:WIN_BASE[i] }; }
+function myMetrics(p){ return { ret:+(15.5*retMul(p)).toFixed(1), assets:getBalance(), win:57 }; }
 
-function curProblem(){ return PROBLEMS[order[qi%order.length]]; }
-
-function resetSel(){
-  sel={dir:null, lev:1, wager:1000, stop:null, take:null, horizon:10};
-  if(sel.wager>store.balance) sel.wager = Math.max(0, store.balance);
+function build(p){
+  const rows=NAMES.map((n,i)=>{ const m=metrics(i,p); return {name:n,car:CARS[i],ch:CHARS[i],title:TITLES[i],me:false,...m}; });
+  const mm=myMetrics(p);
+  rows.push({ name:state.nick, car:byId('car',state.equip.car).em, ch:byId('char',state.equip.char).em,
+    title:state.equip.title==='none'?'':byId('title',state.equip.title).em, me:true, ...mm });
+  rows.sort((a,b)=> b[curMetric]-a[curMetric]);
+  return rows;
+}
+function metricVal(r){ return curMetric==='ret'?pct(r.ret):curMetric==='assets'?kfmt(r.assets)+'P':r.win+'%'; }
+function metricCol(r){ return curMetric==='ret'?scls(r.ret):curMetric==='assets'?'':''; }
+function subLine(r){
+  const parts=[];
+  if(curMetric!=='ret') parts.push('수익 '+pct(r.ret));
+  if(curMetric!=='assets') parts.push('자산 '+kfmt(r.assets)+'P');
+  if(curMetric!=='win') parts.push('승률 '+r.win+'%');
+  return parts.join(' · ');
 }
 
-/* ---------- number fmt ---------- */
-const fmtP=(v)=>{ const a=Math.abs(v); if(a>=1000) return v.toLocaleString(undefined,{maximumFractionDigits:0}); if(a>=1) return v.toFixed(2); return Number(v.toPrecision(4)).toString(); };
-const pct=(v)=>(v>=0?'+':'')+v.toFixed(2)+'%';
-const signCls=(v)=> v>0?'up':(v<0?'dn':'flat');
-
-/* ---------- GameEngine port (faithful to GameEngine.kt) ---------- */
-function evaluate(prob, d){
-  const C=prob.candles, vis=Math.min(Math.max(prob.vis,1),C.length), entryIdx=vis-1, entry=C[entryIdx][3];
-  const availableFuture=C.length-vis, horizon=Math.min(Math.max(d.horizon,0),availableFuture);
-  const future = horizon>0 ? C.slice(vis, vis+horizon) : [];
-  let maxUp=0,maxDown=0;
-  for(const c of future){ const up=(c[1]-entry)/entry*100, dn=(c[2]-entry)/entry*100; if(up>maxUp)maxUp=up; if(dn<maxDown)maxDown=dn; }
-  const endClose = future.length ? future[future.length-1][3] : entry;
-  const marketEnd=(endClose-entry)/entry*100;
-  if(d.dir==='WATCH' || horizon===0 || entry<=0){
-    return {dir:d.dir,lev:Math.max(1,d.lev),wager:d.wager,entry,exit:endClose,reason:'NO_POSITION',offset:horizon,raw:0,levret:0,points:0,maxUp,maxDown,marketEnd,hitStop:false,hitTake:false};
-  }
-  const long=d.dir==='LONG', lev=Math.max(1,d.lev);
-  const liqPct=100/lev;
-  const userStop=(d.stop&&d.stop>0)?d.stop:null;
-  const effStop=Math.min(userStop==null?Infinity:userStop, liqPct);
-  const stopIsLiq=userStop==null || userStop>=liqPct;
-  const stopPrice= long? entry*(1-effStop/100) : entry*(1+effStop/100);
-  const takePrice=(d.take&&d.take>0)?(long?entry*(1+d.take/100):entry*(1-d.take/100)):null;
-  let exit=endClose, reason='HORIZON_END', offset=horizon, hitStop=false, hitTake=false;
-  for(let k=0;k<future.length;k++){ const c=future[k];
-    const adverse= long? c[2]<=stopPrice : c[1]>=stopPrice;
-    const favor= takePrice!=null && (long? c[1]>=takePrice : c[2]<=takePrice);
-    if(adverse){ exit=stopPrice; reason= stopIsLiq?'LIQUIDATION':'STOP_LOSS'; offset=k+1; hitStop=true; break; }
-    else if(favor){ exit=takePrice; reason='TAKE_PROFIT'; offset=k+1; hitTake=true; break; }
-  }
-  const sign=long?1:-1, raw=sign*(exit-entry)/entry*100, levret=Math.max(-100, raw*lev), points=Math.round(d.wager*levret/100);
-  return {dir:d.dir,lev,wager:d.wager,entry,exit,reason,offset,raw,levret,points,maxUp,maxDown,marketEnd,hitStop,hitTake};
+/* nav */
+function go(v){
+  document.querySelectorAll('.view').forEach(e=>e.classList.remove('on'));
+  $('v-'+v).classList.add('on');
+  document.querySelectorAll('#nav div').forEach(d=>d.classList.toggle('on', d.dataset.go===v));
+  document.querySelector('.body').scrollTop=0;
+  if(v==='rank') renderRank(); if(v==='garage') renderShop(); if(v==='home') renderHome();
 }
-const REASON_KO={TAKE_PROFIT:'익절 도달',STOP_LOSS:'손절 도달',LIQUIDATION:'청산 💥',HORIZON_END:'기간 종료',NO_POSITION:'관망'};
-const DIR_KO={LONG:'롱',SHORT:'숏',WATCH:'관망'};
+document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.go)));
+document.querySelectorAll('[data-toast]').forEach(el=>el.addEventListener('click',()=>toast(el.dataset.toast)));
+document.querySelectorAll('[data-href]').forEach(el=>el.addEventListener('click',()=>{ location.href=el.dataset.href; }));
+function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
 
-/* ---------- chart ---------- */
-const cv=$('chart'), ctx=cv.getContext('2d');
-let cssW=0, cssH=0;
-let view={count:60, start:0};   // count = candles shown (zoom), start = leftmost index (pan)
-function sizeCanvas(){
-  const r=cv.getBoundingClientRect(); const dpr=window.devicePixelRatio||1;
-  cssW=r.width; cssH=r.height;
-  cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-/* ---------- indicators (ported from Indicators.kt / Ichimoku.kt; computed over the REVEALED slice → leak-free) ---------- */
-function smaArr(v,period){ const out=new Array(v.length).fill(null); let s=0;
-  for(let i=0;i<v.length;i++){ s+=v[i]; if(i>=period)s-=v[i-period]; if(i>=period-1)out[i]=s/period; } return out; }
-function emaArr(v,period){ const out=new Array(v.length).fill(null);
-  if(period<=0||v.length<period) return out; const k=2/(period+1); let prev=0;
-  for(let i=0;i<period;i++) prev+=v[i]; prev/=period; out[period-1]=prev;
-  for(let i=period;i<v.length;i++){ prev=(v[i]-prev)*k+prev; out[i]=prev; } return out; }
-function rsiV(ag,al){ if(al===0) return ag===0?50:100; const rs=ag/al; return 100-100/(1+rs); }
-function rsiArr(cl,period){ period=period||14; const out=new Array(cl.length).fill(null);
-  if(cl.length<=period) return out; let g=0,l=0;
-  for(let i=1;i<=period;i++){ const c=cl[i]-cl[i-1]; if(c>=0)g+=c; else l-=c; }
-  let ag=g/period, al=l/period; out[period]=rsiV(ag,al);
-  for(let i=period+1;i<cl.length;i++){ const c=cl[i]-cl[i-1]; const gg=c>0?c:0, ll=c<0?-c:0;
-    ag=(ag*(period-1)+gg)/period; al=(al*(period-1)+ll)/period; out[i]=rsiV(ag,al); } return out; }
-function bollArr(v,period,k){ period=period||20; k=k||2; const mid=smaArr(v,period);
-  const up=new Array(v.length).fill(null), lo=new Array(v.length).fill(null);
-  for(let i=0;i<v.length;i++){ const m=mid[i]; if(m==null)continue; let ss=0;
-    for(let j=i-period+1;j<=i;j++){ const d=v[j]-m; ss+=d*d; } const sd=Math.sqrt(ss/period);
-    up[i]=m+k*sd; lo[i]=m-k*sd; } return {up,mid,lo}; }
-function macdArr(v){ const ef=emaArr(v,12), es=emaArr(v,26);
-  const macd=v.map((_,i)=> (ef[i]!=null&&es[i]!=null)? ef[i]-es[i]:null);
-  const first=macd.findIndex(x=>x!=null); const signal=new Array(v.length).fill(null);
-  if(first>=0){ const compact=macd.slice(first).map(x=>x==null?0:x); const e=emaArr(compact,9);
-    for(let j=0;j<e.length;j++) signal[first+j]=e[j]; }
-  const hist=v.map((_,i)=> (macd[i]!=null&&signal[i]!=null)? macd[i]-signal[i]:null);
-  return {macd,signal,hist}; }
-function ichiArr(cand){ const n=cand.length;
-  const mid=(period,i)=>{ if(i<period-1)return null; let hi=-Infinity,lo=Infinity;
-    for(let j=i-period+1;j<=i;j++){ if(cand[j][1]>hi)hi=cand[j][1]; if(cand[j][2]<lo)lo=cand[j][2]; } return (hi+lo)/2; };
-  const tenkan=[],kijun=[],spanA=[],spanB=[];
-  for(let i=0;i<n;i++){ const t=mid(9,i), k=mid(26,i); tenkan[i]=t; kijun[i]=k;
-    spanA[i]=(t!=null&&k!=null)?(t+k)/2:null; spanB[i]=mid(52,i); }
-  return {tenkan,kijun,spanA,spanB,disp:26}; }
-
-/* ---------- pane layout (deterministic from active indicators) ---------- */
-function layout(){
-  const top=10, gap=8, bottom=8, priceH=210;
-  const volH= ind.volume?50:0, rsiH= ind.rsi?60:0, macdH= ind.macd?60:0;
-  let y=top; const L={};
-  L.priceTop=y; y+=priceH; L.priceBot=y;
-  if(volH){ y+=gap; L.volTop=y; y+=volH; L.volBot=y; } else { L.volTop=L.volBot=L.priceBot; }
-  if(rsiH){ y+=gap; L.rsiTop=y; y+=rsiH; L.rsiBot=y; }
-  if(macdH){ y+=gap; L.macdTop=y; y+=macdH; L.macdBot=y; }
-  L.bottomAll=y; L.totalH=y+bottom;
-  L.hasVol=!!volH; L.hasRsi=!!rsiH; L.hasMacd=!!macdH;
-  return L;
-}
-function layoutCanvas(){ const L=layout(); cv.style.height=L.totalH+'px'; sizeCanvas(); return L; }
-
-/* ---------- viewport (zoom/pan) ---------- */
-function clampView(){ const total=P.candles.length;
-  view.count=Math.max(20, Math.min(view.count, total));
-  view.start=Math.max(0, Math.min(view.start, total-view.count)); }
-function setViewRecent(){ const total=P.candles.length;
-  view.count=Math.min(view.count||60, total);
-  const right=(P.vis-1)+Math.min(P.fut, 8);          // entry + a few reserved future slots on the right
-  view.start=right-view.count+1; clampView(); }
-function zoomBy(factor, anchorFrac){ const total=P.candles.length;
-  const f=(anchorFrac==null?0.5:anchorFrac);
-  const anchor=view.start+f*view.count;              // candle index under the anchor point
-  view.count=Math.max(20, Math.min(view.count*factor, total));
-  view.start=anchor-f*view.count; clampView(); drawChart(); }
-
-function drawChart(){
-  if(!cssW) layoutCanvas();
-  const L=layout(), W=cssW; ctx.clearRect(0,0,cssW,cssH);
-  const C=P.candles, total=C.length, vis=P.vis;
-  const axisW=52, padL=8, plotR=W-axisW;
-  const priceTop=L.priceTop, priceBot=L.priceBot;
-  clampView();
-  const cw=(plotR-padL)/view.count;
-  const cx=(i)=>padL+cw*(i - view.start + 0.5);
-  // visible revealed range [v0,v1); padded [l0,l1) for smooth line edges
-  const v0=Math.max(0, Math.floor(view.start));
-  const v1=Math.min(revealed, Math.ceil(view.start+view.count));
-  const l0=Math.max(0, v0-1), l1=Math.min(revealed, v1+1);
-
-  // indicators over revealed slice only (leak-free)
-  const rc=C.slice(0,revealed), closes=rc.map(c=>c[3]);
-  const maDefs=[{p:5,col:'#FFD54A'},{p:20,col:'#4CC3FF'},{p:60,col:'#B980FF'},{p:200,col:'#FF8FB0'}];
-  const mas= ind.ma? maDefs.map(m=>({col:m.col, arr:smaArr(closes,m.p)})):[];
-  const boll= ind.boll? bollArr(closes,20,2):null;
-  const ichi= ind.ichi? ichiArr(rc):null;
-  const rsi= ind.rsi? rsiArr(closes,14):null;
-  const mac= ind.macd? macdArr(closes):null;
-
-  // autoscale price over the VISIBLE window (+ overlays in view) → zoomed swings fill the pane
-  let lo=Infinity,hi=-Infinity,vmax=0;
-  for(let i=v0;i<v1;i++){ if(C[i][2]<lo)lo=C[i][2]; if(C[i][1]>hi)hi=C[i][1]; if(C[i][4]>vmax)vmax=C[i][4]; }
-  if(!isFinite(lo)){ const e=C[Math.max(0,revealed-1)]; lo=e[2]; hi=e[1]; }
-  const ext=(x)=>{ if(x!=null){ if(x<lo)lo=x; if(x>hi)hi=x; } };
-  if(boll) for(let i=v0;i<v1;i++){ ext(boll.up[i]); ext(boll.lo[i]); }
-  if(ichi) for(let i=v0;i<v1;i++){ ext(ichi.spanA[i]); ext(ichi.spanB[i]); ext(ichi.tenkan[i]); ext(ichi.kijun[i]); }
-  for(const m of mas) for(let i=v0;i<v1;i++) ext(m.arr[i]);
-  const pad=(hi-lo)*0.08||hi*0.01||1; lo-=pad; hi+=pad;
-  const yOf=(p)=>priceBot-(p-lo)/(hi-lo)*(priceBot-priceTop);
-  const vyOf=(v)=>L.volBot-(v/(vmax||1))*(L.volBot-L.volTop);
-
-  ctx.font='10px '+getComputedStyle(document.body).fontFamily;
-  ctx.textBaseline='middle'; ctx.textAlign='left';
-  for(let g=0;g<=4;g++){ const py=priceTop+(priceBot-priceTop)*g/4; const price=hi-(hi-lo)*g/4;
-    ctx.strokeStyle='#1B2436'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(plotR,py); ctx.stroke();
-    ctx.fillStyle='#5A6478'; ctx.fillText(fmtP(price), plotR+5, py); }
-
-  // hidden-future shade (only if the reveal boundary is within view)
-  if(revealed<total && revealed<view.start+view.count){ const sx=Math.max(padL, cx(revealed)-cw/2);
-    ctx.fillStyle='rgba(233,185,73,0.05)'; ctx.fillRect(sx,priceTop,plotR-sx,L.bottomAll-priceTop);
-    ctx.strokeStyle='rgba(233,185,73,0.3)'; ctx.setLineDash([3,4]); ctx.lineWidth=1;
-    ctx.beginPath(); ctx.moveTo(sx,priceTop); ctx.lineTo(sx,L.bottomAll); ctx.stroke(); ctx.setLineDash([]); }
-
-  // ichimoku cloud (forward +26), only segments overlapping the view
-  if(ichi){ for(let i=51;i<revealed-1;i++){ const j=i+ichi.disp; if(j+1>total-1) break;
-      if(j+1<view.start-1 || j>view.start+view.count+1) continue;
-      const a1=ichi.spanA[i],b1=ichi.spanB[i],a2=ichi.spanA[i+1],b2=ichi.spanB[i+1];
-      if(a1==null||b1==null||a2==null||b2==null) continue;
-      const x1=cx(j),x2=cx(j+1);
-      ctx.beginPath(); ctx.moveTo(x1,yOf(a1)); ctx.lineTo(x2,yOf(a2)); ctx.lineTo(x2,yOf(b2)); ctx.lineTo(x1,yOf(b1)); ctx.closePath();
-      ctx.fillStyle=((a1+a2)>=(b1+b2))?'rgba(53,196,106,0.16)':'rgba(229,72,77,0.16)'; ctx.fill(); } }
-
-  // volume (visible)
-  if(L.hasVol){ for(let i=v0;i<v1;i++){ const c=C[i]; const up=c[3]>=c[0];
-      ctx.fillStyle= up?'rgba(240,97,109,.5)':'rgba(76,141,246,.5)'; const bw=Math.max(1,cw*0.66);
-      ctx.fillRect(cx(i)-bw/2, vyOf(c[4]), bw, L.volBot-vyOf(c[4])); }
-    ctx.fillStyle='#5A6478'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('거래량', padL+2, L.volTop+2); }
-
-  // candles (visible) — thicker with zoom
-  for(let i=v0;i<v1;i++){ const c=C[i]; const up=c[3]>=c[0]; const col= up?'#F0616D':'#4C8DF6';
-    const x=cx(i); ctx.strokeStyle=col; ctx.lineWidth=Math.max(1,cw*0.13); ctx.beginPath(); ctx.moveTo(x,yOf(c[1])); ctx.lineTo(x,yOf(c[2])); ctx.stroke();
-    const bw=Math.max(1.5,cw*0.72); const yo=yOf(c[0]), yc=yOf(c[3]);
-    ctx.fillStyle=col; ctx.fillRect(x-bw/2, Math.min(yo,yc), bw, Math.max(1,Math.abs(yc-yo))); }
-
-  // polyline helper over padded visible range
-  const plot=(arr,col,w)=>{ ctx.strokeStyle=col; ctx.lineWidth=w||1.3; ctx.beginPath(); let st=false;
-    for(let i=l0;i<l1;i++){ const v=arr[i]; if(v==null){st=false;continue;} const x=cx(i),y=yOf(v);
-      if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); };
-
-  for(const m of mas) plot(m.arr, m.col, 1.4);
-  if(boll){ plot(boll.up,'#5AA9E6',1); plot(boll.lo,'#5AA9E6',1); ctx.setLineDash([3,3]); plot(boll.mid,'#7C8AA5',1); ctx.setLineDash([]); }
-  if(ichi){ plot(ichi.tenkan,'#2BD4C4',1.2); plot(ichi.kijun,'#E0679F',1.2);
-    ctx.strokeStyle='#9AA7BD'; ctx.lineWidth=1; ctx.beginPath(); let st=false;
-    for(let i=Math.max(26,l0+26);i<Math.min(revealed,l1+26);i++){ const x=cx(i-26),y=yOf(closes[i]); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); }
-
-  // active-overlay legend (price pane, bottom-left)
-  { let lx=padL+2, ly=priceBot-11; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.font='9px '+getComputedStyle(document.body).fontFamily;
-    const leg=[]; if(ind.ma) leg.push(['MA5','#FFD54A'],['20','#4CC3FF'],['60','#B980FF'],['200','#FF8FB0']);
-    if(ind.boll) leg.push(['BB','#5AA9E6']); if(ind.ichi) leg.push(['전환','#2BD4C4'],['기준','#E0679F'],['구름','#35C46A']);
-    for(const t of leg){ ctx.fillStyle=t[1]; ctx.fillText(t[0],lx,ly); lx+=ctx.measureText(t[0]).width+7; } }
-
-  // entry line (horizontal always; vertical only if entry in view)
-  const entry=C[vis-1][3];
-  ctx.strokeStyle='rgba(233,185,73,.55)'; ctx.setLineDash([4,3]); ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(padL,yOf(entry)); ctx.lineTo(plotR,yOf(entry)); ctx.stroke();
-  if(vis-1>=view.start-1 && vis-1<=view.start+view.count){ const exx=cx(vis-1);
-    ctx.beginPath(); ctx.moveTo(exx,priceTop); ctx.lineTo(exx,L.bottomAll); ctx.stroke(); }
-  ctx.setLineDash([]);
-  tagPrice(ctx, plotR, yOf(entry), '진입 '+fmtP(entry), '#E9B949', '#080B14');
-
-  // stop/take preview (bet phase)
-  if(phase==='bet' && sel.dir && sel.dir!=='WATCH'){
-    const long=sel.dir==='LONG'; const liq=100/Math.max(1,sel.lev);
-    const eff=Math.min(sel.stop==null?Infinity:sel.stop, liq);
-    const sp= long? entry*(1-eff/100): entry*(1+eff/100); const isLiq= sel.stop==null || sel.stop>=liq;
-    if(sp>lo&&sp<hi){ line(ctx,padL,plotR,yOf(sp),'#E5484D'); tagPrice(ctx,plotR,yOf(sp),(isLiq?'청산 ':'손절 ')+fmtP(sp),'#E5484D','#fff'); }
-    if(sel.take){ const tp= long? entry*(1+sel.take/100): entry*(1-sel.take/100); if(tp>lo&&tp<hi){ line(ctx,padL,plotR,yOf(tp),'#35C46A'); tagPrice(ctx,plotR,yOf(tp),'익절 '+fmtP(tp),'#35C46A','#062'); } } }
-  // exit marker (result)
-  if(phase==='result' && outcome && outcome.reason!=='NO_POSITION'){
-    const oy=yOf(outcome.exit); const oxi=vis-1+outcome.offset;
-    line(ctx,padL,plotR,oy, outcome.points>=0?'#35C46A':'#E5484D');
-    if(oxi>=view.start-1 && oxi<=view.start+view.count){ const ox=cx(Math.min(oxi,total-1)); ctx.fillStyle= outcome.points>=0?'#35C46A':'#E5484D'; ctx.beginPath(); ctx.arc(ox,oy,3.5,0,7); ctx.fill(); } }
-
-  // RSI pane
-  if(rsi && L.hasRsi){ const t=L.rsiTop,b=L.rsiBot, ry=(v)=> b-(v/100)*(b-t);
-    ctx.setLineDash([3,3]);
-    ctx.strokeStyle='rgba(229,72,77,.4)'; ctx.beginPath(); ctx.moveTo(padL,ry(70)); ctx.lineTo(plotR,ry(70)); ctx.stroke();
-    ctx.strokeStyle='rgba(53,196,106,.4)'; ctx.beginPath(); ctx.moveTo(padL,ry(30)); ctx.lineTo(plotR,ry(30)); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.strokeStyle='#C9B458'; ctx.lineWidth=1.2; ctx.beginPath(); let st=false;
-    for(let i=l0;i<l1;i++){ const v=rsi[i]; if(v==null){st=false;continue;} const x=cx(i),y=ry(v); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke();
-    ctx.fillStyle='#5A6478'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('RSI 14',padL+2,t+2);
-    ctx.textBaseline='middle'; ctx.fillText('70',plotR+5,ry(70)); ctx.fillText('30',plotR+5,ry(30)); }
-
-  // MACD pane
-  if(mac && L.hasMacd){ const t=L.macdTop,b=L.macdBot, mid=(t+b)/2;
-    let mm=1e-9; for(let i=v0;i<v1;i++){ [mac.macd[i],mac.signal[i],mac.hist[i]].forEach(v=>{ if(v!=null&&Math.abs(v)>mm)mm=Math.abs(v); }); }
-    const my=(v)=> mid-(v/mm)*((b-t)/2*0.86);
-    ctx.strokeStyle='#1B2436'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(padL,mid); ctx.lineTo(plotR,mid); ctx.stroke();
-    for(let i=v0;i<v1;i++){ const h=mac.hist[i]; if(h==null)continue; const x=cx(i), bw=Math.max(1,cw*0.66);
-      ctx.fillStyle= h>=0?'rgba(53,196,106,.6)':'rgba(229,72,77,.6)'; const y0=my(0),y1=my(h); ctx.fillRect(x-bw/2,Math.min(y0,y1),bw,Math.max(1,Math.abs(y1-y0))); }
-    const plotM=(arr,col)=>{ ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.beginPath(); let st=false;
-      for(let i=l0;i<l1;i++){ const v=arr[i]; if(v==null){st=false;continue;} const x=cx(i),y=my(v); if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);} ctx.stroke(); };
-    plotM(mac.macd,'#4C8DF6'); plotM(mac.signal,'#E9A23B');
-    ctx.fillStyle='#5A6478'; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillText('MACD 12·26·9',padL+2,t+2); }
-}
-function line(ctx,x1,x2,y,col){ ctx.strokeStyle=col; ctx.setLineDash([4,3]); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke(); ctx.setLineDash([]); }
-function tagPrice(ctx,xRight,y,txt,bg,fg){ ctx.font='9px '+getComputedStyle(document.body).fontFamily; const w=ctx.measureText(txt).width+8;
-  ctx.fillStyle=bg; const yy=Math.max(8,Math.min(y,cssH-8)); roundRect(ctx,xRight-w-1,yy-7,w,14,3); ctx.fill(); ctx.fillStyle=fg; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(txt,xRight-w+3,yy); }
-function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-
-/* ---------- controls build ---------- */
-function chipGroup(host, items, isOn, onPick){
-  host.innerHTML='';
-  items.forEach(it=>{ const el=document.createElement('div'); el.className='chip gold'+(isOn(it.val)?' on':''); el.tabIndex=0;
-    el.innerHTML=it.html; const act=()=>onPick(it.val);
-    el.addEventListener('click',act); el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}});
-    host.appendChild(el); });
-}
-function buildControls(){
-  chipGroup($('levRow'), LEVS.map(v=>({val:v,html:v+'배'})), it=>sel.lev===it, v=>{sel.lev=v; sync();});
-  chipGroup($('wagerRow'), WAGERS.map(v=>({val:v,html:v.toLocaleString()+'P'})), it=>sel.wager===it, v=>{sel.wager=v; sync();});
-  chipGroup($('stopRow'), STOPS.map(s=>({val:s.v,html:s.l})), it=>sel.stop===it, v=>{sel.stop=v; sync();});
-  chipGroup($('takeRow'), TAKES.map(s=>({val:s.v,html:s.l})), it=>sel.take===it, v=>{sel.take=v; sync();});
-  chipGroup($('horRow'), HORS.map(v=>({val:v,html:v+'캔들'})), it=>sel.horizon===it, v=>{sel.horizon=v; sync();});
-}
-function buildDir(){
-  document.querySelectorAll('#dirRow .chip').forEach(el=>{
-    el.classList.toggle('on', sel.dir===el.dataset.dir);
-    el.onclick=()=>{ sel.dir=el.dataset.dir; sync(); };
-    el.onkeydown=(e)=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault(); sel.dir=el.dataset.dir; sync();} };
-  });
+/* home */
+$('nick').addEventListener('input',e=>{ state.nick=e.target.value||'무명트레이더'; saveHS(); });
+function myRank(p,metric){ const sv=curMetric; curMetric=metric; const l=build(p); curMetric=sv; return l.findIndex(r=>r.me)+1; }
+function renderHome(){
+  $('hCh').textContent=byId('char',state.equip.char).em;
+  $('hCar').textContent=byId('car',state.equip.car).em;
+  $('hAcc').textContent=state.equip.acc==='none'?'':byId('acc',state.equip.acc).em;
+  $('hAmt').textContent=fmt(getBalance())+' P';
+  const t=state.equip.title; const tc=$('hTitle');
+  if(t==='none'){ tc.style.display='none'; } else { tc.style.display='inline-block'; tc.textContent='👑 '+byId('title',t).em; }
+  const defs=[['ret','수익률'],['assets','자산'],['win','승률']];
+  const arrows=['▲2','—','▼1'];
+  $('ranksum').innerHTML=defs.map((d,i)=>{ const rk=myRank('week',d[0]);
+    return `<div class="rc" data-m="${d[0]}"><div class="t">주간 ${d[1]}</div><div class="r" style="color:${rk<=3?'var(--gold)':'var(--tprimary)'}">${rk}위</div>
+      <div class="d ${arrows[i]==='—'?'fl':arrows[i][0]==='▲'?'up':'dn'}">${arrows[i]}</div></div>`;
+  }).join('');
+  document.querySelectorAll('#ranksum .rc').forEach(el=>el.addEventListener('click',()=>{ curMetric=el.dataset.m; setSub(); go('rank'); }));
 }
 
-/* ---------- indicator toggles ---------- */
-const IND=[
-  {k:'volume',label:'거래량',col:'#8A93A6'},
-  {k:'ma',label:'이평선',col:'#4CC3FF'},
-  {k:'boll',label:'볼린저',col:'#5AA9E6'},
-  {k:'rsi',label:'RSI',col:'#C9B458'},
-  {k:'macd',label:'MACD',col:'#4C8DF6'},
-  {k:'ichi',label:'일목',col:'#2BD4C4'},
-];
-function buildIndBar(){ const host=$('indbar'); host.innerHTML='';
-  IND.forEach(it=>{ const el=document.createElement('div'); el.className='itog'+(ind[it.k]?' on':''); el.tabIndex=0;
-    el.innerHTML='<span class="dot" style="background:'+(ind[it.k]?it.col:'#5A6478')+'"></span>'+it.label;
-    const act=()=>{ ind[it.k]=!ind[it.k]; store.ind=ind; saveS(store); buildIndBar(); layoutCanvas(); drawChart(); };
-    el.addEventListener('click',act); el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}});
-    host.appendChild(el); });
+/* ranking */
+function setPeriod(){ document.querySelectorAll('#periodTabs .tab').forEach(x=>x.classList.toggle('on',x.dataset.p===curPeriod)); }
+function setSub(){ document.querySelectorAll('#metricTabs .subtab').forEach(x=>x.classList.toggle('on',x.dataset.m===curMetric)); }
+document.querySelectorAll('#periodTabs .tab').forEach(t=>t.addEventListener('click',()=>{ curPeriod=t.dataset.p; setPeriod(); renderRank(); }));
+document.querySelectorAll('#metricTabs .subtab').forEach(t=>t.addEventListener('click',()=>{ curMetric=t.dataset.m; setSub(); renderRank(); }));
+function renderRank(){
+  setPeriod(); setSub();
+  const list=build(curPeriod);
+  const order=[1,0,2], hcls=['h2','h1','h2'], medal=['🥈','🥇','🥉'];
+  $('podium').innerHTML=order.map((idx,pos)=>{ const r=list[idx];
+    return `<div class="ped ${idx===0?'p1':''} ${hcls[pos]}"><div class="medal">${medal[pos]}</div>
+      <div class="pav">${r.ch}</div><div class="pcar">${r.car}</div>
+      <div class="pn" style="${r.me?'color:var(--gold)':''}">${r.name}</div>
+      <div class="pt">${r.title||''}</div>
+      <div class="ps ${metricCol(r)}">${metricVal(r)}</div></div>`;
+  }).join('');
+  $('rankList').innerHTML=list.slice(3).map((r,i)=>`
+    <div class="rrow ${r.me?'me':''}"><div class="rk">${i+4}</div><div class="rav">${r.ch}</div>
+      <div class="rnm"><div class="n">${r.name}<span class="car">${r.car}</span>${r.title?` · <span style="color:var(--gold)">${r.title}</span>`:''}</div>
+        <div class="sub">${subLine(r)}</div></div>
+      <div class="rsc ${metricCol(r)}">${metricVal(r)}</div></div>`).join('');
 }
 
-/* ---------- risk text + submit state ---------- */
-function sync(){
-  buildDir(); buildControls();
-  $('posOnly').style.opacity = (sel.dir==='WATCH')?'.4':'1';
-  const liq=(100/Math.max(1,sel.lev));
-  let r='';
-  if(sel.dir==='WATCH'){ r='관망: 포지션 없이 다음 흐름을 지켜봅니다. <b>포인트 변동 없음.</b>'; }
-  else if(!sel.dir){ r='방향을 선택하면 리스크가 표시됩니다.'; }
-  else{
-    r=`최대 손실 <b>-${sel.wager.toLocaleString()}P</b> · 청산선 역방향 <b>${liq.toFixed(liq<10?1:0)}%</b>`;
-    if(sel.lev>=10) r+=' <span class="warn">⚠ 초고배율: 작은 역행에도 청산</span>';
-    else if(sel.lev>=5) r+=' <span class="warn">⚠ 고배율 주의</span>';
-  }
-  $('risk').innerHTML=r;
-  const over = sel.dir!=='WATCH' && sel.wager>store.balance;
-  const btn=$('submitBtn');
-  if(!sel.dir){ btn.disabled=true; btn.textContent='방향을 선택하세요'; }
-  else if(over){ btn.disabled=true; btn.textContent='포인트 부족'; }
-  else if(store.balance<=0 && sel.dir!=='WATCH'){ btn.disabled=true; btn.textContent='포인트 부족'; }
-  else { btn.disabled=false; btn.textContent= sel.dir==='WATCH'?'관망 제출':'제출하기'; }
-  if(phase==='bet') drawChart();
+/* garage */
+document.querySelectorAll('#catbar .cat').forEach(c=>c.addEventListener('click',()=>{
+  curCat=c.dataset.c; document.querySelectorAll('#catbar .cat').forEach(x=>x.classList.toggle('on',x===c)); renderShop();
+}));
+function renderShop(justId){
+  $('gAmt').textContent=fmt(getBalance())+' P';
+  $('pCh').textContent=byId('char',state.equip.char).em;
+  $('pCar').textContent=byId('car',state.equip.car).em;
+  $('pAcc').textContent=state.equip.acc==='none'?'':byId('acc',state.equip.acc).em;
+  $('pNick').textContent=state.nick;
+  const pt=state.equip.title, ptc=$('pTitle');
+  if(pt==='none'){ ptc.style.display='none'; } else { ptc.style.display='inline-block'; ptc.textContent='👑 '+byId('title',pt).em; }
+  const owned=state.owned[curCat], eq=state.equip[curCat];
+  $('shop').innerHTML=ITEMS[curCat].map(it=>{
+    const isOwned=owned.has(it.id), isEq=eq===it.id, rr=RARITY[rarity(it.price)];
+    const st = isEq?'<div class="st eq">장착중</div>':isOwned?'<div class="st owned">보유</div>':'';
+    const price = it.price===0?'<div class="pr free">기본</div>':(isOwned?'<div class="pr free">보유</div>':`<div class="pr">${fmt(it.price)} P</div>`);
+    const em = it.txt?`<div class="em txt" style="color:${rr[1]}">${it.em}</div>`:`<div class="em">${it.em}</div>`;
+    return `<div class="item ${isEq?'eq':''} ${it.id===justId?'just':''}" data-id="${it.id}" style="border-color:${isEq?'var(--gold)':rr[1]+'66'}">
+      ${st}${em}<div class="nm">${it.nm}</div><div class="rr" style="color:${rr[1]}">${rr[0]}</div>${price}</div>`;
+  }).join('');
+  document.querySelectorAll('#shop .item').forEach(el=>el.addEventListener('click',()=>onItem(el.dataset.id)));
+}
+function onItem(id){
+  const it=byId(curCat,id), owned=state.owned[curCat], bal=getBalance();
+  if(owned.has(id)){ state.equip[curCat]=id; saveHS(); toast(it.nm+' 장착!'); renderShop(id); }
+  else if(bal>=it.price){ setBalance(bal-it.price); owned.add(id); state.equip[curCat]=id; saveHS();
+    toast('🛒 '+it.nm+' 구매 & 장착! (-'+fmt(it.price)+'P)'); renderShop(id); }
+  else toast('자산 부족 ('+fmt(it.price-bal)+'P 모자람) — 차트배틀로 벌어보세요');
 }
 
-/* ---------- phases ---------- */
-function loadProblem(){
-  P=curProblem(); resetSel(); phase='bet'; revealed=P.vis; outcome=null;
-  $('betPane').classList.remove('hidden'); $('resPane').classList.add('hidden');
-  $('qtag').textContent='문제 '+(qi+1);
-  $('bal').textContent=store.balance.toLocaleString()+'P';
-  const d=P.diff; $('diff').textContent='난이도 '+'●'.repeat(d)+'○'.repeat(5-d);
-  $('hiddenTag').classList.remove('hidden');
-  layoutCanvas(); setViewRecent(); sync(); drawChart();
-  document.querySelector('.scroll').scrollTop=0;
-}
-function submit(){
-  outcome=evaluate(P, sel); phase='reveal';
-  $('submitBtn').disabled=true;
-  const target=P.vis+Math.min(sel.horizon, P.candles.length-P.vis);
-  if(reduce){ revealed=target; finishReveal(); return; }
-  clearInterval(revealTimer);
-  const iv=(target-revealed)>15?55:90;   // faster tick for long (30캔들) reveals
-  revealTimer=setInterval(()=>{ revealed++;
-    if(revealed-1 >= view.start+view.count-2){ view.start = (revealed - view.count + 2); clampView(); }  // follow the newest candle
-    drawChart(); if(revealed>=target){ clearInterval(revealTimer); finishReveal(); } }, iv);
-}
-function finishReveal(){
-  phase='result'; $('hiddenTag').classList.add('hidden'); drawChart(); renderResult();
-  $('betPane').classList.add('hidden'); $('resPane').classList.remove('hidden');
-  document.querySelector('.scroll').scrollTop=0;
-}
-function renderResult(){
-  const o=outcome;
-  $('rReason').textContent=REASON_KO[o.reason]; $('rReason').className='res-reason '+(o.points>0?'up':o.points<0?'dn':'flat');
-  $('rPts').textContent=(o.points>0?'+':'')+o.points.toLocaleString(); $('rPts').className='res-pts '+signCls(o.points);
-  $('rRet').innerHTML= o.reason==='NO_POSITION' ? '<span class="flat">포지션 없음</span>'
-    : `<span class="${signCls(o.levret)}">${pct(o.levret)}</span> <span class="flat">(${sel.lev}배 · 원수익 ${pct(o.raw)})</span>`;
-  // badges
-  const b=[]; b.push(`<span class="badge dir">${DIR_KO[o.dir]}${o.dir!=='WATCH'?' '+o.lev+'배':''}</span>`);
-  if(o.hitTake) b.push('<span class="badge take">익절 적중</span>');
-  if(o.hitStop) b.push(`<span class="badge stop">${o.reason==='LIQUIDATION'?'청산':'손절'} 적중</span>`);
-  $('rBadges').innerHTML=b.join('');
-  $('rEntry').textContent=fmtP(o.entry); $('rExit').textContent=fmtP(o.exit);
-  $('rMax').innerHTML=`<span class="up">${pct(o.maxUp)}</span> / <span class="dn">${pct(o.maxDown)}</span>`;
-  const availFut=P.candles.length-P.vis, hz=Math.min(sel.horizon,availFut);
-  $('rMktK').textContent=`${hz}캔들 시장수익률`+(hz<sel.horizon?' (가용)':'');
-  $('rMkt').innerHTML=`<span class="${signCls(o.marketEnd)}">${pct(o.marketEnd)}</span>`;
-  $('rSym').textContent=P.symbol; $('rPeriod').textContent=`${P.tf} · ${P.period} · ${P.source}`;
-  $('rTags').innerHTML=P.tags.map(t=>`<span>${t}</span>`).join('');
-  $('rEx').textContent=P.explain;
-  $('fPlayed').textContent=store.played+'판';
-  $('fWin').textContent= (store.wins+store.losses)>0 ? '승률 '+Math.round(store.wins/(store.wins+store.losses)*100)+'%' : '승률 –';
-  $('fBest').textContent= store.best>0?('최고 +'+store.best.toLocaleString()):'최고 –';
-}
-function commitNext(){
-  const o=outcome;
-  store.balance = Math.max(0, store.balance + o.points);
-  store.played++;
-  if(o.points>0){ store.wins++; if(o.points>store.best) store.best=o.points; }
-  else if(o.points<0) store.losses++;
-  saveS(store);
-  qi++; if(qi>=order.length){ order=shuffle(PROBLEMS.map((_,i)=>i)); qi=0; }
-  loadProblem();
-}
-function retry(){ // score-neutral
-  phase='bet'; revealed=P.vis; outcome=null;
-  $('betPane').classList.remove('hidden'); $('resPane').classList.add('hidden');
-  $('hiddenTag').classList.remove('hidden');
-  setViewRecent(); sync(); drawChart(); document.querySelector('.scroll').scrollTop=0;
-}
-
-/* ---------- wire ---------- */
-$('submitBtn').addEventListener('click',()=>{ if(!$('submitBtn').disabled) submit(); });
-$('nextBtn').addEventListener('click',commitNext);
-$('retryBtn').addEventListener('click',retry);
-let rt; window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{ layoutCanvas(); drawChart(); },120); });
-
-/* ---------- pan (drag) + zoom (wheel/pinch/buttons) ---------- */
-function cwNow(){ return (cssW-52-8)/view.count; }   // axisW=52, padL=8
-let dragging=false, dragX0=0, dragStart0=0;
-const pointers=new Map();  // for pinch
-cv.addEventListener('pointerdown',(e)=>{ pointers.set(e.pointerId,e); if(pointers.size===1){ dragging=true; dragX0=e.clientX; dragStart0=view.start; } });
-window.addEventListener('pointermove',(e)=>{
-  if(pointers.has(e.pointerId)) pointers.set(e.pointerId,e);
-  if(pointers.size>=2){ dragging=false; return; }      // pinch handled on pointerup delta below
-  if(!dragging) return;
-  view.start = dragStart0 - (e.clientX-dragX0)/cwNow(); clampView(); drawChart();
-});
-let pinchBase=null;
-window.addEventListener('pointermove',(e)=>{
-  if(pointers.size<2) { pinchBase=null; return; }
-  const pts=[...pointers.values()]; const d=Math.abs(pts[0].clientX-pts[1].clientX)+Math.abs(pts[0].clientY-pts[1].clientY);
-  if(pinchBase==null){ pinchBase={d, count:view.count}; return; }
-  if(d>4){ view.count=Math.max(20, Math.min(pinchBase.count*(pinchBase.d/d), P.candles.length)); clampView(); drawChart(); }
-});
-function releasePtr(e){ pointers.delete(e.pointerId); if(pointers.size<2) pinchBase=null; if(pointers.size===0) dragging=false; }
-window.addEventListener('pointerup',releasePtr); window.addEventListener('pointercancel',releasePtr);
-cv.addEventListener('wheel',(e)=>{ e.preventDefault(); const rect=cv.getBoundingClientRect();
-  const frac=Math.max(0,Math.min(1,(e.clientX-rect.left-8)/((cssW-52-8)||1)));
-  zoomBy(e.deltaY>0?1.18:0.85, frac); }, {passive:false});
-$('zoomIn').addEventListener('click',()=>zoomBy(0.78));
-$('zoomOut').addEventListener('click',()=>zoomBy(1.28));
-$('zoomReset').addEventListener('click',()=>{ view.count=60; setViewRecent(); drawChart(); });
-
-buildIndBar();
-loadProblem();
+renderHome();
 })();
 </script>
