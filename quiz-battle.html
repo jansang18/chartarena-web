@@ -175,10 +175,10 @@ var players=[
 var ROUNDS=10, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
 
 /* 결정론 캔들 */
-function gen(seed){ var n=58,vis=48,s=seed,cs=[],p=0.3;
+function gen(seed){ var n=78,vis=48,s=seed,cs=[],p=0.3;   // 48 공개 + 30 예측 캔들
   var rnd=function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};
   var trendUp=rnd()<0.5, base=(rnd()-0.5)*0.004;
-  for(var i=0;i<n;i++){var drift=base+(i>40?(trendUp?0.006:-0.006):(rnd()-0.5)*0.004);var op=p;p=Math.max(0.08,op+(rnd()-0.5)*0.02+drift);
+  for(var i=0;i<n;i++){var drift=base+(i>40?(trendUp?0.003:-0.003):(rnd()-0.5)*0.004);var op=p;p=Math.max(0.08,op+(rnd()-0.5)*0.02+drift);
     cs.push([op,Math.max(op,p)+rnd()*0.008,Math.min(op,p)-rnd()*0.008,p,rnd()*0.7+0.3]);}
   return {cs:cs,vis:vis,n:n}; }
 function sma(cl,per,up){var o=[],s=0;for(var i=0;i<up;i++){s+=cl[i];if(i>=per)s-=cl[i-per];o[i]=i>=per-1?s/per:null;}return o;}
@@ -267,14 +267,14 @@ function lockIn(){
   if(players[0].pick===null){ players[0].pick='W'; }
   players.forEach(function(p,i){ if(i>0) p.pick=botPick(p); });
   renderPods(); renderCtrl();
-  var target=GD.vis+8;
+  var target=GD.vis+30;
   if(reduce){ gRev=target; finishRound(); return; }
   if(revTimer)clearInterval(revTimer);
-  revTimer=setInterval(function(){ gRev++; drawChart(); if(gRev>=target){ clearInterval(revTimer); finishRound(); } },80);
+  revTimer=setInterval(function(){ gRev++; drawChart(); if(gRev>=target){ clearInterval(revTimer); finishRound(); } },48);
 }
 function finishRound(){
-  gRev=GD.vis+8; drawChart();
-  var cs=GD.cs,vis=GD.vis,entry=cs[vis-1][3],exit=cs[vis-1+8][3];
+  gRev=GD.vis+30; drawChart();
+  var cs=GD.cs,vis=GD.vis,entry=cs[vis-1][3],exit=cs[vis-1+30][3];
   var liq=false;
   players.forEach(function(p){ var sign=p.pick==='L'?1:(p.pick==='S'?-1:0);
     var ret=sign*(exit-entry)/entry*100*p.lev; if(p.strat==='me'&&ret<=-100)liq=true; p.dp=Math.round(ret*3); p.score+=p.dp; });
