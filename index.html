@@ -1,221 +1,333 @@
-<title>차트아레나 — 가로 앱 (홈·랭킹·차고)</title>
+<title>차트아레나 — 가로 앱 (홈 허브)</title>
 <style>
   :root{
     --bg:#070d1c; --p1:#0e1830; --p2:#16223e; --line:#22335a;
-    --gold:#E9B949; --gold2:#F6D272; --green:#35D07A; --blue:#4CA9FF; --pink:#FF5C8A; --purple:#B266FF; --teal:#2FE6C4; --orange:#FF9A3C;
+    --gold:#E9B949; --gold2:#F6D272; --green:#35D07A; --blue:#4CA9FF; --pink:#FF5C8A; --purple:#B266FF; --teal:#2FE6C4; --orange:#FF9A3C; --red:#F0616D;
     --tp:#EAF0FA; --ts:#93A0BC; --tm:#5A6478;
     --sans:"Segoe UI",-apple-system,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
     --mono:"Cascadia Mono",ui-monospace,Consolas,monospace;
   }
   *{box-sizing:border-box}
-  body{margin:0; background:#05070f; color:var(--tp); font-family:var(--sans); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:16px 8px; overflow-x:hidden}
-  .cap{max-width:560px; text-align:center; margin-bottom:10px}
-  .cap .k{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#8A6D2B; font-weight:700}
-  .cap h1{margin:.3em 0 .1em; font-size:20px; font-weight:800}
-  .cap p{margin:0; color:var(--ts); font-size:12.5px}
-  .cap .r{margin-top:7px; font-size:11px; color:var(--tm)}
-
+  body{margin:0; background:#05070f; color:var(--tp); font-family:var(--sans); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:10px 6px; overflow-x:hidden}
   .scaler{transform-origin:top center}
-  .frame{width:1120px; height:516px; border-radius:20px; overflow:hidden; display:flex;
-    background:radial-gradient(120% 90% at 30% 0%, #12203c, #0a1327 55%, #060c1a);
-    box-shadow:0 30px 70px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
+  .frame{width:1672px; height:950px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
+    background:radial-gradient(120% 80% at 22% 0%, #12203c 0%, #0a1327 46%, #060c1a 100%);
+    box-shadow:0 30px 80px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
 
-  /* 좌측 레일 */
-  .rail{width:240px; flex:0 0 auto; padding:12px 13px; overflow-y:auto; border-right:1px solid var(--line);
-    background:linear-gradient(180deg,rgba(14,24,48,.7),rgba(8,14,30,.7)); display:flex; flex-direction:column}
-  .brand{font-weight:900; font-size:17px; margin-bottom:8px}
-  .brand .g{color:var(--gold)}
-  .avwrap{position:relative; border-radius:14px; padding:9px; background:#0a1122; border:1px solid var(--line); text-align:center}
-  .avwrap .ava{width:82px; height:82px; margin:0 auto; border-radius:12px; overflow:hidden; background:radial-gradient(circle at 50% 30%,#12203a,#070c16); border:1px solid var(--line); position:relative; display:flex; align-items:center; justify-content:center}
-  .avwrap .ava img{width:100%; height:100%; object-fit:cover}
-  .avwrap .ava .em{font-size:52px}
-  .avwrap .ava .car{position:absolute; bottom:3px; left:50%; transform:translateX(-50%); font-size:20px}
-  .avwrap .edit{position:absolute; right:10px; top:10px; width:28px;height:28px;border-radius:50%;background:rgba(233,185,73,.12);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer}
-  .nickrow{display:flex; justify-content:center; align-items:center; gap:6px; margin-top:6px}
-  .nick{background:transparent; border:none; color:var(--tp); font-weight:900; font-size:17px; text-align:center; width:100%; font-family:inherit}
-  .nick:focus{outline:none; border-bottom:1px dashed var(--gold)}
-  .title{margin-top:5px; font-size:11px; font-weight:800; color:var(--gold)}
-  .chips{display:flex; gap:6px; justify-content:center; margin-top:6px}
-  .chip{font-size:11px; font-weight:800; padding:3px 10px; border-radius:999px; font-family:var(--mono)}
-  .chip.lv{color:#2a2107; background:linear-gradient(180deg,var(--gold2),var(--gold))}
-  .chip.fire{color:var(--tp); background:rgba(255,120,60,.14); border:1px solid rgba(255,120,60,.4)}
-  .assets{margin-top:8px; text-align:center; background:#0a1122; border:1px solid var(--line); border-radius:12px; padding:7px 10px}
-  .assets .l{font-size:10px; letter-spacing:.14em; color:#8A6D2B; font-weight:800}
-  .assets .v{font-family:var(--mono); font-weight:900; font-size:21px; line-height:1.1;
-    background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
-  .nav{margin-top:7px; display:flex; flex-direction:column; gap:3px}
-  .nav a{display:flex; align-items:center; gap:9px; padding:5px 11px; border-radius:9px; text-decoration:none; color:var(--ts); font-weight:800; font-size:12.5px; background:#0d1730; border:1px solid var(--line); cursor:pointer}
-  .nav a .ic{font-size:15px}
-  .nav a.on{color:var(--gold); border-color:var(--gold); background:rgba(233,185,73,.08)}
-  .nav a.batt{color:#04223f; background:linear-gradient(180deg,#8fd6ff,#4CA9FF); border-color:transparent}
-  .foot{margin-top:7px; color:var(--tm); font-size:8.5px; line-height:1.35}
+  /* ===== TOP BAR ===== */
+  .topbar{height:64px; flex:0 0 auto; display:flex; align-items:center; gap:14px; padding:0 22px; border-bottom:1px solid var(--line); background:rgba(8,14,30,.55)}
+  .logo{font-weight:900; font-size:22px; letter-spacing:-.5px; display:flex; align-items:center; gap:9px}
+  .logo .g{color:var(--gold)} .logo .lm{font-size:20px}
+  .tsp{flex:1}
+  .curr{display:flex; align-items:center; gap:10px}
+  .pill{display:flex; align-items:center; gap:8px; background:#0a1122; border:1px solid var(--line); border-radius:999px; padding:5px 8px 5px 8px; font-weight:800; font-family:var(--mono); font-size:15px}
+  .pill .cico{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900}
+  .pill.coin .cico{background:linear-gradient(180deg,#F6D272,#D8A63A);color:#3a2c07}
+  .pill.gem .cico{background:linear-gradient(180deg,#8fe3ff,#3aa7e0);color:#06283b;font-size:11px}
+  .pill .add{width:23px;height:23px;border-radius:50%;background:rgba(233,185,73,.18);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;margin-left:1px;cursor:pointer}
+  .ticons{display:flex; align-items:center; gap:8px; margin-left:4px}
+  .ticon{position:relative; width:40px;height:40px;border-radius:12px;background:#0a1122;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
+  .ticon .dot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--pink);border:2px solid #0a1122}
 
-  /* 메인 */
-  .main{flex:1; min-width:0; padding:16px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent}
-  .main::-webkit-scrollbar{width:7px}.main::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+  /* ===== BODY ===== */
+  .body{flex:1; min-height:0; display:flex}
+
+  /* ===== SIDEBAR ===== */
+  .side{width:296px; flex:0 0 auto; padding:16px 14px; border-right:1px solid var(--line); background:linear-gradient(180deg,rgba(14,24,48,.6),rgba(8,14,30,.5)); display:flex; flex-direction:column; overflow-y:auto}
+  .profcard{position:relative; border-radius:16px; padding:14px; background:#0a1122; border:1px solid var(--line)}
+  .profcard .ava{width:158px;height:158px;margin:0 auto;border-radius:14px;overflow:hidden;background:radial-gradient(circle at 50% 30%,#12203a,#070c16);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center}
+  .profcard .ava img{width:100%;height:100%;object-fit:cover}
+  .profcard .ava .em{font-size:86px}
+  .profcard .ava .car{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:30px}
+  .profcard .edit{position:absolute;right:12px;top:12px;width:30px;height:30px;border-radius:50%;background:rgba(233,185,73,.12);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer}
+  .pname{text-align:center;font-weight:900;font-size:21px;margin-top:12px}
+  .plevel{display:flex;align-items:center;gap:8px;margin-top:11px}
+  .plevel .lv{font-family:var(--mono);font-weight:900;font-size:12px;color:#2a2107;background:linear-gradient(180deg,var(--gold2),var(--gold));padding:4px 9px;border-radius:7px}
+  .plevel .bar{flex:1;height:10px;border-radius:6px;background:#0a1122;border:1px solid var(--line);overflow:hidden}
+  .plevel .bar i{display:block;height:100%;width:72%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+  .plevel .pct{font-family:var(--mono);font-size:11px;color:var(--ts);font-weight:800}
+  .ppoints{margin-top:13px;text-align:center;background:#0a1122;border:1px solid var(--line);border-radius:12px;padding:11px}
+  .ppoints .l{font-size:10px;letter-spacing:.14em;color:#8A6D2B;font-weight:800}
+  .ppoints .v{font-family:var(--mono);font-weight:900;font-size:25px;line-height:1.1;background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .nav{margin-top:14px;display:flex;flex-direction:column;gap:6px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;text-decoration:none;color:var(--ts);font-weight:800;font-size:15px;cursor:pointer;border:1px solid transparent}
+  .nav a .ic{font-size:18px;width:22px;text-align:center}
+  .nav a:hover{background:#0d1730}
+  .nav a.on{color:var(--gold);background:rgba(233,185,73,.10);border-color:rgba(233,185,73,.4)}
+  .battlebtn{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:9px;padding:15px;border-radius:13px;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:16px;color:#04223f;text-decoration:none;background:linear-gradient(180deg,#8fd6ff,#4CA9FF);box-shadow:0 8px 20px -6px rgba(76,169,255,.6)}
+  .sfoot{margin-top:9px;color:var(--tm);font-size:8.5px;line-height:1.35;text-align:center}
+
+  /* ===== MAIN ===== */
+  .main{flex:1;min-width:0;padding:18px 20px;overflow-y:auto}
   .view{display:none} .view.on{display:block}
-  .vh{font-weight:900; font-size:19px; margin:0 0 12px; display:flex; align-items:center; gap:8px}
+  .mh{font-weight:800;font-size:18px;margin:0 0 13px;display:flex;align-items:center;gap:8px}
 
-  /* HOME */
-  .rcards{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
-  .rc{border-radius:14px; padding:12px; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line); position:relative; overflow:hidden}
-  .rc .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
-  .rc .t{font-size:11px; color:var(--ts); margin-top:6px}
-  .rc .rk{font-size:22px; font-weight:900; margin-top:1px}
-  .rc .d{font-size:11px; font-weight:800; font-family:var(--mono)}
+  /* stat row */
+  .statrow{display:flex;gap:14px;margin-bottom:14px}
+  .statgrp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;flex:1}
+  .stat{background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .stat .top{display:flex;align-items:center;gap:10px}
+  .stat .ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px}
+  .stat .t{font-size:12.5px;color:var(--ts);font-weight:600}
+  .stat .rk{font-size:28px;font-weight:900;margin-top:8px;line-height:1}
+  .stat .d{font-size:12.5px;font-weight:800;font-family:var(--mono);margin-top:4px}
   .up{color:var(--green)} .dn{color:var(--pink)} .fl{color:var(--ts)}
-  .tiles{display:grid; grid-template-columns:1.28fr 1fr 1fr; grid-template-rows:146px 146px; gap:11px; margin-top:12px}
-  .tile{position:relative; border-radius:16px; padding:14px 15px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.07); display:flex; flex-direction:column}
-  .tile.hero{grid-row:1 / span 2; grid-column:1}
-  .tile h3{margin:0; font-size:15px; font-weight:900; position:relative; z-index:2}
-  .tile.hero h3{font-size:22px; text-shadow:0 2px 10px rgba(0,0,0,.8)}
-  .tile p{margin:3px 0 0; font-size:11px; color:rgba(255,255,255,.72); position:relative; z-index:2; max-width:62%}
-  .tile.hero p{max-width:72%; font-size:12.5px; text-shadow:0 2px 8px rgba(0,0,0,.85)}
-  .tile .blob{position:absolute; width:150px;height:150px;border-radius:50%;right:-40px;bottom:-50px;filter:blur(6px);opacity:.5}
-  .tile img.art{position:absolute; right:-6px; bottom:-8px; height:86px; filter:drop-shadow(0 8px 14px rgba(0,0,0,.55)); z-index:1}
-  .tile.hero img.art{height:450px; right:-38px; bottom:-30px}
-  .t-battle{background:linear-gradient(135deg,#0d3a34,#0b1b2a)} .t-battle .blob{background:var(--teal)}
-  .t-journey{background:linear-gradient(135deg,#0e2a52,#0b1730)} .t-journey .blob{background:var(--blue)}
-  .t-train{background:linear-gradient(135deg,#3a2410,#1b1428)} .t-train .blob{background:var(--orange)}
-  .t-rank{background:linear-gradient(110deg,#2a2410,#12162a)} .t-rank .blob{background:var(--gold)}
-  .t-garage{background:linear-gradient(135deg,#2a184a,#141033)} .t-garage .blob{background:var(--purple)}
+  .timer{flex:0 0 316px;background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:15px}
+  .timer .ic{width:46px;height:46px;border-radius:12px;background:rgba(76,169,255,.12);border:1px solid rgba(76,169,255,.4);display:flex;align-items:center;justify-content:center;font-size:22px}
+  .timer .l{font-size:12.5px;color:var(--ts)}
+  .timer .v{font-family:var(--mono);font-weight:900;font-size:23px;margin-top:4px;letter-spacing:.5px}
 
-  /* RANKING */
+  /* dashboard */
+  .dash{display:grid;grid-template-columns:1.12fr 1fr;gap:14px;align-items:stretch}
+  .hero{position:relative;border-radius:18px;overflow:hidden;padding:20px 22px 18px;display:flex;flex-direction:column;
+    background:linear-gradient(140deg,#0f2f2b 0%,#0c1a32 52%,#15112a 100%);border:1px solid #234043}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 42%,rgba(53,208,122,.12),transparent 70%);pointer-events:none}
+  .hhead{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}
+  .hhead h3{margin:0;font-size:28px;font-weight:900;letter-spacing:-.5px}
+  .status{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--green);white-space:nowrap;margin-top:6px}
+  .status::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green)}
+  .hsub{color:var(--ts);font-size:14px;margin-top:7px;position:relative;z-index:1}
+  .himg{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;margin:8px 0;position:relative;z-index:1}
+  .himg img{max-height:300px;max-width:96%;object-fit:contain;filter:drop-shadow(0 14px 26px rgba(0,0,0,.6))}
+  .hstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:15px;position:relative;z-index:1}
+  .hstat{background:rgba(5,12,26,.55);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .hstat .l{font-size:12px;color:var(--ts)}
+  .hstat .v{font-size:23px;font-weight:900;font-family:var(--mono);margin-top:4px}
+  .hbtn{display:block;text-align:center;padding:16px;border-radius:13px;font-weight:900;font-size:17px;color:#062018;text-decoration:none;position:relative;z-index:1;
+    background:linear-gradient(90deg,#4CA9FF,#35D07A);box-shadow:0 10px 26px -8px rgba(53,208,122,.65)}
+
+  .rightcol{display:flex;flex-direction:column;gap:14px;min-height:0}
+  .cards2x2{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1}
+  .mcard{position:relative;border-radius:16px;overflow:hidden;padding:16px 17px;border:1px solid rgba(255,255,255,.08);cursor:pointer;display:flex;flex-direction:column;min-height:158px}
+  .mcard h4{margin:0;font-size:19px;font-weight:900;position:relative;z-index:1}
+  .mcard p{margin:5px 0 0;font-size:12.5px;color:rgba(255,255,255,.7);position:relative;z-index:1}
+  .mcard .cgo{margin-top:auto;font-size:12.5px;font-weight:800;color:var(--gold);position:relative;z-index:1}
+  .mcard .glow{position:absolute;width:150px;height:150px;border-radius:50%;right:-30px;bottom:-40px;filter:blur(14px);opacity:.38}
+  .mcard .art{position:absolute;right:6px;bottom:4px;height:104px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55));z-index:0}
+  .mcard .emart{position:absolute;right:18px;bottom:16px;font-size:58px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.55));z-index:0}
+  .m-mission{background:linear-gradient(135deg,#12253f,#0d1730)}
+  .m-shop{background:linear-gradient(135deg,#2b2410,#14162a)}
+  .m-deco{background:linear-gradient(135deg,#251642,#12102e)}
+  .m-rank{background:linear-gradient(120deg,#2a2410,#12162a)}
+
+  .recent{background:linear-gradient(180deg,var(--p1),#0b1428);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .recent .rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .recent .rh h4{margin:0;font-size:15px;font-weight:800}
+  .recent .rh .more{font-size:12px;color:var(--ts);cursor:pointer}
+  .acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .act{display:flex;align-items:center;gap:10px;background:#0a1122;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+  .act .ic{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:rgba(255,255,255,.05);flex:0 0 auto}
+  .act .n{font-size:12.5px;font-weight:700}
+  .act .tm{font-size:10px;color:var(--tm);margin-top:2px}
+  .act .m{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--green);margin-left:auto}
+
+  /* ===== BOTTOM NAV ===== */
+  .bottomnav{height:66px;flex:0 0 auto;display:flex;border-top:1px solid var(--line);background:rgba(8,14,30,.7)}
+  .bnav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--ts);font-size:12px;font-weight:700;text-decoration:none;position:relative}
+  .bnav .bi{font-size:20px}
+  .bnav:hover{color:var(--tp)}
+  .bnav.on{color:var(--gold)}
+  .bnav.on::before{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--gold)}
+
+  /* ===== SUB-VIEW HEADER ===== */
+  .vh{font-weight:900; font-size:20px; margin:0 0 14px; display:flex; align-items:center; gap:8px}
+
+  /* ===== RANKING ===== */
   .tabs{display:flex; gap:6px; margin-bottom:8px}
-  .tab{padding:8px 14px; border-radius:9px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:13px; cursor:pointer}
+  .tab{padding:9px 16px; border-radius:9px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:13px; cursor:pointer}
   .tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:#2a2107; border-color:transparent}
   .tab.sm.on{background:var(--p2); color:var(--gold); border-color:var(--gold)}
-  .rankwrap{display:flex; gap:14px}
-  .podium{flex:0 0 300px; display:flex; align-items:flex-end; gap:8px}
-  .ped{flex:1; text-align:center; border-radius:12px 12px 8px 8px; padding:10px 4px; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
-  .ped.p1{border-color:var(--gold); box-shadow:0 0 22px -6px rgba(233,185,73,.5); padding-bottom:18px}
-  .ped .med{font-size:20px}.ped .pav{font-size:26px;margin:2px 0}.ped .pcar{font-size:14px}
-  .ped .pn{font-size:11px;font-weight:800;margin-top:2px} .ped .pt{font-size:8px;color:var(--gold)} .ped .ps{font-size:12px;font-weight:900;font-family:var(--mono);margin-top:2px}
-  .rlist{flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; align-content:start}
-  .rrow{display:flex; align-items:center; gap:8px; padding:7px 9px; border-radius:9px; background:var(--p1); border:1px solid var(--line)}
+  .rankwrap{display:flex; gap:16px}
+  .podium{flex:0 0 330px; display:flex; align-items:flex-end; gap:9px}
+  .ped{flex:1; text-align:center; border-radius:12px 12px 8px 8px; padding:12px 5px; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
+  .ped.p1{border-color:var(--gold); box-shadow:0 0 22px -6px rgba(233,185,73,.5); padding-bottom:20px}
+  .ped .med{font-size:22px}.ped .pav{font-size:30px;margin:3px 0}.ped .pcar{font-size:15px}
+  .ped .pn{font-size:12px;font-weight:800;margin-top:3px} .ped .pt{font-size:9px;color:var(--gold)} .ped .ps{font-size:14px;font-weight:900;font-family:var(--mono);margin-top:3px}
+  .rlist{flex:1; display:grid; grid-template-columns:1fr 1fr; gap:8px; align-content:start}
+  .rrow{display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:9px; background:var(--p1); border:1px solid var(--line)}
   .rrow.me{border-color:var(--gold); background:rgba(233,185,73,.07)}
-  .rrow .rk{width:18px;text-align:center;font-weight:900;font-family:var(--mono);color:var(--ts);font-size:12px}
-  .rrow .rav{font-size:17px;width:20px;text-align:center}
+  .rrow .rk{width:20px;text-align:center;font-weight:900;font-family:var(--mono);color:var(--ts);font-size:13px}
+  .rrow .rav{font-size:19px;width:22px;text-align:center}
   .rrow .rn{flex:1;min-width:0}
-  .rrow .rn .n{font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rrow .rn .s{font-size:9px;color:var(--tm);font-family:var(--mono)}
-  .rrow .rv{font-family:var(--mono);font-weight:900;font-size:13px}
+  .rrow .rn .n{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rrow .rn .s{font-size:10px;color:var(--tm);font-family:var(--mono)}
+  .rrow .rv{font-family:var(--mono);font-weight:900;font-size:14px}
 
-  /* GARAGE */
-  .gwrap{display:flex; gap:14px}
-  .gleft{flex:0 0 240px}
-  .gprev{border-radius:16px; padding:16px; text-align:center; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
-  .gprev .pv{width:150px;height:150px;margin:0 auto;border-radius:14px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 30%,#12203a,#070c16);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -6px rgba(178,102,255,.4)}
-  .gprev .pv img{width:100%;height:100%;object-fit:cover}.gprev .pv .em{font-size:78px}.gprev .pv .car{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:30px}
-  .gprev .nm{font-weight:800;font-size:15px;margin-top:10px}
-  .gprev .tt{color:var(--gold);font-size:11px;font-weight:700;margin-top:3px}
-  .catcol{margin-top:12px; display:flex; flex-direction:column; gap:6px}
-  .cat{padding:9px 12px; border-radius:10px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:13px; cursor:pointer; text-align:center}
+  /* ===== GARAGE ===== */
+  .gwrap{display:flex; gap:16px}
+  .gleft{flex:0 0 260px}
+  .gprev{border-radius:16px; padding:18px; text-align:center; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
+  .gprev .pv{width:170px;height:170px;margin:0 auto;border-radius:14px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 30%,#12203a,#070c16);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;box-shadow:0 0 22px -6px rgba(178,102,255,.4)}
+  .gprev .pv img{width:100%;height:100%;object-fit:cover}.gprev .pv .em{font-size:90px}.gprev .pv .car{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:34px}
+  .gprev .nm{font-weight:800;font-size:16px;margin-top:12px}
+  .gprev .tt{color:var(--gold);font-size:12px;font-weight:700;margin-top:3px}
+  .catcol{margin-top:14px; display:flex; flex-direction:column; gap:7px}
+  .cat{padding:11px 12px; border-radius:10px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:14px; cursor:pointer; text-align:center}
   .cat.on{background:var(--p2); color:var(--gold); border-color:var(--gold)}
-  .shop{flex:1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; align-content:start}
-  .item{position:relative; border-radius:14px; padding:12px 6px; text-align:center; cursor:pointer; background:var(--p1); border:1.5px solid var(--line)}
-  .item .em{font-size:34px}.item .em.tx{font-size:14px;font-weight:900;padding:8px 2px}
-  .item img{height:52px; object-fit:contain}
-  .item .nm{font-weight:800;font-size:12px;margin-top:4px}
-  .item .rr{font-size:9px;font-weight:800;margin-top:1px}
-  .item .pr{font-family:var(--mono);font-size:11px;margin-top:3px;color:var(--gold)}
-  .item .st{position:absolute;top:6px;right:6px;font-size:8px;font-weight:800;padding:2px 5px;border-radius:5px}
+  .shop{flex:1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-content:start}
+  .item{position:relative; border-radius:14px; padding:14px 8px; text-align:center; cursor:pointer; background:var(--p1); border:1.5px solid var(--line)}
+  .item .em{font-size:40px}.item .em.tx{font-size:15px;font-weight:900;padding:10px 2px}
+  .item img{height:64px; object-fit:contain}
+  .item .nm{font-weight:800;font-size:13px;margin-top:5px}
+  .item .rr{font-size:10px;font-weight:800;margin-top:2px}
+  .item .pr{font-family:var(--mono);font-size:12px;margin-top:4px;color:var(--gold)}
+  .item .st{position:absolute;top:7px;right:7px;font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px}
 
-  /* JOURNEY */
-  .jstars{margin-left:auto; color:var(--gold); font-family:var(--mono); font-weight:800; font-size:14px}
-  .chapter{margin-bottom:12px}
-  .chhead{display:flex; align-items:center; gap:8px; margin-bottom:7px}
-  .chhead .num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px}
-  .chhead .nm{font-weight:800;font-size:14px} .chhead .sb{color:var(--ts);font-size:11px} .chhead .cnt{margin-left:auto;font-family:var(--mono);font-weight:800;font-size:12px}
+  /* ===== JOURNEY ===== */
+  .jstars{margin-left:auto; color:var(--gold); font-family:var(--mono); font-weight:800; font-size:15px}
+  .chapter{margin-bottom:16px}
+  .chhead{display:flex; align-items:center; gap:9px; margin-bottom:9px}
+  .chhead .num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+  .chhead .nm{font-weight:800;font-size:15px} .chhead .sb{color:var(--ts);font-size:12px} .chhead .cnt{margin-left:auto;font-family:var(--mono);font-weight:800;font-size:13px}
   .jrow{display:flex; align-items:center}
-  .jnode{display:flex; flex-direction:column; align-items:center; flex:0 0 auto; width:58px}
-  .jconn{flex:1; height:6px; border-radius:3px; min-width:12px}
-  .jcirc{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:17px;border:2px solid}
-  .jstar{font-size:10px; height:13px; line-height:13px; color:var(--gold)}
-  .jtag{font-size:8px; font-weight:800; color:var(--gold); margin-top:1px}
-  /* TRAIN */
-  .trainGrid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-  .tcard{border-radius:14px; padding:14px; background:linear-gradient(135deg,var(--p2),var(--p1)); border:1px solid var(--line); display:flex; gap:12px; align-items:center}
-  .tcard .ic{font-size:34px} .tcard .b{flex:1; min-width:0} .tcard h4{margin:0;font-size:15px;font-weight:800} .tcard p{margin:3px 0 0;font-size:11px;color:var(--ts);line-height:1.4}
-  .tcard .rec{font-size:10px;color:var(--gold);font-family:var(--mono);margin-top:4px}
-  .tcard .start{border:none;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a2107;font-weight:800;font-size:12px;padding:9px 15px;border-radius:9px;cursor:pointer;font-family:inherit}
+  .jnode{display:flex; flex-direction:column; align-items:center; flex:0 0 auto; width:70px}
+  .jconn{flex:1; height:6px; border-radius:3px; min-width:16px}
+  .jcirc{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px;border:2px solid}
+  .jstar{font-size:11px; height:14px; line-height:14px; color:var(--gold)}
+  .jtag{font-size:9px; font-weight:800; color:var(--gold); margin-top:2px}
 
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) scale(.9);z-index:99;background:rgba(6,12,26,.96);border:1px solid var(--gold);color:var(--gold);font-weight:800;font-size:13px;padding:10px 18px;border-radius:11px;opacity:0;transition:.2s;pointer-events:none}
+  /* ===== TRAIN ===== */
+  .trainGrid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .tcard{border-radius:14px; padding:16px; background:linear-gradient(135deg,var(--p2),var(--p1)); border:1px solid var(--line); display:flex; gap:13px; align-items:center}
+  .tcard .ic{font-size:38px} .tcard .b{flex:1; min-width:0} .tcard h4{margin:0;font-size:16px;font-weight:800} .tcard p{margin:4px 0 0;font-size:12px;color:var(--ts);line-height:1.4}
+  .tcard .rec{font-size:11px;color:var(--gold);font-family:var(--mono);margin-top:5px}
+  .tcard .start{border:none;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a2107;font-weight:800;font-size:13px;padding:10px 17px;border-radius:9px;cursor:pointer;font-family:inherit}
+
+  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) scale(.9);z-index:99;background:rgba(6,12,26,.96);border:1px solid var(--gold);color:var(--gold);font-weight:800;font-size:14px;padding:11px 20px;border-radius:11px;opacity:0;transition:.2s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
 </style>
 
-<div class="cap">
-  <div class="k">ChartArena · 가로 앱</div>
-  <h1>🖥️ 홈 · 랭킹 · 차고 (가로 3분할)</h1>
-  <p>레퍼런스처럼 <b style="color:var(--tp)">좌측 프로필 레일 + 메인</b> 구조. 차고에서 사고 장착하면 좌측·랭킹에 바로 반영.</p>
-  <div class="r">📱 스마트폰 가로(19.5:9) 비율 · 폭에 맞게 축소됩니다</div>
-</div>
-
 <div class="scaler" id="scaler"><div class="frame">
-  <!-- 좌측 레일 -->
-  <div class="rail">
-    <div class="brand">차트<span class="g">아레나</span></div>
-    <div class="avwrap">
-      <div class="ava" id="railAva"></div>
-      <div class="edit">✏️</div>
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="topbar">
+    <div class="logo"><span class="lm">📊</span><span>차트<span class="g">아레나</span></span></div>
+    <div class="tsp"></div>
+    <div class="curr">
+      <div class="pill coin"><span class="cico">$</span><span>12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
+      <div class="pill gem"><span class="cico">◆</span><span>2,380</span></div>
     </div>
-    <div class="nickrow"><input class="nick" id="nick" value="차트고수" maxlength="10" aria-label="닉네임"></div>
-    <div class="title" id="railTitle"></div>
-    <div class="chips"><span class="chip lv">Lv.12</span><span class="chip fire">🔥 7일</span></div>
-    <div class="assets"><div class="l">보유 자산</div><div class="v" id="railAmt">25,000 P</div></div>
-    <div class="nav" id="nav">
-      <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
-      <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
-      <a data-go="journey"><span class="ic">🗺️</span>여정</a>
-      <a data-go="train"><span class="ic">🥷</span>훈련</a>
-      <a data-go="garage"><span class="ic">🏎️</span>차고 · 꾸미기</a>
-      <a class="batt" href="quiz-battle.html"><span class="ic">⚔️</span>차트배틀 LIVE</a>
+    <div class="ticons">
+      <div class="ticon" data-toast="메일 — 준비 중">✉️</div>
+      <div class="ticon" data-toast="알림 — 준비 중">🔔<span class="dot"></span></div>
+      <div class="ticon" data-toast="설정 — 준비 중">⚙️</div>
     </div>
-    <div class="foot">포인트/자산은 가상 재화이며 환전되지 않습니다.</div>
   </div>
 
-  <!-- 메인 -->
-  <div class="main">
-    <div class="view on" id="v-home">
-      <div class="vh">🏠 홈</div>
-      <div class="rcards" id="rcards"></div>
-      <div class="tiles">
-        <div class="tile hero t-battle" data-href="quiz-battle.html"><div class="blob"></div><img class="art" src="assets/tile_battle.png" alt=""><h3>차트 배틀 LIVE</h3><p>4인 실시간 퀴즈쇼 대결</p></div>
-        <div class="tile t-journey" data-go="journey"><div class="blob"></div><img class="art" src="assets/tile_journey.png" alt=""><h3>여정</h3><p>챕터 지도 도전</p></div>
-        <div class="tile t-train" data-go="train"><div class="blob"></div><img class="art" src="assets/tile_train.png" alt=""><h3>훈련</h3><p>생존·도장·아레나</p></div>
-        <div class="tile t-garage" data-go="garage"><div class="blob"></div><img class="art" src="assets/car_rocket.png" alt=""><h3>차고 · 꾸미기</h3><p>캐릭터·자동차</p></div>
-        <div class="tile t-rank" data-go="rank"><div class="blob"></div><img class="art" src="assets/tile_rank.png" alt=""><h3>랭킹</h3><p>일 · 주 · 월</p></div>
+  <div class="body">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="side">
+      <div class="profcard">
+        <div class="ava" id="pAva"></div>
+        <div class="edit" id="pEdit">✏️</div>
       </div>
+      <div class="pname" id="pName">차트고수</div>
+      <div class="plevel"><span class="lv">Lv.12</span><div class="bar"><i></i></div><span class="pct">72%</span></div>
+      <div class="ppoints"><div class="l">보유 포인트</div><div class="v" id="pPoints">25,000 P</div></div>
+      <div class="nav">
+        <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
+        <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
+        <a data-go="garage"><span class="ic">🛒</span>상점</a>
+        <a data-toast="미션 — 준비 중"><span class="ic">📋</span>미션</a>
+        <a data-go="train"><span class="ic">🥷</span>훈련</a>
+        <a data-go="garage"><span class="ic">🎨</span>차트 · 꾸미기</a>
+      </div>
+      <a class="battlebtn" href="quiz-battle.html">⚔️ 차트 배틀 LIVE</a>
+      <div class="sfoot">본 앱은 교육용 모의 트레이딩 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.</div>
     </div>
 
-    <div class="view" id="v-rank">
-      <div class="vh">🏆 랭킹</div>
-      <div class="tabs" id="pTabs"></div>
-      <div class="tabs" id="mTabs" style="margin-bottom:14px"></div>
-      <div class="rankwrap"><div class="podium" id="podium"></div><div class="rlist" id="rlist"></div></div>
-    </div>
+    <!-- ===== MAIN ===== -->
+    <div class="main" id="mainScroll">
 
-    <div class="view" id="v-garage">
-      <div class="vh">🏎️ 차고 · 꾸미기</div>
-      <div class="gwrap">
-        <div class="gleft">
-          <div class="gprev"><div class="pv" id="gpv"></div><div class="nm" id="gpNick">차트고수</div><div class="tt" id="gpTitle"></div></div>
-          <div class="catcol" id="catbar"></div>
+      <!-- HOME -->
+      <div class="view on" id="v-home">
+        <div class="mh">📊 내 순위 현황</div>
+        <div class="statrow">
+          <div class="statgrp">
+            <div class="stat"><div class="top"><div class="ic" style="background:rgba(53,208,122,.14);color:var(--green)">📈</div><div class="t">주간 수익률</div></div><div class="rk">7위</div><div class="d up">▲ 2</div></div>
+            <div class="stat"><div class="top"><div class="ic" style="background:rgba(233,185,73,.14);color:var(--gold)">🪙</div><div class="t">월간 수익률</div></div><div class="rk">16위</div><div class="d fl">–</div></div>
+            <div class="stat"><div class="top"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="t">전체 순위</div></div><div class="rk">8위</div><div class="d dn">▼ 1</div></div>
+          </div>
+          <div class="timer"><div class="ic">🕐</div><div><div class="l">시즌 남은 기간</div><div class="v">12일 08:45:32</div></div></div>
         </div>
-        <div class="shop" id="shop"></div>
+
+        <div class="dash">
+          <div class="hero">
+            <div class="hhead"><h3>차트 배틀 LIVE</h3><span class="status">진행 중</span></div>
+            <div class="hsub">실시간으로 펼쳐지는 치열한 차트 배틀!</div>
+            <div class="himg"><img src="assets/tile_battle.png" alt="황소 vs 곰"></div>
+            <div class="hstats">
+              <div class="hstat"><div class="l">롱 포지션</div><div class="v up">58%</div></div>
+              <div class="hstat"><div class="l">참여자 수</div><div class="v">1,248명</div></div>
+              <div class="hstat"><div class="l">숏 포지션</div><div class="v dn">42%</div></div>
+            </div>
+            <a class="hbtn" href="quiz-battle.html">지금 참여하기</a>
+          </div>
+
+          <div class="rightcol">
+            <div class="cards2x2">
+              <div class="mcard m-mission" data-toast="미션 — 준비 중"><div class="glow" style="background:var(--blue)"></div><span class="emart">🎁</span><h4>미션</h4><p>일일 · 주간 미션</p><div class="cgo">미션 보기 ›</div></div>
+              <div class="mcard m-shop" data-go="garage"><div class="glow" style="background:var(--gold)"></div><span class="emart">💰</span><h4>상점</h4><p>아이템 · 꾸미기</p><div class="cgo">상점 바로가기 ›</div></div>
+              <div class="mcard m-deco" data-go="garage"><div class="glow" style="background:var(--purple)"></div><img class="art" src="assets/car_rocket.png" alt=""><h4>차트 · 꾸미기</h4><p>나만의 공간 꾸미기</p><div class="cgo">꾸미기 ›</div></div>
+              <div class="mcard m-rank" data-go="rank"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/tile_rank.png" alt=""><h4>랭킹</h4><p>최고의 트레이더는?</p><div class="cgo">랭킹 보기 ›</div></div>
+            </div>
+            <div class="recent">
+              <div class="rh"><h4>최근 활동</h4><span class="more" data-toast="최근 활동 — 준비 중">더보기 ›</span></div>
+              <div class="acts">
+                <div class="act"><div class="ic" style="color:var(--gold)">🏆</div><div><div class="n">배틀 보상 획득</div><div class="tm">10분 전</div></div><div class="m">+120 P</div></div>
+                <div class="act"><div class="ic" style="color:var(--green)">📈</div><div><div class="n">주간 미션 완료</div><div class="tm">30분 전</div></div><div class="m">+300 P</div></div>
+                <div class="act"><div class="ic" style="color:var(--blue)">🎖️</div><div><div class="n">랭킹 변동</div><div class="tm">1시간 전</div></div><div class="m up">▲ 2</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="view" id="v-journey">
-      <div class="vh">🗺️ 여정 <span class="jstars" id="jstars">⭐ 0/75</span></div>
-      <div id="chapters"></div>
-    </div>
+      <!-- RANKING -->
+      <div class="view" id="v-rank">
+        <div class="vh">🏆 랭킹</div>
+        <div class="tabs" id="pTabs"></div>
+        <div class="tabs" id="mTabs" style="margin-bottom:14px"></div>
+        <div class="rankwrap"><div class="podium" id="podium"></div><div class="rlist" id="rlist"></div></div>
+      </div>
 
-    <div class="view" id="v-train">
-      <div class="vh">🥷 훈련</div>
-      <div class="trainGrid" id="trainGrid"></div>
+      <!-- GARAGE / SHOP -->
+      <div class="view" id="v-garage">
+        <div class="vh">🛒 상점 · 꾸미기</div>
+        <div class="gwrap">
+          <div class="gleft">
+            <div class="gprev"><div class="pv" id="gpv"></div><div class="nm" id="gpNick">차트고수</div><div class="tt" id="gpTitle"></div></div>
+            <div class="catcol" id="catbar"></div>
+          </div>
+          <div class="shop" id="shop"></div>
+        </div>
+      </div>
+
+      <!-- JOURNEY (hidden entry, kept) -->
+      <div class="view" id="v-journey">
+        <div class="vh">🗺️ 여정 <span class="jstars" id="jstars">⭐ 0/75</span></div>
+        <div id="chapters"></div>
+      </div>
+
+      <!-- TRAIN -->
+      <div class="view" id="v-train">
+        <div class="vh">🥷 훈련</div>
+        <div class="trainGrid" id="trainGrid"></div>
+      </div>
+
     </div>
   </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <div class="bottomnav">
+    <a class="bnav on" data-go="home"><span class="bi">🏠</span>홈</a>
+    <a class="bnav" href="quiz-battle.html"><span class="bi">⚔️</span>배틀</a>
+    <a class="bnav" href="game.html"><span class="bi">📈</span>차트</a>
+    <span class="bnav" data-toast="뉴스 — 준비 중"><span class="bi">📰</span>뉴스</span>
+    <span class="bnav" data-toast="커뮤니티 — 준비 중"><span class="bi">👥</span>커뮤니티</span>
+    <span class="bnav" data-toast="설정 — 준비 중"><span class="bi">⚙️</span>설정</span>
+  </div>
+
 </div></div>
 <div class="toast" id="toast"></div>
 
@@ -223,7 +335,7 @@
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
-function fit(){var s=Math.min(1,(window.innerWidth-16)/1120);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(516*s)+'px';sc.style.width='1120px';}
+function fit(){var s=Math.min(1,(window.innerWidth-12)/1672);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(950*s)+'px';sc.style.width='1672px';}
 window.addEventListener('resize',fit);fit();
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1300);}
 var fmt=function(n){return Math.round(n).toLocaleString();};
@@ -247,32 +359,25 @@ function avaHTML(){ var ch=st.ch,car=st.car;
   return inner+'<span class="car">'+EMO[car]+'</span>';
 }
 function refreshProfile(){
-  $('railAva').innerHTML=avaHTML();
-  $('railAmt').textContent=fmt(getBal())+' P';
-  $('railTitle').textContent=st.title?('👑 '+st.title):'';
-  $('nick').value=st.nick;
+  var a=$('pAva'); if(a)a.innerHTML=avaHTML();
+  var p=$('pPoints'); if(p)p.textContent=fmt(getBal())+' P';
+  var n=$('pName'); if(n)n.textContent=st.nick;
 }
+function renderHome(){ refreshProfile(); }
 
 /* nav */
 function go(v){
-  document.querySelectorAll('.view').forEach(function(e){e.classList.remove('on');});
-  $('v-'+v).classList.add('on');
-  document.querySelectorAll('#nav a[data-go]').forEach(function(a){a.classList.toggle('on',a.dataset.go===v);});
-  document.querySelector('.main').scrollTop=0;
-  if(v==='home')renderHome(); if(v==='rank')renderRank(); if(v==='garage')renderGarage(); if(v==='journey')renderJourney(); if(v==='train')renderTrain();
+  var vs=document.querySelectorAll('.view'); for(var i=0;i<vs.length;i++)vs[i].classList.remove('on');
+  var el=$('v-'+v); if(el)el.classList.add('on');
+  var ns=document.querySelectorAll('.nav a[data-go], .bnav[data-go]'); for(var j=0;j<ns.length;j++)ns[j].classList.toggle('on', ns[j].dataset.go===v);
+  var m=$('mainScroll'); if(m)m.scrollTop=0;
+  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='journey')renderJourney(); else if(v==='train')renderTrain();
 }
 document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return;}
-  var h=e.target.closest('[data-href]'); if(h){location.href=h.dataset.href;return;}
-  var t=e.target.closest('[data-toast]'); if(t){toast(t.dataset.toast+' — 데모');return;}
+  var t=e.target.closest('[data-toast]'); if(t){toast(t.dataset.toast);return;}
 });
-$('nick').addEventListener('input',function(e){st.nick=e.target.value||'무명';saveHS();$('gpNick').textContent=st.nick;});
-
-/* HOME */
-var RC=[{ic:'📈',col:'#35D07A',t:'주간 수익률',rk:'7위',d:'▲2',dc:'up'},{ic:'🪙',col:'#4CA9FF',t:'주간 자산',rk:'16위',d:'—',dc:'fl'},{ic:'🎯',col:'#FF5C8A',t:'주간 승률',rk:'8위',d:'▼1',dc:'dn'}];
-function renderHome(){ refreshProfile();
-  $('rcards').innerHTML=RC.map(function(c){return '<div class="rc"><div class="ic" style="background:'+c.col+'22;border:1px solid '+c.col+'66;color:'+c.col+'">'+c.ic+'</div><div class="t">'+c.t+'</div><div class="rk">'+c.rk+'</div><div class="d '+c.dc+'">'+c.d+'</div></div>';}).join('');
-}
+var pe=$('pEdit'); if(pe)pe.addEventListener('click',function(){var v=prompt('닉네임 입력',st.nick); if(v){st.nick=v.slice(0,10);saveHS();refreshProfile();}});
 
 /* RANKING */
 var PER=[['day','일간'],['week','주간'],['month','월간']],MET=[['ret','수익률'],['assets','자산'],['win','승률']];
