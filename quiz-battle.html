@@ -1,0 +1,279 @@
+<title>차트아레나 — 차트배틀 (가로 퀴즈쇼)</title>
+<style>
+  :root{
+    --gold:#E9B949; --gold2:#F6D272; --green:#35D07A; --pink:#FF5C8A; --blue:#4CA9FF; --up:#F0616D; --down:#4C8DF6;
+    --sans:"Segoe UI",-apple-system,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+    --mono:"Cascadia Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:#05060d; color:#EAF0FA; font-family:var(--sans); min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; padding:16px 8px; overflow-x:hidden}
+  .cap{max-width:560px; text-align:center; margin-bottom:10px}
+  .cap .k{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#8A6D2B; font-weight:700}
+  .cap h1{margin:.3em 0 .1em; font-size:20px; font-weight:800}
+  .cap p{margin:0; color:#93A0BC; font-size:12.5px; line-height:1.55}
+  .rotate{margin-top:8px; font-size:11px; color:#5A6478}
+
+  .scaler{transform-origin:top center}
+  /* 가로 스튜디오 무대 (고정 크기 → JS로 화면폭에 맞춰 스케일) */
+  .frame{position:relative; width:940px; height:590px; border-radius:22px; overflow:hidden;
+    background:radial-gradient(120% 80% at 50% -10%, #1b3a6b 0%, #0c1a35 45%, #060d1e 100%);
+    box-shadow:0 30px 70px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
+  /* 스포트라이트 */
+  .spot{position:absolute; top:-40px; width:150px; height:340px; pointer-events:none; opacity:.5;
+    background:radial-gradient(closest-side at 50% 0,rgba(120,180,255,.5),transparent 75%); filter:blur(4px); transform:skewX(0)}
+  .spot.s1{left:6%} .spot.s2{left:30%} .spot.s3{left:62%} .spot.s4{right:6%}
+
+  .top{position:relative; z-index:2; display:flex; align-items:center; gap:12px; padding:14px 20px}
+  .logo{font-weight:900; font-size:20px; letter-spacing:.3px}
+  .logo .g{color:var(--gold)}
+  .live{font-size:11px; font-weight:900; color:#fff; background:#e5484d; padding:3px 9px; border-radius:6px; box-shadow:0 0 12px rgba(229,72,77,.6); animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.55}}
+  .round{margin-left:auto; font-family:var(--mono); font-weight:800; color:var(--gold); font-size:15px}
+  .endbtn{margin-left:12px; background:#123; border:1px solid #2a4b7a; color:#9fc3ff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer}
+
+  /* TV 스크린(차트) */
+  .tv{position:relative; z-index:2; margin:2px auto 0; width:600px; height:300px; border-radius:14px; padding:9px;
+    background:linear-gradient(180deg,#0c2244,#08152b); border:2px solid #2f5c9e;
+    box-shadow:0 0 26px -4px rgba(76,169,255,.5), 0 0 0 4px rgba(0,0,0,.3) inset}
+  #chart{width:100%; height:100%; display:block; border-radius:8px; background:#050c1c}
+  .tvtag{position:absolute; left:16px; top:16px; font-size:11px; color:#7fb0ff; font-family:var(--mono)}
+  .timer{position:absolute; right:16px; top:12px; text-align:center}
+  .timer .n{font-family:var(--mono); font-weight:900; font-size:30px; line-height:1; color:var(--gold); text-shadow:0 0 12px rgba(233,185,73,.6)}
+  .timer .b{width:88px; height:6px; margin-top:4px; border-radius:3px; background:#0a1a33; overflow:hidden}
+  .timer .b i{display:block; height:100%; background:linear-gradient(90deg,var(--green),var(--gold)); width:100%}
+  .verdict{position:absolute; left:50%; top:48%; transform:translate(-50%,-50%) scale(.7); opacity:0; transition:all .3s;
+    font-weight:900; font-size:34px; color:#fff; text-shadow:0 2px 14px #000, 0 0 26px rgba(233,185,73,.7); white-space:nowrap; z-index:3}
+  .verdict.show{opacity:1; transform:translate(-50%,-50%) scale(1)}
+
+  /* 단상 4개 */
+  .podiums{position:absolute; left:0; right:0; bottom:96px; z-index:2; display:flex; justify-content:center; gap:16px; padding:0 18px}
+  .pod{width:180px; text-align:center; position:relative}
+  .pod .ava{height:78px; display:flex; align-items:flex-end; justify-content:center; position:relative}
+  .pod .ava img{height:78px; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .pod .ava .em{font-size:52px; line-height:1; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .pod .pick{position:absolute; top:-6px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:900; padding:2px 10px; border-radius:999px; opacity:0; transition:all .2s}
+  .pod .pick.on{opacity:1}
+  .pick.L{background:rgba(53,208,122,.22); color:var(--green); border:1px solid var(--green)}
+  .pick.S{background:rgba(255,92,138,.22); color:var(--pink); border:1px solid var(--pink)}
+  .pick.W{background:rgba(233,185,73,.22); color:var(--gold); border:1px solid var(--gold)}
+  .pick.Q{background:#0a1a33; color:#5a7099; border:1px solid #24406e}
+  .desk{margin-top:2px; border-radius:10px 10px 6px 6px; padding:8px 6px 9px; background:linear-gradient(180deg,#16305a,#0b1c38); border:1px solid #2a4b7a; position:relative}
+  .desk.me{border-color:var(--gold); box-shadow:0 0 18px -4px rgba(233,185,73,.5)}
+  .desk .nm{font-size:12px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .desk .led{margin-top:5px; background:#020814; border:1px solid #0d1f3a; border-radius:6px; padding:4px 0;
+    font-family:var(--mono); font-weight:900; font-size:22px; color:var(--green); text-shadow:0 0 8px rgba(53,208,122,.7); letter-spacing:1px}
+  .desk .delta{position:absolute; right:6px; top:-14px; font-family:var(--mono); font-weight:900; font-size:14px; opacity:0; transition:all .5s}
+  .desk .crown{position:absolute; left:50%; top:-30px; transform:translateX(-50%); font-size:18px; opacity:0}
+  .desk.lead .crown{opacity:1}
+
+  /* 하단 컨트롤 (내 선택) */
+  .ctrl{position:absolute; left:0; right:0; bottom:0; z-index:4; height:88px; display:flex; align-items:center; gap:10px; padding:0 18px;
+    background:linear-gradient(0deg,rgba(6,12,26,.96),rgba(6,12,26,.55)); border-top:1px solid #1a2c4e}
+  .ctrl .lab{font-size:12px; color:#93A0BC; font-weight:700; margin-right:2px}
+  .dir{flex:1; max-width:150px; text-align:center; padding:12px 6px; border-radius:12px; cursor:pointer; border:2px solid transparent; background:#0e1c38; font-weight:900; font-size:16px}
+  .dir small{display:block; font-size:9px; font-weight:400; opacity:.75}
+  .dir.long{color:var(--green)} .dir.long.on{background:rgba(53,208,122,.2); border-color:var(--green); box-shadow:0 0 16px -3px rgba(53,208,122,.6)}
+  .dir.short{color:var(--pink)} .dir.short.on{background:rgba(255,92,138,.2); border-color:var(--pink); box-shadow:0 0 16px -3px rgba(255,92,138,.6)}
+  .dir.watch{color:var(--gold)} .dir.watch.on{background:rgba(233,185,73,.2); border-color:var(--gold); box-shadow:0 0 16px -3px rgba(233,185,73,.6)}
+  .levs{display:flex; gap:5px}
+  .lev{padding:8px 11px; border-radius:9px; background:#0e1c38; border:1px solid #24406e; color:#9fc3ff; font-weight:800; font-size:13px; cursor:pointer}
+  .lev.on{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:#3a2c07; border-color:transparent}
+  .go{margin-left:auto; border:none; cursor:pointer; font-family:inherit; color:#3a2c07; font-weight:900; font-size:15px; padding:13px 22px; border-radius:12px;
+    background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); box-shadow:0 6px 18px -4px rgba(233,185,73,.6)}
+  .go.next{background:linear-gradient(180deg,#8fd6ff,#4CA9FF); color:#04223f}
+  .go:disabled{background:#1a2c4e; color:#5a7099; box-shadow:none; cursor:default}
+  .msg{position:absolute; left:50%; bottom:100px; transform:translateX(-50%); z-index:5; background:rgba(6,12,26,.95); border:1px solid var(--gold);
+    color:var(--gold); font-weight:800; font-size:13px; padding:8px 16px; border-radius:10px; opacity:0; transition:.2s; pointer-events:none}
+  .msg.show{opacity:1}
+  @media (prefers-reduced-motion: reduce){ .live{animation:none} }
+</style>
+
+<div class="cap">
+  <div class="k">ChartArena · 차트배틀 LIVE</div>
+  <h1>📺 가로 퀴즈쇼 차트배틀</h1>
+  <p>4명이 단상에서 같은 차트로 대결! 롱/숏/관망을 고르면 <b style="color:#EAF0FA">미래가 공개</b>되고 점수판이 오르내립니다. (봇 3명 vs 나)</p>
+  <div class="rotate">📱 폰이면 가로로 돌려서 보세요 · 전체 화면이 폭에 맞게 축소됩니다</div>
+</div>
+
+<div class="scaler" id="scaler">
+<div class="frame">
+  <div class="spot s1"></div><div class="spot s2"></div><div class="spot s3"></div><div class="spot s4"></div>
+
+  <div class="top">
+    <div class="logo">차트<span class="g">아레나</span></div>
+    <span class="live">● LIVE</span>
+    <span class="round" id="round">ROUND 1 / 5</span>
+    <button class="endbtn" type="button" id="endbtn">종료</button>
+  </div>
+
+  <div class="tv">
+    <canvas id="chart"></canvas>
+    <div class="tvtag" id="tvtag">난이도 ◆◆◆◆◇</div>
+    <div class="timer"><div class="n" id="tnum">8</div><div class="b"><i id="tbar"></i></div></div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <div class="podiums" id="podiums"></div>
+
+  <div class="ctrl">
+    <span class="lab">내 선택</span>
+    <div class="dir long" data-dir="L" id="dL">↗ 롱<small>상승</small></div>
+    <div class="dir short" data-dir="S" id="dS">↘ 숏<small>하락</small></div>
+    <div class="dir watch" data-dir="W" id="dW">◎ 관망<small>보존</small></div>
+    <div class="levs" id="levs"></div>
+    <button class="go" id="go" type="button">확정 ▶</button>
+  </div>
+  <div class="msg" id="msg"></div>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* 화면폭에 맞춰 가로 무대 스케일 */
+function fit(){ var s=Math.min(1,(window.innerWidth-16)/940); var sc=$('scaler');
+  sc.style.transform='scale('+s+')'; sc.style.height=(590*s)+'px'; sc.style.width='940px'; }
+window.addEventListener('resize',fit); fit();
+
+/* 플레이어 (나 + 봇3) */
+var players=[
+  {name:'차트고수', shark:true, score:0, strat:'me', pick:null, lev:2, dp:0},
+  {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},
+  {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
+  {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0},
+];
+var ROUNDS=5, round=1, phase='pick', tleft=8, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
+
+/* 결정론 캔들 */
+function gen(seed){ var n=58,vis=48,s=seed,cs=[],p=0.3;
+  var rnd=function(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};
+  var trendUp=rnd()<0.5, base=(rnd()-0.5)*0.004;
+  for(var i=0;i<n;i++){var drift=base+(i>40?(trendUp?0.006:-0.006):(rnd()-0.5)*0.004);var op=p;p=Math.max(0.08,op+(rnd()-0.5)*0.02+drift);
+    cs.push([op,Math.max(op,p)+rnd()*0.008,Math.min(op,p)-rnd()*0.008,p,rnd()*0.7+0.3]);}
+  return {cs:cs,vis:vis,n:n}; }
+function sma(cl,per,up){var o=[],s=0;for(var i=0;i<up;i++){s+=cl[i];if(i>=per)s-=cl[i-per];o[i]=i>=per-1?s/per:null;}return o;}
+
+function drawChart(){
+  var cv=$('chart'),ctx=cv.getContext('2d'),r=cv.getBoundingClientRect(); if(r.width<2)return;
+  var dpr=window.devicePixelRatio||1; cv.width=r.width*dpr; cv.height=r.height*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  var W=r.width,H=r.height; ctx.clearRect(0,0,W,H);
+  var padL=8,axisW=44,plotR=W-axisW,pT=10,pB=H-14, cs=GD.cs,n=GD.n,vis=GD.vis,rev=gRev,cw=(plotR-padL)/n,cx=function(i){return padL+cw*(i+0.5);};
+  var cl=cs.map(function(c){return c[3];}),lo=1e9,hi=-1e9;
+  for(var i=0;i<rev;i++){if(cs[i][2]<lo)lo=cs[i][2];if(cs[i][1]>hi)hi=cs[i][1];}
+  var pad=(hi-lo)*0.12;lo-=pad;hi+=pad;var yOf=function(p){return pB-(p-lo)/(hi-lo)*(pB-pT);};
+  for(var g=0;g<=4;g++){var yy=pT+(pB-pT)*g/4;ctx.strokeStyle='rgba(40,70,120,.4)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(plotR,yy);ctx.stroke();
+    ctx.fillStyle='#5b7bb0';ctx.font='9px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText((hi-(hi-lo)*g/4).toFixed(3),plotR+4,yy);}
+  if(rev<n){var sx=cx(rev)-cw/2;ctx.fillStyle='rgba(233,185,73,.06)';ctx.fillRect(sx,pT,plotR-sx,pB-pT);
+    ctx.strokeStyle='rgba(233,185,73,.45)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(sx,pT);ctx.lineTo(sx,pB);ctx.stroke();ctx.setLineDash([]);
+    if(phase==='pick'){ctx.fillStyle='#E9B949';ctx.textAlign='center';ctx.fillText('미래 예측 구간',(sx+plotR)/2,pT+8);}}
+  var glow=function(col,arr,w){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.shadowColor=col;ctx.shadowBlur=5;ctx.beginPath();var st=false;for(var i=0;i<rev;i++){if(arr[i]==null)continue;var x=cx(i),y=yOf(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();ctx.shadowBlur=0;};
+  glow('#FFD54A',sma(cl,5,rev),1.3); glow('#4CC3FF',sma(cl,20,rev),1.3);
+  for(var i=0;i<rev;i++){var c=cs[i],up=c[3]>=c[0],col=up?'#F0616D':'#4C8DF6',x=cx(i);
+    ctx.strokeStyle=col;ctx.lineWidth=1;ctx.shadowColor=col;ctx.shadowBlur=3;ctx.beginPath();ctx.moveTo(x,yOf(c[1]));ctx.lineTo(x,yOf(c[2]));ctx.stroke();ctx.shadowBlur=0;
+    var bw=Math.max(2,cw*0.62),yo=yOf(c[0]),yc=yOf(c[3]);ctx.fillStyle=col;ctx.fillRect(x-bw/2,Math.min(yo,yc),bw,Math.max(1.5,Math.abs(yc-yo)));}
+  var entry=cs[vis-1][3],ey=yOf(entry);ctx.strokeStyle='rgba(233,185,73,.6)';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,ey);ctx.lineTo(plotR,ey);ctx.stroke();ctx.setLineDash([]);
+}
+
+/* 단상 렌더 */
+function renderPods(){
+  var lead=Math.max.apply(null,players.map(function(p){return p.score;}));
+  $('podiums').innerHTML=players.map(function(p,i){
+    var av=p.shark?'<img src="assets/char_shark.png" alt="">':'<span class="em">'+p.em+'</span>';
+    var pk=p.pick, reveal=(phase!=='pick'), known=(i===0||reveal)&&pk;   // 봇 선택은 공개 단계에서만
+    var pkc=known?pk:'Q', pklab=known?{L:'롱 ↗',S:'숏 ↘',W:'관망 ◎'}[pk]:'?';
+    return '<div class="pod">'
+      +'<div class="pick '+pkc+' on">'+pklab+'</div>'
+      +'<div class="ava">'+av+'</div>'
+      +'<div class="desk'+(i===0?' me':'')+(p.score===lead&&phase==='result'?' lead':'')+'">'
+        +'<div class="crown">👑</div>'
+        +'<div class="nm">'+(i===0?'⭐ ':'')+p.name+'</div>'
+        +'<div class="led">'+fmtScore(p.score)+'</div>'
+        +'<div class="delta" id="dl'+i+'"></div>'
+      +'</div></div>';
+  }).join('');
+}
+function fmtScore(v){ var s=(v<0?'-':'')+('000'+Math.abs(v)).slice(-4); return s; }
+
+/* 컨트롤 */
+function renderCtrl(){
+  ['L','S','W'].forEach(function(d){ $('d'+d).classList.toggle('on', mySel.dir===d); });
+  $('levs').innerHTML=[1,2,3].map(function(l){return '<div class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'">'+l+'배</div>';}).join('');
+  var go=$('go');
+  if(phase==='pick'){ go.className='go'; go.textContent='확정 ▶'; go.disabled=(mySel.dir===null); }
+  else if(phase==='result'){ go.className='go next'; go.textContent=(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶'); go.disabled=false; }
+  else { go.className='go'; go.disabled=true; go.textContent='공개 중…'; }
+}
+$('dL').onclick=function(){pick('L');}; $('dS').onclick=function(){pick('S');}; $('dW').onclick=function(){pick('W');};
+function pick(d){ if(phase!=='pick')return; mySel.dir=d; players[0].pick=d; renderCtrl(); renderPods(); }
+$('levs').onclick=function(e){ var l=e.target.closest('[data-lev]'); if(l&&phase==='pick'){mySel.lev=+l.dataset.lev; players[0].lev=mySel.lev; renderCtrl();} };
+$('go').onclick=function(){ if(phase==='pick'){ if(mySel.dir===null){toast('방향을 선택하세요');return;} lockIn(); } else if(phase==='result'){ nextRound(); } };
+$('endbtn').onclick=function(){ toast('데모 — 로비로'); };
+
+function toast(m){ var t=$('msg'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1200); }
+
+/* 봇 선택(공개 구간만 사용) */
+function botPick(p){
+  var cs=GD.cs,vis=GD.vis,cl=cs.map(function(c){return c[3];}),ma=sma(cl,20,vis),last=cl[vis-1],m=ma[vis-1]||last;
+  var up=last>=m, s=(round*7+p.name.length)%100;
+  if(p.strat==='trend') return up?'L':'S';
+  if(p.strat==='counter') return up?'S':'L';
+  return ['L','S','W'][s%3];
+}
+
+/* 라운드 시작 */
+function startRound(){
+  phase='pick'; GD=gen(round*99173+7); gRev=GD.vis; tleft=8; mySel={dir:null,lev:2};
+  players.forEach(function(p){p.pick=null;p.dp=0;});
+  $('round').textContent='ROUND '+round+' / '+ROUNDS;
+  $('tvtag').textContent='난이도 '+'◆'.repeat(3+(round%3))+'◇'.repeat(5-(3+(round%3)));
+  $('verdict').classList.remove('show');
+  renderPods(); renderCtrl(); drawChart(); $('tnum').textContent=tleft; $('tbar').style.width='100%';
+  if(tmr)clearInterval(tmr);
+  tmr=setInterval(function(){ tleft--; $('tnum').textContent=Math.max(0,tleft); $('tbar').style.width=(Math.max(0,tleft)/8*100)+'%';
+    if(tleft<=0){ clearInterval(tmr); if(phase==='pick') lockIn(); } },1000);
+}
+function lockIn(){
+  if(phase!=='pick')return; clearInterval(tmr); phase='reveal';
+  if(players[0].pick===null){ players[0].pick='W'; }
+  players.forEach(function(p,i){ if(i>0) p.pick=botPick(p); });
+  renderPods(); renderCtrl();
+  var target=GD.vis+8;
+  if(reduce){ gRev=target; finishRound(); return; }
+  if(revTimer)clearInterval(revTimer);
+  revTimer=setInterval(function(){ gRev++; drawChart(); if(gRev>=target){ clearInterval(revTimer); finishRound(); } },80);
+}
+function finishRound(){
+  gRev=GD.vis+8; drawChart();
+  var cs=GD.cs,vis=GD.vis,entry=cs[vis-1][3],exit=cs[vis-1+8][3];
+  players.forEach(function(p){ var sign=p.pick==='L'?1:(p.pick==='S'?-1:0);
+    var ret=sign*(exit-entry)/entry*100*p.lev; p.dp=Math.round(ret*3); p.score+=p.dp; });
+  phase='result'; renderPods(); renderCtrl();
+  // 델타 애니메이션
+  players.forEach(function(p,i){ var d=$('dl'+i); if(!d)return; if(p.dp===0){d.textContent='±0';d.style.color='#93A0BC';}
+    else{d.textContent=(p.dp>0?'+':'')+p.dp; d.style.color=p.dp>0?'#35D07A':'#FF5C8A';} d.style.opacity='1'; d.style.top='-26px'; });
+  // 판정 문구
+  var me=players[0], best=Math.max.apply(null,players.map(function(p){return p.dp;}));
+  var v=$('verdict'); v.textContent = me.dp>0?(me.dp>=best?'🔥 이번 판 1등!':'👍 수익!'):(me.dp<0?'💧 손실…':'😐 관망');
+  v.style.color = me.dp>0?'#35D07A':(me.dp<0?'#FF5C8A':'#E9B949'); v.classList.add('show');
+}
+function nextRound(){
+  if(round>=ROUNDS){ finalResult(); return; }
+  round++; startRound();
+}
+function finalResult(){
+  var ranked=players.slice().sort(function(a,b){return b.score-a.score;});
+  var v=$('verdict'); v.style.color='#E9B949';
+  v.textContent = ranked[0]===players[0]?'🏆 우승! 축하합니다':'🏆 우승: '+ranked[0].name;
+  v.classList.add('show');
+  var go=$('go'); go.className='go next'; go.textContent='🔄 다시 하기';
+  go.onclick=function(){ players.forEach(function(p){p.score=0;p.pick=null;p.dp=0;}); round=1; startRound(); go.onclick=function(){ if(phase==='pick'){if(mySel.dir===null){toast('방향을 선택하세요');return;}lockIn();}else if(phase==='result'){nextRound();} }; };
+}
+
+window.addEventListener('resize',drawChart);
+startRound();
+})();
+</script>
