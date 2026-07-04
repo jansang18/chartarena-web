@@ -64,14 +64,16 @@
   .rc .rk{font-size:22px; font-weight:900; margin-top:1px}
   .rc .d{font-size:11px; font-weight:800; font-family:var(--mono)}
   .up{color:var(--green)} .dn{color:var(--pink)} .fl{color:var(--ts)}
-  .tiles{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
-  .tile{position:relative; border-radius:16px; padding:15px; min-height:96px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.07)}
-  .tile.wide{grid-column:1/-1; min-height:74px}
-  .tile h3{margin:0; font-size:17px; font-weight:900; position:relative; z-index:1}
-  .tile p{margin:3px 0 0; font-size:11px; color:rgba(255,255,255,.72); position:relative; z-index:1}
+  .tiles{display:grid; grid-template-columns:1.28fr 1fr 1fr; grid-template-rows:146px 146px; gap:11px; margin-top:12px}
+  .tile{position:relative; border-radius:16px; padding:14px 15px; overflow:hidden; cursor:pointer; border:1px solid rgba(255,255,255,.07); display:flex; flex-direction:column}
+  .tile.hero{grid-row:1 / span 2; grid-column:1}
+  .tile h3{margin:0; font-size:15px; font-weight:900; position:relative; z-index:1}
+  .tile.hero h3{font-size:22px}
+  .tile p{margin:3px 0 0; font-size:11px; color:rgba(255,255,255,.72); position:relative; z-index:1; max-width:62%}
+  .tile.hero p{max-width:72%; font-size:12.5px}
   .tile .blob{position:absolute; width:150px;height:150px;border-radius:50%;right:-40px;bottom:-50px;filter:blur(6px);opacity:.5}
-  .tile img.art{position:absolute; right:-8px; bottom:-10px; height:118px; filter:drop-shadow(0 8px 14px rgba(0,0,0,.55)); z-index:1}
-  .tile.wide img.art{height:80px; right:8px; bottom:6px}
+  .tile img.art{position:absolute; right:-6px; bottom:-8px; height:86px; filter:drop-shadow(0 8px 14px rgba(0,0,0,.55)); z-index:1}
+  .tile.hero img.art{height:150px; right:-2px; bottom:-6px}
   .t-battle{background:linear-gradient(135deg,#0d3a34,#0b1b2a)} .t-battle .blob{background:var(--teal)}
   .t-journey{background:linear-gradient(135deg,#0e2a52,#0b1730)} .t-journey .blob{background:var(--blue)}
   .t-train{background:linear-gradient(135deg,#3a2410,#1b1428)} .t-train .blob{background:var(--orange)}
@@ -178,11 +180,11 @@
       <div class="vh">🏠 홈</div>
       <div class="rcards" id="rcards"></div>
       <div class="tiles">
-        <div class="tile t-battle" data-href="quiz-battle.html"><div class="blob"></div><img class="art" src="assets/tile_battle.png" alt=""><h3>차트 배틀 LIVE</h3><p>4인 퀴즈쇼 대결</p></div>
+        <div class="tile hero t-battle" data-href="quiz-battle.html"><div class="blob"></div><img class="art" src="assets/tile_battle.png" alt=""><h3>차트 배틀 LIVE</h3><p>4인 실시간 퀴즈쇼 대결</p></div>
         <div class="tile t-journey" data-go="journey"><div class="blob"></div><img class="art" src="assets/tile_journey.png" alt=""><h3>여정</h3><p>챕터 지도 도전</p></div>
         <div class="tile t-train" data-go="train"><div class="blob"></div><img class="art" src="assets/tile_train.png" alt=""><h3>훈련</h3><p>생존·도장·아레나</p></div>
-        <div class="tile t-garage" data-go="garage"><div class="blob"></div><img class="art" src="assets/car_rocket.png" alt=""><h3>차고 · 꾸미기</h3><p>캐릭터·자동차·칭호</p></div>
-        <div class="tile wide t-rank" data-go="rank"><div class="blob"></div><img class="art" src="assets/tile_rank.png" alt=""><h3>랭킹</h3><p>수익률 · 자산 · 승률 / 일 · 주 · 월</p></div>
+        <div class="tile t-garage" data-go="garage"><div class="blob"></div><img class="art" src="assets/car_rocket.png" alt=""><h3>차고 · 꾸미기</h3><p>캐릭터·자동차</p></div>
+        <div class="tile t-rank" data-go="rank"><div class="blob"></div><img class="art" src="assets/tile_rank.png" alt=""><h3>랭킹</h3><p>일 · 주 · 월</p></div>
       </div>
     </div>
 
