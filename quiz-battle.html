@@ -118,14 +118,14 @@
   <div class="top">
     <img class="blogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <span class="live">● LIVE</span>
-    <span class="round" id="round">ROUND 1 / 5</span>
+    <span class="round" id="round">ROUND 1 / 10</span>
     <button class="endbtn" type="button" id="endbtn">종료</button>
   </div>
 
   <div class="tv">
     <canvas id="chart"></canvas>
     <div class="tvtag" id="tvtag">난이도 ◆◆◆◆◇</div>
-    <div class="timer"><div class="n" id="tnum">8</div><div class="b"><i id="tbar"></i></div></div>
+    <div class="timer"><div class="n" id="tnum">15</div><div class="b"><i id="tbar"></i></div></div>
     <div class="verdict" id="verdict"></div>
   </div>
 
@@ -172,7 +172,7 @@ var players=[
   {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
   {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0},
 ];
-var ROUNDS=5, round=1, phase='pick', tleft=8, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
+var ROUNDS=10, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
 
 /* 결정론 캔들 */
 function gen(seed){ var n=58,vis=48,s=seed,cs=[],p=0.3;
@@ -252,14 +252,14 @@ function botPick(p){
 
 /* 라운드 시작 */
 function startRound(){
-  phase='pick'; GD=gen(Math.floor(Math.random()*2e9)+1); gRev=GD.vis; tleft=8; mySel={dir:null,lev:2};
+  phase='pick'; GD=gen(Math.floor(Math.random()*2e9)+1); gRev=GD.vis; tleft=15; mySel={dir:null,lev:2};
   players.forEach(function(p){p.pick=null;p.dp=0;});
   $('round').textContent='ROUND '+round+' / '+ROUNDS;
   $('tvtag').textContent='난이도 '+'◆'.repeat(3+(round%3))+'◇'.repeat(5-(3+(round%3)));
   $('verdict').classList.remove('show');
   renderPods(); renderCtrl(); drawChart(); $('tnum').textContent=tleft; $('tbar').style.width='100%';
   if(tmr)clearInterval(tmr);
-  tmr=setInterval(function(){ tleft--; $('tnum').textContent=Math.max(0,tleft); $('tbar').style.width=(Math.max(0,tleft)/8*100)+'%';
+  tmr=setInterval(function(){ tleft--; $('tnum').textContent=Math.max(0,tleft); $('tbar').style.width=(Math.max(0,tleft)/15*100)+'%';
     if(tleft<=0){ clearInterval(tmr); if(phase==='pick') lockIn(); } },1000);
 }
 function lockIn(){
