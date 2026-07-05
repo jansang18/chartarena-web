@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:type" content="website">
+<meta property="og:title" content="차트 퍼즐 퀘스트 — 차트아레나">
+<meta property="og:description" content="레벨을 깨는 차트 예측 퍼즐! 다음은 오른다? 내린다? 별을 모으고 월드를 정복하세요.">
+<meta property="og:image" content="https://jansang18.github.io/chartarena-web/assets/og.png">
+<title>차트 퍼즐 퀘스트 — 차트아레나</title>
+<style>
+  :root{
+    --bg:#070d1c; --p1:#0e1830; --p2:#16223e; --line:#22335a;
+    --gold:#E9B949; --gold2:#F6D272; --green:#35D07A; --blue:#4CA9FF; --pink:#FF5C8A; --purple:#B266FF; --teal:#2FE6C4; --orange:#FF9A3C; --red:#F0616D;
+    --tp:#EAF0FA; --ts:#93A0BC; --tm:#5A6478;
+    --sans:"Segoe UI",-apple-system,"Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+    --mono:"Cascadia Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{background:radial-gradient(130% 90% at 50% -10%,#12203c,#070d1c 60%);color:var(--tp);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px 40px}
+  /* top bar */
+  .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(7,13,28,.82);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top .home{display:flex;align-items:center;gap:6px;color:var(--ts);text-decoration:none;font-weight:800;font-size:14px;padding:7px 12px;border:1px solid var(--line);border-radius:10px;background:var(--p1)}
+  .top .home:hover{color:var(--tp)}
+  .top h1{margin:0;font-size:18px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:7px;flex:1;min-width:0}
+  .top .stat{display:flex;align-items:center;gap:6px;font-weight:900;font-family:var(--mono);font-size:15px;background:var(--p1);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+  .top .stat.g{color:var(--gold)} .top .stat.s{color:var(--gold2)}
+  /* ===== MAP ===== */
+  .maphd{text-align:center;padding:22px 10px 6px}
+  .maphd h2{margin:0;font-size:26px;font-weight:900;letter-spacing:-.5px}
+  .maphd p{margin:6px 0 0;color:var(--ts);font-size:13.5px}
+  .world{margin:18px 0;border:1px solid var(--wl,var(--line));border-radius:20px;padding:16px 16px 20px;background:linear-gradient(160deg,var(--wa,#101b34),#0b1428 75%);position:relative;overflow:hidden}
+  .world::before{content:"";position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:var(--wc,#4CA9FF);opacity:.10;filter:blur(20px)}
+  .world .wh{display:flex;align-items:center;gap:11px;margin-bottom:14px;position:relative;z-index:1}
+  .world .wemo{font-size:30px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5))}
+  .world .wnm{font-size:18px;font-weight:900}
+  .world .wsub{font-size:12px;color:var(--ts);font-weight:700}
+  .world .wstar{margin-left:auto;font-size:13px;font-weight:900;color:var(--gold);font-family:var(--mono)}
+  .levels{display:flex;flex-wrap:wrap;gap:14px 18px;position:relative;z-index:1}
+  .lv{width:96px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+  .lv .disc{width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;position:relative;
+    background:radial-gradient(circle at 50% 35%,var(--wc,#4CA9FF),#0a1428);border:3px solid var(--wc,#4CA9FF);box-shadow:0 6px 16px -6px rgba(0,0,0,.7)}
+  .lv.locked .disc{background:#0e1830;border-color:#26324f;color:var(--tm);box-shadow:none}
+  .lv.locked{cursor:default}
+  .lv.boss .disc{border-radius:18px;font-size:26px}
+  .lv.cur .disc{animation:pulse 1.3s ease-in-out infinite}
+  .lv.cur .disc::after{content:"";position:absolute;inset:-8px;border-radius:inherit;border:2px solid var(--wc,#4CA9FF);opacity:.5;animation:ring 1.3s ease-out infinite}
+  @keyframes pulse{50%{transform:scale(1.07)}}
+  @keyframes ring{0%{transform:scale(.9);opacity:.6}100%{transform:scale(1.35);opacity:0}}
+  .lv .nm{font-size:11px;color:var(--ts);font-weight:700}
+  .lv .stars{font-size:12px;letter-spacing:1px;line-height:1;height:12px}
+  .lv .stars .on{color:var(--gold)} .lv .stars .off{color:#2b3757}
+  .lv .cur-tag{font-size:10px;font-weight:900;color:#081018;background:var(--wc,#4CA9FF);border-radius:6px;padding:2px 7px;margin-top:1px}
+  /* ===== PLAY ===== */
+  #play{display:none;max-width:760px;margin:0 auto;padding:14px 16px 40px}
+  #play.on{display:block}
+  .phd{display:flex;align-items:center;gap:10px;margin:6px 0 12px}
+  .phd .back{color:var(--ts);background:var(--p1);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+  .phd .ptitle{font-weight:900;font-size:16px}
+  .phd .pmeta{margin-left:auto;font-size:12.5px;color:var(--ts);font-weight:700}
+  .rdots{display:flex;gap:6px;margin:0 0 10px}
+  .rdots i{flex:1;height:6px;border-radius:4px;background:#1a2540}
+  .rdots i.ok{background:var(--green)} .rdots i.no{background:var(--red)} .rdots i.now{background:var(--gold)}
+  .qbox{background:linear-gradient(160deg,#0f1c38,#0b1428);border:1px solid var(--line);border-radius:18px;padding:12px 12px 14px;position:relative;overflow:hidden}
+  .qtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .qtop .ttl{font-size:15px;font-weight:900}
+  .combo{font-size:13px;font-weight:900;color:var(--orange);font-family:var(--mono);opacity:0;transition:.2s;transform:scale(.8)}
+  .combo.show{opacity:1;transform:scale(1)}
+  .chartwrap{position:relative;height:300px;border-radius:14px;overflow:hidden;background:#08101f;border:1px solid #16223e}
+  canvas#pchart{width:100%;height:100%;display:block}
+  .verdict{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.6);font-size:44px;font-weight:900;opacity:0;pointer-events:none;text-shadow:0 4px 20px rgba(0,0,0,.6);z-index:5}
+  .verdict.show{animation:pop .5s cubic-bezier(.2,1.3,.4,1) forwards}
+  @keyframes pop{60%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-58%) scale(1);opacity:1}}
+  .ans{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .ans button{border:none;border-radius:16px;padding:18px 10px;font-family:inherit;font-weight:900;font-size:20px;cursor:pointer;color:#081018;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s}
+  .ans button:active{transform:translateY(2px) scale(.98)}
+  .ans .up{background:linear-gradient(180deg,#63e39b,#2bb673)}
+  .ans .dn{background:linear-gradient(180deg,#ff8aa6,#f0616d)}
+  .ans button .sub{font-size:12px;font-weight:800;opacity:.85}
+  .ans button:disabled{opacity:.45;cursor:default}
+  .contbar{margin-top:12px;display:none}
+  .contbar.on{display:block}
+  .reveal-msg{text-align:center;font-size:13.5px;color:var(--ts);font-weight:700;margin:2px 0 10px;min-height:18px}
+  .contbtn{width:100%;border:none;border-radius:14px;padding:15px;font-family:inherit;font-weight:900;font-size:16px;cursor:pointer;color:#081018;background:linear-gradient(90deg,#8fd6ff,#4CA9FF)}
+  /* result overlay */
+  .ov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(4,8,18,.72);backdrop-filter:blur(4px);padding:20px}
+  .ov.on{display:flex}
+  .card{width:min(420px,92vw);background:linear-gradient(165deg,#15233f,#0c1730);border:1px solid var(--line);border-radius:22px;padding:26px 22px;text-align:center;box-shadow:0 30px 80px -20px #000}
+  .card .big{font-size:22px;font-weight:900}
+  .card .rstars{font-size:44px;letter-spacing:6px;margin:14px 0 6px}
+  .card .rstars .on{color:var(--gold);text-shadow:0 3px 12px rgba(233,185,73,.5)} .card .rstars .off{color:#2b3757}
+  .card .rline{color:var(--ts);font-size:14px;margin:6px 0}
+  .card .reward{font-family:var(--mono);font-weight:900;color:var(--gold);font-size:18px;margin:6px 0 16px}
+  .card .btns{display:flex;flex-direction:column;gap:9px}
+  .card button{border:none;border-radius:13px;padding:13px;font-family:inherit;font-weight:900;font-size:15px;cursor:pointer}
+  .card .prim{color:#081018;background:linear-gradient(90deg,#8fd6ff,#4CA9FF)}
+  .card .sec{color:var(--tp);background:var(--p1);border:1px solid var(--line)}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;display:none}
+  .foot{text-align:center;color:var(--tm);font-size:10.5px;line-height:1.5;margin-top:26px}
+  @media(max-width:540px){ .lv{width:calc(33.3% - 12px)} .lv .disc{width:58px;height:58px;font-size:19px} .maphd h2{font-size:22px} }
+</style>
+</head>
+<body>
+<div class="top">
+  <a class="home" href="index.html">← 홈</a>
+  <h1>🧩 차트 퍼즐 퀘스트</h1>
+  <div class="stat s" id="tStars">⭐ 0</div>
+  <div class="stat g" id="tPts">💰 0</div>
+</div>
+
+<!-- MAP -->
+<div id="map" class="wrap">
+  <div class="maphd">
+    <h2>월드를 정복하라! 🗺️</h2>
+    <p>차트를 보고 <b style="color:var(--green)">오른다</b> / <b style="color:var(--pink)">내린다</b> 를 맞혀 별을 모으세요. 실제 코인 차트로 만든 퍼즐이에요.</p>
+  </div>
+  <div id="worlds"></div>
+  <div class="foot">본 앱은 교육용 모의 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.<br>차트는 과거 실데이터이며 특정 종목의 매수·매도 추천이 아닙니다.</div>
+</div>
+
+<!-- PLAY -->
+<div id="play">
+  <div class="phd">
+    <button class="back" id="pback" type="button">← 맵</button>
+    <div class="ptitle" id="pTitle">레벨</div>
+    <div class="pmeta" id="pMeta"></div>
+  </div>
+  <div class="rdots" id="rdots"></div>
+  <div class="qbox">
+    <div class="qtop"><div class="ttl">이 차트, 다음은? 📈</div><div class="combo" id="combo"></div></div>
+    <div class="chartwrap"><canvas id="pchart"></canvas><div class="verdict" id="verdict"></div></div>
+    <div class="ans">
+      <button class="up" id="bUp" type="button">📈 오른다<span class="sub">UP</span></button>
+      <button class="dn" id="bDn" type="button">📉 내린다<span class="sub">DOWN</span></button>
+    </div>
+    <div class="contbar" id="contbar">
+      <div class="reveal-msg" id="revealMsg"></div>
+      <button class="contbtn" id="contbtn" type="button">다음 ›</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="ov" id="ov">
+  <div class="card">
+    <div class="big" id="ovTitle">레벨 클리어!</div>
+    <div class="rstars" id="ovStars"></div>
+    <div class="rline" id="ovLine"></div>
+    <div class="reward" id="ovReward"></div>
+    <div class="btns">
+      <button class="prim" id="ovNext" type="button">다음 레벨 ›</button>
+      <button class="sec" id="ovRetry" type="button">다시 도전</button>
+      <button class="sec" id="ovMap" type="button">맵으로</button>
+    </div>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script src="charts.js"></script>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var CH = (window.CHARTS && window.CHARTS.length) ? window.CHARTS : [];
+/* ---------- 저장 ---------- */
+var PK='chartarena_puzzle_v1', GS='chartarena_web_v1';
+function lj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return{};}}
+var PS=lj(PK); if(!PS.stars)PS.stars={};
+function savePS(){try{localStorage.setItem(PK,JSON.stringify(PS));}catch(e){}}
+function getBal(){var g=lj(GS);return typeof g.balance==='number'?g.balance:25000;}
+function addBal(v){var g=lj(GS);g.balance=(typeof g.balance==='number'?g.balance:25000)+v;localStorage.setItem(GS,JSON.stringify(g));}
+var fmt=function(n){return Math.round(n).toLocaleString();};
+
+/* ---------- 월드 정의 ---------- */
+var WORLDS=[
+  {id:'w0',emo:'🌱',nm:'새싹 마을',sub:'아주 쉬움',c:'#35D07A',thr:0.035,H:7},
+  {id:'w1',emo:'🌊',nm:'파도 해변',sub:'쉬움',c:'#4CA9FF',thr:0.026,H:6},
+  {id:'w2',emo:'🏜️',nm:'모래 사막',sub:'보통',c:'#FF9A3C',thr:0.019,H:6},
+  {id:'w3',emo:'🏔️',nm:'눈보라 설산',sub:'어려움',c:'#2FE6C4',thr:0.014,H:5},
+  {id:'w4',emo:'🌋',nm:'용암 화산',sub:'매우 어려움',c:'#F0616D',thr:0.010,H:5},
+  {id:'w5',emo:'🚀',nm:'우주 정거장',sub:'마스터',c:'#B266FF',thr:0.007,H:4}
+];
+var LVW=5, ROUNDS=5; // 월드당 5레벨, 레벨당 5라운드 (5번째=보스)
+function lvId(w,l){return w+'_'+l;}
+function isBoss(l){return l===LVW-1;}
+function starsOf(id){return PS.stars[id]||0;}
+function unlocked(wi,li){ if(wi===0&&li===0)return true;
+  if(li>0) return starsOf(lvId(wi,li-1))>0;
+  return starsOf(lvId(wi-1,LVW-1))>0; } // 이전 월드 보스 클리어로 다음 월드 오픈
+function totalStars(){var s=0;for(var k in PS.stars)s+=PS.stars[k];return s;}
+function maxStars(){return WORLDS.length*LVW*3;}
+
+/* ---------- 화면 전환 ---------- */
+function show(which){ $('map').style.display=which==='map'?'':'none'; $('play').classList.toggle('on',which==='play'); if(which==='map'){renderMap();window.scrollTo(0,0);} }
+
+/* ---------- 맵 ---------- */
+function renderMap(){
+  $('tStars').textContent='⭐ '+totalStars();
+  $('tPts').textContent='💰 '+fmt(getBal());
+  var html='';
+  WORLDS.forEach(function(w,wi){
+    var got=0,tot=LVW*3; for(var l=0;l<LVW;l++)got+=starsOf(lvId(wi,l));
+    var lvs='';
+    for(var li=0;li<LVW;li++){
+      var id=lvId(wi,li),st=starsOf(id),un=unlocked(wi,li),boss=isBoss(li);
+      var cur = un && st===0; // 다음 도전 레벨
+      var cls='lv'+(un?'':' locked')+(boss?' boss':'')+(cur?' cur':'');
+      var inner = un ? (boss?'👑':(li+1)) : '🔒';
+      var stars='<span class="'+(st>=1?'on':'off')+'">★</span><span class="'+(st>=2?'on':'off')+'">★</span><span class="'+(st>=3?'on':'off')+'">★</span>';
+      lvs+='<div class="'+cls+'" '+(un?'data-w="'+wi+'" data-l="'+li+'"':'')+'>'
+        +'<div class="disc">'+inner+'</div>'
+        +(cur?'<div class="cur-tag">도전!</div>':'<div class="stars">'+stars+'</div>')
+        +'<div class="nm">'+(boss?'보스':('레벨 '+(li+1)))+'</div></div>';
+    }
+    var open = wi===0 || starsOf(lvId(wi-1,LVW-1))>0;
+    html+='<div class="world" style="--wc:'+w.c+';--wl:'+w.c+'44;--wa:'+w.c+'14">'
+      +'<div class="wh"><span class="wemo">'+(open?w.emo:'🔒')+'</span><div><div class="wnm">'+w.nm+'</div><div class="wsub">'+w.sub+(open?'':' · 이전 월드 보스를 깨면 열려요')+'</div></div><div class="wstar">⭐ '+got+'/'+tot+'</div></div>'
+      +'<div class="levels">'+lvs+'</div></div>';
+  });
+  $('worlds').innerHTML=html;
+}
+$('worlds').addEventListener('click',function(e){ var el=e.target.closest('.lv[data-w]'); if(!el)return; startLevel(+el.dataset.w,+el.dataset.l); });
+
+/* ---------- 라운드 데이터 ---------- */
+function pickRound(w){
+  if(!CH.length) return null;
+  for(var t=0;t<60;t++){
+    var c=CH[Math.floor(Math.random()*CH.length)]; var cs=c.cs; if(!cs||cs.length<70) continue;
+    var E=46+Math.floor(Math.random()*12), H=w.H;
+    if(E+H>=cs.length-1) continue;
+    var a=cs[E][3], b=cs[E+H][3]; var chg=b/a-1;
+    if(Math.abs(chg)<w.thr) continue;
+    return {c:c, E:E, H:H, up:chg>0, chg:chg};
+  }
+  // 폴백: 아무거나
+  var c2=CH[Math.floor(Math.random()*CH.length)], E2=52, H2=w.H;
+  return {c:c2,E:E2,H:H2,up:c2.cs[E2+H2][3]>c2.cs[E2][3],chg:c2.cs[E2+H2][3]/c2.cs[E2][3]-1};
+}
+
+/* ---------- 차트 그리기 ---------- */
+function drawChart(reveal){
+  var cv=$('pchart'),ctx=cv.getContext('2d'),r=cv.getBoundingClientRect(); if(r.width<2)return;
+  var dpr=window.devicePixelRatio||1; cv.width=r.width*dpr; cv.height=r.height*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+  var W=r.width,H=r.height; ctx.clearRect(0,0,W,H);
+  var rd=CUR.round, cs=rd.c.cs, from=Math.max(0,rd.E-44), qto=rd.E+1, rto=reveal?rd.E+rd.H+1:qto;
+  var padL=8,axisW=40,plotR=W-axisW,pT=12,pB=H-14;
+  var scaleTo = reveal? rto : qto;
+  var lo=1e9,hi=-1e9; for(var i=from;i<scaleTo;i++){ if(cs[i][2]<lo)lo=cs[i][2]; if(cs[i][1]>hi)hi=cs[i][1]; }
+  var pad=(hi-lo)*0.12||1; lo-=pad; hi+=pad;
+  var span=Math.max(1,(rd.E+rd.H+1)-from);
+  var cw=(plotR-padL)/span, cx=function(i){return padL+cw*(i-from+0.5);}, yOf=function(p){return pB-(p-lo)/(hi-lo)*(pB-pT);};
+  // grid
+  for(var g=0;g<=3;g++){var yy=pT+(pB-pT)*g/3;ctx.strokeStyle='rgba(40,70,120,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(plotR,yy);ctx.stroke();}
+  // future zone shade
+  var zx=cx(rd.E)+cw/2;
+  ctx.fillStyle='rgba(233,185,73,.06)';ctx.fillRect(zx,pT,plotR-zx,pB-pT);
+  ctx.strokeStyle='rgba(233,185,73,.4)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(zx,pT);ctx.lineTo(zx,pB);ctx.stroke();ctx.setLineDash([]);
+  if(!reveal){ctx.fillStyle='rgba(233,185,73,.6)';ctx.font='700 11px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='center';ctx.fillText('다음은?',(zx+plotR)/2,pT+14);}
+  // candles
+  var upc='#35D07A',dnc='#F0616D',upf='rgba(53,208,122,.9)',dnf='rgba(240,97,109,.9)';
+  var drawTo=reveal?rto:qto;
+  for(var k=from;k<drawTo;k++){ var o=cs[k][0],hg=cs[k][1],lw=cs[k][2],cl=cs[k][3],x=cx(k);
+    var isFut=k>rd.E; var up=cl>=o; var col=up?upc:dnc, fil=up?upf:dnf;
+    if(isFut){ col=up?'#8fe3b0':'#ff9db0'; fil=col; }
+    ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,yOf(hg));ctx.lineTo(x,yOf(lw));ctx.stroke();
+    var bw=Math.max(1.5,cw*0.62),y1=yOf(o),y2=yOf(cl),bh=Math.max(1,Math.abs(y2-y1));
+    ctx.fillStyle=fil;ctx.fillRect(x-bw/2,Math.min(y1,y2),bw,bh);
+  }
+  // entry dot
+  ctx.fillStyle='#E9B949';ctx.beginPath();ctx.arc(cx(rd.E),yOf(cs[rd.E][3]),3.2,0,6.29);ctx.fill();
+  // axis labels
+  ctx.fillStyle='#5b7bb0';ctx.font='9px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';ctx.textBaseline='middle';
+  for(var g2=0;g2<=3;g2++){var yy2=pT+(pB-pT)*g2/3;ctx.fillText((hi-(hi-lo)*g2/3).toFixed(1),plotR+3,yy2);}
+}
+
+/* ---------- 레벨 진행 ---------- */
+var CUR={wi:0,li:0,w:null,round:null,ri:0,correct:0,combo:0,results:[],answered:false};
+function startLevel(wi,li){
+  CUR={wi:wi,li:li,w:WORLDS[wi],round:null,ri:0,correct:0,combo:0,results:[],answered:false};
+  $('pTitle').textContent=WORLDS[wi].emo+' '+WORLDS[wi].nm+' · '+(isBoss(li)?'👑 보스':('레벨 '+(li+1)));
+  show('play'); nextRound();
+}
+function renderDots(){ var h=''; for(var i=0;i<ROUNDS;i++){ var c=CUR.results[i]; h+='<i class="'+(c===true?'ok':c===false?'no':(i===CUR.ri?'now':''))+'"></i>'; } $('rdots').innerHTML=h; }
+function nextRound(){
+  CUR.round=pickRound(CUR.w); CUR.answered=false;
+  $('pMeta').textContent='라운드 '+(CUR.ri+1)+' / '+ROUNDS;
+  renderDots();
+  $('contbar').classList.remove('on'); $('verdict').classList.remove('show'); $('verdict').textContent='';
+  $('bUp').disabled=false; $('bDn').disabled=false;
+  var cm=$('combo'); if(CUR.combo>=2){cm.textContent='🔥 '+CUR.combo+' 콤보!';cm.classList.add('show');}else cm.classList.remove('show');
+  drawChart(false);
+}
+function answer(guessUp){
+  if(CUR.answered||!CUR.round)return; CUR.answered=true;
+  $('bUp').disabled=true; $('bDn').disabled=true;
+  var ok=(guessUp===CUR.round.up);
+  CUR.results[CUR.ri]=ok;
+  if(ok){CUR.correct++;CUR.combo++;} else {CUR.combo=0;}
+  drawChart(true); renderDots();
+  var v=$('verdict'); v.textContent=ok?'✅':'❌'; v.style.color=ok?'var(--green)':'var(--red)'; v.classList.add('show');
+  if(ok)burst();
+  var pct=(CUR.round.chg*100); var dir=CUR.round.up?'올랐어요 ▲':'내렸어요 ▼';
+  $('revealMsg').innerHTML=(ok?'<b style="color:var(--green)">정답!</b> ':'<b style="color:var(--red)">아쉬워요!</b> ')
+    +'다음 '+CUR.round.H+'칸 동안 <b>'+Math.abs(pct).toFixed(1)+'%</b> '+dir
+    +' <span style="color:var(--tm)">('+CUR.round.c.sym+' '+CUR.round.c.tf+')</span>';
+  $('contbtn').textContent = (CUR.ri>=ROUNDS-1)?'결과 보기 ›':'다음 ›';
+  $('contbar').classList.add('on');
+}
+$('bUp').onclick=function(){answer(true);}; $('bDn').onclick=function(){answer(false);};
+$('contbtn').onclick=function(){ if(CUR.ri>=ROUNDS-1){finishLevel();} else {CUR.ri++;nextRound();} };
+$('pback').onclick=function(){show('map');};
+
+function finishLevel(){
+  var id=lvId(CUR.wi,CUR.li), c=CUR.correct;
+  var st = c>=ROUNDS?3 : c===ROUNDS-1?2 : c>=ROUNDS-2?1 : 0; // 5→3,4→2,3→1,else 0
+  var prev=starsOf(id), reward=0;
+  if(st>prev){ reward=(st-prev)*300 + (st===3?200:0); addBal(reward); PS.stars[id]=st; savePS(); }
+  var pass=st>0;
+  $('ovTitle').textContent = pass?(st===3?'⭐ 퍼펙트 클리어!':'레벨 클리어!'):'조금 아쉬워요';
+  $('ovStars').innerHTML='<span class="'+(st>=1?'on':'off')+'">★</span><span class="'+(st>=2?'on':'off')+'">★</span><span class="'+(st>=3?'on':'off')+'">★</span>';
+  $('ovLine').textContent = c+' / '+ROUNDS+' 정답'+(pass?'':' · 3개 이상 맞히면 클리어!');
+  $('ovReward').textContent = reward>0?('+'+fmt(reward)+' P 획득! 💰'):(pass?'별 갱신 없음':'');
+  var nextLi=CUR.li+1, hasNext = nextLi<LVW || CUR.wi+1<WORLDS.length;
+  $('ovNext').style.display = (pass&&hasNext)?'':'none';
+  $('ov').classList.add('on');
+  if(pass&&st===3)bigBurst();
+}
+$('ovMap').onclick=function(){$('ov').classList.remove('on');show('map');};
+$('ovRetry').onclick=function(){$('ov').classList.remove('on');startLevel(CUR.wi,CUR.li);};
+$('ovNext').onclick=function(){ $('ov').classList.remove('on');
+  var nl=CUR.li+1, nw=CUR.wi;
+  if(nl>=LVW){nw++;nl=0;}
+  if(nw<WORLDS.length && unlocked(nw,nl)) startLevel(nw,nl); else show('map');
+};
+
+/* ---------- 컨페티 ---------- */
+var cvC=$('confetti'),cx2=cvC.getContext('2d'),parts=[],craf=null;
+function sizeC(){cvC.width=innerWidth;cvC.height=innerHeight;}
+function spawn(n,cx0,cy0,spread){ for(var i=0;i<n;i++){ var a=Math.random()*Math.PI*2, sp=spread*(0.4+Math.random());
+  parts.push({x:cx0,y:cy0,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-4,g:0.22+Math.random()*0.1,life:60+Math.random()*30,
+    c:['#E9B949','#35D07A','#4CA9FF','#FF5C8A','#B266FF','#2FE6C4'][i%6],s:4+Math.random()*5,rot:Math.random()*6,vr:(Math.random()-.5)*0.4}); } }
+function runC(){ cx2.clearRect(0,0,cvC.width,cvC.height); var alive=false;
+  for(var i=0;i<parts.length;i++){var p=parts[i]; if(p.life<=0)continue; alive=true; p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life--;
+    cx2.save();cx2.translate(p.x,p.y);cx2.rotate(p.rot);cx2.fillStyle=p.c;cx2.globalAlpha=Math.max(0,Math.min(1,p.life/25));cx2.fillRect(-p.s/2,-p.s/2,p.s,p.s*1.6);cx2.restore(); }
+  if(alive){craf=requestAnimationFrame(runC);} else {cvC.style.display='none';parts=[];craf=null;} }
+function startC(){ sizeC();cvC.style.display='block'; if(!craf)craf=requestAnimationFrame(runC); }
+function burst(){ var r=$('pchart').getBoundingClientRect(); spawn(36,r.left+r.width/2,r.top+r.height*0.4,7); startC(); }
+function bigBurst(){ spawn(120,innerWidth/2,innerHeight*0.4,11); spawn(60,innerWidth*0.25,innerHeight*0.5,9); spawn(60,innerWidth*0.75,innerHeight*0.5,9); startC(); }
+addEventListener('resize',function(){ if($('play').classList.contains('on'))drawChart(CUR.answered); });
+
+/* ---------- 시작 ---------- */
+if(!CH.length){ $('worlds').innerHTML='<div style="text-align:center;color:var(--ts);padding:40px">차트를 불러오지 못했어요. 새로고침 해주세요.</div>'; }
+renderMap();
+})();
+</script>
+</body>
+</html>

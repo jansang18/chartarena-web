@@ -400,7 +400,7 @@
         <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
         <a data-go="garage"><span class="ic">🛒</span>상점</a>
         <a data-go="guild"><span class="ic">🛡️</span>길드</a>
-        <a data-go="journey"><span class="ic">🗺️</span>여정</a>
+        <a href="puzzle.html"><span class="ic">🧩</span>퍼즐</a>
         <a data-go="train"><span class="ic">🥷</span>훈련</a>
       </div>
       <div class="sfoot">본 앱은 교육용 모의 트레이딩 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.</div>
@@ -433,15 +433,15 @@
           </div>
 
           <div class="jhero">
-            <div class="hhead"><h3>🗺️ 여정 퀘스트</h3><span class="jbadge">🎮 혼자 플레이</span></div>
-            <div class="hsub">챕터를 깨며 배우는 나만의 차트 마스터 여정</div>
+            <div class="hhead"><h3>🧩 퍼즐 퀘스트</h3><span class="jbadge">🎮 혼자 플레이</span></div>
+            <div class="hsub">차트 보고 ↑/↓ 맞히기! 레벨 깨고 별 모으는 차트 퍼즐</div>
             <div class="jpath" id="jHeroPath"></div>
             <div class="hstats">
-              <div class="hstat"><div class="l">획득 별</div><div class="v" id="jHeroStars">0/75</div></div>
-              <div class="hstat"><div class="l">진행률</div><div class="v" id="jHeroPct">0%</div></div>
+              <div class="hstat"><div class="l">획득 별</div><div class="v" id="jHeroStars">0/90</div></div>
+              <div class="hstat"><div class="l">클리어</div><div class="v" id="jHeroPct">0/30</div></div>
               <div class="hstat"><div class="l">다음 도전</div><div class="v jvsm" id="jHeroNext">-</div></div>
             </div>
-            <a class="hbtn jbtn" data-go="journey">이어서 도전하기 →</a>
+            <a class="hbtn jbtn" href="puzzle.html">퍼즐 풀러 가기 →</a>
           </div>
 
           <div class="rcol3">
@@ -470,12 +470,6 @@
           </div>
           <div class="shop" id="shop"></div>
         </div>
-      </div>
-
-      <!-- JOURNEY (hidden entry, kept) -->
-      <div class="view" id="v-journey">
-        <div class="vh">🗺️ 여정 <span class="jstars" id="jstars">⭐ 0/75</span></div>
-        <div id="chapters"></div>
       </div>
 
       <!-- TRAIN -->
@@ -588,17 +582,19 @@ function refreshProfile(){
   var p=$('pPoints'); if(p)p.textContent=fmt(getBal())+' P';
   var n=$('pName'); if(n)n.textContent=st.nick;
 }
-function renderHome(){ refreshProfile(); renderJourneyHero(); }
-function renderJourneyHero(){ if(!$('jHeroPath')||typeof CH==='undefined')return;
-  var tot=jTot(), pct=Math.round(tot/75*100), nx=jNext();
-  var s=$('jHeroStars'); if(s)s.textContent=tot+'/75';
-  var p=$('jHeroPct'); if(p)p.textContent=pct+'%';
-  var n=$('jHeroNext'); if(n)n.textContent=nx?('레벨 '+(+nx[1]+1)+'-'+(+nx[3]+1)):'올클리어!';
-  $('jHeroPath').innerHTML=CH.map(function(ch,ci){
-    var earned=0; for(var k=0;k<5;k++)earned+=Math.min(3,jstars['c'+ci+'n'+k]||0);
-    var done=earned>=15, started=earned>0, cur=nx&&(+nx[1]===ci);
-    var conn=ci>0?'<div class="jpconn'+(started?' on':'')+'"></div>':'';
-    return conn+'<div class="jpnode'+(done?' done':(cur?' cur':''))+'" style="--cc:'+ch.c+'"><span class="jpi">'+(done?'✓':(ci+1))+'</span><span class="jpn">'+ch.n+'</span></div>';
+function renderHome(){ refreshProfile(); renderPuzzleHero(); }
+var PWORLDS=[['🌱','새싹 마을','#35D07A'],['🌊','파도 해변','#4CA9FF'],['🏜️','모래 사막','#FF9A3C'],['🏔️','눈보라 설산','#2FE6C4'],['🌋','용암 화산','#F0616D'],['🚀','우주 정거장','#B266FF']];
+function renderPuzzleHero(){ if(!$('jHeroPath'))return; var LVW=5, totalLv=PWORLDS.length*LVW;
+  var ps=lj('chartarena_puzzle_v1'); var stars=(ps&&ps.stars)||{};
+  var tot=0,cleared=0,nextW=0,nextL=0,found=false;
+  for(var w=0;w<PWORLDS.length;w++)for(var l=0;l<LVW;l++){ var st=stars[w+'_'+l]||0; tot+=st; if(st>0)cleared++; if(!found&&st===0){nextW=w;nextL=l;found=true;} }
+  var s=$('jHeroStars'); if(s)s.textContent=tot+'/'+(totalLv*3);
+  var p=$('jHeroPct'); if(p)p.textContent=cleared+'/'+totalLv;
+  var n=$('jHeroNext'); if(n)n.textContent=found?(PWORLDS[nextW][0]+' '+(nextL+1<LVW?('레벨 '+(nextL+1)):'보스')):'올클리어!';
+  $('jHeroPath').innerHTML=PWORLDS.map(function(wd,wi){ var g=0; for(var l=0;l<LVW;l++)g+=(stars[wi+'_'+l]||0);
+    var done=g>=LVW, started=g>0, cur=found&&wi===nextW;
+    var conn=wi>0?'<div class="jpconn'+(started?' on':'')+'"></div>':'';
+    return conn+'<div class="jpnode'+(done?' done':(cur?' cur':''))+'" style="--cc:'+wd[2]+'"><span class="jpi">'+(done?'✓':(wi+1))+'</span><span class="jpn">'+wd[1]+'</span></div>';
   }).join('');
 }
 
@@ -608,7 +604,7 @@ function go(v){
   var el=$('v-'+v); if(el)el.classList.add('on');
   var ns=document.querySelectorAll('.nav a[data-go], .bnav[data-go]'); for(var j=0;j<ns.length;j++)ns[j].classList.toggle('on', ns[j].dataset.go===v);
   var m=$('mainScroll'); if(m)m.scrollTop=0;
-  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='journey')renderJourney(); else if(v==='train')renderTrain(); else if(v==='guild')guildEnter();
+  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='train')renderTrain(); else if(v==='guild')guildEnter();
 }
 document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return;}
