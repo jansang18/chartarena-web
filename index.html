@@ -18,7 +18,7 @@
   *{box-sizing:border-box}
   body{margin:0; background:#05070f; color:var(--tp); font-family:var(--sans); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:10px 6px; overflow-x:hidden}
   .scaler{transform-origin:top center}
-  .frame{width:1672px; height:702px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
+  .frame{width:1672px; height:666px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
     background:radial-gradient(120% 80% at 22% 0%, #12203c 0%, #0a1327 46%, #060c1a 100%);
     box-shadow:0 30px 80px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
 
@@ -110,7 +110,7 @@
   .nav a:hover{background:#0d1730}
   .nav a.on{color:var(--gold);background:rgba(233,185,73,.10);border-color:rgba(233,185,73,.4)}
   .battlebtn{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:9px;padding:10px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-weight:900;font-size:16px;color:#04223f;text-decoration:none;background:linear-gradient(180deg,#8fd6ff,#4CA9FF);box-shadow:0 8px 20px -6px rgba(76,169,255,.6)}
-  .sfoot{margin-top:6px;color:var(--tm);font-size:8px;line-height:1.3;text-align:center}
+  .sfoot{margin-top:auto;padding-top:10px;color:var(--tm);font-size:8px;line-height:1.3;text-align:center}
 
   /* ===== MAIN ===== */
   .main{flex:1;min-width:0;padding:10px 18px;overflow-y:auto}
@@ -142,14 +142,34 @@
   .status{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--green);white-space:nowrap;margin-top:6px}
   .status::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green)}
   .hsub{color:var(--ts);font-size:12px;margin-top:2px;position:relative;z-index:3}
-  .himg{flex:0 0 auto;height:300px;display:flex;align-items:center;justify-content:center;margin:0;position:relative;z-index:1;overflow:visible}
-  .himg img{max-height:122%;max-width:114%;object-fit:contain;filter:drop-shadow(0 14px 26px rgba(0,0,0,.6))}
+  .himg{flex:1;min-height:200px;max-height:290px;display:flex;align-items:center;justify-content:center;margin:0;position:relative;z-index:1;overflow:hidden}
+  .himg img{max-height:100%;max-width:104%;object-fit:contain;filter:drop-shadow(0 14px 26px rgba(0,0,0,.6))}
   .hstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:6px;position:relative;z-index:2}
   .hstat{background:rgba(5,12,26,.72);border:1px solid var(--line);border-radius:12px;padding:7px;text-align:center}
   .hstat .l{font-size:11.5px;color:var(--ts)}
   .hstat .v{font-size:18px;font-weight:900;font-family:var(--mono);margin-top:2px}
   .hbtn{display:block;text-align:center;padding:10px;border-radius:12px;font-weight:900;font-size:15px;color:#062018;text-decoration:none;position:relative;z-index:2;
     background:linear-gradient(90deg,#4CA9FF,#35D07A);box-shadow:0 10px 26px -8px rgba(53,208,122,.65)}
+
+  /* ===== HOME 3-COLUMN: 배틀 히어로 | 여정 히어로 | 사이드 카드 ===== */
+  .dash3{display:grid;grid-template-columns:1fr 1fr .84fr;gap:12px;align-items:stretch}
+  .jhero{position:relative;border-radius:18px;overflow:hidden;padding:9px 16px 9px;display:flex;flex-direction:column;background:linear-gradient(140deg,#241a3e 0%,#141330 52%,#1a1226 100%);border:1px solid #3a2c5a}
+  .jhero::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 40%,rgba(185,128,255,.15),transparent 70%);pointer-events:none}
+  .jbadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:#d9c2ff;background:rgba(185,128,255,.16);border:1px solid rgba(185,128,255,.4);border-radius:999px;padding:3px 9px;white-space:nowrap;margin-top:5px}
+  .jvsm{font-size:13px}
+  .jbtn{background:linear-gradient(90deg,#B980FF,#E9B949);color:#241634;box-shadow:0 10px 26px -8px rgba(185,128,255,.6)}
+  .jpath{flex:1;display:flex;align-items:flex-start;justify-content:center;gap:0;padding:16px 2px 6px;position:relative;z-index:1;min-height:150px}
+  .jpnode{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto;width:58px}
+  .jpnode .jpi{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;border:2px solid var(--cc);color:var(--cc);background:#120f26}
+  .jpnode.done .jpi{background:var(--cc);color:#0a1018}
+  .jpnode.cur .jpi{box-shadow:0 0 0 4px rgba(255,255,255,.12),0 0 16px -2px var(--cc)}
+  .jpnode .jpn{font-size:9px;color:var(--ts);text-align:center;line-height:1.15;max-width:56px}
+  .jpconn{flex:1;height:3px;border-radius:2px;background:#2a2445;margin-top:20px;min-width:6px}
+  .jpconn.on{background:linear-gradient(90deg,#B980FF,#E9B949)}
+  .rcol3{display:flex;flex-direction:column;gap:11px}
+  .rcol3 .mcard{flex:1;min-height:74px}
+  .rcol3 .mcard .art{height:118px}
+  .gloadsub{font-size:12px;color:var(--tm)}
 
   .rightcol{display:flex;flex-direction:column;gap:11px;min-height:0}
   .cards2x2{display:grid;grid-template-columns:1fr 1fr;gap:11px;flex:1}
@@ -264,6 +284,87 @@
 
   .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) scale(.9);z-index:99;background:rgba(6,12,26,.96);border:1px solid var(--gold);color:var(--gold);font-weight:800;font-size:14px;padding:11px 20px;border-radius:11px;opacity:0;transition:.2s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) scale(1)}
+
+  /* ===== GUILD ===== */
+  .gsub{font-size:13px;font-weight:700;color:var(--ts);margin-left:4px}
+  .gsub .gdname{color:var(--gold)}
+  .tab.gleave{margin-left:auto;color:var(--pink);border-color:rgba(255,92,138,.4);background:rgba(255,92,138,.08)}
+  .gload{padding:40px 10px;text-align:center;color:var(--ts);font-size:14px}
+  .gmhead{font-size:13px;font-weight:800;color:var(--ts);margin:0 0 10px}
+  .gemb{width:52px;height:52px;flex:0 0 auto;border-radius:14px;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:26px}
+  .gemb.big{width:82px;height:82px;border-radius:20px;font-size:44px}
+  .gemb.sm{width:38px;height:38px;border-radius:10px;font-size:19px}
+  /* browse */
+  .ghero2{background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:14px;padding:13px 18px;margin-bottom:12px}
+  .ghero2 .gh2t{font-size:17px;font-weight:900}
+  .ghero2 .gh2s{font-size:12.5px;color:var(--ts);margin-top:4px;line-height:1.4}
+  .glist{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .gcard{display:flex;align-items:center;gap:13px;background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+  .gcard .ginfo{flex:1;min-width:0}
+  .gcard .gname{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gcard .gdemo{font-size:10px;font-weight:800;color:var(--tm);background:#0a1122;border:1px solid var(--line);border-radius:6px;padding:1px 5px;vertical-align:middle}
+  .gcard .gmeta{font-size:12px;color:var(--ts);font-family:var(--mono);margin-top:3px}
+  .gjoin{flex:0 0 auto;border:none;border-radius:10px;padding:9px 18px;font-weight:900;font-size:13px;font-family:inherit;cursor:pointer;color:#04223f;background:linear-gradient(180deg,#8fd6ff,#4CA9FF)}
+  .gjoined{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--green);padding:9px 12px}
+  /* create */
+  .gcreate{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:start}
+  .gcpreview{display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#16223e,#0a1120 82%);border:1px solid var(--line);border-radius:16px;padding:18px 10px}
+  .gcform{display:flex;flex-direction:column}
+  .gclab{font-size:12px;font-weight:800;color:var(--ts);margin:10px 0 5px}.gclab:first-child{margin-top:0}
+  .ginput{background:#0a1122;border:1px solid var(--line);border-radius:10px;padding:10px 13px;color:var(--tp);font-size:14px;font-family:inherit;outline:none}
+  .ginput:focus{border-color:var(--gold)}
+  .gemgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+  .gem{height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#0a1122;border:1px solid var(--line);border-radius:9px;cursor:pointer}
+  .gem.on{border-color:var(--gold);background:rgba(233,185,73,.14)}
+  .gcolrow{display:flex;gap:8px}
+  .gcol{width:30px;height:30px;border-radius:8px;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1px var(--line)}
+  .gcol.on{border-color:#fff}
+  .gcbtn{margin-top:16px;border:none;border-radius:12px;padding:13px;font-weight:900;font-size:15px;font-family:inherit;cursor:pointer;color:#2a2107;background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 10px 24px -8px rgba(233,185,73,.5)}
+  /* dashboard */
+  .ghdr{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:16px;padding:15px 18px;margin-bottom:12px}
+  .ghinfo{flex:1;min-width:0}
+  .ghname{font-size:20px;font-weight:900;letter-spacing:-.3px}
+  .ghdesc{font-size:12.5px;color:var(--ts);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ghbar{display:flex;align-items:center;gap:9px;margin-top:9px}
+  .ghlv{font-family:var(--mono);font-weight:900;font-size:12px;color:#2a2107;background:linear-gradient(180deg,var(--gold2),var(--gold));padding:3px 9px;border-radius:7px;flex:0 0 auto}
+  .ghbarline{flex:1;height:9px;border-radius:6px;background:#0a1122;border:1px solid var(--line);overflow:hidden}
+  .ghbarline i{display:block;height:100%}
+  .ghpct{font-family:var(--mono);font-size:11px;color:var(--ts);font-weight:800;flex:0 0 auto}
+  .ghstats{display:flex;gap:10px;flex:0 0 auto}
+  .ghs{background:rgba(5,12,26,.55);border:1px solid var(--line);border-radius:12px;padding:8px 16px;text-align:center;min-width:78px}
+  .ghs .l{font-size:11px;color:var(--ts)}
+  .ghs .v{font-size:18px;font-weight:900;font-family:var(--mono);margin-top:2px}
+  .ghrow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .gmission,.gcheer{background:linear-gradient(180deg,var(--p1),#0b1428);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .gmhd{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800}
+  .gmrw{font-size:11px;color:var(--gold);font-weight:800}
+  .gmgoal{font-size:13px;color:var(--ts);margin:12px 0 8px}.gmgoal b{color:var(--tp)}
+  .gmbar{height:14px;border-radius:8px;background:#0a1122;border:1px solid var(--line);overflow:hidden}
+  .gmbar i{display:block;height:100%;background:linear-gradient(90deg,#35D07A,#8fe3b0);border-radius:8px}
+  .gmnum{font-family:var(--mono);font-size:12px;color:var(--ts);font-weight:700;margin-top:7px;text-align:right}
+  .gchd{font-size:14px;font-weight:800;margin-bottom:10px}
+  .gchs{font-size:11px;color:var(--ts);font-weight:600;margin-left:4px}
+  .chebar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+  .cheb{width:38px;height:38px;border:1px solid var(--line);background:#0a1122;border-radius:10px;font-size:19px;cursor:pointer;transition:.1s}
+  .cheb:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .cheed{display:flex;flex-wrap:wrap;gap:6px;max-height:120px;overflow-y:auto}
+  .chip{display:flex;align-items:center;gap:6px;background:#0a1122;border:1px solid var(--line);border-radius:999px;padding:4px 11px 4px 8px;font-size:12px}
+  .chip .che{font-size:15px}.chip .chn{font-weight:700}.chip .cht{color:var(--tm);font-size:11px}
+  .chempty{font-size:12.5px;color:var(--tm);padding:8px 2px}
+  /* members + guild rank */
+  .gmembers,.grank{display:flex;flex-direction:column;gap:8px}
+  .gmrow,.grrow{display:flex;align-items:center;gap:13px;background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:12px;padding:9px 14px}
+  .gmrow.me,.grrow.me{border-color:var(--gold);background:rgba(233,185,73,.07)}
+  .gmrk,.grk{width:26px;text-align:center;font-family:var(--mono);font-weight:900;font-size:15px;color:var(--ts);flex:0 0 auto}
+  .gmav{width:38px;height:38px;flex:0 0 auto;border-radius:10px;overflow:hidden;background:radial-gradient(circle at 50% 30%,#1b3054,#0a1120 84%);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .gmav img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;transform:scale(1.5);transform-origin:50% 15%}
+  .gmav .ge{font-size:20px}
+  .gmn,.grn{flex:1;min-width:0}
+  .gmn .n,.grn .n{font-size:14px;font-weight:800}
+  .gmrole{font-size:11.5px;font-weight:700;margin-top:1px}
+  .grn .s{font-size:11.5px;color:var(--ts);font-family:var(--mono);margin-top:2px}
+  .gme{font-size:10px;font-weight:800;color:var(--gold);background:rgba(233,185,73,.14);border-radius:5px;padding:1px 5px;margin-left:3px}
+  .gmc,.grv{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--gold);flex:0 0 auto}
 </style>
 
 <div class="scaler" id="scaler"><div class="frame">
@@ -297,11 +398,10 @@
         <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
         <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
         <a data-go="garage"><span class="ic">🛒</span>상점</a>
-        <a data-toast="미션 — 준비 중"><span class="ic">📋</span>미션</a>
+        <a data-go="guild"><span class="ic">🛡️</span>길드</a>
+        <a data-go="journey"><span class="ic">🗺️</span>여정</a>
         <a data-go="train"><span class="ic">🥷</span>훈련</a>
-        <a data-go="garage"><span class="ic">🎨</span>차트 · 꾸미기</a>
       </div>
-      <a class="battlebtn" href="quiz-battle.html">⚔️ 차트 배틀 LIVE</a>
       <div class="sfoot">본 앱은 교육용 모의 트레이딩 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.</div>
     </div>
 
@@ -320,7 +420,7 @@
           <div class="timer"><div class="ic">🕐</div><div><div class="l">시즌 남은 기간</div><div class="v">12일 08:45:32</div></div></div>
         </div>
 
-        <div class="dash">
+        <div class="dash3">
           <div class="hero">
             <div class="hhead"><h3>차트 배틀 LIVE</h3><span class="status">진행 중</span></div>
             <div class="hsub">실시간으로 펼쳐지는 치열한 차트 배틀!</div>
@@ -333,21 +433,22 @@
             <a class="hbtn" href="quiz-battle.html">지금 참여하기</a>
           </div>
 
-          <div class="rightcol">
-            <div class="cards2x2">
-              <div class="mcard m-mission" data-toast="미션 — 준비 중"><div class="glow" style="background:var(--blue)"></div><img class="art" src="assets/icon_mission.png" alt=""><h4>미션</h4><p>일일 · 주간 미션</p><div class="cgo">미션 보기 ›</div></div>
-              <div class="mcard m-shop" data-go="garage"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/icon_shop.png" alt=""><h4>상점</h4><p>아이템 · 꾸미기</p><div class="cgo">상점 바로가기 ›</div></div>
-              <div class="mcard m-deco" data-go="garage"><div class="glow" style="background:var(--purple)"></div><img class="art" src="assets/car_rocket.png" alt=""><h4>차트 · 꾸미기</h4><p>나만의 공간 꾸미기</p><div class="cgo">꾸미기 ›</div></div>
-              <div class="mcard m-rank" data-go="rank"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/tile_rank.png" alt=""><h4>랭킹</h4><p>최고의 트레이더는?</p><div class="cgo">랭킹 보기 ›</div></div>
+          <div class="jhero">
+            <div class="hhead"><h3>🗺️ 여정 퀘스트</h3><span class="jbadge">🎮 혼자 플레이</span></div>
+            <div class="hsub">챕터를 깨며 배우는 나만의 차트 마스터 여정</div>
+            <div class="jpath" id="jHeroPath"></div>
+            <div class="hstats">
+              <div class="hstat"><div class="l">획득 별</div><div class="v" id="jHeroStars">0/75</div></div>
+              <div class="hstat"><div class="l">진행률</div><div class="v" id="jHeroPct">0%</div></div>
+              <div class="hstat"><div class="l">다음 도전</div><div class="v jvsm" id="jHeroNext">-</div></div>
             </div>
-            <div class="recent">
-              <div class="rh"><h4>최근 활동</h4><span class="more" data-toast="최근 활동 — 준비 중">더보기 ›</span></div>
-              <div class="acts">
-                <div class="act"><div class="ic" style="color:var(--gold)">🏆</div><div><div class="n">배틀 보상 획득</div><div class="tm">10분 전</div></div><div class="m">+120 P</div></div>
-                <div class="act"><div class="ic" style="color:var(--green)">📈</div><div><div class="n">주간 미션 완료</div><div class="tm">30분 전</div></div><div class="m">+300 P</div></div>
-                <div class="act"><div class="ic" style="color:var(--blue)">🎖️</div><div><div class="n">랭킹 변동</div><div class="tm">1시간 전</div></div><div class="m up">▲ 2</div></div>
-              </div>
-            </div>
+            <a class="hbtn jbtn" data-go="journey">이어서 도전하기 →</a>
+          </div>
+
+          <div class="rcol3">
+            <div class="mcard m-mission" data-toast="미션 — 준비 중"><div class="glow" style="background:var(--blue)"></div><img class="art" src="assets/icon_mission.png" alt=""><h4>미션</h4><p>일일 · 주간 미션</p><div class="cgo">미션 보기 ›</div></div>
+            <div class="mcard m-shop" data-go="garage"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/icon_shop.png" alt=""><h4>상점</h4><p>아이템 · 펫 · 꾸미기</p><div class="cgo">상점 바로가기 ›</div></div>
+            <div class="mcard m-rank" data-go="rank"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/tile_rank.png" alt=""><h4>랭킹</h4><p>최고의 트레이더는?</p><div class="cgo">랭킹 보기 ›</div></div>
           </div>
         </div>
       </div>
@@ -384,6 +485,13 @@
         <div class="trainGrid" id="trainGrid"></div>
       </div>
 
+      <!-- GUILD -->
+      <div class="view" id="v-guild">
+        <div class="vh">🛡️ 길드 <span class="gsub" id="gdSub"></span></div>
+        <div class="tabs" id="gTabs" style="margin-bottom:12px"></div>
+        <div id="gBody"></div>
+      </div>
+
     </div>
   </div>
 
@@ -393,7 +501,7 @@
     <a class="bnav" href="quiz-battle.html"><span class="bi">⚔️</span>배틀</a>
     <a class="bnav" href="game.html"><span class="bi">📈</span>차트</a>
     <span class="bnav" data-toast="뉴스 — 준비 중"><span class="bi">📰</span>뉴스</span>
-    <span class="bnav" data-toast="커뮤니티 — 준비 중"><span class="bi">👥</span>커뮤니티</span>
+    <a class="bnav" data-go="guild"><span class="bi">🛡️</span>길드</a>
     <span class="bnav" data-toast="설정 — 준비 중"><span class="bi">⚙️</span>설정</span>
   </div>
 
@@ -430,7 +538,7 @@ var FB_CONFIG = { apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"
 var FB=null, myUid=null, LB=null;
 /* ══════════════════════════════════════════════════════ */
 var $=function(id){return document.getElementById(id);};
-function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/702);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(702*s)+'px';sc.style.width='1672px';}
+function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/666);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(666*s)+'px';sc.style.width='1672px';}
 window.addEventListener('resize',fit);fit();
 /* 인트로 스플래시 (세션당 1회) */
 (function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash');}catch(e){}
@@ -481,7 +589,19 @@ function refreshProfile(){
   var p=$('pPoints'); if(p)p.textContent=fmt(getBal())+' P';
   var n=$('pName'); if(n)n.textContent=st.nick;
 }
-function renderHome(){ refreshProfile(); }
+function renderHome(){ refreshProfile(); renderJourneyHero(); }
+function renderJourneyHero(){ if(!$('jHeroPath')||typeof CH==='undefined')return;
+  var tot=jTot(), pct=Math.round(tot/75*100), nx=jNext();
+  var s=$('jHeroStars'); if(s)s.textContent=tot+'/75';
+  var p=$('jHeroPct'); if(p)p.textContent=pct+'%';
+  var n=$('jHeroNext'); if(n)n.textContent=nx?('레벨 '+(+nx[1]+1)+'-'+(+nx[3]+1)):'올클리어!';
+  $('jHeroPath').innerHTML=CH.map(function(ch,ci){
+    var earned=0; for(var k=0;k<5;k++)earned+=Math.min(3,jstars['c'+ci+'n'+k]||0);
+    var done=earned>=15, started=earned>0, cur=nx&&(+nx[1]===ci);
+    var conn=ci>0?'<div class="jpconn'+(started?' on':'')+'"></div>':'';
+    return conn+'<div class="jpnode'+(done?' done':(cur?' cur':''))+'" style="--cc:'+ch.c+'"><span class="jpi">'+(done?'✓':(ci+1))+'</span><span class="jpn">'+ch.n+'</span></div>';
+  }).join('');
+}
 
 /* nav */
 function go(v){
@@ -489,7 +609,7 @@ function go(v){
   var el=$('v-'+v); if(el)el.classList.add('on');
   var ns=document.querySelectorAll('.nav a[data-go], .bnav[data-go]'); for(var j=0;j<ns.length;j++)ns[j].classList.toggle('on', ns[j].dataset.go===v);
   var m=$('mainScroll'); if(m)m.scrollTop=0;
-  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='journey')renderJourney(); else if(v==='train')renderTrain();
+  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='journey')renderJourney(); else if(v==='train')renderTrain(); else if(v==='guild')guildEnter();
 }
 document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return;}
@@ -513,7 +633,8 @@ function fetchLB(cb){ if(!FB){cb(null);return;} FB.collection('scores').orderBy(
 (function(){ try{ if(!FB_CONFIG.apiKey)return; loadFB(function(){ try{ if(typeof firebase==='undefined')return;
   firebase.initializeApp(FB_CONFIG); FB=firebase.firestore();
   firebase.auth().signInAnonymously().then(function(c){ myUid=c.user.uid; submitScore();
-    var vr=$('v-rank'); if(vr&&vr.classList.contains('on'))renderRank(); }).catch(function(){}); }catch(e){FB=null;} }); }catch(e){} })();
+    var vr=$('v-rank'); if(vr&&vr.classList.contains('on'))renderRank();
+    var vg=$('v-guild'); if(vg&&vg.classList.contains('on'))guildEnter(); else if(GLD.gid&&!GLD.local)guildLoad(); }).catch(function(){}); }catch(e){FB=null;} }); }catch(e){} })();
 function kf(v){return v>=100000?Math.round(v/1000)+'K':v>=10000?(v/1000).toFixed(1)+'K':Math.round(v).toLocaleString();}
 function mval(e){return rm==='points'?e.points:rm==='win'?e.win:e.best;}
 function mv(e){return rm==='points'?kf(e.points)+'P':rm==='win'?e.win+'%':'+'+kf(e.best);}
@@ -643,6 +764,195 @@ document.addEventListener('click',function(e){var jn=e.target.closest('[data-jn]
 var TRAIN=[{ic:'💀',n:'생존 모드',d:'롱/숏만으로 연속 도전 — 손익<0이면 종료',rec:'최고 12라운드'},{ic:'🕯️',n:'캔들 도장',d:'강조된 캔들 패턴 4지선다(17종 감지)',rec:'정답률 78%'},{ic:'📐',n:'황금비율 던전',d:'피보나치 되돌림 위치 예측',rec:'정답률 64%'},{ic:'⚔️',n:'롱숏 아레나',d:'트레이딩 봇 6명과 레이팅 대결',rec:'레이팅 1180'}];
 function renderTrain(){ $('trainGrid').innerHTML=TRAIN.map(function(t){return '<div class="tcard"><div class="ic">'+t.ic+'</div><div class="b"><h4>'+t.n+'</h4><p>'+t.d+'</p><div class="rec">'+t.rec+'</div></div><button class="start" type="button" data-train="'+t.n+'">시작</button></div>';}).join(''); }
 document.addEventListener('click',function(e){var t=e.target.closest('[data-train]');if(t)toast(t.dataset.train+' — 데모');});
+
+/* ═══════════════ 길드 시스템 (Firebase 실데이터 + 데모/오프라인 폴백) ═══════════════ */
+var GLK='chartarena_guild_v1';
+var GEMO=['🛡️','🐂','🐻','🦈','🐲','🔥','⚡','👑','🚀','💎','🏆','🌙','⭐','🍀','🎯','⚔️','🦁','🐺','🦄','🎲'];
+var GCOL=['#E9B949','#4CC3FF','#B980FF','#F0616D','#35D07A','#FF8AA6','#5AA9FF','#F6D272'];
+var CHEEREMO=['👍','🔥','🎉','😂','😮','😭','💪','🙏','👏','❤️','🚀','🧠'];
+var ROLE={owner:['👑 길드장','var(--gold)'], officer:['🛡️ 부길드장','#4CC3FF'], member:['멤버','var(--ts)']};
+var GLD={ gid:null, local:null, guild:null, tab:'browse', list:[], loaded:false, cre:{emblem:'🛡️',color:'#E9B949'} };
+(function(){ try{ var g=JSON.parse(localStorage.getItem(GLK)||'null'); if(g&&g.gid){ GLD.gid=g.gid; GLD.local=g.local||null; } }catch(e){} })();
+function saveGL(){ try{ localStorage.setItem(GLK, JSON.stringify({gid:GLD.gid, local:GLD.local})); }catch(e){} }
+function gLevel(tp){ return 1+Math.floor((tp||0)/200000); }
+function gLevelProg(tp){ var base=(gLevel(tp)-1)*200000; return Math.max(0,Math.min(100,Math.round(((tp-base)/200000)*100))); }
+function myContrib(){ return getBal(); }
+function gTotal(g){ if(!g)return 0; if(typeof g.totalPoints==='number')return g.totalPoints; var s=0,m=g.members||{}; for(var k in m)s+=(m[k].contrib||0); return s; }
+function gMembersArr(g){ var m=(g&&g.members)||{}, a=[]; for(var k in m)a.push(Object.assign({uid:k},m[k])); a.sort(function(x,y){return (y.contrib||0)-(x.contrib||0);}); return a; }
+function gMissionTarget(g){ return Math.max(100000, Math.ceil((gTotal(g)+1)/100000)*100000); }
+function gAva(ch){ return IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="ge">'+(EMO[ch]||'🧑')+'</span>'; }
+function meMember(role){ return {nick:(st.nick||'익명').slice(0,12), ch:st.ch, role:role, contrib:myContrib(), joinedAt:Date.now()}; }
+/* 데모 길드 */
+function mkDemo(id,name,em,color,nicks,chs,pts){ var mem={}; nicks.forEach(function(n,i){ mem['d_'+id+'_'+i]={nick:n,ch:chs[i]||'bull',role:i===0?'owner':(i<3?'officer':'member'),contrib:pts[i]||10000,joinedAt:0}; });
+  return {gid:'demo_'+id, demo:true, name:name, emblem:em, color:color, desc:name+' — 함께 정상으로!', ownerUid:'d_'+id+'_0', members:mem, memberCount:nicks.length, cheers:[]}; }
+function demoGuilds(){ return [
+  mkDemo('bull','불장 클랜','🐂','#E9B949',['존버왕','캔들도사','추매요정','매수의신','개미짱'],['king','dragon','tiger','shark','bull'],[182000,138000,73000,61000,24000]),
+  mkDemo('moon','달까지가즈아','🚀','#B980FF',['우상향고고','따상가자','존리형'],['dragon','tiger','bear'],[152000,44000,120000]),
+  mkDemo('dia','다이아핸즈','💎','#4CC3FF',['숏충이','물타기장인','칼손절','청산킹'],['bear','shark','tiger','king'],[151000,86000,21000,52000]),
+  mkDemo('tiger','타이거즈','🐯','#F0616D',['불장러','청산킹'],['tiger','king'],[138000,52000]),
+  mkDemo('whale','고래사냥꾼','🦈','#35D07A',['매수의신','존버왕','캔들도사'],['shark','king','dragon'],[61000,182000,138000])
+];}
+function demoFind(gid){ var a=demoGuilds(); for(var i=0;i<a.length;i++)if(a[i].gid===gid)return a[i]; return null; }
+/* Firebase */
+function inc(n){ return firebase.firestore.FieldValue.increment(n); }
+function fbGuild(gid){ return FB.collection('guilds').doc(gid); }
+/* 원격(공유) 길드 문서는 신뢰 불가 → 색/엠블럼 화이트리스트, 숫자 검증 (XSS·오염 방지) */
+function sanG(x){ if(!x)return x; x.color=(GCOL.indexOf(x.color)>=0)?x.color:GCOL[0]; x.emblem=(GEMO.indexOf(x.emblem)>=0)?x.emblem:'🛡️';
+  x.name=String(x.name==null?'':x.name).slice(0,14); x.desc=String(x.desc==null?'':x.desc).slice(0,60);
+  if(typeof x.totalPoints!=='number'||!isFinite(x.totalPoints))x.totalPoints=undefined; if(typeof x.memberCount!=='number')x.memberCount=undefined; return x; }
+function fbFetchGuilds(cb){ if(!FB){cb(null);return;} FB.collection('guilds').orderBy('totalPoints','desc').limit(30).get()
+  .then(function(qs){ var a=[]; qs.forEach(function(d){ var x=d.data(); x.gid=d.id; x.demo=false; a.push(sanG(x)); }); cb(a); }).catch(function(){cb(null);}); }
+/* cb(guild) 성공 · cb(null,false) 문서없음(진짜 삭제) · cb(null,true) 읽기실패(일시적) — 구분 중요 */
+function fbGetGuild(gid,cb){ if(!FB){cb(null,true);return;} fbGuild(gid).get().then(function(d){ if(!d.exists){cb(null,false);return;} var x=d.data(); x.gid=d.id; x.demo=false; cb(sanG(x)); }).catch(function(){cb(null,true);}); }
+function fbCreate(obj,cb){ FB.collection('guilds').add(obj).then(function(ref){ cb(ref.id); }).catch(function(){cb(null);}); }
+function fbJoin(gid,cb){ fbGuild(gid).get().then(function(d){ if(!d.exists){cb(false);return;} var data=d.data();
+    if(data.members&&data.members[myUid]){ cb(true); return; }  /* 이미 멤버 → 중복 증가 방지 */
+    var mem=meMember('member'); var u={}; u['members.'+myUid]=mem; u.memberCount=inc(1); u.totalPoints=inc(mem.contrib);
+    fbGuild(gid).update(u).then(function(){cb(true);}).catch(function(){cb(false);}); }).catch(function(){cb(false);}); }
+function fbSync(gid,g,cb){ if(!g||!g.members||!g.members[myUid]){cb&&cb();return;} var now=myContrib(), d=now-(g.members[myUid].contrib||0); if(d===0){cb&&cb();return;}
+  var u={}; u['members.'+myUid+'.contrib']=now; u.totalPoints=inc(d); fbGuild(gid).update(u).then(function(){cb&&cb();}).catch(function(){cb&&cb();}); }
+function fbCheer(gid,emo,cb){ var c={uid:myUid,nick:(st.nick||'익명').slice(0,12),emo:emo,ts:Date.now()};
+  fbGuild(gid).update({cheers:firebase.firestore.FieldValue.arrayUnion(c)}).then(function(){cb&&cb();}).catch(function(){cb&&cb();}); }  /* 원자적 추가 → 동시 응원 유실 방지 */
+function fbLeave(gid,g,cb){ var mem=g.members&&g.members[myUid]; var contrib=mem?(mem.contrib||0):0;
+  var others=Object.keys(g.members||{}).filter(function(k){return k!==myUid;});
+  if(others.length===0){ fbGuild(gid).delete().then(function(){cb(true);}).catch(function(){cb(false);}); return; }
+  var u={}; u['members.'+myUid]=firebase.firestore.FieldValue.delete(); u.memberCount=inc(-1); u.totalPoints=inc(-contrib);
+  if(g.ownerUid===myUid){ u.ownerUid=others[0]; u['members.'+others[0]+'.role']='owner'; }
+  fbGuild(gid).update(u).then(function(){cb(true);}).catch(function(){cb(false);}); }
+/* 상태 흐름 */
+function guildEnter(){ renderGuild(); guildLoad(); }
+function guildLoad(){
+  if(GLD.gid){
+    if(GLD.local){ GLD.guild=GLD.local; if(GLD.tab==='browse'||GLD.tab==='create')GLD.tab='ghome'; GLD.loaded=true; GLD.offline=false; renderGuild(); fetchList(true); return; }
+    if(FB&&myUid){ fbGetGuild(GLD.gid,function(g,err){
+        if(!g){ if(err){ GLD.loaded=true; GLD.offline=true; renderGuild(); return; }  /* 일시적 오류: 멤버십 유지 */
+          GLD.gid=null; GLD.guild=null; saveGL(); GLD.tab='browse'; GLD.loaded=true; GLD.offline=false; guildLoad(); return; }  /* 진짜 삭제됨 */
+        GLD.offline=false;
+        if(GLD.tab==='browse'||GLD.tab==='create')GLD.tab='ghome';
+        if(g.members&&g.members[myUid]){ fbSync(GLD.gid,g,function(){ fbGetGuild(GLD.gid,function(g2){ GLD.guild=g2||g; GLD.loaded=true; renderGuild(); }); }); }
+        else { GLD.guild=g; GLD.loaded=true; renderGuild(); }
+      }); fetchList(true); return; }
+    GLD.loaded=true; GLD.offline=true; renderGuild(); return;  /* FB 준비 전: 무한 스피너 대신 오프라인 표시 */
+  }
+  GLD.offline=false;
+  if(GLD.tab==='ghome'||GLD.tab==='members'||GLD.tab==='grank')GLD.tab='browse';
+  fetchList(false);
+}
+/* 랭킹용 목록: 실데이터면 실제 길드만(데모 섞지 않음 → 순위 왜곡 방지), 오프라인이면 데모 */
+function fetchList(keep){ if(FB){ fbFetchGuilds(function(a){ GLD.list=(a||[]); GLD.loaded=true; if(!keep||GLD.tab==='browse'||GLD.tab==='grank')renderGuild(); }); }
+  else { GLD.list=demoGuilds(); GLD.loaded=true; renderGuild(); } }
+/* 찾기 화면용 목록: 실데이터가 적어도 둘러볼 수 있게 데모를 뒤에 붙여 표시(랭킹엔 미포함) */
+function browseList(){ return FB ? (GLD.list||[]).concat(demoGuilds()) : (GLD.list||[]); }
+/* 액션 */
+function doCreate(){ if(GLD.busy)return; var name=($('gcName')?$('gcName').value:'').trim().slice(0,14); if(!name){ toast('길드 이름을 입력하세요'); return; }
+  if(FB&&!myUid){ toast('연결 중이에요. 잠시 후 다시 시도해주세요'); return; }
+  var uid=(FB&&myUid)?myUid:'me'; var mem={}; mem[uid]=meMember('owner');
+  var base={ name:name, emblem:GLD.cre.emblem, color:GLD.cre.color, desc:(($('gcDesc')?$('gcDesc').value:'')||'').trim().slice(0,60), ownerUid:uid, createdAt:Date.now(), members:mem, memberCount:1, totalPoints:myContrib(), cheers:[] };
+  if(FB&&myUid){ GLD.busy=true; fbCreate(base,function(gid){ GLD.busy=false; if(!gid){ toast('생성 실패 — 잠시 후 다시'); return; } GLD.gid=gid; GLD.local=null; GLD.tab='ghome'; GLD.offline=false; saveGL(); toast('🛡️ 길드 «'+name+'» 창설!'); guildLoad(); }); }
+  else { base.gid='local_'+Date.now(); base.demo=false; GLD.gid=base.gid; GLD.local=base; GLD.guild=base; GLD.tab='ghome'; saveGL(); toast('🛡️ 길드 «'+name+'» 창설!'); renderGuild(); }
+}
+function doJoin(gid){ if(GLD.busy)return; if(GLD.gid){ toast('이미 길드에 가입돼 있어요'); return; }
+  var g=browseList().filter(function(x){return x.gid===gid;})[0]||demoFind(gid); if(!g){ toast('길드를 찾을 수 없어요'); return; }
+  if(FB&&!myUid){ toast('연결 중이에요. 잠시 후 다시 시도해주세요'); return; }
+  if(FB&&myUid&&!g.demo){ GLD.busy=true; fbJoin(gid,function(ok){ GLD.busy=false; if(!ok){ toast('가입 실패 — 잠시 후 다시'); return; } GLD.gid=gid; GLD.local=null; GLD.tab='ghome'; GLD.offline=false; saveGL(); toast('가입 완료! 환영합니다 🎉'); guildLoad(); }); }
+  else { var clone=JSON.parse(JSON.stringify(g)); clone.demo=false; clone.members=clone.members||{}; clone.members['me']=meMember('member'); clone.memberCount=(clone.memberCount||0)+1; clone.totalPoints=gTotal(clone); GLD.gid=g.gid; GLD.local=clone; GLD.guild=clone; GLD.tab='ghome'; saveGL(); toast('가입 완료! 환영합니다 🎉'); renderGuild(); }
+}
+function doLeave(){ if(!GLD.gid||GLD.busy)return; if(!confirm('정말 길드를 나갈까요?'))return;
+  if(GLD.local){ GLD.gid=null; GLD.local=null; GLD.guild=null; GLD.tab='browse'; GLD.offline=false; saveGL(); toast('길드에서 나왔어요'); guildLoad(); return; }
+  if(FB&&myUid){ GLD.busy=true; var gid=GLD.gid;
+    var finish=function(){ GLD.busy=false; GLD.gid=null; GLD.local=null; GLD.guild=null; GLD.tab='browse'; GLD.offline=false; saveGL(); toast('길드에서 나왔어요'); guildLoad(); };
+    /* 최신 문서를 읽어 마지막멤버 삭제/길드장 위임을 정확히 판단, 서버 성공 후에만 로컬 정리 */
+    fbGetGuild(gid,function(g,err){ if(err){ GLD.busy=false; toast('연결 상태를 확인해주세요'); return; } if(!g){ finish(); return; }
+      fbLeave(gid,g,function(ok){ if(ok)finish(); else { GLD.busy=false; toast('나가기 실패 — 잠시 후 다시'); } }); });
+    return; }
+  GLD.gid=null; GLD.local=null; GLD.guild=null; GLD.tab='browse'; GLD.offline=false; saveGL(); guildLoad();
+}
+function doCheer(emo){ var g=GLD.guild; if(!g)return;
+  if(GLD.local){ g.cheers=(g.cheers||[]); g.cheers.push({uid:'me',nick:(st.nick||'나').slice(0,12),emo:emo,ts:Date.now()}); if(g.cheers.length>24)g.cheers=g.cheers.slice(-24); GLD.local=g; saveGL(); renderGuild(); }
+  else if(FB&&myUid){ g.cheers=(g.cheers||[]); g.cheers.push({uid:myUid,nick:(st.nick||'나').slice(0,12),emo:emo,ts:Date.now()}); if(g.cheers.length>24)g.cheers=g.cheers.slice(-24); renderGuild(); fbCheer(GLD.gid,emo,function(){ fbGetGuild(GLD.gid,function(g2){ if(g2){GLD.guild=g2; renderGuild();} }); }); }
+}
+/* 렌더 */
+function guildRank(g){ var arr=(GLD.list||[]).slice();
+  if(g){ arr=arr.filter(function(x){return x.gid!==g.gid;}); arr.push(g); }  /* 내 길드는 최신(동기화된) 객체가 우선 */
+  var seen={}; arr=arr.filter(function(x){ if(seen[x.gid])return false; seen[x.gid]=1; return true; });
+  arr.sort(function(a,b){return gTotal(b)-gTotal(a);}); return arr; }
+function ago(ts){ var s=Math.floor((Date.now()-ts)/1000); if(s<60)return '방금'; if(s<3600)return Math.floor(s/60)+'분 전'; if(s<86400)return Math.floor(s/3600)+'시간 전'; return Math.floor(s/86400)+'일 전'; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function renderGuild(){ if(!$('gBody'))return; refreshProfile(); var inG=!!GLD.gid;
+  var tabs = inG ? [['ghome','길드 홈'],['members','멤버'],['grank','길드 랭킹']] : [['browse','길드 찾기'],['create','길드 만들기']];
+  $('gdSub').innerHTML = inG&&GLD.guild ? '<span class="gdname">'+esc(GLD.guild.name)+'</span>' : (FB?'🌐 실시간':'🎮 데모');
+  $('gTabs').innerHTML = tabs.map(function(t){return '<div class="tab'+(GLD.tab===t[0]?' on':'')+'" data-gtab="'+t[0]+'">'+t[1]+'</div>';}).join('') + (inG?'<div class="tab gleave" data-gleave="1">🚪 나가기</div>':'');
+  var body=$('gBody');
+  if(!GLD.loaded){ body.innerHTML='<div class="gload">불러오는 중…</div>'; return; }
+  if(inG && GLD.offline && !GLD.guild){ body.innerHTML='<div class="gload">🔌 연결 대기 중…<br>네트워크가 연결되면 길드를 자동으로 불러와요.<br><span class="gloadsub">문제가 계속되면 위 🚪 나가기로 나올 수 있어요.</span></div>'; return; }
+  if(GLD.tab==='create'){ body.innerHTML=viewCreate(); return; }
+  if(GLD.tab==='browse'){ body.innerHTML=viewBrowse(); return; }
+  if(!GLD.guild){ body.innerHTML='<div class="gload">길드 정보를 불러오는 중…</div>'; return; }
+  if(GLD.tab==='members'){ body.innerHTML=viewMembers(GLD.guild); return; }
+  if(GLD.tab==='grank'){ body.innerHTML=viewGRank(GLD.guild); return; }
+  body.innerHTML=viewHome(GLD.guild);
+}
+function viewBrowse(){ var list=browseList();
+  var cards=list.map(function(g){ var tp=gTotal(g), joined=GLD.gid===g.gid;
+    return '<div class="gcard"><div class="gemb" style="background:'+g.color+'22;border-color:'+g.color+';color:'+g.color+'">'+g.emblem+'</div>'
+      +'<div class="ginfo"><div class="gname">'+esc(g.name)+(g.demo?' <span class="gdemo">데모</span>':'')+'</div>'
+      +'<div class="gmeta">Lv.'+gLevel(tp)+' · 멤버 '+(g.memberCount||gMembersArr(g).length)+'명 · 🔥 '+kf(tp)+'P</div></div>'
+      +(joined?'<div class="gjoined">가입됨</div>':'<button class="gjoin" type="button" data-gjoin="'+g.gid+'">가입</button>')+'</div>';
+  }).join('');
+  return '<div class="ghero2"><div class="gh2t">함께 정상에 오르세요 🏔️</div><div class="gh2s">길드에 가입해 멤버들과 기여도를 모으고, 주간 미션과 길드 랭킹에 도전하세요.</div></div>'
+    +'<div class="glist">'+(cards||'<div class="gload">아직 길드가 없어요. 첫 길드를 만들어보세요!</div>')+'</div>';
+}
+function viewCreate(){ var em=GEMO.map(function(e){return '<div class="gem'+(GLD.cre.emblem===e?' on':'')+'" data-gem="'+e+'">'+e+'</div>';}).join('');
+  var col=GCOL.map(function(c){return '<div class="gcol'+(GLD.cre.color===c?' on':'')+'" data-gcol="'+c+'" style="background:'+c+'"></div>';}).join('');
+  return '<div class="gcreate"><div class="gcpreview"><div class="gemb big" style="background:'+GLD.cre.color+'22;border-color:'+GLD.cre.color+';color:'+GLD.cre.color+'">'+GLD.cre.emblem+'</div></div>'
+    +'<div class="gcform"><label class="gclab">길드 이름</label><input id="gcName" class="ginput" maxlength="14" placeholder="예) 불장 클랜" autocomplete="off">'
+    +'<label class="gclab">엠블럼</label><div class="gemgrid">'+em+'</div>'
+    +'<label class="gclab">색상</label><div class="gcolrow">'+col+'</div>'
+    +'<label class="gclab">소개 (선택)</label><input id="gcDesc" class="ginput" maxlength="60" placeholder="한 줄 소개" autocomplete="off">'
+    +'<button class="gcbtn" type="button" id="gcCreate">🛡️ 길드 창설하기</button></div></div>';
+}
+function viewHome(g){ var tp=gTotal(g), lv=gLevel(tp), prog=gLevelProg(tp), target=gMissionTarget(g), mprog=Math.min(100,Math.round(tp/target*100));
+  var rankArr=guildRank(g); var pos=0; for(var i=0;i<rankArr.length;i++){ if(rankArr[i].gid===g.gid){pos=i+1;break;} }
+  var members=gMembersArr(g);
+  var cheers=(g.cheers||[]).slice(-14).reverse();
+  var cheerFeed = cheers.length?cheers.map(function(c){return '<div class="chip"><span class="che">'+c.emo+'</span><span class="chn">'+esc(c.nick)+'</span><span class="cht">'+ago(c.ts)+'</span></div>';}).join(''):'<div class="chempty">아직 응원이 없어요. 첫 응원을 남겨보세요!</div>';
+  var buttons=CHEEREMO.map(function(e){return '<button class="cheb" type="button" data-cheer="'+e+'">'+e+'</button>';}).join('');
+  return '<div class="ghdr"><div class="gemb big" style="background:'+g.color+'22;border-color:'+g.color+';color:'+g.color+'">'+g.emblem+'</div>'
+    +'<div class="ghinfo"><div class="ghname">'+esc(g.name)+'</div><div class="ghdesc">'+esc(g.desc||'')+'</div>'
+    +'<div class="ghbar"><div class="ghlv">Lv.'+lv+'</div><div class="ghbarline"><i style="width:'+prog+'%;background:'+g.color+'"></i></div><div class="ghpct">'+prog+'%</div></div></div>'
+    +'<div class="ghstats"><div class="ghs"><div class="l">길드 순위</div><div class="v">'+(pos>0?pos+'위':'-')+'</div></div><div class="ghs"><div class="l">멤버</div><div class="v">'+members.length+'명</div></div><div class="ghs"><div class="l">총 기여</div><div class="v">'+kf(tp)+'P</div></div></div></div>'
+    +'<div class="ghrow"><div class="gmission"><div class="gmhd"><span>🎯 이번 주 길드 미션</span><span class="gmrw">달성 시 전원 보너스</span></div>'
+    +'<div class="gmgoal">길드 총 기여도 <b>'+fmt(target)+'P</b> 돌파</div>'
+    +'<div class="gmbar"><i style="width:'+mprog+'%"></i></div><div class="gmnum">'+fmt(tp)+' / '+fmt(target)+'P ('+mprog+'%)</div></div>'
+    +'<div class="gcheer"><div class="gchd">📣 응원판 <span class="gchs">이모티콘으로 서로 응원해요</span></div>'
+    +'<div class="chebar">'+buttons+'</div><div class="cheed">'+cheerFeed+'</div></div></div>';
+}
+function viewMembers(g){ var members=gMembersArr(g); var meUid=(GLD.local?'me':myUid);
+  var rows=members.map(function(m,i){ var r=ROLE[m.role]||ROLE.member; var me=m.uid===meUid;
+    return '<div class="gmrow'+(me?' me':'')+'"><div class="gmrk">'+(i+1)+'</div><div class="gmav">'+gAva(m.ch)+'</div>'
+      +'<div class="gmn"><div class="n">'+esc(m.nick)+(me?' <span class="gme">나</span>':'')+'</div><div class="gmrole" style="color:'+r[1]+'">'+r[0]+'</div></div>'
+      +'<div class="gmc">🔥 '+kf(m.contrib||0)+'P</div></div>';
+  }).join('');
+  return '<div class="gmhead">멤버 '+members.length+'명 · 기여도 순</div><div class="gmembers">'+rows+'</div>';
+}
+function viewGRank(g){ var arr=guildRank(g);
+  var rows=arr.map(function(x,i){ var mine=x.gid===g.gid; var tp=gTotal(x);
+    return '<div class="grrow'+(mine?' me':'')+'"><div class="grk">'+(i+1)+'</div><div class="gemb sm" style="background:'+x.color+'22;border-color:'+x.color+';color:'+x.color+'">'+x.emblem+'</div>'
+      +'<div class="grn"><div class="n">'+esc(x.name)+(mine?' <span class="gme">우리</span>':'')+'</div><div class="s">Lv.'+gLevel(tp)+' · 멤버 '+(x.memberCount||gMembersArr(x).length)+'명</div></div>'
+      +'<div class="grv">🔥 '+kf(tp)+'P</div></div>';
+  }).join('');
+  return '<div class="gmhead">🏆 길드 랭킹 · 총 기여도 순</div><div class="grank">'+rows+'</div>';
+}
+/* 이벤트 */
+document.addEventListener('click',function(e){
+  var tb=e.target.closest('[data-gtab]'); if(tb){ GLD.tab=tb.dataset.gtab; if((GLD.tab==='browse'||GLD.tab==='grank')&&FB&&!GLD.local)fetchList(true); renderGuild(); return; }
+  if(e.target.closest('[data-gleave]')){ doLeave(); return; }
+  var jn=e.target.closest('[data-gjoin]'); if(jn){ doJoin(jn.dataset.gjoin); return; }
+  var em=e.target.closest('[data-gem]'); if(em){ GLD.cre.emblem=em.dataset.gem; renderGuild(); return; }
+  var co=e.target.closest('[data-gcol]'); if(co){ GLD.cre.color=co.dataset.gcol; renderGuild(); return; }
+  if(e.target.closest('#gcCreate')){ doCreate(); return; }
+  var ch=e.target.closest('[data-cheer]'); if(ch){ doCheer(ch.dataset.cheer); return; }
+});
 
 renderHome();
 })();

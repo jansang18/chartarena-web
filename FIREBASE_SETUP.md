@@ -28,11 +28,26 @@ service cloud.firestore {
         && request.resource.data.nick is string
         && request.resource.data.nick.size() <= 12;
     }
+    // 길드: 누구나 읽기, 로그인 사용자는 생성/수정(가입·응원·기여 반영),
+    // 삭제는 길드장만 (마지막 멤버가 나가면 자동 삭제)
+    match /guilds/{gid} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 14;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid;
+    }
   }
 }
 ```
-> 누구나 랭킹을 **읽을** 수 있고, 로그인한 사용자는 **자기 문서(scores/본인UID)만** 쓸 수 있습니다.
+> 누구나 랭킹·길드를 **읽을** 수 있고, 로그인한 사용자는 **자기 문서(scores/본인UID)만** 쓸 수 있습니다.
+> 길드는 가입·응원·기여도 반영을 위해 로그인 사용자면 문서를 수정할 수 있게 열어둡니다(교육용 데모라 허용).
 > (가상 포인트 교육용 게임이라 자기 점수 부풀리기는 막지 않습니다 — 큰 문제 아님)
+
+> ⚠️ **길드 기능을 쓰려면 이 규칙을 꼭 다시 게시하세요.** `guilds` 규칙이 없으면
+> 실시간 길드 생성·가입이 막히고, 앱은 자동으로 데모(가짜 길드)로 표시됩니다.
 
 ## 5) 설정값 복사 → 코드에 붙여넣기
 1. **프로젝트 설정(⚙️) → 일반 → 내 앱 → 웹앱 추가(`</>`)** → 앱 등록.
