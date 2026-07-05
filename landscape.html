@@ -215,6 +215,18 @@
   .gprev{border-radius:16px; padding:18px; text-align:center; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
   .gprev .pv{width:178px;height:178px;margin:0 auto;border-radius:16px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 30%,#1b3054,#0a1120 84%);border:1px solid var(--line);display:block;box-shadow:0 0 22px -6px rgba(178,102,255,.4)}
   .gprev .pv img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;transform:scale(1.62);transform-origin:50% 15%}.gprev .pv .em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:104px}.gprev .pv .car{position:absolute;bottom:6px;right:9px;font-size:28px;z-index:2;filter:drop-shadow(0 2px 5px rgba(0,0,0,.65))}
+  .gprev .pv .petbase{width:100%;height:100%;object-fit:contain;padding:14px;transform:none;left:auto;object-position:center}
+  .gprev .pv .pit{position:absolute;object-fit:contain;z-index:3;pointer-events:none;left:50%;transform:translateX(-50%);filter:drop-shadow(0 3px 5px rgba(0,0,0,.5))}
+  .gprev .pv .pit.head{top:-2%;width:66%}
+  .gprev .pv .pit.neck{top:49%;width:80%}
+  .gprev .pv .pit.face{top:29%;width:54%}
+  .gprev .pv .petempty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center}
+  .gprev .pv .petempty .pe1{font-size:46px;opacity:.8}
+  .gprev .pv .petempty .pe2{font-size:14px;font-weight:800;color:var(--tp)}
+  .gprev .pv .petempty .pe3{font-size:11px;color:var(--ts)}
+  .profcard .ava .petmini,.gprev .pv .petmini{position:absolute;bottom:-3px;left:-5px;width:48%;height:48%;object-fit:contain;z-index:4;filter:drop-shadow(0 2px 5px rgba(0,0,0,.6));transform:none}
+  .sellb{font-family:var(--mono);font-size:11px;font-weight:800;margin-top:5px;color:#FF8AA6;background:rgba(255,92,138,.12);border:1px solid rgba(255,92,138,.4);border-radius:8px;padding:4px 6px;cursor:pointer;display:inline-block}
+  .sellb:hover{background:rgba(255,92,138,.22)}
   .gprev .nm{font-weight:800;font-size:16px;margin-top:12px}
   .gprev .tt{color:var(--gold);font-size:12px;font-weight:700;margin-top:3px}
   .catcol{margin-top:14px; display:flex; flex-direction:column; gap:7px}
@@ -446,16 +458,23 @@ var HU=[['hu0','제이드'],['hu1','미나'],['hu2','핑키'],['hu3','카이'],[
 /* 악세사리(상점 판매) : id, 이름, 가격, 이모지 */
 var ACC=[['none','없음',0,''],['glasses','동그란 안경',1500,'👓'],['cap','볼캡',2500,'🧢'],['shades','선글라스',3500,'🕶️'],['scarf','머플러',4500,'🧣'],['phones','헤드폰',7000,'🎧'],['watch','골드시계',20000,'⌚'],['bag','명품백',35000,'👜'],['tophat','실크햇',12000,'🎩'],['crown','왕관',60000,'👑'],['ring','다이아 반지',90000,'💍']];
 var ACCEMO={}; ACC.forEach(function(a){ACCEMO[a[0]]=a[3];});
-var st={nick:hs.nick||'', ch:(hs.equip&&hs.equip.ch)||'hu0', car:(hs.equip&&hs.equip.car)||'bike', title:(hs.equip&&hs.equip.title)||'', acc:(hs.equip&&hs.equip.acc)||'none', setup:!!hs.setup,
-  owned:{car:new Set((hs.owned&&hs.owned.car)||['bike']), title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none'])}};
+var st={nick:hs.nick||'', ch:(hs.equip&&hs.equip.ch)||'hu0', title:(hs.equip&&hs.equip.title)||'', acc:(hs.equip&&hs.equip.acc)||'none',
+  pet:(hs.equip&&hs.equip.pet)||'', petEq:Object.assign({head:'',neck:'',face:''},(hs.equip&&hs.equip.petEq)||{}), setup:!!hs.setup,
+  owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[])}};
 if(!IMG[st.ch]){st.ch='hu0';}
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
-function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,equip:{ch:st.ch,car:st.car,title:st.title,acc:st.acc},owned:{car:[...st.owned.car],title:[...st.owned.title],acc:[...st.owned.acc]},jstars:jstars}));}
+function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi]},jstars:jstars}));}
 
-function avaHTML(){ var ch=st.ch,car=st.car;
+function avaHTML(){ var ch=st.ch;
   var inner = IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="em">'+(EMO[ch]||'🙂')+'</span>';
   var accB = (st.acc&&ACCEMO[st.acc])?'<span class="acc">'+ACCEMO[st.acc]+'</span>':'';
-  return inner+'<span class="car">'+EMO[car]+'</span>'+accB;
+  var petB = (st.pet&&st.owned.pet.has(st.pet))?'<img class="petmini" src="assets/'+st.pet+'.png" alt="">':'';
+  return inner+accB+petB;
+}
+function petHTML(){ if(!st.pet||!st.owned.pet.has(st.pet)) return '<div class="petempty"><span class="pe1">🐾</span><span class="pe2">아직 펫이 없어요</span><span class="pe3">상점 · 펫에서 입양해요</span></div>';
+  var h='<img class="petbase" src="assets/'+st.pet+'.png" alt="">';
+  ['neck','head','face'].forEach(function(sl){ var id=st.petEq[sl]; if(id&&st.owned.pi.has(id)) h+='<img class="pit '+sl+'" src="assets/'+id+'.png" alt="">'; });
+  return h;
 }
 function refreshProfile(){
   var a=$('pAva'); if(a)a.innerHTML=avaHTML();
@@ -518,17 +537,26 @@ function drawRank(){ var L=build();
 }
 document.addEventListener('click',function(e){ var m=e.target.closest('[data-met]'); if(m){rm=m.dataset.met;renderRank();return;} if(e.target.closest('#rkRefresh')){ if(FB)submitScore(); renderRank(); toast('랭킹 새로고침'); } });
 
-/* GARAGE — 캐릭터는 무료 선택, 상점은 탈것/악세사리/칭호 판매 */
-var ITEMS={
-  car:[['bike','자전거',0],['scooter','스쿠터',2500],['car','경차',7000],['taxi','세단',16000],['sports','스포츠카',40000],['rocket','슈퍼카',90000]],
-  acc:ACC,
-  title:[['','없음',0],['개미','개미 트레이더',2000],['존버의 신','존버의 신',12000],['청산 마스터','청산 마스터',22000],['🐋 고래','고래',60000],['전설','전설의 트레이더',120000]]};
+/* GARAGE — 캐릭터 무료 선택 · 펫/펫꾸미기/악세사리/칭호 사고팔기(판매=반값) */
+var PETNM=['골든리트리버','웰시코기','포메라니안','푸들','시바견','비글','닥스훈트','허스키','프렌치불독','말티즈','슈나우저','치와와','사모예드','보더콜리','카발리에','브리티시숏헤어','히말라얀','스코티시폴드','페르시안','샴','벵갈','삼색냥','턱시도냥','치즈냥','검은냥','러시안블루','갈색태비','메인쿤','아메숏','흰페르시안'];
+var PETPR=[4000,4500,7000,9000,5000,4000,5500,14000,8000,9500,7500,4500,20000,6500,10000,13000,22000,15000,26000,11000,24000,9000,6500,6000,7000,18000,7000,32000,9000,28000];
+var PETS=PETNM.map(function(n,i){return ['pt'+i,n,PETPR[i]];});
+var PAROW=[0,0,0,0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,5,5,5,5,5,5,5,6,6,6,6,6,7,7,7,7,7,7,7,8,8,8,8,8,8,8,9,9,9,9,9,9,9,10,10,10,10,10,10,10,11];
+var PACAT=['목줄','리본목줄','반다나','하네스','나비넥타이','목도리','왕관','귀·모자','모자','안경','목걸이·가방','케이프'];
+var PAPR=[2000,2800,2400,4500,2400,3800,16000,6000,7500,3200,9000,22000];
+var PASLOT=['neck','neck','neck','neck','neck','neck','head','head','face','neck','neck','neck'];
+var _pc={}, PAITEMS=PAROW.map(function(row,i){ _pc[row]=(_pc[row]||0)+1; return ['pa'+i, PACAT[row]+' '+_pc[row], PAPR[row]+(_pc[row]-1)*500, PASLOT[row]]; });
+var ITEMS={ pet:PETS, pi:PAITEMS, acc:ACC, title:[['','없음',0],['개미','개미 트레이더',2000],['존버의 신','존버의 신',12000],['청산 마스터','청산 마스터',22000],['🐋 고래','고래',60000],['전설','전설의 트레이더',120000]] };
 var gcat='char';
 function rar(p){return p===0?['기본','#5A6478']:p<5000?['일반','#9AA7BD']:p<15000?['레어','#4CC3FF']:p<45000?['에픽','#B980FF']:['전설','#E9B949'];}
+function ownSet(){ return gcat==='pet'?st.owned.pet:gcat==='pi'?st.owned.pi:st.owned[gcat]; }
+function isEq(id){ return gcat==='pet'?st.pet===id : gcat==='pi'?(st.petEq.head===id||st.petEq.neck===id||st.petEq.face===id) : gcat==='acc'?st.acc===id : st.title===id; }
+function slotOf(id){ var it=PAITEMS.find(function(x){return x[0]===id;}); return it?it[3]:'neck'; }
+function equipCur(id){ if(gcat==='pet')st.pet=id; else if(gcat==='pi'){var sl=slotOf(id); st.petEq[sl]=(st.petEq[sl]===id?'':id);} else if(gcat==='acc')st.acc=id; else st.title=id; }
 function renderGarage(){ refreshProfile();
-  $('gpv').innerHTML=avaHTML();
+  $('gpv').innerHTML=(gcat==='pet'||gcat==='pi')?petHTML():avaHTML();
   $('gpNick').textContent=st.nick; $('gpTitle').textContent=st.title?('👑 '+st.title):'';
-  var CN=[['char','캐릭터'],['car','탈것'],['acc','악세사리'],['title','칭호']];
+  var CN=[['char','캐릭터'],['pet','펫'],['pi','펫꾸미기'],['acc','악세사리'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<div class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</div>';}).join('');
   if(gcat==='char'){
     $('shop').innerHTML=HU.map(function(h){var id=h[0],nm=h[1],eq=st.ch===id;
@@ -536,22 +564,26 @@ function renderGarage(){ refreshProfile();
     }).join('');
     return;
   }
-  $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=st.owned[gcat].has(id),eq=(gcat==='car'?st.car:gcat==='acc'?st.acc:st.title)===id;var rr=rar(pr);
-    var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':gcat==='acc'?'<div class="pic"><div class="em">'+(it[3]||'—')+'</div></div>':(IMG[id]?'<div class="pic"><img src="'+IMG[id]+'" alt=""></div>':'<div class="pic"><div class="em">'+EMO[id]+'</div></div>');
+  $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=ownSet().has(id),eq=isEq(id),rr=rar(pr);
+    var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':gcat==='acc'?'<div class="pic"><div class="em">'+(it[3]||'—')+'</div></div>':'<div class="pic"><img src="assets/'+id+'.png" alt=""></div>';
     var stt=eq?'<div class="st" style="background:var(--gold);color:#111">장착중</div>':own?'<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>':'';
-    var price=pr===0?'<div class="pr" style="color:var(--ts)">기본</div>':own?'<div class="pr" style="color:var(--ts)">보유</div>':'<div class="pr">'+fmt(pr)+' P</div>';
-    return '<div class="item" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':rr[1]+'55')+';box-shadow:'+(eq?'0 0 16px -6px '+rr[1]:'none')+'">'+stt+vis+'<div class="nm">'+nm+'</div><div class="rr" style="color:'+rr[1]+'">'+rr[0]+'</div>'+price+'</div>';
+    var foot = pr===0?'<div class="pr" style="color:var(--ts)">기본</div>' : own?'<div class="sellb" data-sell="'+id+'">💰 '+fmt(Math.floor(pr/2))+'P 판매</div>' : '<div class="pr">'+fmt(pr)+' P</div>';
+    return '<div class="item" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':rr[1]+'55')+';box-shadow:'+(eq?'0 0 16px -6px '+rr[1]:'none')+'">'+stt+vis+'<div class="nm">'+nm+'</div><div class="rr" style="color:'+rr[1]+'">'+rr[0]+'</div>'+foot+'</div>';
   }).join('');
 }
+function sellItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;}); if(!row||row[2]===0)return; var refund=Math.floor(row[2]/2);
+  if(gcat==='pet'){ if(st.pet===id)st.pet=''; st.owned.pet.delete(id); }
+  else if(gcat==='pi'){ for(var s in st.petEq)if(st.petEq[s]===id)st.petEq[s]=''; st.owned.pi.delete(id); }
+  else { if(isEq(id)){ if(gcat==='acc')st.acc='none'; else st.title=''; } st.owned[gcat].delete(id); }
+  setBal(getBal()+refund); saveHS(); refreshProfile(); renderGarage(); toast('💰 '+row[1]+' 판매 · +'+fmt(refund)+'P'); }
 document.addEventListener('click',function(e){
   var c=e.target.closest('[data-cat]'); if(c){gcat=c.dataset.cat;renderGarage();return;}
+  var sb=e.target.closest('[data-sell]'); if(sb){ sellItem(sb.dataset.sell); return; }
   var it=e.target.closest('#shop .item'); if(!it)return; var id=it.dataset.id;
   if(gcat==='char'){ st.ch=id; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
-  var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var pr=row[2]; var own=st.owned[gcat].has(id);
-  function equip(){ if(gcat==='car')st.car=id;else if(gcat==='acc')st.acc=id;else st.title=id; }
-  if(own){ equip(); saveHS(); toast(row[1]+' 장착!'); }
-  else { var bal=getBal(); if(bal>=pr){ setBal(bal-pr); st.owned[gcat].add(id); equip(); saveHS(); toast('🛒 '+row[1]+' 구매 & 장착!'); } else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); return; } }
-  renderGarage();
+  var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var pr=row[2]; var own=ownSet().has(id);
+  if(own){ equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast(row[1]+(isEq(id)?' 장착!':' 해제')); }
+  else { var bal=getBal(); if(bal>=pr){ setBal(bal-pr); ownSet().add(id); equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast('🛒 '+row[1]+' 구매 & 장착!'); } else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); return; } }
 });
 
 /* 첫 실행: 캐릭터 선택 (히어로 + 캐러셀 + 닉네임, 한 번만) */
