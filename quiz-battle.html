@@ -38,6 +38,7 @@
   .live{font-size:11px; font-weight:900; color:#fff; background:#e5484d; padding:3px 9px; border-radius:6px; box-shadow:0 0 12px rgba(229,72,77,.6); animation:blink 1.2s infinite}
   @keyframes blink{50%{opacity:.55}}
   .round{margin-left:auto; font-family:var(--mono); font-weight:800; color:var(--gold); font-size:15px}
+  .bbal{font-family:var(--mono); font-weight:900; color:#FCE9A6; font-size:14px; background:rgba(233,185,73,.14); border:1px solid rgba(233,185,73,.4); border-radius:999px; padding:4px 12px}
   .endbtn{margin-left:12px; background:#123; border:1px solid #2a4b7a; color:#9fc3ff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer}
 
   /* TV 스크린(차트) */
@@ -50,9 +51,13 @@
   .timer .n{font-family:var(--mono); font-weight:900; font-size:30px; line-height:1; color:var(--gold); text-shadow:0 0 12px rgba(233,185,73,.6)}
   .timer .b{width:88px; height:6px; margin-top:4px; border-radius:3px; background:#0a1a33; overflow:hidden}
   .timer .b i{display:block; height:100%; background:linear-gradient(90deg,var(--green),var(--gold)); width:100%}
-  .verdict{position:absolute; left:50%; top:48%; transform:translate(-50%,-50%) scale(.7); opacity:0; transition:all .3s;
-    font-weight:900; font-size:34px; color:#fff; text-shadow:0 2px 14px #000, 0 0 26px rgba(233,185,73,.7); white-space:nowrap; z-index:3}
+  .verdict{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%) scale(.7); opacity:0; transition:all .3s; text-align:center;
+    background:rgba(6,12,26,.9); border:1px solid rgba(233,185,73,.5); border-radius:16px; padding:12px 22px; z-index:3; box-shadow:0 12px 40px -10px #000; white-space:nowrap}
   .verdict.show{opacity:1; transform:translate(-50%,-50%) scale(1)}
+  .verdict .mv{font-weight:900; font-size:32px; line-height:1.05; text-shadow:0 2px 14px #000}
+  .verdict .pl{font-weight:800; font-size:16px; color:#EAF0FA; margin-top:6px}
+  .verdict .bl{font-family:var(--mono); font-size:12.5px; color:#93A0BC; margin-top:3px}
+  .verdict .bl b{color:#FCE9A6}
 
   /* 단상 4개 */
   .podiums{position:absolute; left:0; right:0; bottom:80px; z-index:2; display:flex; justify-content:center; gap:20px; padding:0 22px}
@@ -76,18 +81,23 @@
   .desk.lead .crown{opacity:1}
 
   /* 하단 컨트롤 (내 선택) */
-  .ctrl{position:absolute; left:0; right:0; bottom:0; z-index:4; height:74px; display:flex; align-items:center; gap:10px; padding:0 20px;
+  .ctrl{position:absolute; left:0; right:0; bottom:0; z-index:4; height:74px; display:flex; align-items:center; gap:13px; padding:0 16px;
     background:linear-gradient(0deg,rgba(6,12,26,.96),rgba(6,12,26,.55)); border-top:1px solid #1a2c4e}
   .ctrl .lab{font-size:12px; color:#93A0BC; font-weight:700; margin-right:2px}
-  .dir{flex:1; max-width:150px; text-align:center; padding:8px 6px; border-radius:12px; cursor:pointer; border:2px solid transparent; background:#0e1c38; font-weight:900; font-size:15px}
+  .cgrp{display:flex; align-items:center; gap:5px}
+  .clab{font-size:10px; color:#7d8bab; font-weight:800; letter-spacing:.02em}
+  .dir{flex:0 0 auto; width:86px; text-align:center; padding:7px 4px; border-radius:11px; cursor:pointer; border:2px solid transparent; background:#0e1c38; font-weight:900; font-size:14px}
   .dir small{display:block; font-size:9px; font-weight:400; opacity:.75}
+  .bets{display:flex; gap:4px}
+  .bet{padding:8px 9px; border-radius:9px; background:#0e1c38; border:1px solid #2c4a35; color:#9fe3bb; font-weight:800; font-size:12px; cursor:pointer; min-width:36px; text-align:center}
+  .bet.on{background:linear-gradient(180deg,#8fe3b0,#35D07A); color:#06301c; border-color:transparent}
   .dir.long{color:var(--green)} .dir.long.on{background:rgba(53,208,122,.2); border-color:var(--green); box-shadow:0 0 16px -3px rgba(53,208,122,.6)}
   .dir.short{color:var(--pink)} .dir.short.on{background:rgba(255,92,138,.2); border-color:var(--pink); box-shadow:0 0 16px -3px rgba(255,92,138,.6)}
   .dir.watch{color:var(--gold)} .dir.watch.on{background:rgba(233,185,73,.2); border-color:var(--gold); box-shadow:0 0 16px -3px rgba(233,185,73,.6)}
-  .levs{display:flex; gap:5px}
-  .lev{padding:8px 11px; border-radius:9px; background:#0e1c38; border:1px solid #24406e; color:#9fc3ff; font-weight:800; font-size:13px; cursor:pointer}
+  .levs{display:flex; gap:4px}
+  .lev{padding:8px 9px; border-radius:9px; background:#0e1c38; border:1px solid #24406e; color:#9fc3ff; font-weight:800; font-size:12px; cursor:pointer; min-width:32px; text-align:center}
   .lev.on{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:#3a2c07; border-color:transparent}
-  .go{margin-left:auto; border:none; cursor:pointer; font-family:inherit; color:#3a2c07; font-weight:900; font-size:15px; padding:10px 20px; border-radius:12px;
+  .go{margin-left:auto; border:none; cursor:pointer; font-family:inherit; color:#3a2c07; font-weight:900; font-size:13.5px; padding:10px 16px; border-radius:12px; white-space:nowrap;
     background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); box-shadow:0 6px 18px -4px rgba(233,185,73,.6)}
   .go.next{background:linear-gradient(180deg,#8fd6ff,#4CA9FF); color:#04223f}
   .go:disabled{background:#1a2c4e; color:#5a7099; box-shadow:none; cursor:default}
@@ -127,7 +137,7 @@
 <div class="cap">
   <div class="k">ChartArena · 차트배틀 LIVE</div>
   <h1>📺 가로 퀴즈쇼 차트배틀</h1>
-  <p>4명이 <b style="color:#35D07A">실제 바이낸스 차트</b>로 대결! 롱/숏/관망을 고르면 <b style="color:#EAF0FA">미래가 공개</b>되고, 정답 때 <b style="color:#E9B949">어떤 종목·몇 분봉</b>인지 공개됩니다. 이모티콘으로 서로 응원·약올림! (봇 3명 vs 나)</p>
+  <p>4명이 <b style="color:#35D07A">실제 바이낸스 차트</b>로 대결! <b style="color:#EAF0FA">배팅액(보유 %)·방향·레버리지</b>를 걸면 미래가 공개돼요. 코인이 움직인 <b style="color:#E9B949">%만큼 배당</b> — 맞히면 따고 틀리면 배팅액을 잃어요. (봇 3명 vs 나)</p>
   <div class="rotate">📱 폰이면 가로로 돌려서 보세요 · 전체 화면이 폭에 맞게 축소됩니다</div>
 </div>
 
@@ -139,6 +149,7 @@
     <img class="blogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <span class="live">● LIVE</span>
     <span class="round" id="round">ROUND 1 / 10</span>
+    <span class="bbal" id="bbal">💰 0</span>
     <button class="endbtn" type="button" id="endbtn">종료</button>
   </div>
 
@@ -153,11 +164,13 @@
   <div class="podiums" id="podiums"></div>
 
   <div class="ctrl">
-    <span class="lab">내 선택</span>
-    <div class="dir long" data-dir="L" id="dL">↗ 롱<small>상승</small></div>
-    <div class="dir short" data-dir="S" id="dS">↘ 숏<small>하락</small></div>
-    <div class="dir watch" data-dir="W" id="dW">◎ 관망<small>보존</small></div>
-    <div class="levs" id="levs"></div>
+    <div class="cgrp"><span class="clab">방향</span>
+      <div class="dir long" data-dir="L" id="dL">↗ 롱<small>상승</small></div>
+      <div class="dir short" data-dir="S" id="dS">↘ 숏<small>하락</small></div>
+      <div class="dir watch" data-dir="W" id="dW">◎ 관망<small>안 검</small></div>
+    </div>
+    <div class="cgrp"><span class="clab">배팅</span><div class="bets" id="bets"></div></div>
+    <div class="cgrp"><span class="clab">배율</span><div class="levs" id="levs"></div></div>
     <button class="go" id="go" type="button">확정 ▶</button>
   </div>
   <div class="msg" id="msg"></div>
@@ -185,6 +198,16 @@ for(var _pi=0;_pi<45;_pi++)CHIMG['pet'+_pi]='assets/pet'+_pi+'.png';
 for(var _hi=0;_hi<17;_hi++)CHIMG['hu'+_hi]='assets/hu'+_hi+'.png';
 var hub={}; try{hub=JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){}
 var myCh=(hub.equip&&hub.equip.ch)||'shark', myNick=hub.nick||'차트고수';
+/* 보유 포인트(전 앱 공유) — 배팅/배당에 실제로 사용 */
+var GS='chartarena_web_v1';
+function ljg(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return{};}}
+function getBal(){var g=ljg(GS);return typeof g.balance==='number'?g.balance:25000;}
+function setBal(v){var g=ljg(GS);g.balance=Math.max(0,Math.round(v));localStorage.setItem(GS,JSON.stringify(g));}
+function fmtP(n){return Math.round(n).toLocaleString();}
+/* 배팅액 = 보유 포인트의 비율 (포커·맞고처럼 스택 일부를 건다) */
+var BETPCTS=[[0.1,'10%'],[0.25,'25%'],[0.5,'50%'],[1,'올인']];
+var roundBet=0;
+function curBet(){ if(mySel&&mySel.dir==='W')return 0; return Math.max(0,Math.round(getBal()*((mySel&&mySel.betPct)||0.25))); }
 
 /* 화면폭에 맞춰 가로 무대 스케일 */
 function fit(){ var s=Math.min(1,(window.innerWidth-16)/1120); var sc=$('scaler');
@@ -259,25 +282,34 @@ function renderPods(){
       +'<div class="desk'+(i===0?' me':'')+(p.score===lead&&phase==='result'?' lead':'')+'">'
         +'<div class="crown">👑</div>'
         +'<div class="nm">'+(i===0?'⭐ ':'')+p.name+'</div>'
-        +'<div class="led">'+fmtScore(p.score)+'</div>'
+        +'<div class="led">'+fmtLead(p.score)+'P</div>'
         +'<div class="delta" id="dl'+i+'"></div>'
       +'</div></div>';
   }).join('');
 }
 function fmtScore(v){ var s=(v<0?'-':'')+('000'+Math.abs(v)).slice(-4); return s; }
+/* 리더보드용 누적 손익(P) 표기 */
+function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.round(v/1000)+'K':a>=10000?(v/1000).toFixed(1).replace('.0','')+'K':fmtP(v); return (v>0?'+':'')+s; }
 
 /* 컨트롤 */
 function renderCtrl(){
   ['L','S','W'].forEach(function(d){ $('d'+d).classList.toggle('on', mySel.dir===d); });
+  var bal=getBal(); var bb=$('bbal'); if(bb)bb.textContent='💰 '+fmtP(bal);
+  $('bets').innerHTML=BETPCTS.map(function(b){ return '<div class="bet'+(mySel.betPct===b[0]?' on':'')+'" data-bp="'+b[0]+'">'+b[1]+'</div>'; }).join('');
   $('levs').innerHTML=[1,2,3,5,10].map(function(l){return '<div class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'">'+l+'배</div>';}).join('');
-  var go=$('go');
-  if(phase==='pick'){ go.className='go'; go.textContent='확정 ▶'; go.disabled=(mySel.dir===null); }
+  var go=$('go'), bet=curBet();
+  if(phase==='pick'){ go.className='go';
+    if(mySel.dir===null) go.textContent='방향을 골라주세요';
+    else if(mySel.dir==='W') go.textContent='◎ 관망 확정 ▶';
+    else go.textContent='💰'+fmtP(bet)+'P · '+({L:'롱',S:'숏'}[mySel.dir])+' '+mySel.lev+'배 확정 ▶';
+    go.disabled=(mySel.dir===null)||(bal<=0&&mySel.dir!=='W'); }
   else if(phase==='result'){ go.className='go next'; go.textContent=(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶'); go.disabled=false; }
   else { go.className='go'; go.disabled=true; go.textContent='공개 중…'; }
 }
 $('dL').onclick=function(){pick('L');}; $('dS').onclick=function(){pick('S');}; $('dW').onclick=function(){pick('W');};
 function pick(d){ if(phase!=='pick')return; mySel.dir=d; players[0].pick=d; renderCtrl(); renderPods(); }
 $('levs').onclick=function(e){ var l=e.target.closest('[data-lev]'); if(l&&phase==='pick'){mySel.lev=+l.dataset.lev; players[0].lev=mySel.lev; renderCtrl();} };
+$('bets').onclick=function(e){ var b=e.target.closest('[data-bp]'); if(b&&phase==='pick'){ mySel.betPct=+b.dataset.bp; renderCtrl(); } };
 $('go').onclick=function(){ if(phase==='pick'){ if(mySel.dir===null){toast('방향을 선택하세요');return;} lockIn(); } else if(phase==='result'){ nextRound(); } };
 $('endbtn').onclick=function(){ toast('데모 — 로비로'); };
 
@@ -312,7 +344,7 @@ function botPick(p){
 
 /* 라운드 시작 */
 function startRound(){
-  phase='pick'; GD=pickSeg(); gRev=GD.vis; resetView(); tleft=15; mySel={dir:null,lev:2}; $('chartid').classList.remove('show'); var _bs=$('bShare'); if(_bs)_bs.style.display='none';
+  phase='pick'; GD=pickSeg(); gRev=GD.vis; resetView(); tleft=15; mySel={dir:null,lev:2,betPct:(mySel&&mySel.betPct)||0.25}; $('chartid').classList.remove('show'); var _bs=$('bShare'); if(_bs)_bs.style.display='none';
   players.forEach(function(p){p.pick=null;p.dp=0;});
   $('round').textContent='ROUND '+round+' / '+ROUNDS;
   $('tvtag').textContent='난이도 '+'◆'.repeat(3+(round%3))+'◇'.repeat(5-(3+(round%3)));
@@ -326,6 +358,7 @@ function startRound(){
 function lockIn(){
   if(phase!=='pick')return; clearInterval(tmr); phase='reveal';
   if(players[0].pick===null){ players[0].pick='W'; }
+  roundBet = (players[0].pick==='W') ? 0 : Math.min(getBal(), Math.max(1, Math.round(getBal()*mySel.betPct)));  // 이 라운드 배팅액 확정 (방향 걸면 최소 1P)
   players.forEach(function(p,i){ if(i>0) p.pick=botPick(p); });
   renderPods(); renderCtrl(); resetView(); drawChart();
   var target=GD.vis+30;
@@ -336,22 +369,32 @@ function lockIn(){
 function finishRound(){
   gRev=GD.vis+30; drawChart();
   var cs=GD.cs,vis=GD.vis,entry=cs[vis-1][3],exit=cs[vis-1+30][3];
-  var liq=false;
-  players.forEach(function(p){ var sign=p.pick==='L'?1:(p.pick==='S'?-1:0);
-    var ret=sign*(exit-entry)/entry*100*p.lev; if(p.strat==='me'&&ret<=-100)liq=true; p.dp=Math.round(ret*3); p.score+=p.dp; });
+  var moveRaw=(exit-entry)/entry*100;                 // 코인 실제 % 움직임 (+오름 / -내림)
+  var bal0=getBal();
+  var botBet=Math.max(100, Math.round(bal0*0.25));    // 봇 기본 스테이크(비교용)
+  players.forEach(function(p,i){ var bet=(i===0)?roundBet:botBet; var sign=p.pick==='L'?1:(p.pick==='S'?-1:0);
+    var ret=sign*moveRaw*p.lev;                        // 내 방향 기준 수익률%(레버리지 포함)
+    var pnl=Math.round(bet*ret/100); if(pnl<-bet)pnl=-bet;   // 손실은 배팅액까지만
+    p.dp=pnl; p.score+=pnl; });
+  var meP=players[0].dp, nb=bal0+meP; setBal(nb);      // 내 보유 포인트 실제 반영
   phase='result'; renderPods(); renderCtrl();
   $('chartid').innerHTML='🔍 실제 차트 공개 · <b>'+GD.sym+' '+GD.tf+'</b><span class="rl">Binance 실데이터</span>'; $('chartid').classList.add('show');
-  if(liq){ if(tmr)clearInterval(tmr); var vq=$('verdict'); if(vq){vq.textContent='💥 청산! -100% · 홈으로 강제 이동…'; vq.style.color='#FF5C6C'; vq.classList.add('show');}
-    var gq=$('go'); if(gq)gq.disabled=true; toast('💥 청산되었습니다 · 홈 화면으로 이동합니다'); botReact();
-    setTimeout(function(){ try{location.href='index.html';}catch(e){} }, 2300); return; }
-  // 델타 애니메이션
+  // 델타(P) 애니메이션
   players.forEach(function(p,i){ var d=$('dl'+i); if(!d)return; if(p.dp===0){d.textContent='±0';d.style.color='#93A0BC';}
-    else{d.textContent=(p.dp>0?'+':'')+p.dp; d.style.color=p.dp>0?'#35D07A':'#FF5C8A';} d.style.opacity='1'; d.style.top='-26px'; });
-  // 판정 문구
-  var me=players[0], best=Math.max.apply(null,players.map(function(p){return p.dp;}));
-  var v=$('verdict'); v.textContent = me.dp>0?(me.dp>=best?'🔥 이번 판 1등!':'👍 수익!'):(me.dp<0?'💧 손실…':'😐 관망');
-  v.style.color = me.dp>0?'#35D07A':(me.dp<0?'#FF5C8A':'#E9B949'); v.classList.add('show');
+    else{d.textContent=(p.dp>0?'+':'')+fmtP(p.dp); d.style.color=p.dp>0?'#35D07A':'#FF5C8A';} d.style.opacity='1'; d.style.top='-26px'; });
+  // 코인 움직임 + 내 손익 크게 공개
+  var pk=players[0].pick, dl={L:'롱',S:'숏',W:'관망'}[pk];
+  var arrow=moveRaw>=0?'▲':'▼', mvcol=moveRaw>=0?'#35D07A':'#FF5C8A';
+  var plHtml = (pk==='W') ? '<span style="color:#E9B949">관망 · 손익 없음</span>'
+    : (dl+' '+players[0].lev+'배 · '+fmtP(roundBet)+'P → <b style="color:'+(meP>=0?'#35D07A':'#FF5C8A')+'">'+(meP>=0?'+':'')+fmtP(meP)+'P</b>');
+  var v=$('verdict');
+  v.innerHTML='<div class="mv" style="color:'+mvcol+'">코인 '+arrow+' '+Math.abs(moveRaw).toFixed(1)+'%</div>'
+    +'<div class="pl">'+plHtml+'</div>'
+    +'<div class="bl">보유 '+fmtP(bal0)+' → <b>'+fmtP(nb)+'P</b></div>';
+  v.classList.add('show');
   botReact(); _battleCard();
+  if(bal0>0 && meP<0 && nb<=0){ if(tmr)clearInterval(tmr); var gq=$('go'); if(gq)gq.disabled=true;   // 실제 손실로 0이 됐을 때만 파산
+    toast('💥 파산! 포인트를 모두 잃었어요 · [다시 하기]로 재도전(25,000P)'); setTimeout(function(){ finalResult(); }, 2800); }
 }
 function nextRound(){
   if(round>=ROUNDS){ finalResult(); return; }
@@ -359,11 +402,14 @@ function nextRound(){
 }
 function finalResult(){
   var ranked=players.slice().sort(function(a,b){return b.score-a.score;});
-  var v=$('verdict'); v.style.color='#E9B949';
-  v.textContent = ranked[0]===players[0]?'🏆 우승! 축하합니다':'🏆 우승: '+ranked[0].name;
+  var champ = ranked[0]===players[0]?'우승! 축하합니다':'우승: '+ranked[0].name;
+  var v=$('verdict'); v.style.color='';
+  v.innerHTML='<div class="mv" style="color:#E9B949;font-size:26px">🏆 '+champ+'</div>'
+    +'<div class="bl">최종 보유 <b>'+fmtP(getBal())+'P</b> · 이번 배틀 손익 '+(players[0].score>=0?'+':'')+fmtP(players[0].score)+'P</div>';
   v.classList.add('show');
-  var go=$('go'); go.className='go next'; go.textContent='🔄 다시 하기';
-  go.onclick=function(){ players.forEach(function(p){p.score=0;p.pick=null;p.dp=0;}); round=1; startRound(); go.onclick=function(){ if(phase==='pick'){if(mySel.dir===null){toast('방향을 선택하세요');return;}lockIn();}else if(phase==='result'){nextRound();} }; };
+  var go=$('go'); go.className='go next'; go.disabled=false; go.textContent='🔄 다시 하기';   // 파산 후에도 재시작 가능하도록 활성화
+  go.onclick=function(){ if(getBal()<=0) setBal(25000);   // 파산 시 재도전 시드 지급
+    players.forEach(function(p){p.score=0;p.pick=null;p.dp=0;}); round=1; startRound(); go.onclick=function(){ if(phase==='pick'){if(mySel.dir===null){toast('방향을 선택하세요');return;}lockIn();}else if(phase==='result'){nextRound();} }; };
 }
 
 (function(){ var cv=$('chart'); if(!cv)return; cv.style.touchAction='none'; cv.style.cursor='grab'; var drag=null;
