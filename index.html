@@ -247,6 +247,9 @@
   .gprev .pv .petempty .pe3{font-size:11px;color:var(--ts)}
   .profcard .ava .petmini,.gprev .pv .petmini{position:absolute;bottom:-3px;left:-5px;width:48%;height:48%;object-fit:contain;z-index:4;filter:drop-shadow(0 2px 5px rgba(0,0,0,.6));transform:none}
   .sellb{font-family:var(--mono);font-size:11px;font-weight:800;margin-top:5px;color:#FF8AA6;background:rgba(255,92,138,.12);border:1px solid rgba(255,92,138,.4);border-radius:8px;padding:4px 6px;cursor:pointer;display:inline-block}
+  .buyb{font-size:11.5px;font-weight:900;margin-top:5px;color:#04223f;background:linear-gradient(180deg,#8fd6ff,#4CA9FF);border:none;border-radius:8px;padding:5px 8px;cursor:pointer;display:inline-block;box-shadow:0 4px 12px -4px rgba(76,169,255,.6)}
+  .gprev{position:relative}
+  .gprev.previewing::before{content:'👀 미리보기 중 · 구매 전';position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:3;font-size:10.5px;font-weight:900;color:#04223f;background:linear-gradient(90deg,#8fd6ff,#4CA9FF);border-radius:999px;padding:3px 10px;white-space:nowrap;box-shadow:0 4px 12px -4px rgba(0,0,0,.6)}
   .sellb:hover{background:rgba(255,92,138,.22)}
   .gprev .nm{font-weight:800;font-size:16px;margin-top:12px}
   .gprev .tt{color:var(--gold);font-size:12px;font-weight:700;margin-top:3px}
@@ -566,15 +569,24 @@ if(!IMG[st.ch]){st.ch='hu0';}
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
 function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi]},jstars:jstars}));}
 
-function avaHTML(){ var ch=st.ch;
+var PV={cat:'',id:''};   // 상점 미리보기(구매 전 착용) — 사이드바 아바타엔 미적용
+function avaHTML(pv){ var ch=(pv&&PV.cat==='char'&&PV.id)?PV.id:st.ch;
   var inner = IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="em">'+(EMO[ch]||'🙂')+'</span>';
-  var accB = (st.acc&&ACCEMO[st.acc])?'<span class="acc">'+ACCEMO[st.acc]+'</span>':'';
-  var petB = (st.pet&&st.owned.pet.has(st.pet))?'<img class="petmini" src="assets/'+st.pet+'.png" alt="">':'';
+  var accId=(pv&&PV.cat==='acc'&&PV.id)?PV.id:st.acc;
+  var accB = (accId&&ACCEMO[accId])?'<span class="acc">'+ACCEMO[accId]+'</span>':'';
+  var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
+  var petShow = petId && ((pv&&PV.cat==='pet'&&PV.id===petId)||st.owned.pet.has(petId));
+  var petB = petShow?'<img class="petmini" src="assets/'+petId+'.png" alt="">':'';
   return inner+accB+petB;
 }
-function petHTML(){ if(!st.pet||!st.owned.pet.has(st.pet)) return '<div class="petempty"><span class="pe1">🐾</span><span class="pe2">아직 펫이 없어요</span><span class="pe3">상점 · 펫에서 입양해요</span></div>';
-  var h='<img class="petbase" src="assets/'+st.pet+'.png" alt="">';
-  ['neck','head','face'].forEach(function(sl){ var id=st.petEq[sl]; if(id&&st.owned.pi.has(id)) h+='<img class="pit '+sl+'" src="assets/'+id+'.png" alt="">'; });
+function petHTML(pv){ var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
+  var petShow = petId && ((pv&&PV.cat==='pet'&&PV.id===petId)||st.owned.pet.has(petId));
+  if(!petShow) return '<div class="petempty"><span class="pe1">🐾</span><span class="pe2">아직 펫이 없어요</span><span class="pe3">상점 · 펫에서 입양해요</span></div>';
+  var h='<img class="petbase" src="assets/'+petId+'.png" alt="">';
+  ['neck','head','face'].forEach(function(sl){ var id=st.petEq[sl];
+    if(pv&&PV.cat==='pi'&&PV.id&&slotOf(PV.id)===sl) id=PV.id;   // 미리보기 아이템으로 슬롯 대체
+    var show = id && ((pv&&PV.cat==='pi'&&PV.id===id)||st.owned.pi.has(id));
+    if(show) h+='<img class="pit '+sl+'" src="assets/'+id+'.png" alt="">'; });
   return h;
 }
 function refreshProfile(){
@@ -670,7 +682,7 @@ function isEq(id){ return gcat==='pet'?st.pet===id : gcat==='pi'?(st.petEq.head=
 function slotOf(id){ var it=PAITEMS.find(function(x){return x[0]===id;}); return it?it[3]:'neck'; }
 function equipCur(id){ if(gcat==='pet')st.pet=id; else if(gcat==='pi'){var sl=slotOf(id); st.petEq[sl]=(st.petEq[sl]===id?'':id);} else if(gcat==='acc')st.acc=id; else st.title=id; }
 function renderGarage(){ refreshProfile();
-  $('gpv').innerHTML=(gcat==='pet'||gcat==='pi')?petHTML():avaHTML();
+  $('gpv').innerHTML=(gcat==='pet'||gcat==='pi')?petHTML(true):avaHTML(true); var _gp=$('gpv'); if(_gp&&_gp.parentNode)_gp.parentNode.classList.toggle('previewing', !!PV.id);
   $('gpNick').textContent=st.nick; $('gpTitle').textContent=st.title?('👑 '+st.title):'';
   var CN=[['char','캐릭터'],['pet','펫'],['pi','펫꾸미기'],['acc','악세사리'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<div class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</div>';}).join('');
@@ -680,27 +692,31 @@ function renderGarage(){ refreshProfile();
     }).join('');
     return;
   }
-  $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=ownSet().has(id),eq=isEq(id),rr=rar(pr);
+  $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=ownSet().has(id),eq=isEq(id),rr=rar(pr);var isPrev=(!own&&PV.cat===gcat&&PV.id===id);
     var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':gcat==='acc'?'<div class="pic"><div class="em">'+(it[3]||'—')+'</div></div>':'<div class="pic"><img src="assets/'+id+'.png" alt=""></div>';
-    var stt=eq?'<div class="st" style="background:var(--gold);color:#111">장착중</div>':own?'<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>':'';
-    var foot = pr===0?'<div class="pr" style="color:var(--ts)">기본</div>' : own?'<div class="sellb" data-sell="'+id+'">💰 '+fmt(Math.floor(pr/2))+'P 판매</div>' : '<div class="pr">'+fmt(pr)+' P</div>';
-    return '<div class="item" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':rr[1]+'55')+';box-shadow:'+(eq?'0 0 16px -6px '+rr[1]:'none')+'">'+stt+vis+'<div class="nm">'+nm+'</div><div class="rr" style="color:'+rr[1]+'">'+rr[0]+'</div>'+foot+'</div>';
+    var stt=eq?'<div class="st" style="background:var(--gold);color:#111">장착중</div>':own?'<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>':(isPrev?'<div class="st" style="background:var(--blue);color:#04223f">👀 미리보기</div>':'');
+    var foot = pr===0?'<div class="pr" style="color:var(--ts)">기본</div>' : own?'<div class="sellb" data-sell="'+id+'">💰 '+fmt(Math.floor(pr/2))+'P 판매</div>' : (isPrev?'<div class="buyb" data-buy="'+id+'">🛒 구매하기 '+fmt(pr)+'P</div>':'<div class="pr">'+fmt(pr)+' P</div>');
+    return '<div class="item'+(isPrev?' prev':'')+'" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':isPrev?'var(--blue)':rr[1]+'55')+';box-shadow:'+(eq?'0 0 16px -6px '+rr[1]:isPrev?'0 0 18px -4px var(--blue)':'none')+'">'+stt+vis+'<div class="nm">'+nm+'</div><div class="rr" style="color:'+rr[1]+'">'+rr[0]+'</div>'+foot+'</div>';
   }).join('');
 }
 function sellItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;}); if(!row||row[2]===0)return; var refund=Math.floor(row[2]/2);
   if(gcat==='pet'){ if(st.pet===id)st.pet=''; st.owned.pet.delete(id); }
   else if(gcat==='pi'){ for(var s in st.petEq)if(st.petEq[s]===id)st.petEq[s]=''; st.owned.pi.delete(id); }
   else { if(isEq(id)){ if(gcat==='acc')st.acc='none'; else st.title=''; } st.owned[gcat].delete(id); }
-  setBal(getBal()+refund); saveHS(); refreshProfile(); renderGarage(); toast('💰 '+row[1]+' 판매 · +'+fmt(refund)+'P'); }
+  PV={cat:'',id:''}; setBal(getBal()+refund); saveHS(); refreshProfile(); renderGarage(); toast('💰 '+row[1]+' 판매 · +'+fmt(refund)+'P'); }
 document.addEventListener('click',function(e){
-  var c=e.target.closest('[data-cat]'); if(c){gcat=c.dataset.cat;renderGarage();return;}
+  var c=e.target.closest('[data-cat]'); if(c){gcat=c.dataset.cat; PV={cat:'',id:''}; renderGarage();return;}
+  var bb=e.target.closest('[data-buy]'); if(bb){ buyItem(bb.dataset.buy); return; }
   var sb=e.target.closest('[data-sell]'); if(sb){ sellItem(sb.dataset.sell); return; }
   var it=e.target.closest('#shop .item'); if(!it)return; var id=it.dataset.id;
-  if(gcat==='char'){ st.ch=id; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
-  var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var pr=row[2]; var own=ownSet().has(id);
-  if(own){ equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast(row[1]+(isEq(id)?' 장착!':' 해제')); }
-  else { var bal=getBal(); if(bal>=pr){ setBal(bal-pr); ownSet().add(id); equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast('🛒 '+row[1]+' 구매 & 장착!'); } else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); return; } }
+  if(gcat==='char'){ st.ch=id; PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
+  var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var own=ownSet().has(id);
+  if(own){ PV={cat:'',id:''}; equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast(row[1]+(isEq(id)?' 장착!':' 해제')); }
+  else { if(PV.cat===gcat&&PV.id===id){ PV={cat:'',id:''}; } else { PV={cat:gcat,id:id}; toast('👀 미리보기 — [구매하기]로 확정'); } renderGarage(); }   // 구매 전 착용 미리보기(토글)
 });
+function buyItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;}); if(!row)return; var pr=row[2]; var bal=getBal();
+  if(bal>=pr){ setBal(bal-pr); ownSet().add(id); equipCur(id); PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('🛒 '+row[1]+' 구매 & 장착!'); }
+  else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); } }
 
 /* 첫 실행: 캐릭터 선택 (히어로 + 캐러셀 + 닉네임, 한 번만) */
 (function(){ var ov=$('setup'); if(!ov)return;
