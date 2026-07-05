@@ -214,7 +214,7 @@
   .tab{padding:9px 16px; border-radius:9px; background:var(--p1); border:1px solid var(--line); color:var(--ts); font-weight:800; font-size:13px; cursor:pointer}
   .tab.on{background:linear-gradient(180deg,var(--gold2),var(--gold)); color:#2a2107; border-color:transparent}
   .tab.sm.on{background:var(--p2); color:var(--gold); border-color:var(--gold)}
-  .rankwrap{display:flex; gap:16px}
+  .rankwrap{display:flex; gap:16px; align-items:flex-start}
   .podium{flex:0 0 330px; display:flex; align-items:flex-end; gap:9px}
   .ped{flex:1; text-align:center; border-radius:12px 12px 8px 8px; padding:12px 5px; background:linear-gradient(180deg,var(--p2),var(--p1)); border:1px solid var(--line)}
   .ped.p1{border-color:var(--gold); box-shadow:0 0 22px -6px rgba(233,185,73,.5); padding-bottom:20px}
@@ -378,7 +378,7 @@
     <img class="brandlogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <div class="tsp"></div>
     <div class="curr">
-      <div class="pill coin"><span class="cico">$</span><span>12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
+      <div class="pill coin"><span class="cico">P</span><span id="tbCoin">12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
       <div class="pill gem"><span class="cico">◆</span><span>2,380</span></div>
     </div>
     <div class="ticons">
@@ -592,6 +592,7 @@ function petHTML(pv){ var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
 function refreshProfile(){
   var a=$('pAva'); if(a)a.innerHTML=avaHTML();
   var p=$('pPoints'); if(p)p.textContent=fmt(getBal())+' P';
+  var tc=$('tbCoin'); if(tc)tc.textContent=fmt(getBal());   // 상단바 잔고 = 실제 보유 포인트
   var n=$('pName'); if(n)n.textContent=st.nick;
 }
 function renderHome(){ refreshProfile(); renderPuzzleHero(); }
@@ -649,7 +650,7 @@ function mc(e){return rm==='best'?'up':'';}
 function sub(e){var a=[];if(rm!=='points')a.push('자산 '+kf(e.points)+'P');if(rm!=='win')a.push('승률 '+e.win+'%');if(rm!=='best')a.push('최고 +'+kf(e.best));return a.join(' · ');}
 function bots(){ return BN.map(function(n,i){return {n:n,ch:BCH[i],t:BT[i],points:BP[i],win:BW[i],best:BB[i]};}); }
 function build(){ var rows;
-  if(LB){ rows=LB.filter(function(p){return p._id!==myUid;}).map(function(p){return {n:(p.nick||'익명'),ch:EMO[p.ch]||(IMG[p.ch]?'🧑':'❓'),t:'',points:p.points||0,win:p.win||0,best:p.best||0};}).concat(bots()); }
+  if(LB){ rows=LB.filter(function(p){return p._id!==myUid && ((p.played||0)>0||(p.win||0)>0||(p.best||0)>0);}).map(function(p){return {n:(p.nick||'익명'),ch:EMO[p.ch]||(IMG[p.ch]?'🧑':'❓'),t:'',points:p.points||0,win:p.win||0,best:p.best||0};}).concat(bots()); }
   else { rows=bots(); }
   var ms=myStats(); rows.push({n:(st.nick||'나'),ch:EMO[st.ch]||'🧑',t:st.title,points:ms.points,win:ms.win,best:ms.best,me:true});
   rows.sort(function(a,b){return mval(b)-mval(a);}); return rows; }
