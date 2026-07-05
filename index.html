@@ -411,6 +411,12 @@
 <script>
 (function(){
 "use strict";
+/* ═══════════════ 실시간 랭킹 (Firebase) ═══════════════
+   아래 FB_CONFIG 를 Firebase 콘솔의 웹앱 설정값으로 채우면 실시간 랭킹이 켜집니다.
+   비워두면 데모(가상 참가자) 랭킹으로 안전하게 작동합니다. 설정법: FIREBASE_SETUP.md */
+var FB_CONFIG = { apiKey:"", authDomain:"", projectId:"", appId:"" };
+var FB=null, myUid=null, LB=null;
+/* ══════════════════════════════════════════════════════ */
 var $=function(id){return document.getElementById(id);};
 function fit(){var s=Math.min(1,(window.innerWidth-12)/1672);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(770*s)+'px';sc.style.width='1672px';}
 window.addEventListener('resize',fit);fit();
@@ -473,27 +479,44 @@ document.addEventListener('click',function(e){
 var pe=$('pEdit'); if(pe)pe.addEventListener('click',function(){var v=prompt('닉네임 입력',st.nick); if(v){st.nick=v.slice(0,10);saveHS();refreshProfile();}});
 
 /* RANKING */
-var PER=[['day','일간'],['week','주간'],['month','월간']],MET=[['ret','수익률'],['assets','자산'],['win','승률']];
-var rp='day',rm='ret';
+var MET=[['points','자산'],['win','승률'],['best','최고']];
+var rm='points';
 var BN=['존버왕','숏충이','불장러','캔들도사','존리형','물타기장인','추매요정','매수의신','청산킹','우상향고고','따상가자','칼손절'];
-var BCH=['🤴','🐲','🐯','🦈','🐻','🐂','🦈','🐻','🐲','🐯','🐂','🐻'],BCA=['🚀','🏎️','🚕','🚗','🛵','🚗','🛵','🚲','🚕','🏎️','🚗','🛵'],BT=['🐋 고래','전설','청산 마스터','존버의 신','','개미','','','청산 마스터','존버의 신','',''];
-var BR=[24,19,31,-8,15,12,22,-3,9,17,5,-12],BW=[64,58,71,44,60,55,67,48,53,62,50,41],BA=[520,410,360,300,265,235,205,180,160,140,120,104];
-function rmul(p){return p==='day'?1:p==='week'?2.4:5.1;} function amul(p){return p==='day'?1:p==='week'?3.2:9.5;}
-function build(){var rows=BN.map(function(n,i){return {n:n,ch:BCH[i],ca:BCA[i],t:BT[i],ret:+(BR[i]*rmul(rp)).toFixed(1),assets:Math.round(BA[i]*1000*amul(rp)),win:BW[i],me:false};});
-  rows.push({n:st.nick,ch:EMO[st.ch]||'🧑',ca:EMO[st.car],t:st.title,ret:+(15.5*rmul(rp)).toFixed(1),assets:getBal(),win:57,me:true});
-  rows.sort(function(a,b){return b[rm]-a[rm];});return rows;}
-function kf(v){return v>=100000?Math.round(v/1000)+'K':v>=10000?(v/1000).toFixed(1)+'K':v.toLocaleString();}
-function mv(e){return rm==='ret'?(e.ret>=0?'+':'')+e.ret.toFixed(1)+'%':rm==='assets'?kf(e.assets)+'P':e.win+'%';}
-function mc(e){return rm==='ret'?(e.ret>=0?'up':'dn'):'';}
-function sub(e){var a=[];if(rm!=='ret')a.push('수익 '+(e.ret>=0?'+':'')+e.ret.toFixed(1)+'%');if(rm!=='assets')a.push('자산 '+kf(e.assets)+'P');if(rm!=='win')a.push('승률 '+e.win+'%');return a.join(' · ');}
+var BCH=['🤴','🐲','🐯','🦈','🐻','🐂','🦈','🐻','🐲','🐯','🐂','🐻'],BT=['🐋 고래','전설','청산 마스터','존버의 신','','개미','','','청산 마스터','존버의 신','',''];
+var BP=[182000,151000,138000,120000,98000,86000,73000,61000,52000,44000,33000,21000],BW=[64,58,71,44,60,55,67,48,53,62,50,41],BB=[9200,7400,12500,3100,6000,5200,8800,2600,4300,6900,3600,1500];
+function myStats(){ var g=lj(GS),w=g.wins||0,l=g.losses||0,tt=w+l; return {points:getBal(),win:tt?Math.round(w/tt*100):0,best:g.best||0,played:g.played||0}; }
+/* Firebase 실시간 랭킹 (설정 없으면 데모로 폴백) */
+function loadFB(cb){ var mods=['app','auth','firestore'],i=0; (function nx(){ if(i>=mods.length){cb();return;} var s=document.createElement('script'); s.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-'+mods[i++]+'-compat.js'; s.onload=nx; s.onerror=function(){cb();}; document.head.appendChild(s); })(); }
+function submitScore(){ if(!FB||!myUid)return; var s=myStats();
+  FB.collection('scores').doc(myUid).set({nick:(st.nick||'익명').slice(0,12),ch:st.ch,points:s.points,win:s.win,best:s.best,played:s.played,at:Date.now()},{merge:true}).catch(function(){}); }
+function fetchLB(cb){ if(!FB){cb(null);return;} FB.collection('scores').orderBy('points','desc').limit(50).get()
+  .then(function(qs){ var a=[]; qs.forEach(function(d){var x=d.data();x._id=d.id;a.push(x);}); cb(a); }).catch(function(){cb(null);}); }
+(function(){ try{ if(!FB_CONFIG.apiKey)return; loadFB(function(){ try{ if(typeof firebase==='undefined')return;
+  firebase.initializeApp(FB_CONFIG); FB=firebase.firestore();
+  firebase.auth().signInAnonymously().then(function(c){ myUid=c.user.uid; submitScore();
+    var vr=$('v-rank'); if(vr&&vr.classList.contains('on'))renderRank(); }).catch(function(){}); }catch(e){FB=null;} }); }catch(e){} })();
+function kf(v){return v>=100000?Math.round(v/1000)+'K':v>=10000?(v/1000).toFixed(1)+'K':Math.round(v).toLocaleString();}
+function mval(e){return rm==='points'?e.points:rm==='win'?e.win:e.best;}
+function mv(e){return rm==='points'?kf(e.points)+'P':rm==='win'?e.win+'%':'+'+kf(e.best);}
+function mc(e){return rm==='best'?'up':'';}
+function sub(e){var a=[];if(rm!=='points')a.push('자산 '+kf(e.points)+'P');if(rm!=='win')a.push('승률 '+e.win+'%');if(rm!=='best')a.push('최고 +'+kf(e.best));return a.join(' · ');}
+function bots(){ return BN.map(function(n,i){return {n:n,ch:BCH[i],t:BT[i],points:BP[i],win:BW[i],best:BB[i]};}); }
+function build(){ var rows;
+  if(LB){ rows=LB.filter(function(p){return p._id!==myUid;}).map(function(p){return {n:(p.nick||'익명'),ch:EMO[p.ch]||(IMG[p.ch]?'🧑':'❓'),t:'',points:p.points||0,win:p.win||0,best:p.best||0};}).concat(bots()); }
+  else { rows=bots(); }
+  var ms=myStats(); rows.push({n:(st.nick||'나'),ch:EMO[st.ch]||'🧑',t:st.title,points:ms.points,win:ms.win,best:ms.best,me:true});
+  rows.sort(function(a,b){return mval(b)-mval(a);}); return rows; }
 function renderRank(){ refreshProfile();
-  $('pTabs').innerHTML=PER.map(function(p){return '<div class="tab'+(rp===p[0]?' on':'')+'" data-per="'+p[0]+'">'+p[1]+'</div>';}).join('');
+  $('pTabs').innerHTML='<div class="tab on">'+(FB?'🌐 실시간 랭킹':'🎮 데모 랭킹')+'</div><div class="tab" id="rkRefresh">🔄 새로고침</div>';
   $('mTabs').innerHTML=MET.map(function(m){return '<div class="tab sm'+(rm===m[0]?' on':'')+'" data-met="'+m[0]+'">'+m[1]+'</div>';}).join('');
-  var L=build();
-  $('podium').innerHTML=[[1,'🥈','p2'],[0,'🥇','p1'],[2,'🥉','p3']].map(function(o){var e=L[o[0]];return '<div class="ped '+o[2]+'"><div class="med">'+o[1]+'</div><div class="pav">'+e.ch+'</div><div class="pcar">'+e.ca+'</div><div class="pn" style="'+(e.me?'color:var(--gold)':'')+'">'+e.n+'</div><div class="pt">'+(e.t||'')+'</div><div class="ps '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
-  $('rlist').innerHTML=L.slice(3).map(function(e,i){return '<div class="rrow'+(e.me?' me':'')+'"><div class="rk">'+(i+4)+'</div><div class="rav">'+e.ch+'</div><div class="rn"><div class="n">'+e.n+' '+e.ca+(e.t?' · <span style="color:var(--gold)">'+e.t+'</span>':'')+'</div><div class="s">'+sub(e)+'</div></div><div class="rv '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
+  if(FB)submitScore();
+  fetchLB(function(lb){ if(lb)LB=lb; drawRank(); });
+  drawRank(); }
+function drawRank(){ var L=build();
+  $('podium').innerHTML=[[1,'🥈','p2'],[0,'🥇','p1'],[2,'🥉','p3']].map(function(o){var e=L[o[0]];if(!e)return '';return '<div class="ped '+o[2]+'"><div class="med">'+o[1]+'</div><div class="pav">'+e.ch+'</div><div class="pn" style="'+(e.me?'color:var(--gold)':'')+'">'+e.n+'</div><div class="pt">'+(e.t||'')+'</div><div class="ps '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
+  $('rlist').innerHTML=L.slice(3).map(function(e,i){return '<div class="rrow'+(e.me?' me':'')+'"><div class="rk">'+(i+4)+'</div><div class="rav">'+e.ch+'</div><div class="rn"><div class="n">'+e.n+(e.t?' · <span style="color:var(--gold)">'+e.t+'</span>':'')+'</div><div class="s">'+sub(e)+'</div></div><div class="rv '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
 }
-document.addEventListener('click',function(e){var p=e.target.closest('[data-per]');if(p){rp=p.dataset.per;renderRank();}var m=e.target.closest('[data-met]');if(m){rm=m.dataset.met;renderRank();}});
+document.addEventListener('click',function(e){ var m=e.target.closest('[data-met]'); if(m){rm=m.dataset.met;renderRank();return;} if(e.target.closest('#rkRefresh')){ if(FB)submitScore(); renderRank(); toast('랭킹 새로고침'); } });
 
 /* GARAGE — 캐릭터는 무료 선택, 상점은 탈것/악세사리/칭호 판매 */
 var ITEMS={
