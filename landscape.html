@@ -121,12 +121,12 @@
   .statrow{display:flex;align-items:stretch;gap:10px;margin-bottom:8px}
   .mhi{display:flex;align-items:center;gap:8px;flex:0 0 auto;font-weight:800;font-size:14px;color:var(--tp);padding:0 4px 0 2px;line-height:1.18;white-space:nowrap}
   .mhic{font-size:17px}
-  .stat{flex:0 0 150px;background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:12px;padding:6px 12px;text-align:center}
-  .stat .top{display:flex;align-items:center;justify-content:center;gap:8px}
-  .stat .ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
-  .stat .t{font-size:12px;color:var(--ts);font-weight:600}
-  .stat .rk{font-size:18px;font-weight:900;margin-top:2px;line-height:1;display:inline-block}
-  .stat .d{font-size:12px;font-weight:800;font-family:var(--mono);margin-top:2px;margin-left:8px;display:inline-block}
+  .stat{flex:0 0 156px;background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:12px;padding:6px 13px;display:flex;align-items:center;gap:10px}
+  .stat .ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
+  .stat .sv{min-width:0}
+  .stat .l{font-size:12px;color:var(--ts);font-weight:600}
+  .stat .v{font-size:18px;font-weight:900;line-height:1.1;margin-top:2px;white-space:nowrap}
+  .stat .v .d{font-size:12px;font-weight:800;font-family:var(--mono);margin-left:3px}
   .up{color:var(--green)} .dn{color:var(--pink)} .fl{color:var(--ts)}
   .timer{flex:0 0 222px;background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:12px;padding:6px 14px;display:flex;align-items:center;gap:11px}
   .timer .ic{width:32px;height:32px;border-radius:9px;background:rgba(76,169,255,.12);border:1px solid rgba(76,169,255,.4);display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
@@ -413,9 +413,9 @@
       <div class="view on" id="v-home">
         <div class="statrow">
           <div class="mhi"><span class="mhic">📊</span><span>내 순위</span></div>
-          <div class="stat"><div class="top"><div class="ic" style="background:rgba(53,208,122,.14);color:var(--green)">📈</div><div class="t">주간 수익률</div></div><div class="rk">7위</div><div class="d up">▲ 2</div></div>
-          <div class="stat"><div class="top"><div class="ic" style="background:rgba(233,185,73,.14);color:var(--gold)">🪙</div><div class="t">월간 수익률</div></div><div class="rk">16위</div><div class="d fl">–</div></div>
-          <div class="stat"><div class="top"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="t">전체 순위</div></div><div class="rk">8위</div><div class="d dn">▼ 1</div></div>
+          <div class="stat"><div class="ic" style="background:rgba(53,208,122,.14);color:var(--green)">📈</div><div class="sv"><div class="l">주간 수익률</div><div class="v">7위 <span class="d up">▲ 2</span></div></div></div>
+          <div class="stat"><div class="ic" style="background:rgba(233,185,73,.14);color:var(--gold)">🪙</div><div class="sv"><div class="l">월간 수익률</div><div class="v">16위 <span class="d fl">–</span></div></div></div>
+          <div class="stat"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="sv"><div class="l">전체 순위</div><div class="v">8위 <span class="d dn">▼ 1</span></div></div></div>
           <div class="timer"><div class="ic">🕐</div><div><div class="l">시즌 남은 기간</div><div class="v">12일 08:45:32</div></div></div>
         </div>
 
