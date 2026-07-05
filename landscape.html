@@ -18,7 +18,7 @@
   *{box-sizing:border-box}
   body{margin:0; background:#05070f; color:var(--tp); font-family:var(--sans); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:10px 6px; overflow-x:hidden}
   .scaler{transform-origin:top center}
-  .frame{width:1672px; height:666px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
+  .frame{width:1672px; height:652px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
     background:radial-gradient(120% 80% at 22% 0%, #12203c 0%, #0a1327 46%, #060c1a 100%);
     box-shadow:0 30px 80px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
 
@@ -118,16 +118,17 @@
   .mh{font-weight:800;font-size:14.5px;margin:0 0 5px;display:flex;align-items:center;gap:8px}
 
   /* stat row */
-  .statrow{display:flex;gap:12px;margin-bottom:7px}
-  .statgrp{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;flex:1}
-  .stat{background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:12px;padding:6px 12px}
+  .statrow{display:flex;align-items:stretch;gap:10px;margin-bottom:8px}
+  .mhi{display:flex;align-items:center;gap:8px;flex:0 0 auto;font-weight:800;font-size:14px;color:var(--tp);padding:0 4px 0 2px;line-height:1.18;white-space:nowrap}
+  .mhic{font-size:17px}
+  .stat{flex:0 0 150px;background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:12px;padding:6px 12px}
   .stat .top{display:flex;align-items:center;gap:8px}
   .stat .ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
   .stat .t{font-size:12px;color:var(--ts);font-weight:600}
   .stat .rk{font-size:18px;font-weight:900;margin-top:2px;line-height:1;display:inline-block}
   .stat .d{font-size:12px;font-weight:800;font-family:var(--mono);margin-top:2px;margin-left:8px;display:inline-block}
   .up{color:var(--green)} .dn{color:var(--pink)} .fl{color:var(--ts)}
-  .timer{flex:0 0 280px;background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:12px;padding:6px 15px;display:flex;align-items:center;gap:12px}
+  .timer{flex:0 0 222px;background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:12px;padding:6px 14px;display:flex;align-items:center;gap:11px}
   .timer .ic{width:32px;height:32px;border-radius:9px;background:rgba(76,169,255,.12);border:1px solid rgba(76,169,255,.4);display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
   .timer .l{font-size:12px;color:var(--ts)}
   .timer .v{font-family:var(--mono);font-weight:900;font-size:18px;margin-top:2px;letter-spacing:.5px}
@@ -142,7 +143,7 @@
   .status{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--green);white-space:nowrap;margin-top:6px}
   .status::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green)}
   .hsub{color:var(--ts);font-size:12px;margin-top:2px;position:relative;z-index:3}
-  .himg{flex:1;min-height:200px;max-height:290px;display:flex;align-items:center;justify-content:center;margin:0;position:relative;z-index:1;overflow:hidden}
+  .himg{flex:1;min-height:200px;max-height:300px;display:flex;align-items:center;justify-content:center;margin:0;position:relative;z-index:1;overflow:hidden}
   .himg img{max-height:100%;max-width:104%;object-fit:contain;filter:drop-shadow(0 14px 26px rgba(0,0,0,.6))}
   .hstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:6px;position:relative;z-index:2}
   .hstat{background:rgba(5,12,26,.72);border:1px solid var(--line);border-radius:12px;padding:7px;text-align:center}
@@ -410,13 +411,11 @@
 
       <!-- HOME -->
       <div class="view on" id="v-home">
-        <div class="mh">📊 내 순위 현황</div>
         <div class="statrow">
-          <div class="statgrp">
-            <div class="stat"><div class="top"><div class="ic" style="background:rgba(53,208,122,.14);color:var(--green)">📈</div><div class="t">주간 수익률</div></div><div class="rk">7위</div><div class="d up">▲ 2</div></div>
-            <div class="stat"><div class="top"><div class="ic" style="background:rgba(233,185,73,.14);color:var(--gold)">🪙</div><div class="t">월간 수익률</div></div><div class="rk">16위</div><div class="d fl">–</div></div>
-            <div class="stat"><div class="top"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="t">전체 순위</div></div><div class="rk">8위</div><div class="d dn">▼ 1</div></div>
-          </div>
+          <div class="mhi"><span class="mhic">📊</span><span>내 순위<br>현황</span></div>
+          <div class="stat"><div class="top"><div class="ic" style="background:rgba(53,208,122,.14);color:var(--green)">📈</div><div class="t">주간 수익률</div></div><div class="rk">7위</div><div class="d up">▲ 2</div></div>
+          <div class="stat"><div class="top"><div class="ic" style="background:rgba(233,185,73,.14);color:var(--gold)">🪙</div><div class="t">월간 수익률</div></div><div class="rk">16위</div><div class="d fl">–</div></div>
+          <div class="stat"><div class="top"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="t">전체 순위</div></div><div class="rk">8위</div><div class="d dn">▼ 1</div></div>
           <div class="timer"><div class="ic">🕐</div><div><div class="l">시즌 남은 기간</div><div class="v">12일 08:45:32</div></div></div>
         </div>
 
@@ -538,7 +537,7 @@ var FB_CONFIG = { apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"
 var FB=null, myUid=null, LB=null;
 /* ══════════════════════════════════════════════════════ */
 var $=function(id){return document.getElementById(id);};
-function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/666);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(666*s)+'px';sc.style.width='1672px';}
+function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/652);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(652*s)+'px';sc.style.width='1672px';}
 window.addEventListener('resize',fit);fit();
 /* 인트로 스플래시 (세션당 1회) */
 (function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash');}catch(e){}
