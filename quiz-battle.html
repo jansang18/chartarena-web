@@ -395,8 +395,8 @@ function lockIn(){
   if(revTimer)clearTimeout(revTimer);
   function step(){ gRev++; drawChart();
     if(gRev>=target){ revTimer=null; finishRound(); return; }
-    revTimer=setTimeout(step, (target-gRev)<=8 ? 230 : 85); }   // 마지막 8칸은 더 천천히 (긴장감)
-  revTimer=setTimeout(step, 85);
+    revTimer=setTimeout(step, (target-gRev)<=8 ? 400 : 150); }   // 마지막 8칸은 더 천천히 (긴장감)
+  revTimer=setTimeout(step, 150);
 }
 function finishRound(){
   gRev=GD.vis+30; drawChart();
