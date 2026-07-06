@@ -309,7 +309,7 @@ function renderCtrl(){
   var go=$('go'), bet=curBet();
   if(phase==='pick'){ go.className='go';
     if(mySel.dir===null) go.textContent='방향을 골라주세요';
-    else if(mySel.dir==='W') go.textContent='◎ 관망 확정 ▶';
+    else if(mySel.dir==='W') go.textContent='◎ 관망 (-5%) 확정 ▶';
     else go.textContent='💰'+fmtP(bet)+'P · '+({L:'롱',S:'숏'}[mySel.dir])+' '+mySel.lev+'배 확정 ▶';
     go.disabled=(mySel.dir===null)||(bal<=0&&mySel.dir!=='W'); }
   else if(phase==='result'){ go.className='go next'; go.textContent=(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶'); go.disabled=false; }
@@ -381,9 +381,12 @@ function finishRound(){
   var moveRaw=(exit-entry)/entry*100;                 // 코인 실제 % 움직임 (+오름 / -내림)
   var bal0=getBal();
   var botBet=Math.max(100, Math.round(bal0*0.25));    // 봇 기본 스테이크(비교용)
-  players.forEach(function(p,i){ var bet=(i===0)?roundBet:botBet; var sign=p.pick==='L'?1:(p.pick==='S'?-1:0);
-    var ret=sign*moveRaw*p.lev;                        // 내 방향 기준 수익률%(레버리지 포함)
-    var pnl=Math.round(bet*ret/100); if(pnl<-bet)pnl=-bet;   // 손실은 배팅액까지만
+  players.forEach(function(p,i){ var pnl;
+    if(p.pick==='W'){ pnl=-Math.round(bal0*0.05); }         // 관망도 -5% 페널티 (잔고 기준)
+    else { var bet=(i===0)?roundBet:botBet; var sign=p.pick==='L'?1:-1;
+      var ret=sign*moveRaw*p.lev;                           // 방향 기준 수익률%(레버리지 포함)
+      pnl=Math.round(bet*ret/100); if(pnl<-bet)pnl=-bet; }  // 손실은 배팅액까지만
+    if(i===0 && pnl<-bal0) pnl=-bal0;                        // 내 손실은 잔고까지만
     p.dp=pnl; p.score+=pnl; });
   var meP=players[0].dp, nb=bal0+meP; setBal(nb);      // 내 보유 포인트 실제 반영
   phase='result'; renderPods(); renderCtrl();
@@ -394,7 +397,7 @@ function finishRound(){
   // 코인 움직임 + 내 손익 크게 공개
   var pk=players[0].pick, dl={L:'롱',S:'숏',W:'관망'}[pk];
   var arrow=moveRaw>=0?'▲':'▼', mvcol=moveRaw>=0?'#35D07A':'#FF5C8A';
-  var plHtml = (pk==='W') ? '<span style="color:#E9B949">관망 · 손익 없음</span>'
+  var plHtml = (pk==='W') ? ('관망 · <b style="color:#FF5C8A">-5% ('+fmtP(meP)+'P)</b>')
     : (dl+' '+players[0].lev+'배 · '+fmtP(roundBet)+'P → <b style="color:'+(meP>=0?'#35D07A':'#FF5C8A')+'">'+(meP>=0?'+':'')+fmtP(meP)+'P</b>');
   var v=$('verdict');
   v.innerHTML='<div class="mv" style="color:'+mvcol+'">코인 '+arrow+' '+Math.abs(moveRaw).toFixed(1)+'%</div>'
