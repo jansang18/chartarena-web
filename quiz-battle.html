@@ -15,7 +15,7 @@
   }
   *{box-sizing:border-box}
   body{margin:0; background:#05060d; color:#EAF0FA; font-family:var(--sans); min-height:100vh;
-    display:flex; flex-direction:column; align-items:center; padding:16px 8px; overflow-x:hidden}
+    display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; overflow:hidden}
   .cap{max-width:560px; text-align:center; margin-bottom:10px}
   .cap .k{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#8A6D2B; font-weight:700}
   .cap h1{margin:.3em 0 .1em; font-size:20px; font-weight:800}
@@ -137,13 +137,6 @@
   .bshare:active{transform:translateX(-50%) translateY(1px)}
 </style>
 
-<div class="cap">
-  <div class="k">ChartArena · 차트배틀 LIVE</div>
-  <h1>📺 가로 퀴즈쇼 차트배틀</h1>
-  <p>4명이 <b style="color:#35D07A">실제 바이낸스 차트</b>로 대결! <b style="color:#EAF0FA">배팅액(보유 %)·방향·레버리지</b>를 걸면 미래가 공개돼요. 코인이 움직인 <b style="color:#E9B949">%만큼 배당</b> — 맞히면 따고 틀리면 배팅액을 잃어요. (봇 3명 vs 나)</p>
-  <div class="rotate">📱 폰이면 가로로 돌려서 보세요 · 전체 화면이 폭에 맞게 축소됩니다</div>
-</div>
-
 <div class="scaler" id="scaler">
 <div class="frame">
   <div class="spot s1"></div><div class="spot s2"></div><div class="spot s3"></div><div class="spot s4"></div>
@@ -223,7 +216,7 @@ var roundBet=0;
 function curBet(){ if(mySel&&mySel.dir==='W')return 0; return Math.max(0,Math.round(getBal()*((mySel&&mySel.betPct)||0.25))); }
 
 /* 화면폭에 맞춰 가로 무대 스케일 */
-function fit(){ var s=Math.min(1,(window.innerWidth-16)/1120); var sc=$('scaler');
+function fit(){ var s=Math.min(1,(window.innerWidth-16)/1120,(window.innerHeight-16)/516); var sc=$('scaler');
   sc.style.transform='scale('+s+')'; sc.style.height=(516*s)+'px'; sc.style.width='1120px'; }
 window.addEventListener('resize',fit); fit();
 
