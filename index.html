@@ -679,7 +679,9 @@ var _pc={}, PAITEMS=PAROW.map(function(row,i){ _pc[row]=(_pc[row]||0)+1; return 
 var ITEMS={ pet:PETS, pi:PAITEMS, acc:ACC, title:[['','없음',0],['개미','개미 트레이더',2000],['존버의 신','존버의 신',12000],['청산 마스터','청산 마스터',22000],['🐋 고래','고래',60000],['전설','전설의 트레이더',120000]] };
 /* 아이템 가격 상향: 최소 50,000P부터 시작 (올인 인플레 흡수 · 부자 밸런스) */
 function scaleP(p){ if(!p) return 0; var v=p*33.34;
-  if(v<100000) v=Math.round(v/5000)*5000; else if(v<1000000) v=Math.round(v/10000)*10000; else v=Math.round(v/50000)*50000;
+  if(v<100000) v=Math.round(v/5000)*5000;
+  else if(v<1500000) v=Math.round(v/10000)*10000;        // 일반~에픽
+  else v=Math.round(v*250/50000000)*50000000;            // 전설 → 10억대 (최고가 10억)
   return Math.max(50000, v); }
 [PETS, PAITEMS, ACC, ITEMS.title].forEach(function(arr){ arr.forEach(function(x){ x[2]=scaleP(x[2]); }); });
 var gcat='char';
