@@ -42,7 +42,7 @@
   .endbtn{margin-left:12px; background:#123; border:1px solid #2a4b7a; color:#9fc3ff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer}
 
   /* TV 스크린(차트) */
-  .tv{position:relative; z-index:2; margin:2px auto 0; width:900px; height:248px; border-radius:14px; padding:9px;
+  .tv{position:relative; z-index:2; margin:2px auto 0; width:900px; height:224px; border-radius:14px; padding:9px;
     background:linear-gradient(180deg,#0c2244,#08152b); border:2px solid #2f5c9e;
     box-shadow:0 0 26px -4px rgba(76,169,255,.5), 0 0 0 4px rgba(0,0,0,.3) inset}
   #chart{width:100%; height:100%; display:block; border-radius:8px; background:#050c1c}
@@ -62,9 +62,9 @@
   /* 단상 4개 */
   .podiums{position:absolute; left:0; right:0; bottom:80px; z-index:2; display:flex; justify-content:center; gap:20px; padding:0 22px}
   .pod{width:218px; text-align:center; position:relative}
-  .pod .ava{height:60px; display:flex; align-items:flex-end; justify-content:center; position:relative}
-  .pod .ava img{height:60px; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
-  .pod .ava .em{font-size:42px; line-height:1; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))}
+  .pod .ava{height:96px; display:flex; align-items:flex-end; justify-content:center; position:relative}
+  .pod .ava img{height:96px; object-fit:contain; filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
+  .pod .ava .em{font-size:64px; line-height:1; filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
   .pod .pick{position:absolute; top:-6px; left:50%; transform:translateX(-50%); font-size:13px; font-weight:900; padding:2px 10px; border-radius:999px; opacity:0; transition:all .2s}
   .pod .pick.on{opacity:1}
   .pick.L{background:rgba(53,208,122,.22); color:var(--green); border:1px solid var(--green)}
@@ -221,6 +221,14 @@ var players=[
   {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
   {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0},
 ];
+/* AI 상대 = 랜덤 인간 캐릭터 + 랜덤 닉네임 (매 입장마다 랜덤 등장) */
+var BOTNAMES=['불꽃트레이더','존버킴','떡상요정','캔들마스터','코인고수','한강뷰맨','우상향러','물타기왕','단타여신','칼손절','추격매수','다이아손','고래잡이','풀매수러','익절만렙','반등각','평단내리기','로켓탑승','바닥줍줍','패닉셀러','스캘핑고수','존버여왕','불장러','추매요정','시드지킴','청산방지','매수각','존버박','겁쟁이킴','한탕주의'];
+(function randomizeBots(){
+  function shuf(a){ for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
+  var huPool=[]; for(var i=0;i<17;i++){ if('hu'+i!==myCh) huPool.push('hu'+i); }
+  shuf(huPool); var nm=shuf(BOTNAMES.slice());
+  for(var b=1;b<=3;b++){ players[b].chImg=CHIMG[huPool[b-1]]; players[b].name=nm[b-1]; delete players[b].em; }
+})();
 var ROUNDS=10, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
 
 /* 실제 바이낸스 차트 데이터 (종목 숨김·가격 정규화, 각 100캔들 = 공개70 + 예측30) */
