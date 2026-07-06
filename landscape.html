@@ -97,7 +97,9 @@
   .pill{display:flex; align-items:center; gap:8px; background:#0a1122; border:1px solid var(--line); border-radius:999px; padding:5px 8px 5px 8px; font-weight:800; font-family:var(--mono); font-size:15px}
   .pill .cico{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900}
   .pill.coin .cico{background:linear-gradient(180deg,#F6D272,#D8A63A);color:#3a2c07}
-  .pill.gem .cico{background:linear-gradient(180deg,#8fe3ff,#3aa7e0);color:#06283b;font-size:11px}
+  .pill.gem .cico{width:22px;height:22px;border-radius:0;background:linear-gradient(160deg,#e2f7ff 0%,#7fd2f3 42%,#34a4df 72%,#1a80c4 100%);color:transparent;font-size:0;clip-path:polygon(22% 0%,78% 0%,100% 35%,50% 100%,0% 35%);position:relative;overflow:visible;filter:drop-shadow(0 1px 2px rgba(10,120,190,.55))}
+  .pill.gem .cico::before{content:"";position:absolute;left:0;right:0;top:35%;height:1px;background:rgba(255,255,255,.65)}
+  .pill.gem .cico::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%);background:rgba(255,255,255,.32)}
   .pill .add{width:23px;height:23px;border-radius:50%;background:rgba(233,185,73,.18);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;margin-left:1px;cursor:pointer}
   .ticons{display:flex; align-items:center; gap:8px; margin-left:4px}
   .ticon{position:relative; width:40px;height:40px;border-radius:12px;background:#0a1122;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
@@ -410,7 +412,7 @@
     <div class="tsp"></div>
     <div class="curr">
       <div class="pill coin"><span class="cico">P</span><span id="tbCoin">12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
-      <div class="pill gem"><span class="cico">◆</span><span>2,380</span></div>
+      <div class="pill gem"><span class="cico"></span><span>2,380</span></div>
     </div>
     <div class="ticons">
       <div class="ticon" data-toast="메일 — 준비 중">✉️</div>
