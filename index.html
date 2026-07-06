@@ -589,7 +589,7 @@ function _yday(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYe
 function dget(){ var o=lj(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0,streak:o.streak||0,lastAtt:o.lastAtt||''}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
 function dset(o){ localStorage.setItem(DK,JSON.stringify(o)); }
 /* 팝업 + 출석 보상 */
-var ATTEND_TABLE=[10000,12000,14000,16000,18000,20000,30000];   // 1~7일차 연속 출석 보상
+var ATTEND_TABLE=[10000,10000,10000,10000,10000,10000,30000];   // 1~6일 1만, 7일차 3만
 function checkAttendance(){ var d=dget(); if(d.att)return;
   var streak=(d.lastAtt===_yday())?(d.streak%7)+1:1;   // 어제 출석했으면 연속(7 넘으면 1로 순환), 아니면 1일차부터
   d.att=1; d.streak=streak; d.lastAtt=_today(); dset(d);
