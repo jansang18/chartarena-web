@@ -62,10 +62,9 @@
   /* 단상 4개 */
   .podiums{position:absolute; left:0; right:0; bottom:80px; z-index:2; display:flex; justify-content:center; gap:20px; padding:0 22px}
   .pod{width:218px; text-align:center; position:relative}
-  .pod .ava{height:152px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; position:relative}
-  .pod .ava .ch{height:110px; z-index:2; position:relative; margin-bottom:-22px; object-fit:contain; filter:drop-shadow(0 9px 9px rgba(0,0,0,.5))}
-  .pod .ava .box{height:56px; z-index:1; object-fit:contain}
-  .pod .ava .em{font-size:76px; line-height:1; z-index:2; position:relative; margin-bottom:-16px; filter:drop-shadow(0 9px 9px rgba(0,0,0,.5))}
+  .pod .ava{display:flex; align-items:flex-end; justify-content:center; position:relative; z-index:3; margin-bottom:-16px}
+  .pod .ava .ch{height:140px; object-fit:contain; filter:drop-shadow(0 10px 10px rgba(0,0,0,.5))}
+  .pod .ava .em{font-size:104px; line-height:1; filter:drop-shadow(0 10px 10px rgba(0,0,0,.5))}
   .pod .pick{position:absolute; top:2px; left:50%; transform:translateX(-50%); z-index:6; font-size:13px; font-weight:900; padding:2px 10px; border-radius:999px; opacity:0; transition:all .2s}
   .pod .pick.on{opacity:1}
   .pick.L{background:rgba(53,208,122,.22); color:var(--green); border:1px solid var(--green)}
@@ -288,7 +287,7 @@ function renderPods(){
     var pkc=known?pk:'Q', pklab=known?{L:'롱 ↗',S:'숏 ↘',W:'관망 ◎'}[pk]:'?';
     return '<div class="pod">'
       +'<div class="pick '+pkc+' on">'+pklab+'</div>'
-      +'<div class="ava">'+av+'<img class="box" src="assets/box.png" alt=""></div>'
+      +'<div class="ava">'+av+'</div>'
       +'<div class="desk'+(i===0?' me':'')+(p.score===lead&&phase==='result'?' lead':'')+'">'
         +'<div class="crown">👑</div>'
         +'<div class="nm">'+(i===0?'⭐ ':'')+p.name+'</div>'
