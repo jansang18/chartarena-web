@@ -318,7 +318,7 @@ function answer(guessUp){
   var _H=CUR.round.H; CUR.revN=0; drawChart(true);
   if(CUR.revAnim)clearInterval(CUR.revAnim);
   CUR.revAnim=setInterval(function(){ CUR.revN++; drawChart(true);
-    if(CUR.revN>=_H){ clearInterval(CUR.revAnim); CUR.revAnim=null; CUR.revN=null; drawChart(true); revealResult(ok); } }, 1300);
+    if(CUR.revN>=_H){ clearInterval(CUR.revAnim); CUR.revAnim=null; CUR.revN=null; drawChart(true); revealResult(ok); } }, 1000);
 }
 function revealResult(ok){
   var v=$('verdict'); v.textContent=ok?'✅':'❌'; v.style.color=ok?'var(--green)':'var(--red)'; v.classList.add('show');
