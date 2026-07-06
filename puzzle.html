@@ -28,7 +28,9 @@
   .top .stat{display:flex;align-items:center;gap:6px;font-weight:900;font-family:var(--mono);font-size:15px;background:var(--p1);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
   .top .stat.g{color:var(--gold)} .top .stat.s{color:var(--gold2)}
   /* ===== MAP ===== */
-  .maphd{text-align:center;padding:22px 10px 6px}
+  .maphd{text-align:center;padding:14px 10px 6px}
+  .maphd .hicon{width:clamp(122px,30vw,166px);height:auto;margin:0 auto -2px;display:block;
+    filter:drop-shadow(0 14px 26px rgba(0,0,0,.55)) drop-shadow(0 0 22px rgba(178,102,255,.30))}
   .maphd h2{margin:0;font-size:26px;font-weight:900;letter-spacing:-.5px}
   .maphd p{margin:6px 0 0;color:var(--ts);font-size:13.5px}
   .world{margin:18px 0;border:1px solid var(--wl,var(--line));border-radius:20px;padding:16px 16px 20px;background:linear-gradient(160deg,var(--wa,#101b34),#0b1428 75%);position:relative;overflow:hidden}
@@ -113,6 +115,7 @@
 <!-- MAP -->
 <div id="map" class="wrap">
   <div class="maphd">
+    <img class="hicon" src="assets/tile_puzzle.png" alt="차트 퍼즐 퀘스트">
     <h2>월드를 정복하라! 🗺️</h2>
     <p>차트를 보고 <b style="color:var(--green)">오른다</b> / <b style="color:var(--pink)">내린다</b> 를 맞혀 별을 모으세요. 실제 코인 차트로 만든 퍼즐이에요.</p>
   </div>

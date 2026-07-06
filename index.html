@@ -299,7 +299,8 @@
   .gemb.big{width:82px;height:82px;border-radius:20px;font-size:44px}
   .gemb.sm{width:38px;height:38px;border-radius:10px;font-size:19px}
   /* browse */
-  .ghero2{background:linear-gradient(120deg,#152238,#0e1830);border:1px solid var(--line);border-radius:14px;padding:13px 18px;margin-bottom:12px}
+  .ghero2{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#182a44,#0e1830);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:12px}
+  .ghero2 .gh2img{width:76px;height:76px;flex:0 0 76px;object-fit:contain;filter:drop-shadow(0 7px 15px rgba(0,0,0,.5))}
   .ghero2 .gh2t{font-size:17px;font-weight:900}
   .ghero2 .gh2s{font-size:12.5px;color:var(--ts);margin-top:4px;line-height:1.4}
   .glist{display:grid;grid-template-columns:1fr 1fr;gap:11px}
@@ -911,7 +912,7 @@ function viewBrowse(){ var list=browseList();
       +'<div class="gmeta">Lv.'+gLevel(tp)+' · 멤버 '+(g.memberCount||gMembersArr(g).length)+'명 · 🔥 '+kf(tp)+'P</div></div>'
       +(joined?'<div class="gjoined">가입됨</div>':'<button class="gjoin" type="button" data-gjoin="'+g.gid+'">가입</button>')+'</div>';
   }).join('');
-  return '<div class="ghero2"><div class="gh2t">함께 정상에 오르세요 🏔️</div><div class="gh2s">길드에 가입해 멤버들과 기여도를 모으고, 주간 미션과 길드 랭킹에 도전하세요.</div></div>'
+  return '<div class="ghero2"><img class="gh2img" src="assets/tile_guild.png" alt=""><div><div class="gh2t">함께 정상에 오르세요 🏔️</div><div class="gh2s">길드에 가입해 멤버들과 기여도를 모으고, 주간 미션과 길드 랭킹에 도전하세요.</div></div></div>'
     +'<div class="glist">'+(cards||'<div class="gload">아직 길드가 없어요. 첫 길드를 만들어보세요!</div>')+'</div>';
 }
 function viewCreate(){ var em=GEMO.map(function(e){return '<div class="gem'+(GLD.cre.emblem===e?' on':'')+'" data-gem="'+e+'">'+e+'</div>';}).join('');
