@@ -113,8 +113,9 @@
   .profcard .ava img{width:100%;height:100%;object-fit:cover;object-position:50% 12%;transform:scale(1.68);transform-origin:50% 15%}
   .profcard .ava .em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:66px}
   .profcard .ava .car{position:absolute;bottom:5px;right:7px;font-size:20px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.65))}
-  .profcard .edit{width:30px;height:30px;border-radius:50%;background:rgba(233,185,73,.14);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;flex:0 0 auto;margin-top:2px}
+  .profcard .edit,.csname .edit{width:28px;height:28px;border-radius:50%;background:rgba(233,185,73,.14);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;flex:0 0 auto}
   .pname{text-align:center;font-weight:900;font-size:19px}
+  .csname{display:flex;align-items:center;justify-content:center;gap:8px;padding:0 0 8px;margin-top:-2px}
   .plevel{display:flex;align-items:center;gap:8px;margin-top:7px}
   .plevel .lv{font-family:var(--mono);font-weight:900;font-size:12px;color:#2a2107;background:linear-gradient(180deg,var(--gold2),var(--gold));padding:4px 9px;border-radius:7px}
   .plevel .bar{flex:1;height:10px;border-radius:6px;background:#0a1122;border:1px solid var(--line);overflow:hidden}
@@ -421,11 +422,8 @@
   <div class="body">
     <!-- ===== SIDEBAR ===== -->
     <div class="side">
-      <div class="profcard">
-        <div class="pname" id="pName">차트고수</div>
-        <div class="edit" id="pEdit">✏️</div>
-      </div>
       <div class="charshow" id="charShow"></div>
+      <div class="csname"><span class="pname" id="pName">차트고수</span><span class="edit" id="pEdit">✏️</span></div>
       <div class="plevel"><span class="lv">Lv.12</span><div class="bar"><i></i></div><span class="pct">72%</span></div>
       <div class="nav">
         <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
