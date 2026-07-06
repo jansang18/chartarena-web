@@ -137,6 +137,44 @@
   @keyframes emoteFloat{0%{opacity:0; transform:translate(-50%,10px) scale(.5)} 16%{opacity:1; transform:translate(-50%,-4px) scale(1.2)} 34%{transform:translate(-50%,-14px) scale(1)} 100%{opacity:0; transform:translate(-50%,-58px) scale(.85)}}
   .bshare{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);z-index:6;display:none;border:1px solid var(--gold);background:rgba(6,12,26,.94);color:var(--gold);font-family:inherit;font-weight:800;font-size:13px;padding:9px 16px;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.7)}
   .bshare:active{transform:translateX(-50%) translateY(1px)}
+  /* ===== 로비 (모드 선택) ===== */
+  .lobby{position:absolute; inset:0; z-index:40; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    background:radial-gradient(120% 90% at 50% -10%,#173561 0%,#0b1a35 46%,#060d1e 100%); padding:22px}
+  .lobby.hide{display:none}
+  .lobby .llogo{width:210px; margin-bottom:2px}
+  .lobby .ltit{font-weight:900; font-size:19px; color:#EAF0FA; letter-spacing:.01em}
+  .lobby .lsub{font-size:12.5px; color:#93A0BC; margin-top:-8px}
+  .lmodes{display:flex; gap:16px; margin-top:4px}
+  .lcard{width:288px; border-radius:18px; padding:18px 18px 16px; cursor:pointer; border:1px solid #2a4b7a; position:relative; overflow:hidden;
+    background:linear-gradient(180deg,#12294c,#0b1a34); transition:transform .12s, box-shadow .12s, border-color .12s}
+  .lcard:hover{transform:translateY(-3px); border-color:#4CA9FF; box-shadow:0 16px 34px -14px rgba(76,169,255,.55)}
+  .lcard.duel:hover{border-color:#E9B949; box-shadow:0 16px 34px -14px rgba(233,185,73,.55)}
+  .lcard .lic{font-size:38px; line-height:1}
+  .lcard .ln{font-weight:900; font-size:19px; margin-top:8px; color:#fff}
+  .lcard .ld{font-size:12.5px; color:#9fb3d0; margin-top:5px; line-height:1.5}
+  .lcard .lgo{margin-top:12px; text-align:center; font-weight:800; font-size:13px; color:#04223f; background:linear-gradient(180deg,#8fd6ff,#4CA9FF); border-radius:10px; padding:9px}
+  .lcard.duel .lgo{background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); color:#3a2c07}
+  .lcard .ltag{position:absolute; top:12px; right:12px; font-size:10px; font-weight:800; color:#0b1a34; background:#E9B949; padding:2px 8px; border-radius:999px}
+  /* 판돈 선택 단계 */
+  .lante{display:none; flex-direction:column; align-items:center; gap:14px}
+  .lante.on{display:flex}
+  .lante .lq{font-weight:900; font-size:17px; color:#EAF0FA}
+  .lante .lopp{display:flex; align-items:center; gap:10px; background:rgba(8,18,38,.7); border:1px solid #2a4b7a; border-radius:14px; padding:8px 16px 8px 8px}
+  .lante .lopp img{width:46px; height:46px; object-fit:contain; object-position:bottom; filter:drop-shadow(0 3px 5px rgba(0,0,0,.5))}
+  .lante .lopp .on2{font-size:11px; color:#93A0BC} .lante .lopp .nn{font-weight:800; color:#fff; font-size:14px}
+  .lbtns{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:440px}
+  .abtn{min-width:96px; padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:900; font-size:15px; font-family:var(--mono);
+    background:linear-gradient(180deg,#12294c,#0b1a34); border:1px solid #2a4b7a; color:#EAF0FA; transition:.12s}
+  .abtn:hover:not(.dis){border-color:#E9B949; color:#FCE9A6; transform:translateY(-2px)}
+  .abtn small{display:block; font-size:10px; font-weight:700; color:#93A0BC; margin-top:2px; font-family:var(--sans)}
+  .abtn.dis{opacity:.4; cursor:default}
+  .lback{margin-top:2px; font-size:12px; color:#7d8bab; background:none; border:none; cursor:pointer}
+  /* 1v1 단상 (2명 대결) */
+  .podiums.duel{justify-content:center; gap:0}
+  .podiums.duel .pod{flex:0 0 40%; max-width:300px}
+  .vs{flex:0 0 auto; align-self:center; font-weight:900; font-style:italic; font-size:30px; color:#E9B949; text-shadow:0 2px 10px rgba(233,185,73,.5); padding:0 8px; margin-top:24px}
+  .desk .stak{font-family:var(--mono); font-weight:900; font-size:15px; color:#FCE9A6}
+  .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
 
 <div class="scaler" id="scaler">
@@ -179,6 +217,31 @@
   <div class="msg" id="msg"></div>
   <button class="bshare" id="bShare" type="button">📸 인증짤 만들기</button>
   <div class="emobar" id="emobar"><button class="emobtn" id="emobtn" type="button" title="이모티콘">😀</button><div class="emopop" id="emopop"></div></div>
+
+  <div class="lobby" id="lobby">
+    <img class="llogo" src="assets/logo_wordmark.png" alt="차트아레나">
+    <div class="lmodes" id="lmodes">
+      <div class="lcard" id="mode4p">
+        <div class="lic">👥</div>
+        <div class="ln">4명전 배틀</div>
+        <div class="ld">봇 3명과 10라운드 차트 예측 대결. 내 포인트로 베팅해 수익을 쌓아요.</div>
+        <div class="lgo">시작하기 ▶</div>
+      </div>
+      <div class="lcard duel" id="mode1v1">
+        <div class="ltag">NEW</div>
+        <div class="lic">⚔️</div>
+        <div class="ln">1vs1 맞대결</div>
+        <div class="ld">판돈을 걸고 맞짱! 수익률 차이만큼 상대 돈을 뺏어와, 한쪽 판돈이 바닥나면 승부 끝.</div>
+        <div class="lgo">상대 찾기 ▶</div>
+      </div>
+    </div>
+    <div class="lante" id="lante">
+      <div class="lq">⚔️ 판돈을 정하세요 (상대도 같은 금액을 겁니다)</div>
+      <div class="lopp" id="lopp"></div>
+      <div class="lbtns" id="lbtns"></div>
+      <button class="lback" id="lback" type="button">← 모드 선택으로</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -215,7 +278,7 @@ function fmtP(n){return Math.round(n).toLocaleString();}
 /* 배팅액 = 보유 포인트의 비율 (포커·맞고처럼 스택 일부를 건다) */
 var BETPCTS=[[0.1,'10%'],[0.25,'25%'],[0.5,'50%'],[1,'올인']];
 var roundBet=0;
-function curBet(){ if(mySel&&mySel.dir==='W')return 0; return Math.max(0,Math.round(getBal()*((mySel&&mySel.betPct)||0.25))); }
+function curBet(){ if(mySel&&mySel.dir==='W')return 0; var base=(MODE==='1v1'&&duel)?duel.myStack:getBal(); return Math.max(0,Math.round(base*((mySel&&mySel.betPct)||0.25))); }
 
 /* 화면폭에 맞춰 가로 무대 스케일 */
 function fit(){ var s=Math.min(1,(window.innerWidth-16)/1120,(window.innerHeight-16)/516); var sc=$('scaler');
@@ -231,13 +294,15 @@ var players=[
 ];
 /* AI 상대 = 랜덤 인간 캐릭터 + 랜덤 닉네임 (매 입장마다 랜덤 등장) */
 var BOTNAMES=['불꽃트레이더','존버킴','떡상요정','캔들마스터','코인고수','한강뷰맨','우상향러','물타기왕','단타여신','칼손절','추격매수','다이아손','고래잡이','풀매수러','익절만렙','반등각','평단내리기','로켓탑승','바닥줍줍','패닉셀러','스캘핑고수','존버여왕','불장러','추매요정','시드지킴','청산방지','매수각','존버박','겁쟁이킴','한탕주의'];
-(function randomizeBots(){
+function randomizeBots(){
   function shuf(a){ for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;} return a; }
   var huPool=[]; for(var i=0;i<17;i++){ if('hu'+i!==myCh) huPool.push('hu'+i); }
   shuf(huPool); var nm=shuf(BOTNAMES.slice());
   for(var b=1;b<=3;b++){ players[b].chImg=CHIMG[huPool[b-1]]; players[b].name=nm[b-1]; delete players[b].em; }
-})();
+}
+randomizeBots();
 var ROUNDS=10, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
+var MODE='4p', duel=null, roundBet=0;   // MODE: '4p'(4명전) | '1v1'(맞대결); duel={ante,myStack,oppStack,roundNo,cap}
 var autoTimer=null, autoLeft=0;   // 결과 화면 자동 넘김 타이머
 var bind={ma:true, boll:false, ichi:false};   // 차트 지표 토글 (이평선/볼린저/일목)
 
@@ -299,6 +364,7 @@ function drawChart(){
 
 /* 단상 렌더 */
 function renderPods(){
+  if(MODE==='1v1') return renderDuelPods();
   var lead=Math.max.apply(null,players.map(function(p){return p.score;}));
   $('podiums').innerHTML=players.map(function(p,i){
     var av=p.chImg?'<img class="ch" src="'+p.chImg+'" alt="">':'<span class="em">'+p.em+'</span>';
@@ -315,6 +381,23 @@ function renderPods(){
       +'</div></div>';
   }).join('');
 }
+function renderDuelPods(){
+  var stacks=[duel.myStack, duel.oppStack], reveal=(phase!=='pick');
+  var html=players.map(function(p,i){
+    var av=p.chImg?'<img class="ch" src="'+p.chImg+'" alt="">':'<span class="em">'+(p.em||'🙂')+'</span>';
+    var known=(i===0||reveal)&&p.pick, pkc=known?p.pick:'Q', pklab=known?{L:'롱 ↗',S:'숏 ↘',W:'관망 ◎'}[p.pick]:'?';
+    var broke=stacks[i]<=0;
+    return '<div class="pod">'
+      +'<div class="pick '+pkc+' on">'+pklab+'</div>'
+      +'<div class="ava">'+av+'</div>'
+      +'<div class="desk'+(i===0?' me':'')+(broke?' broke':'')+'">'
+        +'<div class="nm">'+(i===0?'⭐ ':'')+p.name+'</div>'
+        +'<div class="stak">'+fmtP(Math.max(0,stacks[i]))+'P</div>'
+        +'<div class="delta" id="dl'+i+'"></div>'
+      +'</div></div>';
+  });
+  $('podiums').innerHTML = html[0] + '<div class="vs">VS</div>' + html[1];
+}
 function fmtScore(v){ var s=(v<0?'-':'')+('000'+Math.abs(v)).slice(-4); return s; }
 /* 리더보드용 누적 손익(P) 표기 */
 function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.round(v/1000)+'K':a>=10000?(v/1000).toFixed(1).replace('.0','')+'K':fmtP(v); return (v>0?'+':'')+s; }
@@ -322,16 +405,16 @@ function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.ro
 /* 컨트롤 */
 function renderCtrl(){
   ['L','S','W'].forEach(function(d){ $('d'+d).classList.toggle('on', mySel.dir===d); });
-  var bal=getBal(); var bb=$('bbal'); if(bb)bb.textContent=fmtP(bal);
+  var bal=(MODE==='1v1'&&duel)?duel.myStack:getBal(); var bb=$('bbal'); if(bb)bb.textContent=fmtP(bal);
   $('bets').innerHTML=BETPCTS.map(function(b){ return '<div class="bet'+(mySel.betPct===b[0]?' on':'')+'" data-bp="'+b[0]+'">'+b[1]+'</div>'; }).join('');
   $('levs').innerHTML=[1,2,3,5,10].map(function(l){return '<div class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'">'+l+'배</div>';}).join('');
   var go=$('go'), bet=curBet();
   if(phase==='pick'){ go.className='go';
     if(mySel.dir===null) go.textContent='방향을 골라주세요';
-    else if(mySel.dir==='W') go.textContent='◎ 관망 (-5%) 확정 ▶';
+    else if(mySel.dir==='W') go.textContent=(MODE==='1v1'?'◎ 관망 (베팅 안 함) 확정 ▶':'◎ 관망 (-5%) 확정 ▶');
     else go.textContent='💰'+fmtP(bet)+'P · '+({L:'롱',S:'숏'}[mySel.dir])+' '+mySel.lev+'배 확정 ▶';
     go.disabled=(mySel.dir===null)||(bal<=0&&mySel.dir!=='W'); }
-  else if(phase==='result'){ go.className='go next'; go.textContent=(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶'); go.disabled=false; }
+  else if(phase==='result'){ go.className='go next'; go.textContent=(MODE==='1v1'?'다음 판 ▶':(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶')); go.disabled=false; }
   else { go.className='go'; go.disabled=true; go.textContent='공개 중…'; }
 }
 $('dL').onclick=function(){pick('L');}; $('dS').onclick=function(){pick('S');}; $('dW').onclick=function(){pick('W');};
@@ -340,7 +423,7 @@ $('levs').onclick=function(e){ var l=e.target.closest('[data-lev]'); if(l&&phase
 $('indbar').onclick=function(e){ var el=e.target.closest('[data-ind]'); if(!el)return; var k=el.dataset.ind; bind[k]=!bind[k]; el.classList.toggle('on',bind[k]); drawChart(); };
 $('bets').onclick=function(e){ var b=e.target.closest('[data-bp]'); if(b&&phase==='pick'){ mySel.betPct=+b.dataset.bp; renderCtrl(); } };
 $('go').onclick=function(){ if(phase==='pick'){ if(mySel.dir===null){toast('방향을 선택하세요');return;} lockIn(); } else if(phase==='result'){ nextRound(); } };
-$('endbtn').onclick=function(){ toast('데모 — 로비로'); };
+$('endbtn').onclick=function(){ if(tmr)clearInterval(tmr); clearAutoNext(); if(revTimer){clearTimeout(revTimer);revTimer=null;} $('verdict').classList.remove('show'); resetGoHandler(); showLobby(); };
 
 function toast(m){ var t=$('msg'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1200); }
 
@@ -372,10 +455,10 @@ function botPick(p){
 }
 
 /* 라운드 시작 */
-function startRound(){ clearAutoNext();
+function startRound(){ clearAutoNext(); resetGoHandler();
   phase='pick'; GD=pickSeg(); gRev=GD.vis; resetView(); tleft=15; mySel={dir:null,lev:2,betPct:(mySel&&mySel.betPct)||0.25}; $('chartid').classList.remove('show'); var _bs=$('bShare'); if(_bs)_bs.style.display='none';
   players.forEach(function(p){p.pick=null;p.dp=0;});
-  $('round').textContent='ROUND '+round+' / '+ROUNDS;
+  $('round').textContent=(MODE==='1v1'?'⚔️ '+round+'판째':'ROUND '+round+' / '+ROUNDS);
   $('tvtag').textContent='난이도 '+'◆'.repeat(3+(round%3))+'◇'.repeat(5-(3+(round%3)));
   $('verdict').classList.remove('show');
   renderPods(); renderCtrl(); drawChart(); $('tnum').textContent=tleft; $('tbar').style.width='100%';
@@ -387,8 +470,12 @@ function startRound(){ clearAutoNext();
 function lockIn(){
   if(phase!=='pick')return; clearInterval(tmr); phase='reveal';
   if(players[0].pick===null){ players[0].pick='W'; }
-  roundBet = (players[0].pick==='W') ? 0 : Math.min(getBal(), Math.max(1, Math.round(getBal()*mySel.betPct)));  // 이 라운드 배팅액 확정 (방향 걸면 최소 1P)
+  var myBase=(MODE==='1v1'&&duel)?duel.myStack:getBal();
+  roundBet = (players[0].pick==='W') ? 0 : Math.min(myBase, Math.max(1, Math.round(myBase*mySel.betPct)));  // 이 라운드 배팅액 확정 (방향 걸면 최소 1P)
   players.forEach(function(p,i){ if(i>0) p.pick=botPick(p); });
+  if(MODE==='1v1'&&duel){ var _o=players[1]; _o.lev=[1,2,2,3,3,5,10][Math.floor(Math.random()*7)];   // 상대 봇: 랜덤 레버리지 + 랜덤 베팅%
+    var _op=[0.25,0.25,0.5,0.5,1][Math.floor(Math.random()*5)];
+    _o.bet=(_o.pick==='W')?0:Math.min(duel.oppStack, Math.max(1, Math.round(duel.oppStack*_op))); }
   renderPods(); renderCtrl(); resetView(); drawChart();
   var target=GD.vis+30;
   if(reduce){ gRev=target; finishRound(); return; }
@@ -399,6 +486,7 @@ function lockIn(){
   revTimer=setTimeout(step, 150);
 }
 function finishRound(){
+  if(MODE==='1v1') return finishDuelRound();
   gRev=GD.vis+30; drawChart();
   var cs=GD.cs,vis=GD.vis,entry=cs[vis-1][3],exit=cs[vis-1+30][3];
   var moveRaw=(exit-entry)/entry*100;                 // 코인 실제 % 움직임 (+오름 / -내림)
@@ -434,13 +522,54 @@ function finishRound(){
     setTimeout(function(){ finalResult(); }, 2800); }
   else { startAutoNext(); }   // 10초 뒤 자동으로 다음 라운드
 }
+/* ===== 1v1 맞대결: 수익률 차이만큼 주고받기 + 한쪽 파산까지 ===== */
+function finishDuelRound(){
+  gRev=GD.vis+30; drawChart();
+  var cs=GD.cs,vis=GD.vis,entry=cs[vis-1][3],exit=cs[vis-1+30][3];
+  var moveRaw=(exit-entry)/entry*100, me=players[0], op=players[1];
+  function pnlOf(pick,bet,lev){ if(pick==='W'||!bet)return 0; var sign=pick==='L'?1:-1; return Math.round(bet*sign*moveRaw*lev/100); }
+  var myPnl=pnlOf(me.pick, roundBet, me.lev), opPnl=pnlOf(op.pick, op.bet||0, op.lev);
+  var diff=myPnl-opPnl, transfer=0;                     // 수익률 차이 = 주고받는 금액 (제로섬)
+  if(diff>0){ transfer=Math.min(diff, duel.oppStack); duel.myStack+=transfer; duel.oppStack-=transfer; me.dp=transfer; op.dp=-transfer; }
+  else if(diff<0){ transfer=Math.min(-diff, duel.myStack); duel.myStack-=transfer; duel.oppStack+=transfer; me.dp=-transfer; op.dp=transfer; }
+  else { me.dp=0; op.dp=0; }
+  duel.roundNo=(duel.roundNo||0)+1;
+  phase='result'; renderPods(); renderCtrl();
+  $('chartid').innerHTML='🔍 실제 차트 공개 · <b>'+GD.sym+' '+GD.tf+'</b><span class="rl">Binance 실데이터</span>'; $('chartid').classList.add('show');
+  [me,op].forEach(function(p,i){ var d=$('dl'+i); if(!d)return; if(p.dp===0){d.textContent='±0';d.style.color='#93A0BC';} else{d.textContent=(p.dp>0?'+':'')+fmtP(p.dp);d.style.color=p.dp>0?'#35D07A':'#FF5C8A';} d.style.opacity='1'; d.style.top='-26px'; });
+  var arrow=moveRaw>=0?'▲':'▼', mvcol=moveRaw>=0?'#35D07A':'#FF5C8A';
+  var meDir={L:'롱',S:'숏',W:'관망'}[me.pick], opDir={L:'롱',S:'숏',W:'관망'}[op.pick];
+  var head = (me.dp===0)?'<span style="color:#E9B949">무승부</span>':(me.dp>0?'<span style="color:#35D07A">이번 판 승 · +'+fmtP(me.dp)+'P 뺏어옴</span>':'<span style="color:#FF5C8A">이번 판 패 · '+fmtP(-me.dp)+'P 뺏김</span>');
+  var v=$('verdict'); v.style.color='';
+  v.innerHTML='<div class="mv" style="color:'+mvcol+'">코인 '+arrow+' '+Math.abs(moveRaw).toFixed(1)+'%</div>'
+    +'<div class="pl">'+head+'</div>'
+    +'<div class="bl">나 '+meDir+(me.pick!=='W'?' '+me.lev+'배':'')+' ('+(myPnl>=0?'+':'')+fmtP(myPnl)+') · '+op.name+' '+opDir+(op.pick!=='W'?' '+op.lev+'배':'')+' ('+(opPnl>=0?'+':'')+fmtP(opPnl)+')</div>'
+    +'<div class="bl">내 판돈 <b>'+fmtP(Math.max(0,duel.myStack))+'P</b> · 상대 '+fmtP(Math.max(0,duel.oppStack))+'P</div>';
+  v.classList.add('show'); botReact(); _battleCard();
+  if(duel.myStack<=0 || duel.oppStack<=0 || duel.roundNo>=duel.cap){ if(tmr)clearInterval(tmr); clearAutoNext(); var gq=$('go'); if(gq)gq.disabled=true;
+    setTimeout(function(){ duelEnd(); }, 2600); }
+  else { startAutoNext(); }
+}
+function duelEnd(){ clearAutoNext();
+  var iWon = duel.myStack >= duel.oppStack, net = Math.round(duel.myStack - duel.ante);
+  setBal(getBal()+net);                                 // 정산: 최종 판돈 − 처음 건 판돈 → 메인 보유 포인트
+  var opName=players[1].name, v=$('verdict'); v.style.color='';
+  var head = iWon ? '🏆 승리! '+opName+' 판돈 소진' : '💀 패배 · 내 판돈 소진';
+  var hcol = iWon ? '#E9B949' : '#FF5C8A';
+  v.innerHTML='<div class="mv" style="color:'+hcol+';font-size:25px">'+head+'</div>'
+    +'<div class="bl">판돈 '+fmtP(duel.ante)+'P → <b style="color:'+(net>=0?'#35D07A':'#FF5C8A')+'">'+(net>=0?'+':'')+fmtP(net)+'P</b> · 보유 <b>'+fmtP(getBal())+'P</b></div>';
+  v.classList.add('show');
+  var go=$('go'); go.className='go next'; go.disabled=false; go.textContent='🔄 다시 · 로비';
+  go.onclick=function(){ if(getBal()<=0) comeback(); resetGoHandler(); showLobby(); };
+}
+function resetGoHandler(){ $('go').onclick=function(){ if(phase==='pick'){ if(mySel.dir===null){toast('방향을 선택하세요');return;} lockIn(); } else if(phase==='result'){ nextRound(); } }; }
 function nextRound(){ clearAutoNext();
-  if(round>=ROUNDS){ finalResult(); return; }
+  if(MODE==='4p' && round>=ROUNDS){ finalResult(); return; }
   round++; startRound();
 }
 /* 결과 화면에서 10초 뒤 자동으로 다음 라운드 (버튼 미클릭 시) */
 function clearAutoNext(){ if(autoTimer){ clearInterval(autoTimer); autoTimer=null; } }
-function updateGoCountdown(){ var go=$('go'); if(go&&phase==='result'){ go.textContent=(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶')+' ('+autoLeft+')'; } }
+function updateGoCountdown(){ var go=$('go'); if(go&&phase==='result'){ go.textContent=(MODE==='1v1'?'다음 판 ▶':(round>=ROUNDS?'🏆 최종 결과':'다음 라운드 ▶'))+' ('+autoLeft+')'; } }
 function startAutoNext(){ clearAutoNext(); autoLeft=10; updateGoCountdown();
   autoTimer=setInterval(function(){ autoLeft--; if(autoLeft<=0){ clearAutoNext(); nextRound(); } else updateGoCountdown(); }, 1000); }
 function finalResult(){ clearAutoNext();
@@ -523,6 +652,39 @@ function _battleCard(){ var me=players[0]; if(!me||!GD)return;
   var b=$('bShare'); if(b){b.style.display=''; b.onclick=function(){ if(_cardData)shareCard(_cardData); };}
 }
 window.addEventListener('resize',drawChart);
-startRound();
+
+/* ===== 로비 / 모드 선택 ===== */
+var ANTES=[10000,50000,100000], pendOpp=null;
+function showLobby(){ var lb=$('lobby'); if(!lb)return; lb.classList.remove('hide'); $('lmodes').style.display='flex'; $('lante').classList.remove('on'); }
+function hideLobby(){ var lb=$('lobby'); if(lb)lb.classList.add('hide'); }
+function startMode4p(){ MODE='4p'; duel=null; round=1;
+  players=[ {name:myNick, chImg:CHIMG[myCh]||CHIMG.shark, score:0, strat:'me', pick:null, lev:2, dp:0},
+    {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},
+    {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
+    {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0} ];
+  randomizeBots(); $('podiums').classList.remove('duel'); hideLobby(); startRound();
+}
+function showAnteScreen(){ $('lmodes').style.display='none'; $('lante').classList.add('on');
+  var huPool=[]; for(var i=0;i<17;i++){ if('hu'+i!==myCh) huPool.push('hu'+i); }
+  var oc=huPool[Math.floor(Math.random()*huPool.length)], on=BOTNAMES[Math.floor(Math.random()*BOTNAMES.length)];
+  pendOpp={oc:oc,on:on};
+  $('lopp').innerHTML='<img src="'+CHIMG[oc]+'" alt=""><div><div class="on2">상대</div><div class="nn">'+on+'</div></div>';
+  var bal=getBal(), html='';
+  ANTES.forEach(function(a){ var dis=a>bal; html+='<div class="abtn'+(dis?' dis':'')+'" data-ante="'+(dis?0:a)+'">'+fmtP(a)+'P<small>'+(dis?'잔액 부족':'둘 다 '+fmtP(a)+' 걸기')+'</small></div>'; });
+  var allin=Math.floor(bal); if(allin>=1000 && ANTES.indexOf(allin)<0) html+='<div class="abtn" data-ante="'+allin+'">올인<small>'+fmtP(allin)+'P</small></div>';
+  if(bal<1000) html='<div class="abtn dis" data-ante="0">포인트가 부족해요<small>최소 1,000P 필요</small></div>';
+  $('lbtns').innerHTML=html;
+}
+function setupDuel(opp,ante){ MODE='1v1'; round=1;
+  players=[ {name:myNick, chImg:CHIMG[myCh]||CHIMG.shark, score:0, strat:'me', pick:null, lev:2, dp:0},
+    {name:opp.on, chImg:CHIMG[opp.oc], score:0, strat:'duel', pick:null, lev:2, dp:0} ];
+  duel={ ante:ante, myStack:ante, oppStack:ante, roundNo:0, cap:24 };
+  $('podiums').classList.add('duel'); hideLobby(); startRound();
+}
+$('mode4p').onclick=startMode4p;
+$('mode1v1').onclick=showAnteScreen;
+$('lback').onclick=function(){ $('lante').classList.remove('on'); $('lmodes').style.display='flex'; };
+$('lbtns').onclick=function(e){ var b=e.target.closest('[data-ante]'); if(!b)return; var a=+b.dataset.ante; if(!a||a<1000){ toast('판돈이 부족해요'); return; } setupDuel(pendOpp,a); };
+showLobby();
 })();
 </script>
