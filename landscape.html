@@ -42,6 +42,14 @@
   .dpsub{color:var(--ts);font-size:13px;margin-top:5px}
   .dpreward{font-size:34px;font-weight:900;color:var(--gold);font-family:var(--mono);margin:16px 0 18px;text-shadow:0 2px 16px rgba(233,185,73,.4)}
   .dpbtn{width:100%;padding:14px;border:none;border-radius:14px;font-weight:900;font-size:17px;font-family:inherit;cursor:pointer;color:#062018;background:linear-gradient(90deg,#F6D272,#E9B949)}
+  .dpweek{display:flex;gap:5px;margin:14px 0 6px}
+  .dpday{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 1px;border-radius:9px;background:rgba(8,16,34,.6);border:1px solid rgba(80,140,220,.18)}
+  .dpday .dd{font-size:10px;color:var(--ts);font-weight:700}
+  .dpday .dr{font-size:12px;font-weight:900;font-family:var(--mono);color:#9fb3d0}
+  .dpday.done{background:rgba(53,208,122,.14);border-color:rgba(53,208,122,.4)}
+  .dpday.done .dr{color:var(--green)}
+  .dpday.cur{background:rgba(233,185,73,.18);border-color:var(--gold);box-shadow:0 0 14px -2px rgba(233,185,73,.6)}
+  .dpday.cur .dd,.dpday.cur .dr{color:var(--gold)}
   /* 첫 실행: 캐릭터 선택 (히어로 + 캐러셀) */
   #setup{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:#04060e}
   #setup.show{display:flex}
@@ -518,8 +526,9 @@
 <div id="splash"><img src="assets/logo.png" alt="차트아레나"></div>
 <div id="dpop" class="dpop"><div class="dpopcard">
   <div class="dpicon" id="dpIcon">🎁</div>
-  <div class="dptitle" id="dpTitle">출석 완료!</div>
-  <div class="dpsub" id="dpSub">매일 접속하고 보상을 받으세요</div>
+  <div class="dptitle" id="dpTitle">출석 보상</div>
+  <div class="dpsub" id="dpSub">7일 연속 출석하면 더 큰 보상!</div>
+  <div class="dpweek" id="dpWeek"></div>
   <div class="dpreward" id="dpReward">+10,000 P</div>
   <button class="dpbtn" id="dpBtn" type="button">받기</button>
 </div></div>
@@ -576,12 +585,21 @@ function isBad(s){ if(!s)return false; var t=(''+s).toLowerCase().replace(/[\s0-
 /* ── 일일 상태 (출석·재기 보상) ── */
 var DK='chartarena_daily_v1';
 function _today(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
-function dget(){ var o=lj(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
+function _yday(){ var d=new Date(); d.setDate(d.getDate()-1); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function dget(){ var o=lj(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0,streak:o.streak||0,lastAtt:o.lastAtt||''}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
 function dset(o){ localStorage.setItem(DK,JSON.stringify(o)); }
 /* 팝업 + 출석 보상 */
-var ATTEND_REWARD=10000;
-function showPop(icon,title,sub,rewardTxt){ var p=$('dpop'); if(!p)return; if($('dpIcon'))$('dpIcon').textContent=icon; if($('dpTitle'))$('dpTitle').textContent=title; if($('dpSub'))$('dpSub').textContent=sub; if($('dpReward'))$('dpReward').textContent=rewardTxt; p.classList.add('show'); }
-function checkAttendance(){ var d=dget(); if(d.att)return; d.att=1; dset(d); setBal(getBal()+ATTEND_REWARD); refreshProfile(); showPop('🎁','출석 완료!','매일 접속하고 보상을 받으세요','+'+fmt(ATTEND_REWARD)+' P'); }
+var ATTEND_TABLE=[10000,12000,14000,16000,18000,20000,30000];   // 1~7일차 연속 출석 보상
+function checkAttendance(){ var d=dget(); if(d.att)return;
+  var streak=(d.lastAtt===_yday())?(d.streak%7)+1:1;   // 어제 출석했으면 연속(7 넘으면 1로 순환), 아니면 1일차부터
+  d.att=1; d.streak=streak; d.lastAtt=_today(); dset(d);
+  var R=ATTEND_TABLE[streak-1]; setBal(getBal()+R); refreshProfile();
+  showAttend(streak,R); }
+function showAttend(streak,R){ var p=$('dpop'); if(!p)return;
+  var wk=$('dpWeek'); if(wk){ var h=''; for(var i=1;i<=7;i++){ var cls=i<streak?'done':(i===streak?'cur':'fut'); h+='<div class="dpday '+cls+'"><span class="dd">'+i+'일</span><span class="dr">'+(ATTEND_TABLE[i-1]/10000)+'만</span></div>'; } wk.innerHTML=h; }
+  if($('dpSub'))$('dpSub').textContent=(streak>=7)?'7일 연속 달성! 최대 보상 🎉':(streak+'일 연속 출석 중 · 7일차엔 3만P!');
+  if($('dpReward'))$('dpReward').textContent='+'+fmt(R)+' P';
+  p.classList.add('show'); }
 document.addEventListener('DOMContentLoaded',function(){ var db=$('dpBtn'); if(db)db.onclick=function(){ $('dpop').classList.remove('show'); }; });
 if($('dpBtn'))$('dpBtn').onclick=function(){ $('dpop').classList.remove('show'); };
 var hs=lj(HS);

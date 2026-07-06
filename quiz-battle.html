@@ -214,7 +214,7 @@ function setBal(v){var g=ljg(GS);g.balance=Math.max(0,Math.round(v));localStorag
 /* 재기(올인 파산) 보상 — 하루 5회까지 각 1,000P */
 var DK='chartarena_daily_v1';
 function _today(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
-function dget(){ var o=ljg(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
+function dget(){ var o=ljg(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0,streak:o.streak||0,lastAtt:o.lastAtt||''}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
 function comeback(){ var d=dget(); if(d.allin<5){ d.allin++; localStorage.setItem(DK,JSON.stringify(d)); setBal(1000); return d.allin; } return 0; }
 function fmtP(n){return Math.round(n).toLocaleString();}
 /* 배팅액 = 보유 포인트의 비율 (포커·맞고처럼 스택 일부를 건다) */
