@@ -33,6 +33,15 @@
   #splash.out{opacity:0;pointer-events:none}
   @keyframes splashPop{0%{transform:scale(.82);opacity:0}55%{opacity:1}100%{transform:scale(1);opacity:1}}
   @media (prefers-reduced-motion:reduce){#splash img{animation:none}}
+  /* 출석·보상 팝업 */
+  .dpop{position:fixed;inset:0;z-index:11000;display:none;align-items:center;justify-content:center;background:rgba(4,7,15,.74)}
+  .dpop.show{display:flex}
+  .dpopcard{width:344px;max-width:86vw;background:linear-gradient(160deg,#15233f,#0c1424);border:1px solid rgba(90,150,230,.3);border-radius:22px;padding:28px 26px 24px;text-align:center;box-shadow:0 30px 80px -20px #000;animation:splashPop .4s cubic-bezier(.2,.8,.2,1) both}
+  .dpicon{font-size:56px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+  .dptitle{font-size:24px;font-weight:900;margin-top:6px}
+  .dpsub{color:var(--ts);font-size:13px;margin-top:5px}
+  .dpreward{font-size:34px;font-weight:900;color:var(--gold);font-family:var(--mono);margin:16px 0 18px;text-shadow:0 2px 16px rgba(233,185,73,.4)}
+  .dpbtn{width:100%;padding:14px;border:none;border-radius:14px;font-weight:900;font-size:17px;font-family:inherit;cursor:pointer;color:#062018;background:linear-gradient(90deg,#F6D272,#E9B949)}
   /* 첫 실행: 캐릭터 선택 (히어로 + 캐러셀) */
   #setup{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:#04060e}
   #setup.show{display:flex}
@@ -507,6 +516,13 @@
 </div></div>
 <div class="toast" id="toast"></div>
 <div id="splash"><img src="assets/logo.png" alt="차트아레나"></div>
+<div id="dpop" class="dpop"><div class="dpopcard">
+  <div class="dpicon" id="dpIcon">🎁</div>
+  <div class="dptitle" id="dpTitle">출석 완료!</div>
+  <div class="dpsub" id="dpSub">매일 접속하고 보상을 받으세요</div>
+  <div class="dpreward" id="dpReward">+10,000 P</div>
+  <button class="dpbtn" id="dpBtn" type="button">받기</button>
+</div></div>
 <div id="setup"><div class="ssc"><div class="setup2">
   <button class="sback" id="sback" type="button" aria-label="이전 캐릭터">‹</button>
   <div class="sleft">
@@ -554,6 +570,20 @@ var GS='chartarena_web_v1', HS='chartarena_hub_v1';
 function lj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return{};}}
 function getBal(){var g=lj(GS);return typeof g.balance==='number'?g.balance:25000;}
 function setBal(v){var g=lj(GS);g.balance=v;localStorage.setItem(GS,JSON.stringify(g));}
+/* ── 욕설 필터 (닉네임·길드명·소개 등 유저 텍스트) ── */
+var BADWORDS=['씨발','시발','씨팔','시팔','씨바알','ㅅㅂ','병신','븅신','ㅂㅅ','ㅄ','개새끼','개색끼','개색','썅년','썅놈','좆','좃','좇','존나','ㅈㄴ','지랄','ㅈㄹ','니미','엠창','창녀','씹','섹스','강간','닥쳐','뒤져','꺼져','fuck','fuk','shit','bitch','asshole','dick','pussy','cunt','nigger','faggot','slut','whore'];
+function isBad(s){ if(!s)return false; var t=(''+s).toLowerCase().replace(/[\s0-9._\-*~!@#^&()+]/g,''); for(var i=0;i<BADWORDS.length;i++){ if(t.indexOf(BADWORDS[i])>=0) return true; } return false; }
+/* ── 일일 상태 (출석·재기 보상) ── */
+var DK='chartarena_daily_v1';
+function _today(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function dget(){ var o=lj(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
+function dset(o){ localStorage.setItem(DK,JSON.stringify(o)); }
+/* 팝업 + 출석 보상 */
+var ATTEND_REWARD=10000;
+function showPop(icon,title,sub,rewardTxt){ var p=$('dpop'); if(!p)return; if($('dpIcon'))$('dpIcon').textContent=icon; if($('dpTitle'))$('dpTitle').textContent=title; if($('dpSub'))$('dpSub').textContent=sub; if($('dpReward'))$('dpReward').textContent=rewardTxt; p.classList.add('show'); }
+function checkAttendance(){ var d=dget(); if(d.att)return; d.att=1; dset(d); setBal(getBal()+ATTEND_REWARD); refreshProfile(); showPop('🎁','출석 완료!','매일 접속하고 보상을 받으세요','+'+fmt(ATTEND_REWARD)+' P'); }
+document.addEventListener('DOMContentLoaded',function(){ var db=$('dpBtn'); if(db)db.onclick=function(){ $('dpop').classList.remove('show'); }; });
+if($('dpBtn'))$('dpBtn').onclick=function(){ $('dpop').classList.remove('show'); };
 var hs=lj(HS);
 var EMO={bull:'🐂',bear:'🐻',shark:'🦈',tiger:'🐯',dragon:'🐲',king:'🤴',bike:'🚲',scooter:'🛵',car:'🚗',taxi:'🚕',sports:'🏎️',rocket:'🚀'};
 var IMG={shark:'assets/char_shark.png', bull:'assets/char_bull.png', bear:'assets/char_bear.png', tiger:'assets/char_tiger.png', dragon:'assets/char_dragon.png', king:'assets/char_king.png',
@@ -749,7 +779,9 @@ function buyItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;}); 
   var sb=$('sback'); if(sb)sb.onclick=function(){ sel(idx-1); };
   nick.addEventListener('input',upd);
   nick.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!btn.disabled)btn.click(); });
-  btn.addEventListener('click',function(){ if(btn.disabled)return; st.ch=HU[idx][0]; st.nick=nick.value.trim().slice(0,10); st.setup=true; saveHS(); refreshProfile();
+  btn.addEventListener('click',function(){ if(btn.disabled)return;
+    if(isBad(nick.value)){ toast('닉네임에 부적절한 표현은 사용할 수 없어요'); nick.focus(); return; }
+    st.ch=HU[idx][0]; st.nick=nick.value.trim().slice(0,10); st.setup=true; saveHS(); refreshProfile();
     var vg=$('v-garage'); if(vg&&vg.classList.contains('on'))renderGarage();
     ov.classList.add('out'); setTimeout(function(){ if(ov.parentNode)ov.parentNode.removeChild(ov); },420); });
   sel(idx);
@@ -868,6 +900,7 @@ function fetchList(keep){ if(FB){ fbFetchGuilds(function(a){ GLD.list=(a||[]); G
 function browseList(){ return FB ? (GLD.list||[]).concat(demoGuilds()) : (GLD.list||[]); }
 /* 액션 */
 function doCreate(){ if(GLD.busy)return; var name=($('gcName')?$('gcName').value:'').trim().slice(0,14); if(!name){ toast('길드 이름을 입력하세요'); return; }
+  if(isBad(name)||isBad($('gcDesc')?$('gcDesc').value:'')){ toast('길드 이름·소개에 부적절한 표현은 사용할 수 없어요'); return; }
   if(FB&&!myUid){ toast('연결 중이에요. 잠시 후 다시 시도해주세요'); return; }
   var uid=(FB&&myUid)?myUid:'me'; var mem={}; mem[uid]=meMember('owner');
   var base={ name:name, emblem:GLD.cre.emblem, color:GLD.cre.color, desc:(($('gcDesc')?$('gcDesc').value:'')||'').trim().slice(0,60), ownerUid:uid, createdAt:Date.now(), members:mem, memberCount:1, totalPoints:myContrib(), cheers:[] };
@@ -978,5 +1011,6 @@ document.addEventListener('click',function(e){
 });
 
 renderHome();
+if(st.setup) setTimeout(checkAttendance,1500);   // 출석 보상 (하루 1회, 스플래시 후)
 })();
 </script>
