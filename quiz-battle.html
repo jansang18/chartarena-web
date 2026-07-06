@@ -7,6 +7,7 @@
 <meta property="og:url" content="https://jansang18.github.io/chartarena-web/">
 <meta name="twitter:card" content="summary_large_image">
 <title>차트아레나 — 차트배틀 (가로 퀴즈쇼)</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1122'/%3E%3Crect x='8.5' y='9' width='4' height='14' rx='1.5' fill='%2335D07A'/%3E%3Crect x='19' y='6' width='4' height='17' rx='1.5' fill='%23FF5C8A'/%3E%3C/svg%3E">
 <style>
   :root{
     --gold:#E9B949; --gold2:#F6D272; --green:#35D07A; --pink:#FF5C8A; --blue:#4CA9FF; --up:#F0616D; --down:#4C8DF6;
@@ -38,7 +39,8 @@
   .live{font-size:11px; font-weight:900; color:#fff; background:#e5484d; padding:3px 9px; border-radius:6px; box-shadow:0 0 12px rgba(229,72,77,.6); animation:blink 1.2s infinite}
   @keyframes blink{50%{opacity:.55}}
   .round{margin-left:auto; font-family:var(--mono); font-weight:800; color:var(--gold); font-size:15px}
-  .bbal{font-family:var(--mono); font-weight:900; color:#FCE9A6; font-size:14px; background:rgba(233,185,73,.14); border:1px solid rgba(233,185,73,.4); border-radius:999px; padding:4px 12px}
+  .bbal{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-weight:900; color:#FCE9A6; font-size:14px; background:rgba(233,185,73,.14); border:1px solid rgba(233,185,73,.4); border-radius:999px; padding:4px 12px 4px 7px}
+  .coindot{display:inline-block;width:17px;height:17px;border-radius:50%;flex:0 0 auto;background:radial-gradient(circle at 34% 30%,#FCEBA8 0%,#F4CE63 42%,#DCA436 74%,#B87F22 100%);box-shadow:inset 0 1px 1px rgba(255,248,210,.8),inset 0 -1.4px 1.6px rgba(120,80,12,.5)}
   .endbtn{margin-left:12px; background:#123; border:1px solid #2a4b7a; color:#9fc3ff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer}
 
   /* TV 스크린(차트) */
@@ -145,7 +147,7 @@
     <img class="blogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <span class="live">● LIVE</span>
     <span class="round" id="round">ROUND 1 / 10</span>
-    <span class="bbal" id="bbal">💰 0</span>
+    <span class="bbal"><i class="coindot"></i><span id="bbal">0</span></span>
     <button class="endbtn" type="button" id="endbtn">종료</button>
   </div>
 
@@ -320,7 +322,7 @@ function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.ro
 /* 컨트롤 */
 function renderCtrl(){
   ['L','S','W'].forEach(function(d){ $('d'+d).classList.toggle('on', mySel.dir===d); });
-  var bal=getBal(); var bb=$('bbal'); if(bb)bb.textContent='💰 '+fmtP(bal);
+  var bal=getBal(); var bb=$('bbal'); if(bb)bb.textContent=fmtP(bal);
   $('bets').innerHTML=BETPCTS.map(function(b){ return '<div class="bet'+(mySel.betPct===b[0]?' on':'')+'" data-bp="'+b[0]+'">'+b[1]+'</div>'; }).join('');
   $('levs').innerHTML=[1,2,3,5,10].map(function(l){return '<div class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'">'+l+'배</div>';}).join('');
   var go=$('go'), bet=curBet();

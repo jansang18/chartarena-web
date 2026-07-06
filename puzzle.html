@@ -8,6 +8,7 @@
 <meta property="og:description" content="레벨을 깨는 차트 예측 퍼즐! 다음은 오른다? 내린다? 별을 모으고 월드를 정복하세요.">
 <meta property="og:image" content="https://jansang18.github.io/chartarena-web/assets/og.png">
 <title>차트 퍼즐 퀘스트 — 차트아레나</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1122'/%3E%3Crect x='8.5' y='9' width='4' height='14' rx='1.5' fill='%2335D07A'/%3E%3Crect x='19' y='6' width='4' height='17' rx='1.5' fill='%23FF5C8A'/%3E%3C/svg%3E">
 <style>
   :root{
     --bg:#070d1c; --p1:#0e1830; --p2:#16223e; --line:#22335a;
@@ -32,6 +33,7 @@
   .top h1{margin:0;font-size:18px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:7px;flex:1;min-width:0}
   .top .stat{display:flex;align-items:center;gap:6px;font-weight:900;font-family:var(--mono);font-size:15px;background:var(--p1);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
   .top .stat.g{color:var(--gold)} .top .stat.s{color:var(--gold2)}
+  .coindot{display:inline-block;width:17px;height:17px;border-radius:50%;flex:0 0 auto;background:radial-gradient(circle at 34% 30%,#FCEBA8 0%,#F4CE63 42%,#DCA436 74%,#B87F22 100%);box-shadow:inset 0 1px 1px rgba(255,248,210,.8),inset 0 -1.4px 1.6px rgba(120,80,12,.5)}
   /* ===== MAP ===== */
   .maphd{text-align:center;padding:14px 10px 6px}
   .maphd .hicon{width:clamp(122px,30vw,166px);height:auto;margin:0 auto -2px;display:block;
@@ -115,7 +117,7 @@
   <a class="home" href="index.html">← 홈</a>
   <h1>🧩 차트 퍼즐 퀘스트</h1>
   <div class="stat s" id="tStars">⭐ 0</div>
-  <div class="stat g" id="tPts">💰 0</div>
+  <div class="stat g"><i class="coindot"></i><span id="tPts">0</span></div>
 </div>
 <div class="scrollwrap">
 
@@ -212,7 +214,7 @@ function show(which){ $('map').style.display=which==='map'?'':'none'; $('play').
 /* ---------- 맵 ---------- */
 function renderMap(){
   $('tStars').textContent='⭐ '+totalStars();
-  $('tPts').textContent='💰 '+fmt(getBal());
+  $('tPts').textContent=fmt(getBal());
   var html='';
   WORLDS.forEach(function(w,wi){
     var got=0,tot=LVW*3; for(var l=0;l<LVW;l++)got+=starsOf(lvId(wi,l));

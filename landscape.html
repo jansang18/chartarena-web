@@ -7,6 +7,7 @@
 <meta property="og:url" content="https://jansang18.github.io/chartarena-web/">
 <meta name="twitter:card" content="summary_large_image">
 <title>차트아레나 — 가로 앱 (홈 허브)</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1122'/%3E%3Crect x='8.5' y='9' width='4' height='14' rx='1.5' fill='%2335D07A'/%3E%3Crect x='19' y='6' width='4' height='17' rx='1.5' fill='%23FF5C8A'/%3E%3C/svg%3E">
 <style>
   :root{
     --bg:#070d1c; --p1:#0e1830; --p2:#16223e; --line:#22335a;
@@ -599,18 +600,19 @@ function dget(){ var o=lj(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0,s
 function dset(o){ localStorage.setItem(DK,JSON.stringify(o)); }
 /* 팝업 + 출석 보상 */
 var ATTEND_TABLE=[10000,10000,10000,10000,10000,10000,30000];   // 1~6일 1만, 7일차 3만
+var _pendAtt=null;
 function checkAttendance(){ var d=dget(); if(d.att)return;
   var streak=(d.lastAtt===_yday())?(d.streak%7)+1:1;   // 어제 출석했으면 연속(7 넘으면 1로 순환), 아니면 1일차부터
-  d.att=1; d.streak=streak; d.lastAtt=_today(); dset(d);
-  var R=ATTEND_TABLE[streak-1]; setBal(getBal()+R); refreshProfile();
-  showAttend(streak,R); }
+  _pendAtt={streak:streak, R:ATTEND_TABLE[streak-1]};   // 지급은 '받기' 클릭 시에만
+  showAttend(streak,_pendAtt.R); }
+function claimAttend(){ if(_pendAtt){ var d=dget(); d.att=1; d.streak=_pendAtt.streak; d.lastAtt=_today(); dset(d); setBal(getBal()+_pendAtt.R); refreshProfile(); toast('출석 보상 +'+fmt(_pendAtt.R)+' P'); _pendAtt=null; } $('dpop').classList.remove('show'); }
 function showAttend(streak,R){ var p=$('dpop'); if(!p)return;
   var wk=$('dpWeek'); if(wk){ var h=''; for(var i=1;i<=7;i++){ var cls=i<streak?'done':(i===streak?'cur':'fut'); h+='<div class="dpday '+cls+'"><span class="dd">'+i+'일</span><span class="dr">'+(ATTEND_TABLE[i-1]/10000)+'만</span></div>'; } wk.innerHTML=h; }
   if($('dpSub'))$('dpSub').textContent=(streak>=7)?'7일 연속 달성! 최대 보상 🎉':(streak+'일 연속 출석 중 · 7일차엔 3만P!');
   if($('dpReward'))$('dpReward').textContent='+'+fmt(R)+' P';
   p.classList.add('show'); }
-document.addEventListener('DOMContentLoaded',function(){ var db=$('dpBtn'); if(db)db.onclick=function(){ $('dpop').classList.remove('show'); }; });
-if($('dpBtn'))$('dpBtn').onclick=function(){ $('dpop').classList.remove('show'); };
+document.addEventListener('DOMContentLoaded',function(){ var db=$('dpBtn'); if(db)db.onclick=claimAttend; });
+if($('dpBtn'))$('dpBtn').onclick=claimAttend;
 var hs=lj(HS);
 var EMO={bull:'🐂',bear:'🐻',shark:'🦈',tiger:'🐯',dragon:'🐲',king:'🤴',bike:'🚲',scooter:'🛵',car:'🚗',taxi:'🚕',sports:'🏎️',rocket:'🚀'};
 var IMG={shark:'assets/char_shark.png', bull:'assets/char_bull.png', bear:'assets/char_bear.png', tiger:'assets/char_tiger.png', dragon:'assets/char_dragon.png', king:'assets/char_king.png',
@@ -703,6 +705,7 @@ function myStats(){ var g=lj(GS),w=g.wins||0,l=g.losses||0,tt=w+l; return {point
 /* Firebase 실시간 랭킹 (설정 없으면 데모로 폴백) */
 function loadFB(cb){ var mods=['app','auth','firestore'],i=0; (function nx(){ if(i>=mods.length){cb();return;} var s=document.createElement('script'); s.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-'+mods[i++]+'-compat.js'; s.onload=nx; s.onerror=function(){cb();}; document.head.appendChild(s); })(); }
 function submitScore(){ if(!FB||!myUid)return; var s=myStats();
+  if((s.best||0)<=0 && (s.played||0)<=0) return;   // 실제로 플레이한 유저만 랭킹 제출 (신규 방문자·테스트 오염 방지)
   FB.collection('scores').doc(myUid).set({nick:(st.nick||'익명').slice(0,12),ch:st.ch,points:s.points,win:s.win,best:s.best,played:s.played,at:Date.now()},{merge:true}).catch(function(){}); }
 function fetchLB(cb){ if(!FB){cb(null);return;} FB.collection('scores').orderBy('points','desc').limit(50).get()
   .then(function(qs){ var a=[]; qs.forEach(function(d){var x=d.data();x._id=d.id;a.push(x);}); cb(a); }).catch(function(){cb(null);}); }
