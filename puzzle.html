@@ -274,7 +274,7 @@ function drawChart(reveal){
   if(!reveal){ctx.fillStyle='rgba(233,185,73,.6)';ctx.font='700 11px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='center';ctx.fillText('다음은?',(zx+plotR)/2,pT+14);}
   // candles
   var upc='#35D07A',dnc='#F0616D',upf='rgba(53,208,122,.9)',dnf='rgba(240,97,109,.9)';
-  var drawTo=reveal?rto:qto;
+  var rn=(CUR.revN!=null)?CUR.revN:rd.H; var drawTo=reveal?Math.min(rto,rd.E+1+rn):qto;
   for(var k=from;k<drawTo;k++){ var o=cs[k][0],hg=cs[k][1],lw=cs[k][2],cl=cs[k][3],x=cx(k);
     var isFut=k>rd.E; var up=cl>=o; var col=up?upc:dnc, fil=up?upf:dnf;
     if(isFut){ col=up?'#8fe3b0':'#ff9db0'; fil=col; }
@@ -290,7 +290,7 @@ function drawChart(reveal){
 }
 
 /* ---------- 레벨 진행 ---------- */
-var CUR={wi:0,li:0,w:null,round:null,ri:0,correct:0,combo:0,results:[],answered:false};
+var CUR={wi:0,li:0,w:null,round:null,ri:0,correct:0,combo:0,results:[],answered:false,revN:null,revAnim:null};
 function startLevel(wi,li){
   CUR={wi:wi,li:li,w:WORLDS[wi],round:null,ri:0,correct:0,combo:0,results:[],answered:false};
   $('pTitle').textContent=WORLDS[wi].emo+' '+WORLDS[wi].nm+' · '+(isBoss(li)?'👑 보스':('레벨 '+(li+1)));
@@ -298,6 +298,7 @@ function startLevel(wi,li){
 }
 function renderDots(){ var h=''; for(var i=0;i<ROUNDS;i++){ var c=CUR.results[i]; h+='<i class="'+(c===true?'ok':c===false?'no':(i===CUR.ri?'now':''))+'"></i>'; } $('rdots').innerHTML=h; }
 function nextRound(){
+  if(CUR.revAnim){clearInterval(CUR.revAnim);CUR.revAnim=null;} CUR.revN=null;
   CUR.round=pickRound(CUR.w); CUR.answered=false;
   $('pMeta').textContent='라운드 '+(CUR.ri+1)+' / '+ROUNDS;
   renderDots();
@@ -312,7 +313,14 @@ function answer(guessUp){
   var ok=(guessUp===CUR.round.up);
   CUR.results[CUR.ri]=ok;
   if(ok){CUR.correct++;CUR.combo++;} else {CUR.combo=0;}
-  drawChart(true); renderDots();
+  renderDots();
+  // 미래 캔들을 1초에 하나씩 긴장감 있게 공개
+  var _H=CUR.round.H; CUR.revN=0; drawChart(true);
+  if(CUR.revAnim)clearInterval(CUR.revAnim);
+  CUR.revAnim=setInterval(function(){ CUR.revN++; drawChart(true);
+    if(CUR.revN>=_H){ clearInterval(CUR.revAnim); CUR.revAnim=null; CUR.revN=null; drawChart(true); revealResult(ok); } }, 1000);
+}
+function revealResult(ok){
   var v=$('verdict'); v.textContent=ok?'✅':'❌'; v.style.color=ok?'var(--green)':'var(--red)'; v.classList.add('show');
   if(ok)burst();
   var pct=(CUR.round.chg*100); var dir=CUR.round.up?'올랐어요 ▲':'내렸어요 ▼';
@@ -324,7 +332,7 @@ function answer(guessUp){
 }
 $('bUp').onclick=function(){answer(true);}; $('bDn').onclick=function(){answer(false);};
 $('contbtn').onclick=function(){ if(CUR.ri>=ROUNDS-1){finishLevel();} else {CUR.ri++;nextRound();} };
-$('pback').onclick=function(){show('map');};
+$('pback').onclick=function(){ if(CUR.revAnim){clearInterval(CUR.revAnim);CUR.revAnim=null;} show('map');};
 
 function finishLevel(){
   var id=lvId(CUR.wi,CUR.li), c=CUR.correct;

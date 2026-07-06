@@ -392,8 +392,11 @@ function lockIn(){
   renderPods(); renderCtrl(); resetView(); drawChart();
   var target=GD.vis+30;
   if(reduce){ gRev=target; finishRound(); return; }
-  if(revTimer)clearInterval(revTimer);
-  revTimer=setInterval(function(){ gRev++; drawChart(); if(gRev>=target){ clearInterval(revTimer); finishRound(); } },48);
+  if(revTimer)clearTimeout(revTimer);
+  function step(){ gRev++; drawChart();
+    if(gRev>=target){ revTimer=null; finishRound(); return; }
+    revTimer=setTimeout(step, (target-gRev)<=8 ? 230 : 85); }   // 마지막 8칸은 더 천천히 (긴장감)
+  revTimer=setTimeout(step, 85);
 }
 function finishRound(){
   gRev=GD.vis+30; drawChart();
