@@ -196,7 +196,7 @@ var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* 허브(차고)에서 장착한 캐릭터·닉네임 공유 */
 var CHIMG={shark:'assets/char_shark.png',bull:'assets/char_bull.png',bear:'assets/char_bear.png',tiger:'assets/char_tiger.png',dragon:'assets/char_dragon.png',king:'assets/char_king.png'};
 for(var _pi=0;_pi<45;_pi++)CHIMG['pet'+_pi]='assets/pet'+_pi+'.png';
-for(var _hi=0;_hi<17;_hi++)CHIMG['hu'+_hi]='assets/hu'+_hi+'.png?v=3';
+for(var _hi=0;_hi<17;_hi++)CHIMG['hu'+_hi]='assets/hu'+_hi+'.png?v=4';
 var hub={}; try{hub=JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){}
 var myCh=(hub.equip&&hub.equip.ch)||'shark', myNick=hub.nick||'차트고수';
 /* 보유 포인트(전 앱 공유) — 배팅/배당에 실제로 사용 */
