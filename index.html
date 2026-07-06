@@ -120,6 +120,7 @@
   .plevel .bar{flex:1;height:10px;border-radius:6px;background:#0a1122;border:1px solid var(--line);overflow:hidden}
   .plevel .bar i{display:block;height:100%;width:72%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
   .plevel .pct{font-family:var(--mono);font-size:11px;color:var(--ts);font-weight:800}
+  .plevel.tbxp{margin-top:0;width:206px;flex:0 0 auto}   /* 상단바 왼쪽 경험치 바 */
   .ppoints{margin-top:7px;text-align:center;background:#0a1122;border:1px solid var(--line);border-radius:12px;padding:7px}
   .ppoints .l{font-size:10px;letter-spacing:.14em;color:#8A6D2B;font-weight:800}
   .ppoints .v{font-family:var(--mono);font-weight:900;font-size:21px;line-height:1.1;background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -406,6 +407,7 @@
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
     <img class="brandlogo" src="assets/logo_wordmark.png" alt="차트아레나">
+    <div class="plevel tbxp"><span class="lv">Lv.12</span><div class="bar"><i></i></div><span class="pct">72%</span></div>
     <div class="tsp"></div>
     <div class="curr">
       <div class="pill coin"><span class="cico">P</span><span id="tbCoin">12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
@@ -426,7 +428,6 @@
         <div class="edit" id="pEdit">✏️</div>
       </div>
       <div class="pname" id="pName">차트고수</div>
-      <div class="plevel"><span class="lv">Lv.12</span><div class="bar"><i></i></div><span class="pct">72%</span></div>
       <div class="ppoints"><div class="l">보유 포인트</div><div class="v" id="pPoints">25,000 P</div></div>
       <div class="nav">
         <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
