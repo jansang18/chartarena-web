@@ -47,6 +47,9 @@
     box-shadow:0 0 26px -4px rgba(76,169,255,.5), 0 0 0 4px rgba(0,0,0,.3) inset}
   #chart{width:100%; height:100%; display:block; border-radius:8px; background:#050c1c}
   .tvtag{position:absolute; left:16px; top:16px; font-size:11px; color:#7fb0ff; font-family:var(--mono)}
+  .indbar{position:absolute; left:14px; top:34px; z-index:3; display:flex; gap:5px}
+  .ind{font-size:10px; font-weight:800; padding:3px 8px; border-radius:999px; background:rgba(8,18,38,.78); border:1px solid #2a4b7a; color:#7d8bab; cursor:pointer; user-select:none; line-height:1.3}
+  .ind.on{color:#06121f; background:#4CC3FF; border-color:#4CC3FF}
   .timer{position:absolute; right:16px; top:12px; text-align:center}
   .timer .n{font-family:var(--mono); font-weight:900; font-size:30px; line-height:1; color:var(--gold); text-shadow:0 0 12px rgba(233,185,73,.6)}
   .timer .b{width:88px; height:6px; margin-top:4px; border-radius:3px; background:#0a1a33; overflow:hidden}
@@ -156,6 +159,11 @@
   <div class="tv">
     <canvas id="chart"></canvas>
     <div class="tvtag" id="tvtag">난이도 ◆◆◆◆◇</div>
+    <div class="indbar" id="indbar">
+      <div class="ind on" data-ind="ma">이평선</div>
+      <div class="ind" data-ind="boll">볼린저</div>
+      <div class="ind" data-ind="ichi">일목</div>
+    </div>
     <div class="timer"><div class="n" id="tnum">15</div><div class="b"><i id="tbar"></i></div></div>
     <div class="verdict" id="verdict"></div>
     <div class="chartid" id="chartid"></div>
@@ -231,6 +239,7 @@ var BOTNAMES=['불꽃트레이더','존버킴','떡상요정','캔들마스터',
 })();
 var ROUNDS=10, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
 var autoTimer=null, autoLeft=0;   // 결과 화면 자동 넘김 타이머
+var bind={ma:true, boll:false, ichi:false};   // 차트 지표 토글 (이평선/볼린저/일목)
 
 /* 실제 바이낸스 차트 데이터 (종목 숨김·가격 정규화, 각 100캔들 = 공개70 + 예측30) */
 var BATTLE_DATA=(window.CHARTS&&window.CHARTS.length)?window.CHARTS:[];
@@ -246,6 +255,10 @@ var DEFCOUNT=170, view={count:170, start:0};
 function clampView(){ var n=GD?GD.n:200; if(view.count>n)view.count=n; if(view.count<28)view.count=28; if(view.start<0)view.start=0; if(view.start>n-view.count)view.start=n-view.count; }
 function resetView(){ view.count=Math.min(GD.n,DEFCOUNT); view.start=GD.n-view.count; clampView(); }
 function sma(cl,per,up){var o=[],s=0;for(var i=0;i<up;i++){s+=cl[i];if(i>=per)s-=cl[i-per];o[i]=i>=per-1?s/per:null;}return o;}
+/* 볼린저밴드 (공개 구간까지만, 미래 누출 없음) */
+function bollB(cl,per,k,up){var mid=sma(cl,per,up),up2=[],lo2=[];for(var i=0;i<up;i++){var m=mid[i];if(m==null){up2[i]=null;lo2[i]=null;continue;}var ss=0;for(var j=i-per+1;j<=i;j++){var d=cl[j]-m;ss+=d*d;}var sd=Math.sqrt(ss/per);up2[i]=m+k*sd;lo2[i]=m-k*sd;}return{mid:mid,up:up2,lo:lo2};}
+/* 일목균형표 (전환·기준·선행스팬) — cs 사용, 공개 구간까지만 */
+function ichiB(cs,up){var t=[],kj=[],sa=[],sb=[];function mid(per,i){if(i<per-1)return null;var hi=-1e9,lo=1e9;for(var j=i-per+1;j<=i;j++){if(cs[j][1]>hi)hi=cs[j][1];if(cs[j][2]<lo)lo=cs[j][2];}return(hi+lo)/2;}for(var i=0;i<up;i++){var tt=mid(9,i),kk=mid(26,i);t[i]=tt;kj[i]=kk;sa[i]=(tt!=null&&kk!=null)?(tt+kk)/2:null;sb[i]=mid(52,i);}return{tenkan:t,kijun:kj,spanA:sa,spanB:sb};}
 
 function drawChart(){
   var cv=$('chart'),ctx=cv.getContext('2d'),r=cv.getBoundingClientRect(); if(r.width<2)return;
@@ -268,7 +281,13 @@ function drawChart(){
   ctx.save();ctx.beginPath();ctx.rect(padL,pT,plotR-padL,pB-pT);ctx.clip();
   var a=Math.max(0,v0-1),b=Math.min(rev,v1+1);
   var glow=function(col,arr,w){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.shadowColor=col;ctx.shadowBlur=5;ctx.beginPath();var st=false;for(var i=a;i<b;i++){if(arr[i]==null)continue;var x=cx(i),y=yOf(arr[i]);if(!st){ctx.moveTo(x,y);st=true;}else ctx.lineTo(x,y);}ctx.stroke();ctx.shadowBlur=0;};
-  glow('#FFD54A',sma(cl,5,rev),1.3); glow('#4CC3FF',sma(cl,20,rev),1.3);
+  if(bind.ichi){ var ic=ichiB(cs,rev); ctx.beginPath(); var st0=false;
+    for(var ii=a;ii<b;ii++){ if(ic.spanA[ii]==null||ic.spanB[ii]==null)continue; var xx=cx(ii); if(!st0){ctx.moveTo(xx,yOf(ic.spanA[ii]));st0=true;} else ctx.lineTo(xx,yOf(ic.spanA[ii])); }
+    for(var jj=b-1;jj>=a;jj--){ if(ic.spanA[jj]==null||ic.spanB[jj]==null)continue; ctx.lineTo(cx(jj),yOf(ic.spanB[jj])); }
+    if(st0){ ctx.closePath(); ctx.fillStyle='rgba(43,212,196,.12)'; ctx.fill(); }
+    glow('#2BD4C4',ic.tenkan,1.1); glow('#E0679F',ic.kijun,1.1); }
+  if(bind.boll){ var bb=bollB(cl,20,2,rev); glow('rgba(120,180,240,.85)',bb.mid,1); glow('rgba(120,180,240,.5)',bb.up,1); glow('rgba(120,180,240,.5)',bb.lo,1); }
+  if(bind.ma){ glow('#FFD54A',sma(cl,5,rev),1.3); glow('#4CC3FF',sma(cl,20,rev),1.3); }
   var bw=Math.max(1,cw*0.62),gl=cw>3?3:0;
   for(var i=v0;i<Math.min(rev,v1);i++){var c=cs[i],up=c[3]>=c[0],col=up?'#F0616D':'#4C8DF6',x=cx(i);
     ctx.strokeStyle=col;ctx.lineWidth=1;ctx.shadowColor=col;ctx.shadowBlur=gl;ctx.beginPath();ctx.moveTo(x,yOf(c[1]));ctx.lineTo(x,yOf(c[2]));ctx.stroke();ctx.shadowBlur=0;
@@ -318,6 +337,7 @@ function renderCtrl(){
 $('dL').onclick=function(){pick('L');}; $('dS').onclick=function(){pick('S');}; $('dW').onclick=function(){pick('W');};
 function pick(d){ if(phase!=='pick')return; mySel.dir=d; players[0].pick=d; renderCtrl(); renderPods(); }
 $('levs').onclick=function(e){ var l=e.target.closest('[data-lev]'); if(l&&phase==='pick'){mySel.lev=+l.dataset.lev; players[0].lev=mySel.lev; renderCtrl();} };
+$('indbar').onclick=function(e){ var el=e.target.closest('[data-ind]'); if(!el)return; var k=el.dataset.ind; bind[k]=!bind[k]; el.classList.toggle('on',bind[k]); drawChart(); };
 $('bets').onclick=function(e){ var b=e.target.closest('[data-bp]'); if(b&&phase==='pick'){ mySel.betPct=+b.dataset.bp; renderCtrl(); } };
 $('go').onclick=function(){ if(phase==='pick'){ if(mySel.dir===null){toast('방향을 선택하세요');return;} lockIn(); } else if(phase==='result'){ nextRound(); } };
 $('endbtn').onclick=function(){ toast('데모 — 로비로'); };

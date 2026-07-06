@@ -18,7 +18,7 @@
   *{box-sizing:border-box}
   body{margin:0; background:#05070f; color:var(--tp); font-family:var(--sans); min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:10px 6px; overflow-x:hidden}
   .scaler{transform-origin:top center}
-  .frame{width:1672px; height:678px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
+  .frame{width:1672px; height:770px; border-radius:22px; overflow:hidden; display:flex; flex-direction:column;
     background:radial-gradient(120% 80% at 22% 0%, #12203c 0%, #0a1327 46%, #060c1a 100%);
     box-shadow:0 30px 80px -20px #000, 0 0 0 1px rgba(255,255,255,.05) inset}
 
@@ -535,7 +535,7 @@ var FB_CONFIG = { apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"
 var FB=null, myUid=null, LB=null;
 /* ══════════════════════════════════════════════════════ */
 var $=function(id){return document.getElementById(id);};
-function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/678);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(678*s)+'px';sc.style.width='1672px';}
+function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/770);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(770*s)+'px';sc.style.width='1672px';}
 window.addEventListener('resize',fit);fit();
 /* 인트로 스플래시 (세션당 1회) */
 (function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash');}catch(e){}

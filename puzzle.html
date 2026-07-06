@@ -18,10 +18,15 @@
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0}
-  body{background:radial-gradient(130% 90% at 50% -10%,#12203c,#070d1c 60%);color:var(--tp);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 16px 40px}
+  body{background:#05070f;color:var(--tp);font-family:var(--sans);height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .scaler{transform-origin:top center}
+  .frame{position:relative;width:1120px;height:516px;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;
+    background:radial-gradient(130% 90% at 50% -10%,#12203c,#070d1c 60%);box-shadow:0 30px 70px -20px #000,0 0 0 1px rgba(255,255,255,.05) inset}
+  .scrollwrap{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+  #confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 16px 30px}
   /* top bar */
-  .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(7,13,28,.82);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top{flex-shrink:0;z-index:20;display:flex;align-items:center;gap:12px;padding:11px 16px;background:rgba(7,13,28,.82);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
   .top .home{display:flex;align-items:center;gap:6px;color:var(--ts);text-decoration:none;font-weight:800;font-size:14px;padding:7px 12px;border:1px solid var(--line);border-radius:10px;background:var(--p1)}
   .top .home:hover{color:var(--tp)}
   .top h1{margin:0;font-size:18px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:7px;flex:1;min-width:0}
@@ -105,12 +110,14 @@
 </style>
 </head>
 <body>
+<div class="scaler" id="scaler"><div class="frame">
 <div class="top">
   <a class="home" href="index.html">← 홈</a>
   <h1>🧩 차트 퍼즐 퀘스트</h1>
   <div class="stat s" id="tStars">⭐ 0</div>
   <div class="stat g" id="tPts">💰 0</div>
 </div>
+<div class="scrollwrap">
 
 <!-- MAP -->
 <div id="map" class="wrap">
@@ -159,10 +166,14 @@
     </div>
   </div>
 </div>
+</div><!-- /scrollwrap -->
 <canvas id="confetti"></canvas>
+</div></div><!-- /frame /scaler -->
 
 <script src="charts.js"></script>
 <script>
+function fitP(){var s=Math.min(1,(window.innerWidth-12)/1120,(window.innerHeight-14)/516);var sc=document.getElementById('scaler');if(sc){sc.style.transform='scale('+s+')';sc.style.height=(516*s)+'px';sc.style.width='1120px';}}
+window.addEventListener('resize',fitP); fitP();
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id);};
