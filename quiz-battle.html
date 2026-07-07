@@ -40,7 +40,7 @@
   @keyframes blink{50%{opacity:.55}}
   .round{margin-left:auto; font-family:var(--mono); font-weight:800; color:var(--gold); font-size:15px}
   .bbal{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-weight:900; color:#FCE9A6; font-size:14px; background:rgba(233,185,73,.14); border:1px solid rgba(233,185,73,.4); border-radius:999px; padding:4px 12px 4px 7px}
-  .coindot{display:inline-block;width:17px;height:17px;border-radius:50%;flex:0 0 auto;background:radial-gradient(circle at 34% 30%,#FCEBA8 0%,#F4CE63 42%,#DCA436 74%,#B87F22 100%);box-shadow:inset 0 1px 1px rgba(255,248,210,.8),inset 0 -1.4px 1.6px rgba(120,80,12,.5)}
+  .coindot{display:inline-block;width:20px;height:20px;object-fit:contain;flex:0 0 auto}
   .endbtn{margin-left:12px; background:#123; border:1px solid #2a4b7a; color:#9fc3ff; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer}
 
   /* TV 스크린(차트) */
@@ -185,7 +185,7 @@
     <img class="blogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <span class="live">● LIVE</span>
     <span class="round" id="round">ROUND 1 / 10</span>
-    <span class="bbal"><i class="coindot"></i><span id="bbal">0</span></span>
+    <span class="bbal"><img class="coindot" src="assets/coin.png?v=1" alt=""><span id="bbal">0</span></span>
     <button class="endbtn" type="button" id="endbtn">종료</button>
   </div>
 
