@@ -281,9 +281,9 @@ var roundBet=0;
 function curBet(){ if(mySel&&mySel.dir==='W')return 0; var base=(MODE==='1v1'&&duel)?duel.myStack:getBal(); return Math.max(0,Math.round(base*((mySel&&mySel.betPct)||0.25))); }
 
 /* 화면폭에 맞춰 가로 무대 스케일 */
-function fit(){ var s=Math.min(1,(window.innerWidth-16)/1120,(window.innerHeight-16)/516); var sc=$('scaler');
+function fit(){ var s=Math.min(1.49,(window.innerWidth-16)/1120,(window.innerHeight-16)/516); var sc=$('scaler');   // 1.49 = 1672/1120 → 허브와 같은 화면 크기로 채움
   sc.style.transform='scale('+s+')'; sc.style.height=(516*s)+'px'; sc.style.width='1120px'; }
-window.addEventListener('resize',fit); fit();
+window.addEventListener('resize',function(){ fit(); drawChart(); }); fit();
 
 /* 플레이어 (나 + 봇3) */
 var players=[
