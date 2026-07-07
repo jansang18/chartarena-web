@@ -240,11 +240,12 @@
   <div class="lobby" id="lobby">
     <img class="llogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <div class="lmodes" id="lmodes">
-      <div class="lcard" id="mode4p">
+      <div class="lcard live" id="modeLive">
+        <div class="ltag hot">LIVE</div>
         <div class="lic">👥</div>
-        <div class="ln">4명전 배틀</div>
-        <div class="ld">봇 3명과 10라운드 차트 예측 대결. 내 포인트로 베팅해 수익을 쌓아요.</div>
-        <div class="lgo">시작하기 ▶</div>
+        <div class="ln">실시간 4명 대결</div>
+        <div class="ld">지금 접속한 실제 유저 4명이 붙는 10라운드 차트 예측 대결! 상대가 없으면 봇으로 채워 바로 시작해요.</div>
+        <div class="lgo">매칭 시작 ▶</div>
       </div>
       <div class="lcard duel" id="mode1v1">
         <div class="ltag">NEW</div>
@@ -252,13 +253,6 @@
         <div class="ln">1vs1 맞대결</div>
         <div class="ld">판돈을 걸고 맞짱! 수익률 차이만큼 상대 돈을 뺏어와, 한쪽 판돈이 바닥나면 승부 끝.</div>
         <div class="lgo">상대 찾기 ▶</div>
-      </div>
-      <div class="lcard live" id="modeLive">
-        <div class="ltag hot">LIVE</div>
-        <div class="lic">🌐</div>
-        <div class="ln">실시간 대결</div>
-        <div class="ld">지금 접속한 실제 유저들과 매칭! 상대가 없으면 봇으로 채워 바로 시작해요.</div>
-        <div class="lgo">매칭 시작 ▶</div>
       </div>
     </div>
     <div class="lante" id="lante">
@@ -746,7 +740,10 @@ function startModeLive(){ showWait(); renderWait([{uid:'me',nick:myNick,ch:myCh,
   if(fbReady()){ mmFindOrCreate(); }
   else setTimeout(function(){ if(!$('lwait').classList.contains('on'))return; if(fbReady())mmFindOrCreate(); else liveFallback('지금은 접속한 상대가 없어요'); }, 2200); }
 function liveCancel(){ try{ if(mmUnsub){mmUnsub();mmUnsub=null;} if(mmTimer){clearInterval(mmTimer);mmTimer=null;} if(LIVE&&LIVE.ref&&fbReady()){ var u={}; u['players.'+myUid]=firebase.firestore.FieldValue.delete(); LIVE.ref.update(u).catch(function(){}); } }catch(e){} LIVE=null; }
-function liveFallback(msg){ try{ if(mmUnsub){mmUnsub();mmUnsub=null;} }catch(e){} if(mmTimer){clearInterval(mmTimer);mmTimer=null;} LIVE=null; toast(msg||'매칭 실패 — 봇과 대결'); hideWait(); startMode4p(); }
+function liveFallback(msg){ try{ if(mmUnsub){mmUnsub();mmUnsub=null;} }catch(e){} if(mmTimer){clearInterval(mmTimer);mmTimer=null;} LIVE=null;
+  if(!$('lwait')||!$('lwait').classList.contains('on')){ startMode4p(); return; }
+  if($('lwt'))$('lwt').textContent='상대를 못 찾았어요'; if($('lwsub'))$('lwsub').textContent=(msg||'지금은 접속한 상대가 없어요')+' · 봇과 대결로 시작해요'; if($('lwspin'))$('lwspin').style.display='none';
+  setTimeout(function(){ if($('lwspin'))$('lwspin').style.display=''; if(!$('lwait')||!$('lwait').classList.contains('on'))return; hideWait(); startMode4p(); }, 1500); }
 function mmFindOrCreate(){ var me={nick:(myNick||'플레이어').slice(0,12),ch:myCh,bot:false,joinAt:Date.now()};
   FB.collection('rooms').where('status','==','wait').orderBy('createdAt','desc').limit(8).get().then(function(qs){
     var joinRef=null; qs.forEach(function(dd){ if(joinRef)return; var x=dd.data(); if(!x||x.status!=='wait')return; if(Date.now()-(x.createdAt||0)>22000)return; if(Object.keys(x.players||{}).length<(x.cap||4))joinRef=dd.ref; });
@@ -808,7 +805,6 @@ function liveMyPickWrite(){ if(!LIVE||!fbReady())return; try{ var u={}; u['picks
 function liveLeave(){ try{ if(LIVE&&LIVE.gameUnsub)LIVE.gameUnsub(); if(mmUnsub){mmUnsub();mmUnsub=null;} if(mmTimer){clearInterval(mmTimer);mmTimer=null;}
   if(LIVE&&LIVE.ref&&fbReady()){ var u={}; u['players.'+myUid]=firebase.firestore.FieldValue.delete(); if(LIVE.host)u.status='done'; LIVE.ref.update(u).catch(function(){}); } }catch(e){} }
 $('modeLive').onclick=startModeLive;
-$('mode4p').onclick=startMode4p;
 $('mode1v1').onclick=showAnteScreen;
 $('lback').onclick=function(){ $('lante').classList.remove('on'); $('lmodes').style.display='flex'; };
 $('lbtns').onclick=function(e){ var b=e.target.closest('[data-ante]'); if(!b)return; var a=+b.dataset.ante; if(!a||a<1000){ toast('판돈이 부족해요'); return; } setupDuel(pendOpp,a); };
