@@ -133,7 +133,8 @@
   .sfoot{margin-top:auto;padding-top:8px;color:var(--tm);font-size:8px;line-height:1.3;text-align:center}
   /* 사이드바 하단 캐릭터 전신 + 펫 쇼케이스 */
   .charshow{flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center;padding:10px 6px 4px;position:relative;overflow:hidden}
-  .charshow::before{content:"";position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:82%;height:30px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(76,169,255,.3),transparent 68%);z-index:0}
+  .charshow::before{content:"";position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:92%;height:50px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(88,182,255,.6),rgba(76,169,255,.24) 44%,transparent 72%);z-index:0}
+  .charshow::after{content:"";position:absolute;bottom:11px;left:50%;transform:translateX(-50%);width:58%;height:15px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(165,222,255,.78),rgba(120,200,255,.3) 55%,transparent 74%);z-index:0}
   .charshow .csch{height:100%;max-height:360px;object-fit:contain;object-position:bottom;position:relative;z-index:2;filter:drop-shadow(0 12px 16px rgba(0,0,0,.55))}
   .charshow .cspet{position:absolute;bottom:4px;right:10px;width:92px;height:92px;z-index:3}
   .charshow .cspet .petbase{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 9px rgba(0,0,0,.5))}
@@ -143,7 +144,9 @@
   .charshow .cspet .pit.face{top:29%;width:54%}
 
   /* ===== MAIN ===== */
-  .main{flex:1;min-width:0;padding:10px 18px;overflow-y:auto}
+  .main{flex:1;min-width:0;padding:10px 18px;overflow-y:auto;
+    background-image:radial-gradient(1.6px 1.6px at 14% 22%,rgba(255,255,255,.5),transparent),radial-gradient(1.2px 1.2px at 29% 60%,rgba(190,215,255,.4),transparent),radial-gradient(2px 2px at 45% 13%,rgba(255,238,190,.45),transparent),radial-gradient(1.5px 1.5px at 62% 40%,rgba(255,255,255,.36),transparent),radial-gradient(1.2px 1.2px at 79% 25%,rgba(205,185,255,.45),transparent),radial-gradient(1.6px 1.6px at 90% 55%,rgba(255,255,255,.34),transparent),radial-gradient(1.2px 1.2px at 36% 82%,rgba(255,255,255,.3),transparent),radial-gradient(2px 2px at 72% 79%,rgba(180,255,230,.36),transparent),radial-gradient(1.2px 1.2px at 55% 92%,rgba(255,255,255,.28),transparent),radial-gradient(1.5px 1.5px at 93% 85%,rgba(255,220,255,.32),transparent),radial-gradient(1.2px 1.2px at 8% 68%,rgba(255,255,255,.28),transparent),radial-gradient(1.4px 1.4px at 50% 30%,rgba(200,230,255,.3),transparent);
+    background-repeat:no-repeat}
   .view{display:none} .view.on{display:block}
   .mh{font-weight:800;font-size:14.5px;margin:0 0 5px;display:flex;align-items:center;gap:8px}
 
@@ -166,7 +169,7 @@
   /* dashboard */
   .dash{display:grid;grid-template-columns:1.12fr 1fr;gap:14px;align-items:stretch}
   .hero{position:relative;border-radius:18px;overflow:hidden;padding:20px 18px 34px;display:flex;flex-direction:column;
-    background:linear-gradient(140deg,#0f2f2b 0%,#181a22 52%,#15112a 100%);border:1px solid #234043}
+    background:linear-gradient(140deg,#0f2f2b 0%,#181a22 52%,#15112a 100%);border:1px solid #2d5750;box-shadow:0 0 34px -10px rgba(60,200,140,.28),0 14px 36px -16px rgba(0,0,0,.65)}
   .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 42%,rgba(53,208,122,.12),transparent 70%);pointer-events:none}
   .hhead{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}
   .hhead h3{margin:0;font-size:20px;font-weight:900;letter-spacing:-.5px}
@@ -184,7 +187,7 @@
 
   /* ===== HOME 3-COLUMN: 배틀 히어로 | 여정 히어로 | 사이드 카드 ===== */
   .dash3{display:grid;grid-template-columns:1fr 1fr .84fr;gap:12px;align-items:stretch}
-  .jhero{position:relative;border-radius:18px;overflow:hidden;padding:20px 16px 34px;display:flex;flex-direction:column;background:linear-gradient(140deg,#241a3e 0%,#141330 52%,#1a1226 100%);border:1px solid #3a2c5a}
+  .jhero{position:relative;border-radius:18px;overflow:hidden;padding:20px 16px 34px;display:flex;flex-direction:column;border:1px solid #46356e;box-shadow:0 0 34px -10px rgba(160,110,240,.3),0 14px 36px -16px rgba(0,0,0,.65);background:radial-gradient(1.6px 1.6px at 22% 46%,rgba(255,255,255,.6),transparent),radial-gradient(1.3px 1.3px at 40% 63%,rgba(210,190,255,.55),transparent),radial-gradient(2px 2px at 57% 49%,rgba(255,245,210,.55),transparent),radial-gradient(1.4px 1.4px at 73% 58%,rgba(255,255,255,.5),transparent),radial-gradient(1.3px 1.3px at 31% 70%,rgba(190,220,255,.5),transparent),radial-gradient(1.6px 1.6px at 85% 46%,rgba(255,255,255,.45),transparent),radial-gradient(1.3px 1.3px at 50% 41%,rgba(255,255,255,.45),transparent),radial-gradient(1.4px 1.4px at 66% 69%,rgba(220,255,240,.45),transparent),radial-gradient(1.3px 1.3px at 16% 60%,rgba(255,255,255,.4),transparent),radial-gradient(1.5px 1.5px at 90% 66%,rgba(255,225,255,.45),transparent),linear-gradient(140deg,#241a3e 0%,#141330 52%,#1a1226 100%);background-repeat:no-repeat}
   .jhero::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 40%,rgba(185,128,255,.15),transparent 70%);pointer-events:none}
   .jbadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:#d9c2ff;background:rgba(185,128,255,.16);border:1px solid rgba(185,128,255,.4);border-radius:999px;padding:3px 9px;white-space:nowrap;margin-top:5px}
   .jvsm{font-size:13px}
