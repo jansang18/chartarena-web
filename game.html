@@ -21,7 +21,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{background:#05070f;
+  body{background:#08080c;
     color:var(--tprimary); font-family:var(--sans); height:100vh; overflow:hidden;
     display:flex; align-items:center; justify-content:center; padding:0}
   .app{width:min(100vw, calc(100vh * 1120 / 516)); aspect-ratio:1120 / 516; background:var(--bg);
@@ -650,13 +650,13 @@ function makeCard(d,cb){
   var acc=d.kind==='liq'?'#FF4D5E':d.kind==='profit'?'#35D07A':d.kind==='loss'?'#FF7A9C':'#E9B949';
   Promise.all([_limg('assets/logo_wordmark.png'),_limg('assets/qr.png'),_limg(d.chImg)]).then(function(im){
     var logo=im[0],qr=im[1],av=im[2];
-    var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0e1c3a');g.addColorStop(1,'#05070f');x.fillStyle=g;x.fillRect(0,0,W,H);
+    var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#181a22');g.addColorStop(1,'#08080c');x.fillStyle=g;x.fillRect(0,0,W,H);
     var rg=x.createRadialGradient(W/2,470,60,W/2,470,660);rg.addColorStop(0,acc+'2e');rg.addColorStop(1,'rgba(5,7,15,0)');x.fillStyle=rg;x.fillRect(0,0,W,H);
     x.strokeStyle='rgba(120,150,200,.22)';x.lineWidth=3;_rr(x,22,22,W-44,H-44,34);x.stroke();
     if(logo){var lw=320,lh=lw*logo.height/logo.width;x.drawImage(logo,(W-lw)/2,64,lw,lh);}
     x.fillStyle='#9fb3d0';x.textAlign='center';x.font='600 25px '+CFF;x.fillText('실전처럼 배우는 차트 모의전 · 교육용(가상 포인트)',W/2,180);
     var ax=150,ay=248,ad=150;
-    x.save();x.beginPath();x.arc(ax,ay+ad/2,ad/2,0,Math.PI*2);x.closePath();x.fillStyle='#0a1428';x.fill();x.clip();
+    x.save();x.beginPath();x.arc(ax,ay+ad/2,ad/2,0,Math.PI*2);x.closePath();x.fillStyle='#14161d';x.fill();x.clip();
     if(av){var sc=Math.max(ad/av.width,ad/av.height)*1.55,iw=av.width*sc,ih=av.height*sc;x.drawImage(av,ax-iw/2,ay+ad/2-ih*0.60,iw,ih);}
     x.restore();
     x.strokeStyle=acc;x.lineWidth=5;x.beginPath();x.arc(ax,ay+ad/2,ad/2,0,Math.PI*2);x.stroke();
