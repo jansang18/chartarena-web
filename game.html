@@ -356,7 +356,7 @@ function layout(){
   L.hasVol=!!volH; L.hasRsi=!!rsiH; L.hasMacd=!!macdH;
   return L;
 }
-function layoutCanvas(){ const L=layout(); cv.style.height=L.totalH+'px'; sizeCanvas(); return L; }
+function layoutCanvas(){ var wrap=cv.parentElement; var h=wrap?wrap.clientHeight:0; if(h>40){ cv.style.height=h+'px'; } sizeCanvas(); return layout(); }   // 차트를 래퍼 높이에 꽉 채움 (세로 최대)
 
 /* ---------- viewport (zoom/pan) ---------- */
 function clampView(){ const total=P.candles.length;
