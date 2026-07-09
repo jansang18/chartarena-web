@@ -633,7 +633,7 @@ function renderResult(){
 /* ===== 인증짤 (결과 공유 카드) ===== */
 var _cardData=null, CFF="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif";
 function _hub(){try{return JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){return{};}}
-function chImgOf(ch){ if(!ch)return 'assets/hu0.png?v=6'; return (ch.indexOf('hu')===0||ch.indexOf('pet')===0)?'assets/'+ch+'.png?v=6':'assets/char_'+ch+'.png'; }
+function chImgOf(ch){ if(!ch)return 'assets/hu0.png?v=7'; return (ch.indexOf('hu')===0||ch.indexOf('pet')===0)?'assets/'+ch+'.png?v=7':'assets/char_'+ch+'.png'; }
 function symKo(s){var m={BTCUSDT:'비트코인',ETHUSDT:'이더리움',SOLUSDT:'솔라나',BNBUSDT:'BNB',XRPUSDT:'리플',DOGEUSDT:'도지코인',ADAUSDT:'에이다',LINKUSDT:'체인링크',AVAXUSDT:'아발란체',DOTUSDT:'폴카닷',LTCUSDT:'라이트코인'};return m[s]||s;}
 function _rr(c,a,b,w,h,r){c.beginPath();c.moveTo(a+r,b);c.arcTo(a+w,b,a+w,b+h,r);c.arcTo(a+w,b+h,a,b+h,r);c.arcTo(a,b+h,a,b,r);c.arcTo(a,b,a+w,b,r);c.closePath();}
 function _limg(src){return new Promise(function(res){if(!src){res(null);return;}var im=new Image();im.onload=function(){res(im);};im.onerror=function(){res(null);};im.src=src;});}
