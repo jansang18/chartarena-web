@@ -124,7 +124,7 @@
   .ppoints{margin-top:7px;text-align:center;background:#14151c;border:1px solid var(--line);border-radius:12px;padding:7px}
   .ppoints .l{font-size:10px;letter-spacing:.14em;color:#8A6D2B;font-weight:800}
   .ppoints .v{font-family:var(--mono);font-weight:900;font-size:21px;line-height:1.1;background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-  .nav{margin-top:7px;display:flex;flex-direction:column;gap:3px}
+  .nav{margin-top:2px;display:flex;flex-direction:column;gap:3px}
   .nav a{display:flex;align-items:center;justify-content:center;gap:11px;padding:6px 12px;border-radius:10px;text-decoration:none;color:var(--ts);font-weight:800;font-size:14px;cursor:pointer;border:1px solid transparent}
   .nav a .ic{font-size:18px;width:22px;text-align:center}
   .nav a:hover{background:#191a23}
@@ -439,9 +439,6 @@
   <div class="body">
     <!-- ===== SIDEBAR ===== -->
     <div class="side">
-      <div class="charshow" id="charShow"></div>
-      <div class="csname"><span class="pname" id="pName">차트고수</span><span class="edit" id="pEdit">✏️</span></div>
-      <div class="plevel"><span class="lv">Lv.12</span><div class="bar"><i></i></div><span class="pct">72%</span></div>
       <div class="nav">
         <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
         <a href="learn.html"><span class="ic">📚</span>학습</a>
@@ -451,6 +448,9 @@
         <a href="puzzle.html"><span class="ic">🧩</span>퍼즐</a>
         <a data-go="train"><span class="ic">🥷</span>훈련</a>
       </div>
+      <div class="charshow" id="charShow"></div>
+      <div class="csname"><span class="pname" id="pName">차트고수</span><span class="edit" id="pEdit">✏️</span></div>
+      <div class="plevel"><span class="lv">Lv.12</span><div class="bar"><i></i></div><span class="pct">72%</span></div>
       <div class="sfoot">본 앱은 교육용 모의 트레이딩 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.</div>
     </div>
 
@@ -556,7 +556,6 @@
   <div class="bottomnav">
     <a class="bnav on" data-go="home"><span class="bi">🏠</span>홈</a>
     <a class="bnav" href="quiz-battle.html"><span class="bi">⚔️</span>배틀</a>
-    <a class="bnav" href="game.html"><span class="bi">📈</span>차트</a>
     <a class="bnav" href="learn.html"><span class="bi">📚</span>학습</a>
     <a class="bnav" data-go="guild"><span class="bi">🛡️</span>길드</a>
     <span class="bnav" data-toast="설정 — 준비 중"><span class="bi">⚙️</span>설정</span>
