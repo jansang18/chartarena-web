@@ -186,6 +186,20 @@
     background:linear-gradient(90deg,#4CA9FF,#35D07A);box-shadow:0 10px 26px -8px rgba(53,208,122,.65)}
 
   /* ===== HOME 3-COLUMN: 배틀 히어로 | 여정 히어로 | 사이드 카드 ===== */
+  .solobar{display:flex;align-items:center;gap:15px;margin-bottom:10px;padding:11px 18px;border-radius:16px;cursor:pointer;
+    text-decoration:none;position:relative;overflow:hidden;border:1px solid rgba(53,208,122,.42);
+    background:linear-gradient(100deg,rgba(19,42,33,.92),rgba(15,27,44,.86));
+    box-shadow:0 0 30px -13px rgba(53,208,122,.55),0 12px 30px -16px rgba(0,0,0,.6);transition:.15s}
+  .solobar:hover{border-color:rgba(53,208,122,.75);transform:translateY(-1px);box-shadow:0 0 42px -10px rgba(53,208,122,.6)}
+  .solobar .sicon{width:50px;height:50px;flex:none;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:26px;
+    background:rgba(53,208,122,.14);border:1px solid rgba(53,208,122,.35)}
+  .solobar .stext{flex:1;min-width:0;position:relative;z-index:2}
+  .solobar .st1{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:900;color:#eafff4}
+  .solobar .sbadge{font-size:10.5px;font-weight:800;color:#08160e;background:#35d07a;border-radius:999px;padding:2px 9px}
+  .solobar .st2{font-size:12.5px;color:#a3cdb9;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .solobar .sgo{flex:none;position:relative;z-index:2;font-weight:900;font-size:14px;color:#062018;
+    background:linear-gradient(180deg,#48e58c,#25b061);border-radius:11px;padding:11px 20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+  .solobar .schart{position:absolute;right:186px;top:8px;bottom:8px;width:160px;opacity:.5;z-index:1;pointer-events:none}
   .dash3{display:grid;grid-template-columns:1fr 1fr .84fr;gap:12px;align-items:stretch}
   .jhero{position:relative;border-radius:18px;overflow:hidden;padding:20px 16px 34px;display:flex;flex-direction:column;border:1px solid #46356e;box-shadow:0 0 34px -10px rgba(160,110,240,.3),0 14px 36px -16px rgba(0,0,0,.65);background:radial-gradient(1.6px 1.6px at 22% 46%,rgba(255,255,255,.6),transparent),radial-gradient(1.3px 1.3px at 40% 63%,rgba(210,190,255,.55),transparent),radial-gradient(2px 2px at 57% 49%,rgba(255,245,210,.55),transparent),radial-gradient(1.4px 1.4px at 73% 58%,rgba(255,255,255,.5),transparent),radial-gradient(1.3px 1.3px at 31% 70%,rgba(190,220,255,.5),transparent),radial-gradient(1.6px 1.6px at 85% 46%,rgba(255,255,255,.45),transparent),radial-gradient(1.3px 1.3px at 50% 41%,rgba(255,255,255,.45),transparent),radial-gradient(1.4px 1.4px at 66% 69%,rgba(220,255,240,.45),transparent),radial-gradient(1.3px 1.3px at 16% 60%,rgba(255,255,255,.4),transparent),radial-gradient(1.5px 1.5px at 90% 66%,rgba(255,225,255,.45),transparent),linear-gradient(140deg,#241a3e 0%,#141330 52%,#1a1226 100%);background-repeat:no-repeat}
   .jhero::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 40%,rgba(185,128,255,.15),transparent 70%);pointer-events:none}
@@ -452,6 +466,22 @@
           <div class="stat"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="sv"><div class="l">전체 순위</div><div class="v">8위 <span class="d dn">▼ 1</span></div></div></div>
           <div class="timer"><div class="ic">🕐</div><div><div class="l">시즌 남은 기간</div><div class="v">12일 08:45:32</div></div></div>
         </div>
+
+        <a class="solobar" href="game.html">
+          <div class="sicon">🎯</div>
+          <svg class="schart" viewBox="0 0 160 44" preserveAspectRatio="none">
+            <polyline points="4,32 26,24 48,28 70,14 92,20 114,8 138,12 156,4" fill="none" stroke="#35d07a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <g stroke-width="6" stroke-linecap="butt">
+              <line x1="26" y1="18" x2="26" y2="34" stroke="#e5484d"/><line x1="70" y1="10" x2="70" y2="26" stroke="#35d07a"/>
+              <line x1="114" y1="6" x2="114" y2="22" stroke="#e5484d"/><line x1="156" y1="2" x2="156" y2="16" stroke="#35d07a"/>
+            </g>
+          </svg>
+          <div class="stext">
+            <div class="st1">솔로 모드 <span class="sbadge">🎮 혼자 플레이</span></div>
+            <div class="st2">실제 과거 차트를 보고 롱·숏·관망 예측 — 나 혼자 실력 연습하기</div>
+          </div>
+          <div class="sgo">차트 예측 시작 →</div>
+        </a>
 
         <div class="dash3">
           <div class="hero">
