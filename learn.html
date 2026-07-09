@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>차트아레나 · 학습 센터</title>
+<style>
+  :root{ --bg:#0a0e1a; --bg2:#111a2e; --card:#141d33; --line:#243352; --txt:#e9eefb; --sub:#93a3c4; --faint:#68789a;
+    --blue:#4a9bff; --up:#e5484d; --down:#3d82f6; --gold:#f5c451; }
+  *{box-sizing:border-box;margin:0}
+  body{background:radial-gradient(120% 60% at 50% -10%,#16223f,#0a0e1a 60%);color:var(--txt);
+    font-family:"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",system-ui,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .top{position:sticky;top:0;z-index:20;background:rgba(10,14,26,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .top .bar{max-width:1000px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px}
+  .back{color:#bcd0f5;text-decoration:none;font-size:14px;font-weight:700;padding:6px 12px;border:1px solid var(--line);border-radius:10px}
+  .brand{font-weight:900;font-size:17px}.brand b{color:var(--blue)}
+  .tabs{display:flex;gap:6px;overflow-x:auto;margin-left:auto}
+  .tab{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#0f1830;color:var(--sub);
+    font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .tab.on{background:linear-gradient(180deg,#2e5c9e,#1f3f74);border-color:var(--blue);color:#fff}
+  .wrap{max-width:1000px;margin:0 auto;padding:26px 18px 90px}
+  .hero{text-align:center;padding:10px 0 26px}
+  .hero h1{font-size:clamp(26px,5vw,40px);font-weight:900;letter-spacing:-.5px}
+  .hero p{color:var(--sub);margin-top:8px;font-size:15px}
+  section{scroll-margin-top:80px;margin-top:34px}
+  .sh{display:flex;align-items:center;gap:10px;margin:0 0 16px}
+  .sh .ic{font-size:22px}.sh h2{font-size:22px;font-weight:800}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 12px 30px -18px #000}
+  .card .ct{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px}
+  .sig{font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;margin-left:auto}
+  .sig.up{color:var(--up);background:rgba(229,72,77,.14)} .sig.down{color:var(--down);background:rgba(61,130,246,.16)}
+  .sig.neu{color:var(--gold);background:rgba(245,196,81,.14)}
+  .viz{margin:12px 0;background:#0c1426;border:1px solid #1c2a46;border-radius:12px;padding:8px;display:flex;justify-content:center}
+  .viz svg{width:100%;height:auto;max-height:170px}
+  .card .d{color:var(--sub);font-size:14px}
+  .card .d b{color:var(--txt)}
+  .lead{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px;color:var(--sub);font-size:15px}
+  .lead b{color:var(--txt)}
+  .keyrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .keyrow .k{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--sub)}
+  .dot{width:12px;height:12px;border-radius:3px}
+  .disc{margin-top:36px;padding:16px 18px;border-radius:14px;border:1px dashed var(--line);color:var(--faint);font-size:13px;background:#0d1526}
+</style>
+</head>
+<body>
+<div class="top"><div class="bar">
+  <a class="back" href="./index.html">‹ 게임으로</a>
+  <div class="brand">📚 차트<b>아레나</b> 학습</div>
+  <div class="tabs">
+    <div class="tab on" data-go="s1">캔들 기초</div>
+    <div class="tab" data-go="s2">캔들 패턴</div>
+    <div class="tab" data-go="s3">차트 패턴</div>
+    <div class="tab" data-go="s4">보조지표</div>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>차트, 처음부터 제대로</h1>
+    <p>캔들 읽는 법부터 패턴·보조지표까지. 실전 배틀 전에 기초를 다져요.</p>
+  </div>
+
+  <section id="s1">
+    <div class="sh"><span class="ic">🕯️</span><h2>1. 캔들 기초</h2></div>
+    <div class="lead">
+      캔들 하나는 <b>일정 시간(예: 하루)의 가격 움직임</b>을 담은 막대예요. 시작가·끝가·최고가·최저가 네 가지가 들어있습니다.
+      <div class="keyrow">
+        <span class="k"><span class="dot" style="background:var(--up)"></span> <b style="color:var(--up)">양봉(빨강)</b> = 종가 &gt; 시가 · 올랐다</span>
+        <span class="k"><span class="dot" style="background:var(--down)"></span> <b style="color:var(--down)">음봉(파랑)</b> = 종가 &lt; 시가 · 내렸다</span>
+      </div>
+    </div>
+    <div class="grid" id="g-basic"></div>
+  </section>
+
+  <section id="s2">
+    <div class="sh"><span class="ic">🔮</span><h2>2. 캔들 패턴 <span style="font-size:14px;color:var(--faint);font-weight:600">· 반전/지속 신호</span></h2></div>
+    <div class="grid" id="g-cpat"></div>
+  </section>
+
+  <section id="s3">
+    <div class="sh"><span class="ic">📈</span><h2>3. 차트 패턴</h2></div>
+    <div class="grid" id="g-chart"></div>
+  </section>
+
+  <section id="s4">
+    <div class="sh"><span class="ic">🧭</span><h2>4. 보조지표</h2></div>
+    <div class="grid" id="g-ind"></div>
+  </section>
+
+  <div class="disc">※ 본 내용은 <b>차트 이해를 돕는 학습 정보</b>이며, 특정 종목 매매나 투자를 권유하는 것이 아닙니다. 모든 투자 판단과 책임은 본인에게 있습니다.</div>
+</div>
+
+<script>
+const UP="#e5484d", DOWN="#3d82f6", SUB="#93a3c4", GRID="#1c2a46", ACC="#4a9bff", GOLD="#f5c451";
+// ---- candle SVG ----
+function candles(cs, w=280, h=150, hiOv, loOv){
+  const pad=16, allV=cs.flatMap(c=>[c.h,c.l]);
+  const hi=hiOv??Math.max(...allV), lo=loOv??Math.min(...allV);
+  const Y=v=>pad+(hi-v)/(hi-lo)*(h-2*pad);
+  const n=cs.length, cw=(w-2*pad)/n, bw=Math.min(cw*0.62,26);
+  let s=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+  cs.forEach((c,i)=>{ const cx=pad+cw*(i+.5), up=c.c>=c.o, col=up?UP:DOWN;
+    s+=`<line x1="${cx}" y1="${Y(c.h)}" x2="${cx}" y2="${Y(c.l)}" stroke="${col}" stroke-width="1.6"/>`;
+    const yT=Y(Math.max(c.o,c.c)), yB=Y(Math.min(c.o,c.c));
+    s+=`<rect x="${cx-bw/2}" y="${yT}" width="${bw}" height="${Math.max(2.5,yB-yT)}" fill="${col}" rx="1.5"/>`; });
+  return s+`</svg>`;
+}
+// annotated single candle (anatomy)
+function anatomy(){
+  const w=280,h=170,cx=150,pad=18,hi=100,lo=0,Y=v=>pad+(hi-v)/(hi-lo)*(h-2*pad);
+  const o=35,c=72,H=92,L=12,bw=34,col=UP;
+  let s=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<line x1="${cx}" y1="${Y(H)}" x2="${cx}" y2="${Y(L)}" stroke="${col}" stroke-width="2"/>`;
+  s+=`<rect x="${cx-bw/2}" y="${Y(c)}" width="${bw}" height="${Y(o)-Y(c)}" fill="${col}" rx="2"/>`;
+  const lab=(x,y,t,anc="start",cl=SUB)=>`<text x="${x}" y="${y}" fill="${cl}" font-size="11.5" text-anchor="${anc}" font-weight="600">${t}</text>`;
+  const tick=(y,x2)=>`<line x1="${cx}" y1="${y}" x2="${x2}" y2="${y}" stroke="${SUB}" stroke-dasharray="3 3" stroke-width="1"/>`;
+  s+=tick(Y(H),cx+70)+lab(cx+74,Y(H)+4,"고가");
+  s+=tick(Y(L),cx+70)+lab(cx+74,Y(L)+4,"저가");
+  s+=tick(Y(c),cx-70)+lab(cx-74,Y(c)+4,"종가","end",UP);
+  s+=tick(Y(o),cx-70)+lab(cx-74,Y(o)+4,"시가","end",UP);
+  s+=lab(cx+bw/2+8,Y((o+c)/2)+4,"몸통",'start',"#e9eefb");
+  s+=lab(cx+8,Y((H+c)/2)+4,"윗꼬리");
+  return s+`</svg>`;
+}
+// line chart (chart patterns): pts=[[x,y]..] on 0..100 domain
+function lineChart(pts, extras=""){
+  const w=280,h=150,pad=16;
+  const X=x=>pad+x/100*(w-2*pad), Y=y=>pad+(100-y)/100*(h-2*pad);
+  let d=pts.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
+  let s=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<path d="${d}" fill="none" stroke="${ACC}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  s+=extras+`</svg>`; return s;
+  function _(){}
+}
+const hline=(y,col,dash=1)=>{const w=280,h=150,pad=16,Y=v=>pad+(100-v)/100*(h-2*pad);
+  return `<line x1="${pad}" y1="${Y(y)}" x2="${w-pad}" y2="${Y(y)}" stroke="${col}" stroke-width="1.4" ${dash?'stroke-dasharray="5 4"':''}/>`;};
+const tline=(x1,y1,x2,y2,col)=>{const w=280,h=150,pad=16,X=x=>pad+x/100*(w-2*pad),Y=v=>pad+(100-v)/100*(h-2*pad);
+  return `<line x1="${X(x1)}" y1="${Y(y1)}" x2="${X(x2)}" y2="${Y(y2)}" stroke="${col}" stroke-width="1.6" stroke-dasharray="5 4"/>`;};
+const txt=(x,y,t,col=SUB)=>{const w=280,h=150,pad=16,X=x0=>pad+x0/100*(w-2*pad),Y=v=>pad+(100-v)/100*(h-2*pad);
+  return `<text x="${X(x)}" y="${Y(y)}" fill="${col}" font-size="11" font-weight="700">${t}</text>`;};
+
+// ---------- DATA ----------
+const BASIC=[
+ {t:"캔들의 구조",sig:"",svg:anatomy(),d:"몸통은 <b>시가~종가</b>, 위아래 꼬리는 그 시간의 <b>고가·저가</b>까지 뻗은 선이에요. 색으로 오름/내림을 한눈에 봅니다."},
+ {t:"양봉 vs 음봉",sig:"",svg:candles([{o:30,h:80,l:22,c:72},{o:72,h:78,l:20,c:30}],280,150,90,10),
+   d:"<b style='color:#e5484d'>양봉(빨강)</b>은 종가가 시가보다 높아 <b>올랐다</b>는 뜻, <b style='color:#3d82f6'>음봉(파랑)</b>은 <b>내렸다</b>는 뜻. (한국식 색상)"},
+ {t:"몸통이 길면 = 힘이 세다",sig:"",svg:candles([{o:30,h:60,l:26,c:44},{o:24,h:82,l:20,c:78}],280,150,90,10),
+   d:"몸통이 길수록 그 방향(매수/매도)의 <b>힘이 강하다</b>는 신호. 짧은 몸통은 힘겨루기가 팽팽했다는 뜻이에요."},
+ {t:"꼬리가 길면 = 되돌림",sig:"",svg:candles([{o:52,h:58,l:20,c:55},{o:48,h:82,l:44,c:45}],280,150,90,10),
+   d:"긴 <b>아래꼬리</b>는 밀렸다가 되사서 올라온 것(지지), 긴 <b>윗꼬리</b>는 올랐다가 팔려서 내려온 것(저항)이에요."},
+];
+const CPAT=[
+ {t:"도지 (十)",sig:["중립","neu"],cs:[{o:50,h:82,l:18,c:50}],d:"시가≈종가로 십자 모양. 매수·매도가 <b>팽팽</b>해 <b>추세 전환</b> 가능성을 암시해요."},
+ {t:"망치형",sig:["상승","up"],cs:[{o:58,h:64,l:22,c:63}],d:"바닥에서 <b>긴 아래꼬리</b> + 위쪽 작은 몸통. 저점 매수세 유입 → <b>반등 신호</b>."},
+ {t:"유성형",sig:["하락","down"],cs:[{o:40,h:82,l:35,c:36}],d:"고점에서 <b>긴 윗꼬리</b> + 아래쪽 작은 몸통. 매도세 등장 → <b>하락 반전</b> 주의."},
+ {t:"상승장악형",sig:["상승","up"],cs:[{o:62,h:66,l:44,c:46},{o:42,h:72,l:38,c:70}],d:"큰 <b>양봉이 직전 음봉을 완전히 감쌈</b>. 매수세가 압도 → 강한 <b>상승 반전</b>."},
+ {t:"하락장악형",sig:["하락","down"],cs:[{o:40,h:58,l:36,c:56},{o:60,h:64,l:28,c:30}],d:"큰 <b>음봉이 직전 양봉을 감쌈</b>. 매도세 압도 → 강한 <b>하락 반전</b>."},
+ {t:"샛별 (아침의 별)",sig:["상승","up"],cs:[{o:70,h:74,l:40,c:44},{o:38,h:44,l:32,c:40},{o:46,h:78,l:42,c:74}],d:"음봉→작은 캔들→양봉. <b>바닥에서 반전</b>하는 대표 패턴이에요."},
+ {t:"석별 (저녁의 별)",sig:["하락","down"],cs:[{o:30,h:60,l:26,c:56},{o:60,h:68,l:56,c:62},{o:56,h:60,l:24,c:28}],d:"양봉→작은 캔들→음봉. <b>고점에서 반전</b>하는 대표 패턴."},
+ {t:"적삼병",sig:["상승","up"],cs:[{o:24,h:40,l:22,c:38},{o:36,h:56,l:34,c:54},{o:52,h:72,l:50,c:70}],d:"양봉 3개가 <b>계단식 상승</b>. 강한 상승 추세의 신호."},
+ {t:"흑삼병",sig:["하락","down"],cs:[{o:76,h:78,l:60,c:62},{o:64,h:66,l:46,c:48},{o:50,h:52,l:30,c:32}],d:"음봉 3개가 <b>계단식 하락</b>. 강한 하락 추세의 신호."},
+];
+const CHART=[
+ {t:"지지선 · 저항선",sig:["중립","neu"],
+  svg:lineChart([[0,50],[12,30],[24,55],[36,32],[48,72],[60,33],[72,70],[85,31],[100,60]], hline(31,UP)+hline(72,DOWN)+txt(2,25,"지지",UP)+txt(70,78,"저항",DOWN)),
+  d:"여러 번 <b>바닥을 지킨 라인=지지</b>, <b>천장에 막힌 라인=저항</b>. 지지 붕괴/저항 돌파가 중요 신호예요."},
+ {t:"추세선",sig:["상승","up"],
+  svg:lineChart([[0,24],[15,40],[28,30],[45,58],[60,46],[78,78],[100,66]], tline(0,20,100,62,ACC)+txt(2,74,"상승 추세",ACC)),
+  d:"저점들을 이으면 <b>상승 추세선</b>(우상향), 고점들을 이으면 <b>하락 추세선</b>. 추세선을 깨면 방향 전환 신호."},
+ {t:"삼각수렴",sig:["중립","neu"],
+  svg:lineChart([[0,80],[14,28],[28,66],[42,38],[56,58],[70,46],[84,52],[100,49]], tline(0,86,100,50,DOWN)+tline(0,20,100,48,UP)+txt(60,72,"돌파?",GOLD)),
+  d:"변동폭이 점점 <b>좁아지며 수렴</b>. 에너지가 응축돼 <b>돌파하는 방향</b>으로 크게 움직이는 경우가 많아요."},
+ {t:"헤드앤숄더",sig:["하락","down"],
+  svg:lineChart([[0,30],[12,58],[22,42],[38,80],[52,42],[66,60],[80,40],[100,22]], hline(42,DOWN)+txt(30,84,"머리",SUB)+txt(2,30,"넥라인",DOWN)),
+  d:"어깨-<b>머리(최고점)</b>-어깨 후 <b>넥라인 이탈</b>. 상승 뒤 <b>하락 반전</b>의 대표 패턴."},
+ {t:"이중천정 (M자)",sig:["하락","down"],
+  svg:lineChart([[0,28],[20,74],[38,48],[58,74],[78,46],[100,22]], hline(74,DOWN)+txt(2,44,"두 번 막힘",SUB)),
+  d:"고점을 <b>두 번 못 뚫으면(M자)</b> 매수세 소진 → <b>하락 전환</b> 가능성."},
+ {t:"이중바닥 (W자)",sig:["상승","up"],
+  svg:lineChart([[0,72],[20,26],[38,52],[58,26],[78,54],[100,78]], hline(26,UP)+txt(2,58,"두 번 지킴",SUB)),
+  d:"바닥을 <b>두 번 지키면(W자)</b> 매도세 소진 → <b>상승 전환</b> 가능성."},
+];
+const IND=[
+ {t:"이동평균선 (MA)",sig:["중립","neu"],
+  svg:(function(){let pr=[[0,30],[14,42],[28,36],[42,54],[56,48],[70,66],[84,60],[100,74]];
+    let ma=[[0,34],[14,38],[28,40],[42,46],[56,50],[70,56],[84,62],[100,66]];
+    let e=`<path d="${ma.map((p,i)=>(i?'L':'M')+(16+p[0]/100*248).toFixed(1)+' '+(16+(100-p[1])/100*118).toFixed(1)).join(' ')}" fill="none" stroke="${GOLD}" stroke-width="2" stroke-dasharray="1 0"/>`;
+    e+=txt(60,80,"골든크로스",GOLD);
+    return lineChart(pr,e);})(),
+  d:"일정 기간 <b>평균 가격</b>. 단기선이 장기선을 <b>위로 뚫으면 골든크로스(상승)</b>, 아래로 뚫으면 데드크로스(하락)."},
+ {t:"RSI (과매수·과매도)",sig:["중립","neu"],
+  svg:lineChart([[0,50],[12,68],[24,80],[36,72],[48,50],[60,28],[72,18],[85,34],[100,52]], hline(74,DOWN)+hline(26,UP)+txt(2,80,"70 과매수",DOWN)+txt(2,20,"30 과매도",UP)),
+  d:"0~100 사이 상대강도. <b>70 이상=과매수</b>(조정 주의), <b>30 이하=과매도</b>(반등 기대). 추세 힘을 잽니다."},
+ {t:"MACD",sig:["중립","neu"],
+  svg:(function(){let a=[[0,40],[16,52],[32,64],[50,58],[68,44],[84,52],[100,64]];
+    let b=[[0,46],[16,48],[32,54],[50,58],[68,52],[84,50],[100,56]];
+    let e=`<path d="${b.map((p,i)=>(i?'L':'M')+(16+p[0]/100*248).toFixed(1)+' '+(16+(100-p[1])/100*118).toFixed(1)).join(' ')}" fill="none" stroke="${GOLD}" stroke-width="2"/>`+txt(20,72,"MACD",ACC)+txt(60,40,"시그널",GOLD);
+    return lineChart(a,e);})(),
+  d:"단기·장기 이평의 차이. <b>MACD선이 시그널선을 위로 교차=매수 신호</b>, 아래로 교차=매도 신호."},
+ {t:"볼린저밴드",sig:["중립","neu"],
+  svg:lineChart([[0,40],[14,58],[28,44],[42,64],[56,40],[70,60],[84,46],[100,58]],
+    tline(0,72,100,74,SUB)+tline(0,24,100,26,SUB)+txt(2,78,"상단(과열)",SUB)+txt(2,20,"하단(과냉)",SUB)),
+  d:"이평선 <b>±표준편차 밴드</b>. 상단 터치=과열, 하단 터치=과냉. 밴드가 <b>좁아지면(스퀴즈) 큰 변동 임박</b>."},
+ {t:"거래량",sig:["중립","neu"],
+  svg:(function(){const w=280,h=150,pad=16,X=x=>pad+x/8*(w-2*pad-20)+10;
+    let bars="";const vals=[40,60,35,80,50,95,45,70];
+    vals.forEach((v,i)=>{const up=i%2?false:true;const bh=v/100*(h-2*pad);
+      bars+=`<rect x="${X(i)-10}" y="${h-pad-bh}" width="20" height="${bh}" fill="${up?UP:DOWN}" opacity=".8" rx="2"/>`;});
+    return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${bars}${txt(40,90,'거래량 급증',GOLD)}</svg>`;})(),
+  d:"가격 움직임의 <b>신뢰도</b>를 확인. <b>상승 + 거래량 증가</b>는 강한 움직임, 거래량 없는 상승은 힘이 약해요."},
+];
+// render
+function render(el, arr){ const g=document.getElementById(el);
+  arr.forEach(o=>{ const c=document.createElement('div');c.className='card';
+    const sig=o.sig&&o.sig[0]?`<span class="sig ${o.sig[1]}">${o.sig[0]}</span>`:'';
+    const svg=o.svg||candles(o.cs);
+    c.innerHTML=`<div class="ct">${o.t}${sig}</div><div class="viz">${svg}</div><div class="d">${o.d}</div>`;
+    g.appendChild(c);});}
+render('g-basic',BASIC); render('g-cpat',CPAT); render('g-chart',CHART); render('g-ind',IND);
+// tabs
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
+  document.getElementById(t.dataset.go).scrollIntoView({behavior:'smooth'});});
+</script>
+</body>
+</html>
