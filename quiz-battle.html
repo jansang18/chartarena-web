@@ -274,6 +274,7 @@
 </div>
 
 <div id="splash"><img src="assets/logo.png" alt="차트아레나"></div>
+<script src="xp.js"></script>
 <script src="charts.js"></script>
 <script>
 (function(){
@@ -541,6 +542,9 @@ function finishRound(){
     if(i===0 && pnl<-bal0) pnl=-bal0;                        // 내 손실은 잔고까지만
     p.dp=pnl; p.score+=pnl; });
   var meP=players[0].dp, nb=bal0+meP; setBal(nb);      // 내 보유 포인트 실제 반영
+  if(window.XP){ var _pk=players[0].pick;
+    var _r=XP.award(XP.forRound({watch:_pk==='W', win:meP>0, watchGood:(_pk==='W'&&Math.abs(moveRaw)<1.5), lowRiskWin:(meP>0&&players[0].lev<=2)}),'battle');
+    if(_r)XP.toast(_r.leveledUp?('🎉 레벨업! Lv.'+_r.newLevel):('+'+_r.gained+' XP')); }
   phase='result'; renderPods(); renderCtrl();
   $('chartid').innerHTML='🔍 실제 차트 공개 · <b>'+GD.sym+' '+GD.tf+'</b><span class="rl">Binance 실데이터</span>'; $('chartid').classList.add('show');
   // 델타(P) 애니메이션
@@ -576,6 +580,7 @@ function finishDuelRound(){
   else if(diff<0){ transfer=Math.min(-diff, duel.myStack); duel.myStack-=transfer; duel.oppStack+=transfer; me.dp=-transfer; op.dp=transfer; }
   else { me.dp=0; op.dp=0; }
   duel.roundNo=(duel.roundNo||0)+1;
+  if(window.XP){ var _r=XP.award(XP.forRound({watch:me.pick==='W', win:myPnl>0, lowRiskWin:(myPnl>0&&me.lev<=2)}),'duel'); if(_r)XP.toast(_r.leveledUp?('🎉 레벨업! Lv.'+_r.newLevel):('+'+_r.gained+' XP')); }
   phase='result'; renderPods(); renderCtrl();
   $('chartid').innerHTML='🔍 실제 차트 공개 · <b>'+GD.sym+' '+GD.tf+'</b><span class="rl">Binance 실데이터</span>'; $('chartid').classList.add('show');
   [me,op].forEach(function(p,i){ var d=$('dl'+i); if(!d)return; if(p.dp===0){d.textContent='±0';d.style.color='#93A0BC';} else{d.textContent=(p.dp>0?'+':'')+fmtP(p.dp);d.style.color=p.dp>0?'#35D07A':'#FF5C8A';} d.style.opacity='1'; d.style.top='-26px'; });

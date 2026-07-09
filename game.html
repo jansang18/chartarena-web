@@ -68,6 +68,8 @@
     user-select:none; white-space:nowrap; font-family:inherit; -webkit-tap-highlight-color:transparent}
   .itog .dot{width:8px; height:8px; border-radius:2px; background:var(--tmuted)}
   .itog.on{color:var(--tprimary); border-color:var(--golddim)}
+  .itog.locked{opacity:.5}
+  .itog .lock{font-size:9.5px;color:var(--tmuted);font-weight:800}
   .itog:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
 
   .scroll{flex:1; max-width:440px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--navy2) transparent; padding:14px 16px 22px}
@@ -225,6 +227,7 @@
  </div><!-- /body -->
 </div>
 
+<script src="xp.js"></script>
 <script src="charts.js"></script>
 <script>
 const PROBLEMS = (window.CHARTS&&window.CHARTS.length)?window.CHARTS.map(function(c){c.candles=c.cs;return c;}):[];
@@ -540,9 +543,18 @@ const IND=[
   {k:'ichi',label:'일목',col:'#2BD4C4'},
 ];
 function buildIndBar(){ const host=$('indbar'); host.innerHTML='';
-  IND.forEach(it=>{ const el=document.createElement('div'); el.className='itog'+(ind[it.k]?' on':''); el.tabIndex=0;
-    el.innerHTML='<span class="dot" style="background:'+(ind[it.k]?it.col:'#5A6478')+'"></span>'+it.label;
-    const act=()=>{ ind[it.k]=!ind[it.k]; store.ind=ind; saveS(store); buildIndBar(); layoutCanvas(); drawChart(); };
+  IND.forEach(it=>{
+    const xpKey = it.k==='volume'?'vol':it.k;
+    const locked = !!(window.XP && !XP.unlocked(xpKey));
+    const needLv = window.XP ? XP.indLv(xpKey) : 1;
+    if(locked && ind[it.k]){ ind[it.k]=false; }   // 잠긴 지표는 강제 off
+    const el=document.createElement('div'); el.className='itog'+(ind[it.k]?' on':'')+(locked?' locked':''); el.tabIndex=0;
+    el.innerHTML = locked
+      ? '<span class="dot" style="background:#5A6478"></span>'+it.label+' <span class="lock">🔒 Lv.'+needLv+'</span>'
+      : '<span class="dot" style="background:'+(ind[it.k]?it.col:'#5A6478')+'"></span>'+it.label;
+    const act=()=>{
+      if(locked){ if(window.XP) XP.toast('Lv.'+needLv+' 부터 사용 가능'); return; }
+      ind[it.k]=!ind[it.k]; store.ind=ind; saveS(store); buildIndBar(); layoutCanvas(); drawChart(); };
     el.addEventListener('click',act); el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();act();}});
     host.appendChild(el); });
 }
@@ -596,6 +608,20 @@ function finishReveal(){
   phase='result'; $('hiddenTag').classList.add('hidden'); drawChart(); renderResult();
   $('betPane').classList.add('hidden'); $('resPane').classList.remove('hidden');
   document.querySelector('.scroll').scrollTop=0;
+  awardRoundXp();
+}
+// 실력 보상형 XP (네이티브 ProgressionEngine 규칙): 승리·손절활용·올바른관망·저배율
+function awardRoundXp(){
+  if(!window.XP || !outcome || outcome._xpDone) return;
+  outcome._xpDone=true;   // 라운드당 1회
+  const watch = outcome.dir==='WATCH';
+  const win = (outcome.points||0) > 0;
+  const usedStop = !!(sel.stop && sel.stop>0);
+  const watchGood = watch && Math.abs(outcome.marketEnd||0) < 1.5;   // 애매한 자리를 관망 = 좋은 절제
+  const lowRiskWin = win && (outcome.lev||1) <= 2;
+  const amt = XP.forRound({watch:watch, win:win, usedStop:usedStop, watchGood:watchGood, lowRiskWin:lowRiskWin});
+  const res = XP.gain(amt, 'game');
+  if(res && res.leveledUp) buildIndBar();   // 레벨업 시 새 지표 해금 반영
 }
 function renderResult(){
   const o=outcome;

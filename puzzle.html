@@ -172,6 +172,7 @@
 <canvas id="confetti"></canvas>
 </div></div><!-- /frame /scaler -->
 
+<script src="xp.js"></script>
 <script src="charts.js"></script>
 <script>
 function fitP(){var s=Math.min(1.49,(window.innerWidth-12)/1120,(window.innerHeight-14)/516);var sc=document.getElementById('scaler');if(sc){sc.style.transform='scale('+s+')';sc.style.height=(516*s)+'px';sc.style.width='1120px';}}   // 1.49 → 허브와 같은 크기로 채움
@@ -350,6 +351,7 @@ function finishLevel(){
   $('ovNext').style.display = (pass&&hasNext)?'':'none';
   $('ov').classList.add('on');
   if(pass&&st===3)bigBurst();
+  if(window.XP){ XP.gain(10 + c*5, 'puzzle'); }   // 기본 10 + 정답당 5 XP
 }
 $('ovMap').onclick=function(){$('ov').classList.remove('on');show('map');};
 $('ovRetry').onclick=function(){$('ov').classList.remove('on');startLevel(CUR.wi,CUR.li);};
