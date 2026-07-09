@@ -675,7 +675,7 @@ function avaHTML(pv){ var ch=(pv&&PV.cat==='char'&&PV.id)?PV.id:st.ch;
 function petHTML(pv){ var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
   var petShow = petId && ((pv&&PV.cat==='pet'&&PV.id===petId)||st.owned.pet.has(petId));
   if(!petShow) return '<div class="petempty"><span class="pe1">🐾</span><span class="pe2">아직 펫이 없어요</span><span class="pe3">상점 · 펫에서 입양해요</span></div>';
-  var h='<img class="petbase" src="assets/'+petId+'.png" alt="">';
+  var h='<img class="petbase" src="assets/'+petId+'.png?v=2" alt="">';
   ['neck','head','face'].forEach(function(sl){ var id=st.petEq[sl];
     if(pv&&PV.cat==='pi'&&PV.id&&slotOf(PV.id)===sl) id=PV.id;   // 미리보기 아이템으로 슬롯 대체
     var show = id && ((pv&&PV.cat==='pi'&&PV.id===id)||st.owned.pi.has(id));
