@@ -144,7 +144,7 @@
   .lobby::before{content:""; position:absolute; top:-16%; left:50%; transform:translateX(-50%); width:min(90%,600px); aspect-ratio:1; border-radius:50%;
     background:radial-gradient(circle,rgba(70,130,255,.22),transparent 60%); pointer-events:none; z-index:0}
   .lobby .lbgchart{position:absolute; inset:0; width:100%; height:100%; opacity:.13; z-index:0; pointer-events:none}
-  .lobby .llogo{width:min(44%,296px); position:relative; z-index:2; filter:drop-shadow(0 8px 28px rgba(70,130,255,.55)); margin-bottom:2px}
+  .lobby .llogo{width:min(52%,430px); position:relative; z-index:2; filter:drop-shadow(0 10px 30px rgba(70,130,255,.5)); margin:-14px 0 -18px}
   .lmodes{display:flex; gap:20px; position:relative; z-index:2}
   /* 팔각 네온 프레임 카드 */
   .lcard{--fc:#4CA9FF; --fg:rgba(76,169,255,.5); width:296px; cursor:pointer; text-decoration:none; display:block;
@@ -161,10 +161,10 @@
     background:var(--fc); color:#0a0e1a; box-shadow:0 0 12px var(--fg)}
   .lcard.duel .ltag{background:linear-gradient(180deg,#f6d272,#d8a63a); color:#2a2107}
   .lcard.sv .ltag{background:#35D07A; color:#04231a}
-  .lcard .licwrap{height:112px; display:flex; align-items:center; justify-content:center; position:relative; margin:2px 0}
-  .lcard .licwrap::before{content:""; position:absolute; width:128px; height:128px; border-radius:50%; background:radial-gradient(circle,var(--fg),transparent 64%); opacity:.85}
-  .lcard .licwrap::after{content:""; position:absolute; width:96px; height:96px; border:2px solid var(--fc); border-radius:50%; opacity:.35; clip-path:polygon(0 0,32% 0,32% 6%,6% 6%,6% 32%,0 32%, 0 68%,6% 68%,6% 94%,32% 94%,32% 100%,0 100%, 100% 100%,68% 100%,68% 94%,94% 94%,94% 68%,100% 68%, 100% 32%,94% 32%,94% 6%,68% 6%,68% 0,100% 0)}
-  .lcard .lic{font-size:60px; position:relative; z-index:1; filter:drop-shadow(0 4px 12px rgba(0,0,0,.6))}
+  .lcard .licwrap{height:120px; display:flex; align-items:center; justify-content:center; position:relative; margin:4px 0 2px}
+  .lcard .licwrap::before{content:""; position:absolute; width:140px; height:140px; border-radius:50%; background:radial-gradient(circle,var(--fg),transparent 66%); opacity:.9}
+  .lcard .lic{width:114px; height:114px; border-radius:50%; object-fit:cover; position:relative; z-index:1;
+    border:2.5px solid var(--fc); box-shadow:0 0 18px var(--fg), 0 6px 16px rgba(0,0,0,.5), inset 0 0 22px rgba(0,0,0,.45)}
   .lcard .ln{font-weight:900; font-size:21px; color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.6)}
   .lcard .ld{font-size:12px; color:#9fb3d0; margin-top:8px; line-height:1.55; min-height:52px}
   .lcard .lgo{margin-top:12px; font-weight:900; font-size:15px; padding:11px; color:#06243f;
@@ -263,25 +263,25 @@
       </g>
       <polyline points="40,470 130,415 190,385 250,420 900,400 960,360 1020,390 1090,340" stroke="#7fb0ff" stroke-width="2" fill="none" opacity=".5"/>
     </svg>
-    <img class="llogo" src="assets/logo_wordmark.png" alt="차트아레나">
+    <img class="llogo" src="assets/logo_lockup.png?v=1" alt="차트아레나">
     <div class="lmodes" id="lmodes">
       <div class="lcard live" id="modeLive"><div class="in">
         <div class="ltag">LIVE</div>
-        <div class="licwrap"><span class="lic">👥</span></div>
+        <div class="licwrap"><img class="lic" src="assets/icon_live.png?v=1" alt=""></div>
         <div class="ln">실시간 4명 대결</div>
         <div class="ld">지금 접속한 유저 4명이 붙는 10라운드 차트 예측 대결! 상대가 없으면 봇으로 채워 바로 시작해요.</div>
         <div class="lgo">매칭 시작 ▶</div>
       </div></div>
       <div class="lcard duel" id="mode1v1"><div class="in">
         <div class="ltag">NEW</div>
-        <div class="licwrap"><span class="lic">⚔️</span></div>
+        <div class="licwrap"><img class="lic" src="assets/icon_duel.png?v=1" alt=""></div>
         <div class="ln">1vs1 맞대결</div>
         <div class="ld">판돈을 걸고 맞짱! 수익률 차이만큼 상대 돈을 뺏어와, 한쪽 판돈이 바닥나면 승부 끝.</div>
         <div class="lgo">상대 찾기 ▶</div>
       </div></div>
       <a class="lcard sv" id="modeSv" href="survival.html"><div class="in">
         <div class="ltag">서바이벌</div>
-        <div class="licwrap"><span class="lic">🏆</span></div>
+        <div class="licwrap"><img class="lic" src="assets/icon_sv.png?v=1" alt=""></div>
         <div class="ln">최후의 1인 (20명)</div>
         <div class="ld">20명이 차트 O/X로 대결! 틀리면 즉시 탈락, 끝까지 살아남으면 우승. 큐플레이식 OX 서바이벌.</div>
         <div class="lgo">입장하기 ▶</div>
