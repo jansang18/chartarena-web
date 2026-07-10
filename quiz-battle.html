@@ -137,28 +137,41 @@
   @keyframes emoteFloat{0%{opacity:0; transform:translate(-50%,10px) scale(.5)} 16%{opacity:1; transform:translate(-50%,-4px) scale(1.2)} 34%{transform:translate(-50%,-14px) scale(1)} 100%{opacity:0; transform:translate(-50%,-58px) scale(.85)}}
   .bshare{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);z-index:6;display:none;border:1px solid var(--gold);background:rgba(6,12,26,.94);color:var(--gold);font-family:inherit;font-weight:800;font-size:13px;padding:9px 16px;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px -6px rgba(0,0,0,.7)}
   .bshare:active{transform:translateX(-50%) translateY(1px)}
-  /* ===== 로비 (모드 선택) ===== */
-  .lobby{position:absolute; inset:0; z-index:40; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
-    background:radial-gradient(120% 90% at 50% -10%,#262838 0%,#14161d 46%,#0a0b0f 100%); padding:22px}
+  /* ===== 로비 (AAA 모드 선택) ===== */
+  .lobby{position:absolute; inset:0; z-index:40; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    background:radial-gradient(85% 62% at 50% 15%,#18325f 0%,#0d1a33 45%,#060c1a 100%); padding:14px; overflow:hidden}
   .lobby.hide{display:none}
-  .lobby .llogo{width:210px; margin-bottom:2px}
-  .lobby .ltit{font-weight:900; font-size:19px; color:#EAF0FA; letter-spacing:.01em}
-  .lobby .lsub{font-size:12.5px; color:#93A0BC; margin-top:-8px}
-  .lmodes{display:flex; gap:16px; margin-top:4px}
-  .lcard{width:288px; border-radius:18px; padding:18px 18px 16px; cursor:pointer; border:1px solid #2a4b7a; position:relative; overflow:hidden;
-    background:linear-gradient(180deg,#1f212d,#14161d); transition:transform .12s, box-shadow .12s, border-color .12s}
-  .lcard:hover{transform:translateY(-3px); border-color:#4CA9FF; box-shadow:0 16px 34px -14px rgba(76,169,255,.55)}
-  .lcard.duel:hover{border-color:#E9B949; box-shadow:0 16px 34px -14px rgba(233,185,73,.55)}
-  .lcard .lic{font-size:38px; line-height:1}
-  .lcard .ln{font-weight:900; font-size:19px; margin-top:8px; color:#fff}
-  .lcard .ld{font-size:12.5px; color:#9fb3d0; margin-top:5px; line-height:1.5}
-  .lcard .lgo{margin-top:12px; text-align:center; font-weight:800; font-size:13px; color:#04223f; background:linear-gradient(180deg,#8fd6ff,#4CA9FF); border-radius:10px; padding:9px}
-  .lcard.duel .lgo{background:linear-gradient(180deg,#FCE9A6,#F6D272 45%,#D8A63A); color:#3a2c07}
-  .lcard .ltag{position:absolute; top:12px; right:12px; font-size:10px; font-weight:800; color:#14161d; background:#E9B949; padding:2px 8px; border-radius:999px}
-  .lcard.live:hover{border-color:#35D07A; box-shadow:0 16px 34px -14px rgba(53,208,122,.5)}
-  .lcard.live .lgo{background:linear-gradient(180deg,#8fe3b0,#35D07A); color:#06301c}
-  .lcard.live .lic{filter:drop-shadow(0 0 8px rgba(76,169,255,.5))}
-  .ltag.hot{background:#e5484d; color:#fff; box-shadow:0 0 10px rgba(229,72,77,.6)}
+  .lobby::before{content:""; position:absolute; top:-16%; left:50%; transform:translateX(-50%); width:min(90%,600px); aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle,rgba(70,130,255,.22),transparent 60%); pointer-events:none; z-index:0}
+  .lobby .lbgchart{position:absolute; inset:0; width:100%; height:100%; opacity:.13; z-index:0; pointer-events:none}
+  .lobby .llogo{width:min(44%,296px); position:relative; z-index:2; filter:drop-shadow(0 8px 28px rgba(70,130,255,.55)); margin-bottom:2px}
+  .lmodes{display:flex; gap:20px; position:relative; z-index:2}
+  /* 팔각 네온 프레임 카드 */
+  .lcard{--fc:#4CA9FF; --fg:rgba(76,169,255,.5); width:296px; cursor:pointer; text-decoration:none; display:block;
+    clip-path:polygon(0 20px,20px 0,calc(100% - 20px) 0,100% 20px,100% calc(100% - 20px),calc(100% - 20px) 100%,20px 100%,0 calc(100% - 20px));
+    background:linear-gradient(155deg,var(--fc),rgba(255,255,255,.28) 42%,var(--fc)); padding:2.5px;
+    filter:drop-shadow(0 0 18px var(--fg)) drop-shadow(0 18px 38px rgba(0,0,0,.6)); transition:transform .14s, filter .14s}
+  .lcard:hover{transform:translateY(-5px); filter:drop-shadow(0 0 34px var(--fg)) drop-shadow(0 26px 52px rgba(0,0,0,.72))}
+  .lcard.live{--fc:#F0616D; --fg:rgba(240,97,109,.5)}
+  .lcard.duel{--fc:#8b7aff; --fg:rgba(139,122,255,.52)}
+  .lcard.sv{--fc:#F5C451; --fg:rgba(245,196,81,.5)}
+  .lcard .in{clip-path:polygon(0 19px,19px 0,calc(100% - 19px) 0,100% 19px,100% calc(100% - 19px),calc(100% - 19px) 100%,19px 100%,0 calc(100% - 19px));
+    background:linear-gradient(180deg,rgba(16,26,50,.97),rgba(7,13,28,.99)); padding:18px 18px 16px; position:relative; text-align:center}
+  .lcard .ltag{position:absolute; top:12px; right:12px; z-index:3; font-size:11px; font-weight:900; letter-spacing:.5px; padding:3px 10px; border-radius:6px;
+    background:var(--fc); color:#0a0e1a; box-shadow:0 0 12px var(--fg)}
+  .lcard.duel .ltag{background:linear-gradient(180deg,#f6d272,#d8a63a); color:#2a2107}
+  .lcard.sv .ltag{background:#35D07A; color:#04231a}
+  .lcard .licwrap{height:112px; display:flex; align-items:center; justify-content:center; position:relative; margin:2px 0}
+  .lcard .licwrap::before{content:""; position:absolute; width:128px; height:128px; border-radius:50%; background:radial-gradient(circle,var(--fg),transparent 64%); opacity:.85}
+  .lcard .licwrap::after{content:""; position:absolute; width:96px; height:96px; border:2px solid var(--fc); border-radius:50%; opacity:.35; clip-path:polygon(0 0,32% 0,32% 6%,6% 6%,6% 32%,0 32%, 0 68%,6% 68%,6% 94%,32% 94%,32% 100%,0 100%, 100% 100%,68% 100%,68% 94%,94% 94%,94% 68%,100% 68%, 100% 32%,94% 32%,94% 6%,68% 6%,68% 0,100% 0)}
+  .lcard .lic{font-size:60px; position:relative; z-index:1; filter:drop-shadow(0 4px 12px rgba(0,0,0,.6))}
+  .lcard .ln{font-weight:900; font-size:21px; color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.6)}
+  .lcard .ld{font-size:12px; color:#9fb3d0; margin-top:8px; line-height:1.55; min-height:52px}
+  .lcard .lgo{margin-top:12px; font-weight:900; font-size:15px; padding:11px; color:#06243f;
+    background:linear-gradient(180deg,#8fd6ff,#3a8fe0); box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 18px -6px rgba(0,0,0,.6);
+    clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,7px 100%,0 50%)}
+  .lcard.duel .lgo{background:linear-gradient(180deg,#b7a4ff,#6a4fd0); color:#fff}
+  .lcard.sv .lgo{background:linear-gradient(180deg,#5fe08f,#22a45f); color:#04231a}
   /* 매칭 대기 화면 */
   .lwait{display:none; flex-direction:column; align-items:center; gap:12px}
   .lwait.on{display:flex}
@@ -238,29 +251,41 @@
   <div class="emobar" id="emobar"><button class="emobtn" id="emobtn" type="button" title="이모티콘">😀</button><div class="emopop" id="emopop"></div></div>
 
   <div class="lobby" id="lobby">
+    <svg class="lbgchart" viewBox="0 0 1120 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none">
+        <line x1="70" y1="360" x2="70" y2="470" stroke="#4C8DF6" stroke-width="3"/><rect x="58" y="380" width="24" height="70" fill="#4C8DF6"/>
+        <line x1="130" y1="320" x2="130" y2="440" stroke="#F0616D" stroke-width="3"/><rect x="118" y="335" width="24" height="80" fill="#F0616D"/>
+        <line x1="190" y1="300" x2="190" y2="410" stroke="#F0616D" stroke-width="3"/><rect x="178" y="315" width="24" height="70" fill="#F0616D"/>
+        <line x1="250" y1="330" x2="250" y2="450" stroke="#4C8DF6" stroke-width="3"/><rect x="238" y="360" width="24" height="60" fill="#4C8DF6"/>
+        <line x1="900" y1="300" x2="900" y2="420" stroke="#F0616D" stroke-width="3"/><rect x="888" y="320" width="24" height="80" fill="#F0616D"/>
+        <line x1="960" y1="260" x2="960" y2="380" stroke="#F0616D" stroke-width="3"/><rect x="948" y="275" width="24" height="85" fill="#F0616D"/>
+        <line x1="1020" y1="290" x2="1020" y2="410" stroke="#4C8DF6" stroke-width="3"/><rect x="1008" y="320" width="24" height="70" fill="#4C8DF6"/>
+      </g>
+      <polyline points="40,470 130,415 190,385 250,420 900,400 960,360 1020,390 1090,340" stroke="#7fb0ff" stroke-width="2" fill="none" opacity=".5"/>
+    </svg>
     <img class="llogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <div class="lmodes" id="lmodes">
-      <div class="lcard live" id="modeLive">
-        <div class="ltag hot">LIVE</div>
-        <div class="lic">👥</div>
+      <div class="lcard live" id="modeLive"><div class="in">
+        <div class="ltag">LIVE</div>
+        <div class="licwrap"><span class="lic">👥</span></div>
         <div class="ln">실시간 4명 대결</div>
-        <div class="ld">지금 접속한 실제 유저 4명이 붙는 10라운드 차트 예측 대결! 상대가 없으면 봇으로 채워 바로 시작해요.</div>
+        <div class="ld">지금 접속한 유저 4명이 붙는 10라운드 차트 예측 대결! 상대가 없으면 봇으로 채워 바로 시작해요.</div>
         <div class="lgo">매칭 시작 ▶</div>
-      </div>
-      <div class="lcard duel" id="mode1v1">
+      </div></div>
+      <div class="lcard duel" id="mode1v1"><div class="in">
         <div class="ltag">NEW</div>
-        <div class="lic">⚔️</div>
+        <div class="licwrap"><span class="lic">⚔️</span></div>
         <div class="ln">1vs1 맞대결</div>
         <div class="ld">판돈을 걸고 맞짱! 수익률 차이만큼 상대 돈을 뺏어와, 한쪽 판돈이 바닥나면 승부 끝.</div>
         <div class="lgo">상대 찾기 ▶</div>
-      </div>
-      <a class="lcard sv" id="modeSv" href="survival.html" style="text-decoration:none;background:radial-gradient(1.6px 1.6px at 22% 46%,rgba(255,255,255,.5),transparent),radial-gradient(2px 2px at 60% 40%,rgba(255,220,150,.5),transparent),linear-gradient(140deg,#3a2a12,#1a1526)">
-        <div class="ltag" style="background:#35D07A;color:#04223f">서바이벌</div>
-        <div class="lic">🏆</div>
+      </div></div>
+      <a class="lcard sv" id="modeSv" href="survival.html"><div class="in">
+        <div class="ltag">서바이벌</div>
+        <div class="licwrap"><span class="lic">🏆</span></div>
         <div class="ln">최후의 1인 (20명)</div>
         <div class="ld">20명이 차트 O/X로 대결! 틀리면 즉시 탈락, 끝까지 살아남으면 우승. 큐플레이식 OX 서바이벌.</div>
-        <div class="lgo" style="background:linear-gradient(180deg,#48e58c,#25b061);color:#062018">입장하기 ▶</div>
-      </a>
+        <div class="lgo">입장하기 ▶</div>
+      </div></a>
     </div>
     <div class="lante" id="lante">
       <div class="lq">⚔️ 판돈을 정하세요 (상대도 같은 금액을 겁니다)</div>
