@@ -103,6 +103,7 @@
   .item .upgb{margin-top:6px;font-size:11px;font-weight:900;color:#2a2107;background:linear-gradient(180deg,#f6d272,#d8a63a);border-radius:8px;padding:5px 6px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(216,166,58,.6);white-space:nowrap}
   .item.islux{border-color:var(--gold)!important;box-shadow:0 0 18px -6px var(--gold)}
   .item .luxtag{position:absolute;top:6px;right:8px;color:var(--gold);font-size:15px;text-shadow:0 0 8px rgba(233,185,73,.8);z-index:2}
+  .item .luxprev{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:2;font-size:9.5px;font-weight:900;letter-spacing:.5px;color:#2a2107;background:linear-gradient(180deg,#f6d272,#d8a63a);padding:2px 9px;border-radius:999px;box-shadow:0 3px 8px -3px rgba(216,166,58,.7)}
   .charshow .luxbadge{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:5;font-size:11px;font-weight:900;letter-spacing:1px;color:#2a2107;background:linear-gradient(180deg,#f6d272,#d8a63a);padding:3px 12px;border-radius:999px;box-shadow:0 4px 12px -4px rgba(216,166,58,.7)}
   .exwrap{display:flex;flex-direction:column;gap:12px;padding:4px}
   .exhd{font-size:14px;color:var(--tp);font-weight:800}.exhd b{color:#7fd0ff;font-family:var(--mono)}
@@ -820,14 +821,18 @@ function renderGarage(){ refreshProfile();
   if(gcat==='char'){
     $('shop').innerHTML=HU.map(function(h){var id=h[0],nm=h[1];
       var own=st.owned.char.has(id), up=st.owned.upg.has(id), eq=st.ch===id;
+      var luxImg=IMG['hux'+String(id).replace('hu','')]||charImg(id);
+      var cardImg = up ? charImg(id) : own ? luxImg : charImg(id);   // 노멀보유 카드엔 럭셔리 미리보기
       var foot = up ? '<div class="pr" style="color:var(--gold);font-weight:900">✦ 럭셔리 보유</div>'
         : own ? '<div class="upgb" data-upg="'+id+'">✦ 럭셔리 '+fmt(1e8)+'</div>'
         : '<div class="buyb" data-buychar="'+id+'">🛒 구매 '+fmt(50000)+'</div>';
-      var badge = eq ? '<div class="st" style="background:var(--gold);color:#111">선택중</div>'
+      var badge = up ? '<div class="st" style="background:var(--gold);color:#111">'+(eq?'선택중':'럭셔리')+'</div>'
+        : eq ? '<div class="st" style="background:var(--green);color:#052">선택중</div>'
         : own ? '<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>' : '';
-      return '<div class="item'+(up?' islux':'')+(own?'':' locked')+'" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':'var(--line)')+';box-shadow:'+(eq?'0 0 16px -6px var(--gold)':'none')+'">'
+      var luxPrev = (own&&!up) ? '<div class="luxprev">✦ 럭셔리 미리보기</div>' : '';
+      return '<div class="item'+(up?' islux':'')+(own?'':' locked')+'" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':(own&&!up)?'rgba(245,196,81,.4)':'var(--line)')+';box-shadow:'+(eq?'0 0 16px -6px var(--gold)':'none')+'">'
         +badge+(up?'<div class="luxtag">✦</div>':'')
-        +'<div class="pic"><img src="'+charImg(id)+'" alt=""></div><div class="nm">'+nm+'</div>'+foot+'</div>';
+        +'<div class="pic">'+luxPrev+'<img src="'+cardImg+'" alt=""></div><div class="nm">'+nm+'</div>'+foot+'</div>';
     }).join('');
     return;
   }
