@@ -97,6 +97,21 @@
   .curr{display:flex; align-items:center; gap:10px}
   .pill{display:flex; align-items:center; gap:8px; background:#14151c; border:1px solid var(--line); border-radius:999px; padding:5px 8px 5px 8px; font-weight:800; font-family:var(--mono); font-size:15px}
   .pill .cico{width:27px;height:27px;object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 1px 3px rgba(0,0,0,.45))}
+  .pill.play{cursor:pointer;color:#ffd66b} .pill.play .pico{font-size:17px;filter:drop-shadow(0 0 6px rgba(255,200,80,.6))}
+  .pill.play.empty{color:#ff7a90} .pill.play.empty .pico{filter:none;opacity:.6}
+  /* 럭셔리 업그레이드 · 보석 교환 */
+  .item .upgb{margin-top:6px;font-size:11px;font-weight:900;color:#2a2107;background:linear-gradient(180deg,#f6d272,#d8a63a);border-radius:8px;padding:5px 6px;cursor:pointer;box-shadow:0 4px 12px -4px rgba(216,166,58,.6);white-space:nowrap}
+  .item.islux{border-color:var(--gold)!important;box-shadow:0 0 18px -6px var(--gold)}
+  .item .luxtag{position:absolute;top:6px;right:8px;color:var(--gold);font-size:15px;text-shadow:0 0 8px rgba(233,185,73,.8);z-index:2}
+  .charshow .luxbadge{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:5;font-size:11px;font-weight:900;letter-spacing:1px;color:#2a2107;background:linear-gradient(180deg,#f6d272,#d8a63a);padding:3px 12px;border-radius:999px;box-shadow:0 4px 12px -4px rgba(216,166,58,.7)}
+  .exwrap{display:flex;flex-direction:column;gap:12px;padding:4px}
+  .exhd{font-size:14px;color:var(--tp);font-weight:800}.exhd b{color:#7fd0ff;font-family:var(--mono)}
+  .excard{display:flex;align-items:center;gap:13px;background:var(--p1);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+  .excard .exi{font-size:30px;flex:0 0 auto}
+  .excard .ext{flex:1;min-width:0}.excard .ext b{display:block;font-size:15px;color:var(--tp)}.excard .ext span{font-size:12px;color:var(--ts)}
+  .excard .exbtns{display:flex;gap:7px;flex:0 0 auto}
+  .exb{font-size:12.5px;font-weight:900;color:#04223f;background:linear-gradient(180deg,#8fd6ff,#4CA9FF);border-radius:9px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+  .exnote{font-size:11px;color:var(--tm);margin-top:4px;line-height:1.5}
   .pill span:not(.cico):not(.add){font-size:15px;line-height:1}
   .pill .add{width:23px;height:23px;border-radius:50%;background:rgba(233,185,73,.18);border:1px solid rgba(233,185,73,.5);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;margin-left:1px;cursor:pointer}
   .ticons{display:flex; align-items:center; gap:8px; margin-left:4px}
@@ -425,8 +440,9 @@
     <img class="brandlogo" src="assets/logo_wordmark.png" alt="차트아레나">
     <div class="tsp"></div>
     <div class="curr">
-      <div class="pill coin"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span><span class="add" data-toast="충전 — 준비 중">＋</span></div>
-      <div class="pill gem"><img class="cico" src="assets/gem.png?v=1" alt=""><span id="tbGem">2,380</span></div>
+      <div class="pill play" id="tbPlayWrap" data-go-play="1"><span class="pico">⚡</span><span id="tbPlay">10/10</span></div>
+      <div class="pill coin"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span></div>
+      <div class="pill gem"><img class="cico" src="assets/gem.png?v=1" alt=""><span id="tbGem">120</span></div>
     </div>
     <div class="ticons">
       <div class="ticon" data-toast="메일 — 준비 중">✉️</div>
@@ -592,6 +608,7 @@
 </div></div></div>
 
 <script src="xp.js"></script>
+<script src="energy.js"></script>
 <script>
 (function(){
 "use strict";
@@ -635,7 +652,7 @@ function checkAttendance(){ var d=dget(); if(d.att)return;
   var streak=(d.lastAtt===_yday())?(d.streak%7)+1:1;   // 어제 출석했으면 연속(7 넘으면 1로 순환), 아니면 1일차부터
   _pendAtt={streak:streak, R:ATTEND_TABLE[streak-1]};   // 지급은 '받기' 클릭 시에만
   showAttend(streak,_pendAtt.R); }
-function claimAttend(){ if(_pendAtt){ var d=dget(); d.att=1; d.streak=_pendAtt.streak; d.lastAtt=_today(); dset(d); setBal(getBal()+_pendAtt.R); refreshProfile(); toast('출석 보상 +'+fmt(_pendAtt.R)+' P'); _pendAtt=null; } $('dpop').classList.remove('show'); }
+function claimAttend(){ if(_pendAtt){ var d=dget(); d.att=1; d.streak=_pendAtt.streak; d.lastAtt=_today(); dset(d); setBal(getBal()+_pendAtt.R); st.gems+=3; saveHS(); refreshProfile(); toast('출석 보상 +'+fmt(_pendAtt.R)+'골드 · 💎+3'); _pendAtt=null; } $('dpop').classList.remove('show'); }
 function showAttend(streak,R){ var p=$('dpop'); if(!p)return;
   var wk=$('dpWeek'); if(wk){ var h=''; for(var i=1;i<=7;i++){ var cls=i<streak?'done':(i===streak?'cur':'fut'); h+='<div class="dpday '+cls+'"><span class="dd">'+i+'일</span><span class="dr">'+(ATTEND_TABLE[i-1]/10000)+'만</span></div>'; } wk.innerHTML=h; }
   if($('dpSub'))$('dpSub').textContent=(streak>=7)?'7일 연속 달성! 최대 보상 🎉':(streak+'일 연속 출석 중 · 7일차엔 3만P!');
@@ -657,20 +674,18 @@ var ACC=[['none','없음',0,''],['glasses','동그란 안경',1500,'👓'],['cap
 var ACCEMO={}; ACC.forEach(function(a){ACCEMO[a[0]]=a[3];});
 var st={nick:hs.nick||'', ch:(hs.equip&&hs.equip.ch)||'hu0', title:(hs.equip&&hs.equip.title)||'', acc:(hs.equip&&hs.equip.acc)||'none',
   pet:(hs.equip&&hs.equip.pet)||'', petEq:Object.assign({head:'',neck:'',face:''},(hs.equip&&hs.equip.petEq)||{}), setup:!!hs.setup,
-  owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[])}};
+  owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[]), upg:new Set((hs.owned&&hs.owned.upg)||[])},
+  gems:(typeof hs.gems==='number'?hs.gems:120)};   // 보석 = 가상 프리미엄 화폐(인게임 획득), 초기 120
 if(!IMG[st.ch]){st.ch='hu0';}
+for(var _lx=0;_lx<17;_lx++)IMG['hux'+_lx]='assets/hux'+_lx+'.png?v=1';   // 럭셔리 스킨
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
-function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi]},jstars:jstars}));}
+function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,gems:st.gems,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi],upg:[...st.owned.upg]},jstars:jstars}));}
+// 캐릭터 이미지: 럭셔리 업그레이드 보유 시 hux 스킨
+function charImg(id){ if(st.owned.upg.has(id)){ return IMG['hux'+String(id).replace('hu','')]||IMG[id]; } return IMG[id]||IMG.hu0; }
 
 var PV={cat:'',id:''};   // 상점 미리보기(구매 전 착용) — 사이드바 아바타엔 미적용
 function avaHTML(pv){ var ch=(pv&&PV.cat==='char'&&PV.id)?PV.id:st.ch;
-  var inner = IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="em">'+(EMO[ch]||'🙂')+'</span>';
-  var accId=(pv&&PV.cat==='acc'&&PV.id)?PV.id:st.acc;
-  var accB = (accId&&ACCEMO[accId])?'<span class="acc">'+ACCEMO[accId]+'</span>':'';
-  var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
-  var petShow = petId && ((pv&&PV.cat==='pet'&&PV.id===petId)||st.owned.pet.has(petId));
-  var petB = petShow?'<img class="petmini" src="assets/'+petId+'.png" alt="">':'';
-  return inner+accB+petB;
+  return charImg(ch)?'<img src="'+charImg(ch)+'" alt="">':'<span class="em">'+(EMO[ch]||'🙂')+'</span>';
 }
 function petHTML(pv){ var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
   var petShow = petId && ((pv&&PV.cat==='pet'&&PV.id===petId)||st.owned.pet.has(petId));
@@ -683,9 +698,9 @@ function petHTML(pv){ var petId=(pv&&PV.cat==='pet'&&PV.id)?PV.id:st.pet;
   return h;
 }
 function charShowHTML(){
-  var chSrc=IMG[st.ch]||IMG.hu0||'assets/hu0.png';
+  var chSrc=charImg(st.ch);
   var h='<img class="csch" src="'+chSrc+'" alt="">';
-  if(st.pet && st.owned.pet.has(st.pet)) h+='<div class="cspet">'+petHTML()+'</div>';   // 장착 펫 전신 옆에
+  if(st.owned.upg.has(st.ch)) h+='<div class="luxbadge">✦ LUXURY</div>';   // 럭셔리 표식
   return h;
 }
 function refreshProfile(){
@@ -693,6 +708,8 @@ function refreshProfile(){
   var cs=$('charShow'); if(cs)cs.innerHTML=charShowHTML();
   var p=$('pPoints'); if(p)p.textContent=fmt(getBal())+' P';
   var tc=$('tbCoin'); if(tc)tc.textContent=fmt(getBal());   // 상단바 잔고 = 실제 보유 포인트
+  var tg=$('tbGem'); if(tg)tg.textContent=fmt(st.gems);
+  var tp=$('tbPlay'); if(tp&&window.NRG){ var pl=NRG.plays(); tp.textContent=pl+'/'+NRG.MAX; var pw=$('tbPlayWrap'); if(pw)pw.classList.toggle('empty',pl<=0); }
   var n=$('pName'); if(n)n.textContent=st.nick;
   if(window.XP){ var lv=XP.level(), pg=Math.round(XP.progress()*100);
     var lvE=$('pLv'); if(lvE)lvE.textContent='Lv.'+lv;
@@ -797,14 +814,20 @@ function equipCur(id){ if(gcat==='pet')st.pet=id; else if(gcat==='pi'){var sl=sl
 function renderGarage(){ refreshProfile();
   $('gpv').innerHTML=(gcat==='pet'||gcat==='pi')?petHTML(true):avaHTML(true); var _gp=$('gpv'); if(_gp&&_gp.parentNode)_gp.parentNode.classList.toggle('previewing', !!PV.id);
   $('gpNick').textContent=st.nick; $('gpTitle').textContent=st.title?('👑 '+st.title):'';
-  var CN=[['char','캐릭터'],['pet','펫'],['pi','펫꾸미기'],['acc','악세사리'],['title','칭호']];
+  var CN=[['char','캐릭터'],['exch','보석교환'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<div class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</div>';}).join('');
   if(gcat==='char'){
-    $('shop').innerHTML=HU.map(function(h){var id=h[0],nm=h[1],eq=st.ch===id;
-      return '<div class="item" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':'var(--line)')+';box-shadow:'+(eq?'0 0 16px -6px var(--gold)':'none')+'">'+(eq?'<div class="st" style="background:var(--gold);color:#111">선택중</div>':'')+'<div class="pic"><img src="'+IMG[id]+'" alt=""></div><div class="nm">'+nm+'</div><div class="pr" style="color:var(--ts)">무료</div></div>';
+    $('shop').innerHTML=HU.map(function(h){var id=h[0],nm=h[1],eq=st.ch===id,up=st.owned.upg.has(id);
+      var foot = up ? '<div class="pr" style="color:var(--gold);font-weight:900">✦ 럭셔리</div>'
+        : '<div class="upgb" data-upg="'+id+'">✦ 럭셔리 '+fmt(1e8)+'</div>';
+      return '<div class="item'+(up?' islux':'')+'" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':'var(--line)')+';box-shadow:'+(eq?'0 0 16px -6px var(--gold)':'none')+'">'
+        +(eq?'<div class="st" style="background:var(--gold);color:#111">선택중</div>':'')
+        +(up?'<div class="luxtag">✦</div>':'')
+        +'<div class="pic"><img src="'+charImg(id)+'" alt=""></div><div class="nm">'+nm+'</div>'+foot+'</div>';
     }).join('');
     return;
   }
+  if(gcat==='exch'){ renderExchange(); return; }
   $('shop').innerHTML=ITEMS[gcat].map(function(it){var id=it[0],nm=it[1],pr=it[2];var own=ownSet().has(id),eq=isEq(id),rr=rar(pr);var isPrev=(!own&&PV.cat===gcat&&PV.id===id);
     var vis = gcat==='title'?'<div class="em tx" style="color:'+rr[1]+'">'+(id===''?'—':id)+'</div>':gcat==='acc'?'<div class="pic"><div class="em">'+(it[3]||'—')+'</div></div>':'<div class="pic"><img src="assets/'+id+'.png" alt=""></div>';
     var stt=eq?'<div class="st" style="background:var(--gold);color:#111">장착중</div>':own?'<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>':(isPrev?'<div class="st" style="background:var(--blue);color:#04223f">👀 미리보기</div>':'');
@@ -818,7 +841,10 @@ function sellItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;});
   else { if(isEq(id)){ if(gcat==='acc')st.acc='none'; else st.title=''; } st.owned[gcat].delete(id); }
   PV={cat:'',id:''}; setBal(getBal()+refund); saveHS(); refreshProfile(); renderGarage(); toast('💰 '+row[1]+' 판매 · +'+fmt(refund)+'P'); }
 document.addEventListener('click',function(e){
+  var gp=e.target.closest('[data-go-play]'); if(gp){ go('garage'); gcat='exch'; PV={cat:'',id:''}; renderGarage(); var pl=window.NRG?NRG.plays():0; toast(pl>0?('게임횟수 '+pl+'/'+(NRG.MAX)+' · '+NRG.nextRefillText()+' 후 충전'):('게임횟수 소진 · '+NRG.nextRefillText()+' 후 충전 · 보석으로 충전 가능')); return; }
   var c=e.target.closest('[data-cat]'); if(c){gcat=c.dataset.cat; PV={cat:'',id:''}; renderGarage();return;}
+  var ub=e.target.closest('[data-upg]'); if(ub){ buyUpgrade(ub.dataset.upg); return; }
+  var ex=e.target.closest('[data-exch]'); if(ex){ doExchange(ex.dataset.exch); return; }
   var bb=e.target.closest('[data-buy]'); if(bb){ buyItem(bb.dataset.buy); return; }
   var sb=e.target.closest('[data-sell]'); if(sb){ sellItem(sb.dataset.sell); return; }
   var it=e.target.closest('#shop .item'); if(!it)return; var id=it.dataset.id;
@@ -830,6 +856,26 @@ document.addEventListener('click',function(e){
 function buyItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;}); if(!row)return; var pr=row[2]; var bal=getBal();
   if(bal>=pr){ setBal(bal-pr); ownSet().add(id); equipCur(id); PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('🛒 '+row[1]+' 구매 & 장착!'); }
   else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); } }
+/* 캐릭터 럭셔리 업그레이드(1억 골드, 캐릭터별 영구) */
+function buyUpgrade(id){ var COST=1e8;
+  if(st.owned.upg.has(id)){ toast('이미 럭셔리예요 ✦'); return; }
+  var nm=(HU.find(function(h){return h[0]===id;})||[,'캐릭터'])[1];
+  if(getBal()>=COST){ setBal(getBal()-COST); st.owned.upg.add(id); st.ch=id; saveHS(); refreshProfile(); renderGarage(); toast('✦ '+nm+' 럭셔리 업그레이드 완료!'); }
+  else { toast('골드 부족 · '+fmt(COST-getBal())+' 더 필요'); } }
+/* 보석 교환: 보석 → 골드 / 게임횟수 (전부 가상재화) */
+function renderExchange(){ var g=st.gems;
+  $('shop').innerHTML='<div class="exwrap">'
+    +'<div class="exhd">💎 보석 <b>'+fmt(g)+'</b>개 보유 · 출석·레벨업으로 무료 획득</div>'
+    +'<div class="excard"><div class="exi">🪙</div><div class="ext"><b>골드 교환</b><span>보석 1개 → 50,000 골드</span></div><div class="exbtns"><div class="exb" data-exch="gold1">1개</div><div class="exb" data-exch="gold10">10개</div></div></div>'
+    +'<div class="excard"><div class="exi">⚡</div><div class="ext"><b>게임횟수 충전</b><span>보석 3개 → 횟수 +5</span></div><div class="exbtns"><div class="exb" data-exch="play1">3개</div><div class="exb" data-exch="playfull">가득(5개)</div></div></div>'
+    +'<div class="exnote">※ 보석·골드·횟수는 모두 가상 재화이며 현금으로 환전되지 않습니다.</div></div>'; }
+function doExchange(kind){
+  if(kind==='gold1'){ if(st.gems<1)return toast('보석 부족'); st.gems-=1; setBal(getBal()+50000); toast('🪙 +50,000 골드'); }
+  else if(kind==='gold10'){ if(st.gems<10)return toast('보석 부족'); st.gems-=10; setBal(getBal()+500000); toast('🪙 +500,000 골드'); }
+  else if(kind==='play1'){ if(st.gems<3)return toast('보석 부족'); st.gems-=3; if(window.NRG)NRG.add(5); toast('⚡ 게임횟수 +5'); }
+  else if(kind==='playfull'){ if(st.gems<5)return toast('보석 부족'); st.gems-=5; if(window.NRG)NRG.setMax(); toast('⚡ 게임횟수 가득!'); }
+  else return;
+  saveHS(); refreshProfile(); renderGarage(); }
 
 /* 첫 실행: 캐릭터 선택 (히어로 + 캐러셀 + 닉네임, 한 번만) */
 (function(){ var ov=$('setup'); if(!ov)return;

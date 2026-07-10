@@ -274,7 +274,23 @@
 </div>
 
 <div id="splash"><img src="assets/logo.png" alt="차트아레나"></div>
+<div id="bNoNrg" class="bnonrg"><div class="bnonrgcard">
+  <div class="bi">⚡</div><h3>게임 횟수를 다 썼어요</h3>
+  <p id="bNrgMsg">다음 충전까지 기다리거나, 허브에서 보석으로 충전할 수 있어요.</p>
+  <a class="bnrgbtn" href="index.html">허브로 가기 →</a>
+  <div class="bnrgsub" onclick="document.getElementById('bNoNrg').classList.remove('on')">닫기</div>
+</div></div>
+<style>
+  .bnonrg{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(5,8,16,.82);backdrop-filter:blur(5px)}
+  .bnonrg.on{display:flex}
+  .bnonrgcard{width:min(86vw,320px);text-align:center;background:radial-gradient(120% 90% at 50% 0%,#1c2a4a,#0e1424 60%,#0a0e1a);border:1px solid rgba(245,196,81,.4);border-radius:20px;padding:24px 20px 18px;box-shadow:0 30px 80px -20px #000}
+  .bnonrgcard .bi{font-size:42px}.bnonrgcard h3{margin:6px 0 4px;color:#fff;font-size:17px;font-weight:900}
+  .bnonrgcard p{color:#9fb0d0;font-size:13px;margin:0 0 14px;line-height:1.6}
+  .bnonrgcard .bnrgbtn{display:block;text-decoration:none;font-weight:900;font-size:14px;color:#2a2107;background:linear-gradient(180deg,#f6d272,#d8a63a);border-radius:11px;padding:11px}
+  .bnonrgcard .bnrgsub{margin-top:11px;color:#6b7a99;font-size:12px;cursor:pointer}
+</style>
 <script src="xp.js"></script>
+<script src="energy.js"></script>
 <script src="charts.js"></script>
 <script>
 (function(){
@@ -809,10 +825,12 @@ function liveConfirm(){ if(phase!=='pick'||!LIVE||LIVE.locked)return; players[0]
 function liveMyPickWrite(){ if(!LIVE||!fbReady())return; try{ var u={}; u['picks.'+myUid]={dir:players[0].pick||'W',lev:mySel.lev,betPct:mySel.betPct}; LIVE.ref.update(u).catch(function(){}); }catch(e){} }
 function liveLeave(){ try{ if(LIVE&&LIVE.gameUnsub)LIVE.gameUnsub(); if(mmUnsub){mmUnsub();mmUnsub=null;} if(mmTimer){clearInterval(mmTimer);mmTimer=null;}
   if(LIVE&&LIVE.ref&&fbReady()){ var u={}; u['players.'+myUid]=firebase.firestore.FieldValue.delete(); if(LIVE.host)u.status='done'; LIVE.ref.update(u).catch(function(){}); } }catch(e){} }
-$('modeLive').onclick=startModeLive;
+function nrgGate(){ if(!window.NRG) return true; if(NRG.use()) return true;
+  var ov=$('bNoNrg'); if(ov){ var m=$('bNrgMsg'); if(m)m.textContent=NRG.nextRefillText()+' 후 10판 충전 · 허브에서 보석으로 즉시 충전할 수 있어요.'; ov.classList.add('on'); } return false; }
+$('modeLive').onclick=function(){ if(nrgGate()) startModeLive(); };
 $('mode1v1').onclick=showAnteScreen;
 $('lback').onclick=function(){ $('lante').classList.remove('on'); $('lmodes').style.display='flex'; };
-$('lbtns').onclick=function(e){ var b=e.target.closest('[data-ante]'); if(!b)return; var a=+b.dataset.ante; if(!a||a<1000){ toast('판돈이 부족해요'); return; } setupDuel(pendOpp,a); };
+$('lbtns').onclick=function(e){ var b=e.target.closest('[data-ante]'); if(!b)return; var a=+b.dataset.ante; if(!a||a<1000){ toast('판돈이 부족해요'); return; } if(nrgGate()) setupDuel(pendOpp,a); };
 showLobby();
 })();
 </script>
