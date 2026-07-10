@@ -679,7 +679,7 @@ var st={nick:hs.nick||'', ch:(hs.equip&&hs.equip.ch)||'hu0', title:(hs.equip&&hs
   owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[]), upg:new Set((hs.owned&&hs.owned.upg)||[]), char:new Set((hs.owned&&hs.owned.char)||[(hs.equip&&hs.equip.ch)||'hu0'])},
   gems:(typeof hs.gems==='number'?hs.gems:120)};   // 보석 = 가상 프리미엄 화폐(인게임 획득), 초기 120
 if(!IMG[st.ch]){st.ch='hu0';}
-for(var _lx=0;_lx<17;_lx++)IMG['hux'+_lx]='assets/hux'+_lx+'.png?v=2';   // 럭셔리 스킨
+for(var _lx=0;_lx<17;_lx++)IMG['hux'+_lx]='assets/hux'+_lx+'.png?v=3';   // 럭셔리 스킨
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
 function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,gems:st.gems,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi],upg:[...st.owned.upg],char:[...st.owned.char]},jstars:jstars}));}
 // 캐릭터 이미지: 럭셔리 업그레이드 보유 시 hux 스킨
