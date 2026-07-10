@@ -558,9 +558,7 @@ function finishRound(){
     if(i===0 && pnl<-bal0) pnl=-bal0;                        // 내 손실은 잔고까지만
     p.dp=pnl; p.score+=pnl; });
   var meP=players[0].dp, nb=bal0+meP; setBal(nb);      // 내 보유 포인트 실제 반영
-  if(window.XP){ var _pk=players[0].pick;
-    var _r=XP.award(XP.forRound({watch:_pk==='W', win:meP>0, watchGood:(_pk==='W'&&Math.abs(moveRaw)<1.5), lowRiskWin:(meP>0&&players[0].lev<=2)}),'battle');
-    if(_r)XP.toast(_r.leveledUp?('🎉 레벨업! Lv.'+_r.newLevel):('+'+_r.gained+' XP')); }
+  battleXp(meP);
   phase='result'; renderPods(); renderCtrl();
   $('chartid').innerHTML='🔍 실제 차트 공개 · <b>'+GD.sym+' '+GD.tf+'</b><span class="rl">Binance 실데이터</span>'; $('chartid').classList.add('show');
   // 델타(P) 애니메이션
@@ -596,7 +594,7 @@ function finishDuelRound(){
   else if(diff<0){ transfer=Math.min(-diff, duel.myStack); duel.myStack-=transfer; duel.oppStack+=transfer; me.dp=-transfer; op.dp=transfer; }
   else { me.dp=0; op.dp=0; }
   duel.roundNo=(duel.roundNo||0)+1;
-  if(window.XP){ var _r=XP.award(XP.forRound({watch:me.pick==='W', win:myPnl>0, lowRiskWin:(myPnl>0&&me.lev<=2)}),'duel'); if(_r)XP.toast(_r.leveledUp?('🎉 레벨업! Lv.'+_r.newLevel):('+'+_r.gained+' XP')); }
+  battleXp(me.dp);
   phase='result'; renderPods(); renderCtrl();
   $('chartid').innerHTML='🔍 실제 차트 공개 · <b>'+GD.sym+' '+GD.tf+'</b><span class="rl">Binance 실데이터</span>'; $('chartid').classList.add('show');
   [me,op].forEach(function(p,i){ var d=$('dl'+i); if(!d)return; if(p.dp===0){d.textContent='±0';d.style.color='#93A0BC';} else{d.textContent=(p.dp>0?'+':'')+fmtP(p.dp);d.style.color=p.dp>0?'#35D07A':'#FF5C8A';} d.style.opacity='1'; d.style.top='-26px'; });
@@ -825,6 +823,14 @@ function liveConfirm(){ if(phase!=='pick'||!LIVE||LIVE.locked)return; players[0]
 function liveMyPickWrite(){ if(!LIVE||!fbReady())return; try{ var u={}; u['picks.'+myUid]={dir:players[0].pick||'W',lev:mySel.lev,betPct:mySel.betPct}; LIVE.ref.update(u).catch(function(){}); }catch(e){} }
 function liveLeave(){ try{ if(LIVE&&LIVE.gameUnsub)LIVE.gameUnsub(); if(mmUnsub){mmUnsub();mmUnsub=null;} if(mmTimer){clearInterval(mmTimer);mmTimer=null;}
   if(LIVE&&LIVE.ref&&fbReady()){ var u={}; u['players.'+myUid]=firebase.firestore.FieldValue.delete(); if(LIVE.host)u.status='done'; LIVE.ref.update(u).catch(function(){}); } }catch(e){} }
+/* 경험치: 배틀·1v1 라운드에서만. 승 +10 / 패 -5 / 무·관망 0. 100 XP = 1레벨. 레벨업 보상 = 골드+보석 */
+function addGems(n){ try{var h=JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{}; h.gems=(h.gems|0)+(n|0); localStorage.setItem('chartarena_hub_v1',JSON.stringify(h));}catch(e){} }
+function battleXp(dp){ if(!window.XP) return; var amt = dp>0?10 : dp<0?-5 : 0; if(amt===0){ return; }
+  var res=XP.award(amt,'battle'); if(!res) return;
+  if(res.leveledUp){ var lvls=res.newLevel-res.oldLevel, gold=100000*lvls, gems=3*lvls;
+    setBal(getBal()+gold); addGems(gems);
+    XP.popup(res); XP.toast('🎉 Lv.'+res.newLevel+' · +'+fmtP(gold)+'골드 💎+'+gems);
+  } else { XP.toast((amt>0?'+':'')+amt+' XP'); } }
 function nrgGate(){ if(!window.NRG) return true; if(NRG.use()) return true;
   var ov=$('bNoNrg'); if(ov){ var m=$('bNrgMsg'); if(m)m.textContent=NRG.nextRefillText()+' 후 10판 충전 · 허브에서 보석으로 즉시 충전할 수 있어요.'; ov.classList.add('on'); } return false; }
 $('modeLive').onclick=function(){ if(nrgGate()) startModeLive(); };

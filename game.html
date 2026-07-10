@@ -631,18 +631,9 @@ function finishReveal(){
   document.querySelector('.scroll').scrollTop=0;
   awardRoundXp();
 }
-// 실력 보상형 XP (네이티브 ProgressionEngine 규칙): 승리·손절활용·올바른관망·저배율
+// 경험치는 배틀·1v1에서만 획득 (솔로 미부여). 지표 해금은 배틀로 오른 레벨 기준으로 buildIndBar가 반영.
 function awardRoundXp(){
-  if(!window.XP || !outcome || outcome._xpDone) return;
-  outcome._xpDone=true;   // 라운드당 1회
-  const watch = outcome.dir==='WATCH';
-  const win = (outcome.points||0) > 0;
-  const usedStop = !!(sel.stop && sel.stop>0);
-  const watchGood = watch && Math.abs(outcome.marketEnd||0) < 1.5;   // 애매한 자리를 관망 = 좋은 절제
-  const lowRiskWin = win && (outcome.lev||1) <= 2;
-  const amt = XP.forRound({watch:watch, win:win, usedStop:usedStop, watchGood:watchGood, lowRiskWin:lowRiskWin});
-  const res = XP.gain(amt, 'game');
-  if(res && res.leveledUp) buildIndBar();   // 레벨업 시 새 지표 해금 반영
+  return;   // 솔로는 XP 없음
 }
 function renderResult(){
   const o=outcome;
@@ -681,7 +672,7 @@ function renderResult(){
 var _cardData=null, CFF="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif";
 function _hub(){try{return JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){return{};}}
 function chImgOf(ch){ if(!ch)return 'assets/hu0.png?v=7';
-  try{var hub=_hub();var upg=(hub.owned&&hub.owned.upg)||[];if(ch.indexOf('hu')===0&&upg.indexOf(ch)>=0)return 'assets/hux'+ch.replace('hu','')+'.png?v=1';}catch(e){}
+  try{var hub=_hub();var upg=(hub.owned&&hub.owned.upg)||[];if(ch.indexOf('hu')===0&&upg.indexOf(ch)>=0)return 'assets/hux'+ch.replace('hu','')+'.png?v=2';}catch(e){}
   return (ch.indexOf('hu')===0||ch.indexOf('pet')===0)?'assets/'+ch+'.png?v=7':'assets/char_'+ch+'.png'; }
 function symKo(s){var m={BTCUSDT:'비트코인',ETHUSDT:'이더리움',SOLUSDT:'솔라나',BNBUSDT:'BNB',XRPUSDT:'리플',DOGEUSDT:'도지코인',ADAUSDT:'에이다',LINKUSDT:'체인링크',AVAXUSDT:'아발란체',DOTUSDT:'폴카닷',LTCUSDT:'라이트코인'};return m[s]||s;}
 function _rr(c,a,b,w,h,r){c.beginPath();c.moveTo(a+r,b);c.arcTo(a+w,b,a+w,b+h,r);c.arcTo(a+w,b+h,a,b+h,r);c.arcTo(a,b+h,a,b,r);c.arcTo(a,b,a+w,b,r);c.closePath();}

@@ -6,7 +6,7 @@
   function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function save(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
 
-  function xpToClear(level) { return 100 + Math.max(0, level - 1) * 50; }
+  function xpToClear(level) { return 100; }   // 100 XP = 1레벨 (평탄)
   function levelForXp(t) { var l = 1, r = Math.max(0, t | 0); while (r >= xpToClear(l)) { r -= xpToClear(l); l++; } return l; }
   function xpIntoLevel(t) { var l = 1, r = Math.max(0, t | 0); while (r >= xpToClear(l)) { r -= xpToClear(l); l++; } return r; }
   function total() { return load().xp | 0; }
@@ -26,12 +26,12 @@
 
   // XP 부여 → {gained, oldLevel, newLevel, leveledUp, unlocks:[{label,lv}], reason}
   function award(amount, reason) {
-    amount = amount | 0; if (amount <= 0) return null;
+    amount = amount | 0; if (amount === 0) return null;
     var s = load(), old = levelForXp(s.xp | 0);
-    s.xp = (s.xp | 0) + amount; save(s);
+    s.xp = Math.max(0, (s.xp | 0) + amount); save(s);   // 패배 시 감소 허용(최저 0)
     var nl = levelForXp(s.xp);
     var unlocks = nl > old ? INDICATORS.filter(function (i) { return i.lv > old && i.lv <= nl; }) : [];
-    return { gained: amount, oldLevel: old, newLevel: nl, leveledUp: nl > old, unlocks: unlocks, reason: reason || '' };
+    return { gained: amount, oldLevel: old, newLevel: nl, leveledUp: nl > old, leveledDown: nl < old, unlocks: unlocks, reason: reason || '' };
   }
 
   // 게임 1판 결과 → XP (실력 보상형: 승리/손절활용/올바른관망/저배율)

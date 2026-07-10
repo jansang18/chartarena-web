@@ -320,8 +320,9 @@
   .shop{flex:1; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-content:start}
   .item{position:relative; border-radius:14px; padding:14px 8px; text-align:center; cursor:pointer; background:var(--p1); border:1.5px solid var(--line)}
   .item .em{font-size:40px}.item .em.tx{font-size:15px;font-weight:900;padding:10px 2px}
-  .item .pic{height:78px;display:flex;align-items:center;justify-content:center;border-radius:12px;margin-bottom:2px;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.16),rgba(150,168,205,.05) 55%,rgba(255,255,255,0) 76%)}
-  .item .pic img{height:66px; object-fit:contain}
+  .item .pic{height:160px;display:flex;align-items:flex-end;justify-content:center;border-radius:12px;margin-bottom:2px;background:radial-gradient(circle at 50% 64%,rgba(255,255,255,.14),rgba(150,168,205,.05) 60%,rgba(255,255,255,0) 80%)}
+  .item .pic img{height:156px; object-fit:contain; object-position:bottom; filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
+  .item.locked .pic img{opacity:.5;filter:grayscale(.4) drop-shadow(0 8px 10px rgba(0,0,0,.45))}
   .item .nm{font-weight:800;font-size:13px;margin-top:5px}
   .item .rr{font-size:10px;font-weight:800;margin-top:2px}
   .item .pr{font-family:var(--mono);font-size:12px;margin-top:4px;color:var(--gold)}
@@ -674,12 +675,12 @@ var ACC=[['none','없음',0,''],['glasses','동그란 안경',1500,'👓'],['cap
 var ACCEMO={}; ACC.forEach(function(a){ACCEMO[a[0]]=a[3];});
 var st={nick:hs.nick||'', ch:(hs.equip&&hs.equip.ch)||'hu0', title:(hs.equip&&hs.equip.title)||'', acc:(hs.equip&&hs.equip.acc)||'none',
   pet:(hs.equip&&hs.equip.pet)||'', petEq:Object.assign({head:'',neck:'',face:''},(hs.equip&&hs.equip.petEq)||{}), setup:!!hs.setup,
-  owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[]), upg:new Set((hs.owned&&hs.owned.upg)||[])},
+  owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[]), upg:new Set((hs.owned&&hs.owned.upg)||[]), char:new Set((hs.owned&&hs.owned.char)||[(hs.equip&&hs.equip.ch)||'hu0'])},
   gems:(typeof hs.gems==='number'?hs.gems:120)};   // 보석 = 가상 프리미엄 화폐(인게임 획득), 초기 120
 if(!IMG[st.ch]){st.ch='hu0';}
-for(var _lx=0;_lx<17;_lx++)IMG['hux'+_lx]='assets/hux'+_lx+'.png?v=1';   // 럭셔리 스킨
+for(var _lx=0;_lx<17;_lx++)IMG['hux'+_lx]='assets/hux'+_lx+'.png?v=2';   // 럭셔리 스킨
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
-function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,gems:st.gems,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi],upg:[...st.owned.upg]},jstars:jstars}));}
+function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,gems:st.gems,equip:{ch:st.ch,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi],upg:[...st.owned.upg],char:[...st.owned.char]},jstars:jstars}));}
 // 캐릭터 이미지: 럭셔리 업그레이드 보유 시 hux 스킨
 function charImg(id){ if(st.owned.upg.has(id)){ return IMG['hux'+String(id).replace('hu','')]||IMG[id]; } return IMG[id]||IMG.hu0; }
 
@@ -817,12 +818,15 @@ function renderGarage(){ refreshProfile();
   var CN=[['char','캐릭터'],['exch','보석교환'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<div class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</div>';}).join('');
   if(gcat==='char'){
-    $('shop').innerHTML=HU.map(function(h){var id=h[0],nm=h[1],eq=st.ch===id,up=st.owned.upg.has(id);
-      var foot = up ? '<div class="pr" style="color:var(--gold);font-weight:900">✦ 럭셔리</div>'
-        : '<div class="upgb" data-upg="'+id+'">✦ 럭셔리 '+fmt(1e8)+'</div>';
-      return '<div class="item'+(up?' islux':'')+'" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':'var(--line)')+';box-shadow:'+(eq?'0 0 16px -6px var(--gold)':'none')+'">'
-        +(eq?'<div class="st" style="background:var(--gold);color:#111">선택중</div>':'')
-        +(up?'<div class="luxtag">✦</div>':'')
+    $('shop').innerHTML=HU.map(function(h){var id=h[0],nm=h[1];
+      var own=st.owned.char.has(id), up=st.owned.upg.has(id), eq=st.ch===id;
+      var foot = up ? '<div class="pr" style="color:var(--gold);font-weight:900">✦ 럭셔리 보유</div>'
+        : own ? '<div class="upgb" data-upg="'+id+'">✦ 럭셔리 '+fmt(1e8)+'</div>'
+        : '<div class="buyb" data-buychar="'+id+'">🛒 구매 '+fmt(50000)+'</div>';
+      var badge = eq ? '<div class="st" style="background:var(--gold);color:#111">선택중</div>'
+        : own ? '<div class="st" style="background:rgba(53,208,122,.2);color:#35D07A">보유</div>' : '';
+      return '<div class="item'+(up?' islux':'')+(own?'':' locked')+'" data-id="'+id+'" style="border-color:'+(eq?'var(--gold)':'var(--line)')+';box-shadow:'+(eq?'0 0 16px -6px var(--gold)':'none')+'">'
+        +badge+(up?'<div class="luxtag">✦</div>':'')
         +'<div class="pic"><img src="'+charImg(id)+'" alt=""></div><div class="nm">'+nm+'</div>'+foot+'</div>';
     }).join('');
     return;
@@ -844,11 +848,12 @@ document.addEventListener('click',function(e){
   var gp=e.target.closest('[data-go-play]'); if(gp){ go('garage'); gcat='exch'; PV={cat:'',id:''}; renderGarage(); var pl=window.NRG?NRG.plays():0; toast(pl>0?('게임횟수 '+pl+'/'+(NRG.MAX)+' · '+NRG.nextRefillText()+' 후 충전'):('게임횟수 소진 · '+NRG.nextRefillText()+' 후 충전 · 보석으로 충전 가능')); return; }
   var c=e.target.closest('[data-cat]'); if(c){gcat=c.dataset.cat; PV={cat:'',id:''}; renderGarage();return;}
   var ub=e.target.closest('[data-upg]'); if(ub){ buyUpgrade(ub.dataset.upg); return; }
+  var bc=e.target.closest('[data-buychar]'); if(bc){ buyChar(bc.dataset.buychar); return; }
   var ex=e.target.closest('[data-exch]'); if(ex){ doExchange(ex.dataset.exch); return; }
   var bb=e.target.closest('[data-buy]'); if(bb){ buyItem(bb.dataset.buy); return; }
   var sb=e.target.closest('[data-sell]'); if(sb){ sellItem(sb.dataset.sell); return; }
   var it=e.target.closest('#shop .item'); if(!it)return; var id=it.dataset.id;
-  if(gcat==='char'){ st.ch=id; PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
+  if(gcat==='char'){ if(!st.owned.char.has(id)){ buyChar(id); return; } st.ch=id; PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
   var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var own=ownSet().has(id);
   if(own){ PV={cat:'',id:''}; equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast(row[1]+(isEq(id)?' 장착!':' 해제')); }
   else { if(PV.cat===gcat&&PV.id===id){ PV={cat:'',id:''}; } else { PV={cat:gcat,id:id}; toast('👀 미리보기 — [구매하기]로 확정'); } renderGarage(); }   // 구매 전 착용 미리보기(토글)
@@ -858,9 +863,16 @@ function buyItem(id){ var row=ITEMS[gcat].find(function(x){return x[0]===id;}); 
   else { toast('자산 부족 ('+fmt(pr-bal)+'P 모자람)'); } }
 /* 캐릭터 럭셔리 업그레이드(1억 골드, 캐릭터별 영구) */
 function buyUpgrade(id){ var COST=1e8;
+  if(!st.owned.char.has(id)){ toast('먼저 노멀 버전(5만)을 구매하세요'); return; }
   if(st.owned.upg.has(id)){ toast('이미 럭셔리예요 ✦'); return; }
   var nm=(HU.find(function(h){return h[0]===id;})||[,'캐릭터'])[1];
   if(getBal()>=COST){ setBal(getBal()-COST); st.owned.upg.add(id); st.ch=id; saveHS(); refreshProfile(); renderGarage(); toast('✦ '+nm+' 럭셔리 업그레이드 완료!'); }
+  else { toast('골드 부족 · '+fmt(COST-getBal())+' 더 필요'); } }
+/* 노멀 캐릭터 구매 (5만 골드) */
+function buyChar(id){ var COST=50000;
+  if(st.owned.char.has(id)){ st.ch=id; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
+  var nm=(HU.find(function(h){return h[0]===id;})||[,'캐릭터'])[1];
+  if(getBal()>=COST){ setBal(getBal()-COST); st.owned.char.add(id); st.ch=id; saveHS(); refreshProfile(); renderGarage(); toast('🛒 '+nm+' 구매 & 선택!'); }
   else { toast('골드 부족 · '+fmt(COST-getBal())+' 더 필요'); } }
 /* 보석 교환: 보석 → 골드 / 게임횟수 (전부 가상재화) */
 function renderExchange(){ var g=st.gems;
@@ -898,7 +910,7 @@ function doExchange(kind){
   nick.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!btn.disabled)btn.click(); });
   btn.addEventListener('click',function(){ if(btn.disabled)return;
     if(isBad(nick.value)){ toast('닉네임에 부적절한 표현은 사용할 수 없어요'); nick.focus(); return; }
-    st.ch=HU[idx][0]; st.nick=nick.value.trim().slice(0,10); st.setup=true; saveHS(); refreshProfile();
+    st.ch=HU[idx][0]; st.owned.char.add(st.ch); st.nick=nick.value.trim().slice(0,10); st.setup=true; saveHS(); refreshProfile();
     var vg=$('v-garage'); if(vg&&vg.classList.contains('on'))renderGarage();
     ov.classList.add('out'); setTimeout(function(){ if(ov.parentNode)ov.parentNode.removeChild(ov); },420); });
   sel(idx);

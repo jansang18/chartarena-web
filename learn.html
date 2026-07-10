@@ -219,15 +219,7 @@ function render(el, arr){ const g=document.getElementById(el);
     c.innerHTML=`<div class="ct">${o.t}${sig}</div><div class="viz">${svg}</div><div class="d">${o.d}</div>`;
     g.appendChild(c);});}
 render('g-basic',BASIC); render('g-cpat',CPAT); render('g-chart',CHART); render('g-ind',IND);
-// 학습 XP: 강의(카드)를 화면에서 처음 보면 강의당 1회 +6 XP (누적·디바운스 토스트)
-if(window.XP && 'IntersectionObserver' in window){
-  var _cards=document.querySelectorAll('.card'); _cards.forEach(function(c,i){c.dataset.lid='L'+i;});
-  var _pend=0,_lv=null,_tm=null;
-  function _flush(){ if(_pend>0){XP.toast('학습 +'+_pend+' XP');_pend=0;} if(_lv){XP.popup(_lv);_lv=null;} }
-  var _obs=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ _obs.unobserve(e.target);
-    var r=XP.awardLesson('learn:'+e.target.dataset.lid,6); if(r){_pend+=r.gained; if(r.leveledUp)_lv=r; clearTimeout(_tm); _tm=setTimeout(_flush,700);} } }); },{threshold:0.5});
-  _cards.forEach(function(c){_obs.observe(c);});
-}
+/* 경험치는 배틀·1v1에서만 획득 (학습은 무료·무제한, XP 미부여) */
 // tabs
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));
