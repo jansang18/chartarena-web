@@ -172,6 +172,7 @@ function startMatching(){
   }, 150);
 }
 $('mbtn').onclick=function(){
+  ac();   // 오디오 언락(사용자 제스처)
   if(window.NRG && !NRG.use()){ this.textContent='게임 횟수 부족 · 허브에서 충전'; this.disabled=true; setTimeout(function(){location.href='index.html';},1400); return; }
   $('match').classList.remove('on'); nextRound();
 };
@@ -212,26 +213,28 @@ function draw(){
 function nextRound(){
   if(!meAlive()){ endGame(false); return; }
   if(aliveCount()<=1){ endGame(true); return; }
-  round++; phase='pick'; CUR=pickChart(); revN=0; tleft=12;
+  round++; phase='count'; CUR=pickChart(); revN=0; tleft=12;
   players.forEach(function(p){ p.pick=null; });
   $('q').textContent='ROUND '+round+' · 다음 흐름은? ('+CUR.sym+' '+CUR.tf+')';
   $('zoneO').className='zone zo'; $('zoneX').className='zone zx';
   renderZones(); draw();
   $('timer').textContent=tleft; $('timer').classList.remove('hot');
-  clearInterval(tmr); tmr=setInterval(function(){ tleft--; $('timer').textContent=Math.max(0,tleft); if(tleft<=3)$('timer').classList.add('hot'); if(tleft<=0){ clearInterval(tmr); lockAndReveal(); } }, 1000);
-  // 봇 점진적 이동 (긴장감): 매 400~700ms 몇 명씩 구역 선택
-  clearInterval(botTimer);
-  botTimer=setInterval(function(){ if(phase!=='pick'){clearInterval(botTimer);return;}
-    var un=players.filter(function(p){return p.alive&&!p.me&&!p.pick;});
-    if(!un.length){ clearInterval(botTimer); return; }
-    var mv=1+((Math.random()*3)|0);
-    for(var k=0;k<mv&&un.length;k++){ var idx=(Math.random()*un.length)|0; var p=un.splice(idx,1)[0]; p.pick = Math.random()<0.52 ? CUR.ans : (CUR.ans==='O'?'X':'O'); }
-    renderZones();
-  }, 520);
+  countdown(function(){
+    phase='pick'; if(players[0].pick){ tleft=3; $('timer').textContent=tleft; }   // 카운트다운 중 미리 골랐으면 단축
+    clearInterval(tmr); tmr=setInterval(function(){ tleft--; $('timer').textContent=Math.max(0,tleft); if(tleft<=3)$('timer').classList.add('hot'); if(tleft<=0){ clearInterval(tmr); lockAndReveal(); } }, 1000);
+    clearInterval(botTimer);
+    botTimer=setInterval(function(){ if(phase!=='pick'){clearInterval(botTimer);return;}
+      var un=players.filter(function(p){return p.alive&&!p.me&&!p.pick;});
+      if(!un.length){ clearInterval(botTimer); return; }
+      var mv=1+((Math.random()*3)|0);
+      for(var k=0;k<mv&&un.length;k++){ var idx=(Math.random()*un.length)|0; var p=un.splice(idx,1)[0]; p.pick = Math.random()<0.52 ? CUR.ans : (CUR.ans==='O'?'X':'O'); }
+      renderZones();
+    }, 520);
+  });
 }
-function pick(d){ if(phase!=='pick')return; players[0].pick=d;
+function pick(d){ if(phase!=='pick'&&phase!=='count')return; players[0].pick=d; sfxPick();
   $('zoneO').classList.toggle('sel',d==='O'); $('zoneX').classList.toggle('sel',d==='X');
-  renderZones(); if(tleft>3){ tleft=3; $('timer').textContent=tleft; } }
+  renderZones(); if(phase==='pick'&&tleft>3){ tleft=3; $('timer').textContent=tleft; } }
 $('zoneO').onclick=function(){pick('O');}; $('zoneX').onclick=function(){pick('X');};
 document.addEventListener('keydown',function(e){ if(phase!=='pick')return; if(e.key==='o'||e.key==='O'||e.key==='ArrowLeft')pick('O'); if(e.key==='x'||e.key==='X'||e.key==='ArrowRight')pick('X'); });
 
@@ -246,20 +249,23 @@ function lockAndReveal(){
 function revealResult(){
   var ans=CUR.ans, wrongZ=(ans==='O'?'zoneX':'zoneO');
   $(ans==='O'?'zoneO':'zoneX').classList.add('right'); $(wrongZ).classList.add('wrong');
-  var bn=$('banner'); bn.className='banner '+(ans==='O'?'o':'x')+' show'; bn.textContent=(ans==='O'?'▲ 상승! O 정답':'▼ 하락! X 정답');
+  var bn=$('banner'); bn.className='banner '+(ans==='O'?'o':'x')+' show'; bn.style.color=''; bn.textContent=(ans==='O'?'▲ 상승! O 정답':'▼ 하락! X 정답');
   // 틀린 구역 아바타 낙하 애니메이션
   var wrongAvs=$(wrongZ==='zoneO'?'zavO':'zavX').querySelectorAll('.zav');
   wrongAvs.forEach(function(el,k){ setTimeout(function(){ el.classList.add('fall'); }, k*35); });
-  var meJustDied=false;
+  var aliveBefore=aliveCount(), meJustDied=false;
   players.forEach(function(p){ if(p.alive && p.pick!==ans){ p.alive=false; if(p.me)meJustDied=true; } });
+  var elimN=aliveBefore-aliveCount();
+  sfxReveal(!meJustDied);
   phase='result';
-  setTimeout(function(){ bn.classList.remove('show'); renderZones();
+  if(elimN>0) setTimeout(function(){ sfxBoom(); bn.className='banner show'; bn.style.color='#F0616D'; bn.textContent='💥 '+elimN+'명 탈락!'; }, 520);
+  setTimeout(function(){ bn.classList.remove('show'); bn.style.color=''; renderZones();
     if(meJustDied){ battleXp(false); endGame(false); return; }
     battleXp(true);
     if(aliveCount()<=1){ endGame(true); return; }
     toast('생존! '+aliveCount()+'명 남음');
-    setTimeout(nextRound, 1000);
-  }, 1050);
+    setTimeout(nextRound, 900);
+  }, 1450);
 }
 
 function battleXp(survived){ if(!window.XP)return; var res=XP.award(survived?10:-5,'survival'); if(!res)return;
@@ -275,10 +281,35 @@ function endGame(win){
   $('rTitle').textContent = win?'최후의 1인 우승!':(place+'위로 탈락');
   $('rPlace').textContent = win?'20명 중 끝까지 생존 🎉':(N+'명 중 '+place+'위');
   $('rRew').innerHTML = '보상 🪙 +'+fmt(gold)+' 골드'+(gems?' · 💎 +'+gems:'')+'<br><span style="color:#9fb0d0;font-size:12px">생존 라운드마다 경험치도 획득했어요</span>';
+  if(win){ confetti(); sfxWin(); }
   $('result').classList.add('on');
 }
 $('rAgain').onclick=function(){ $('result').classList.remove('on'); round=0; players.forEach(function(p){p.alive=true;p.pick=null;}); $('zoneO').className='zone zo';$('zoneX').className='zone zx'; $('match').classList.add('on'); startMatching(); };
 function toast(m){ var t=$('toast'); t.textContent=m; t.classList.add('on'); setTimeout(function(){t.classList.remove('on');},1000); }
+/* ---------- 사운드 (Web Audio, 파일 없음) ---------- */
+var _ac=null; function ac(){ try{ if(!_ac)_ac=new (window.AudioContext||window.webkitAudioContext)(); if(_ac.state==='suspended')_ac.resume(); }catch(e){} return _ac; }
+function beep(freq,dur,type,vol){ var c=ac(); if(!c)return; try{ var o=c.createOscillator(),g=c.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.value=vol||0.06; o.connect(g); g.connect(c.destination); var t=c.currentTime; o.start(t); g.gain.setValueAtTime(g.gain.value,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.stop(t+dur); }catch(e){} }
+function sfxTick(){ beep(880,0.08,'square',0.05); }
+function sfxGo(){ beep(1320,0.18,'square',0.07); }
+function sfxPick(){ beep(520,0.06,'triangle',0.05); }
+function sfxReveal(ok){ if(ok){ beep(660,0.1,'sine',0.06); setTimeout(function(){beep(990,0.14,'sine',0.06);},90); } else { beep(160,0.3,'sawtooth',0.08); } }
+function sfxBoom(){ beep(90,0.35,'sawtooth',0.09); }
+function sfxWin(){ [523,659,784,1046].forEach(function(f,i){ setTimeout(function(){beep(f,0.22,'triangle',0.08);}, i*130); }); }
+/* ---------- 컨페티 ---------- */
+function confetti(){ var wrap=document.createElement('div'); wrap.style.cssText='position:absolute;inset:0;z-index:60;pointer-events:none;overflow:hidden'; $('app').appendChild(wrap);
+  var cols=['#F5C451','#F0616D','#4C8DF6','#35D07A','#B266FF','#fff']; var W=$('app').clientWidth;
+  for(var i=0;i<90;i++){ (function(){ var d=document.createElement('div'); var sz=5+((Math.random()*7)|0); var left=Math.random()*W; var dur=1400+Math.random()*1400; var rot=(Math.random()*360)|0;
+    d.style.cssText='position:absolute;top:-16px;left:'+left+'px;width:'+sz+'px;height:'+(sz*1.6)+'px;background:'+cols[(Math.random()*cols.length)|0]+';border-radius:2px;transform:rotate('+rot+'deg);opacity:.95;transition:transform '+dur+'ms linear,top '+dur+'ms cubic-bezier(.3,.7,.6,1),opacity '+dur+'ms';
+    wrap.appendChild(d); requestAnimationFrame(function(){ d.style.top=($('app').clientHeight+40)+'px'; d.style.transform='rotate('+(rot+540)+'deg) translateX('+((Math.random()*120-60)|0)+'px)'; d.style.opacity='0'; }); })(); }
+  setTimeout(function(){ wrap.remove(); }, 3200);
+}
+/* ---------- 라운드 시작 카운트다운 ---------- */
+function countdown(cb){ var bn=$('banner'); var seq=['3','2','1','시작!']; var i=0;
+  function step(){ if(i>=seq.length){ bn.classList.remove('show'); cb(); return; }
+    bn.className='banner show'; bn.style.color=(seq[i]==='시작!'?'#35D07A':'#F5C451'); bn.textContent=seq[i];
+    if(seq[i]==='시작!')sfxGo(); else sfxTick(); i++; setTimeout(step, 430); }
+  step();
+}
 
 window.addEventListener('resize',function(){ if(CUR)draw(); });
 if(!CHARTS.length){ $('mcount').textContent='차트 데이터를 불러오지 못했어요'; } else startMatching();
