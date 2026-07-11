@@ -214,7 +214,10 @@
   .solobar .st2{font-size:12.5px;color:#a3cdb9;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .solobar .sgo{flex:none;position:relative;z-index:2;font-weight:900;font-size:14px;color:#062018;
     background:linear-gradient(180deg,#48e58c,#25b061);border-radius:11px;padding:11px 20px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
-  .solobar .schart{position:absolute;right:184px;top:7px;bottom:7px;width:220px;opacity:.62;z-index:1;pointer-events:none;filter:drop-shadow(0 0 6px rgba(53,208,122,.35))}
+  .solobar .schart{position:absolute;right:150px;top:0;bottom:0;height:100%;width:360px;opacity:.92;z-index:1;pointer-events:none;
+    object-fit:cover;object-position:center;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 42%,#000 82%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 42%,#000 82%,transparent 100%)}
   .dash3{display:grid;grid-template-columns:1fr 1fr .84fr;gap:12px;align-items:stretch}
   .jhero{position:relative;border-radius:18px;overflow:hidden;padding:20px 16px 34px;display:flex;flex-direction:column;border:1px solid #46356e;box-shadow:0 0 34px -10px rgba(160,110,240,.3),0 14px 36px -16px rgba(0,0,0,.65);background:radial-gradient(1.6px 1.6px at 22% 46%,rgba(255,255,255,.6),transparent),radial-gradient(1.3px 1.3px at 40% 63%,rgba(210,190,255,.55),transparent),radial-gradient(2px 2px at 57% 49%,rgba(255,245,210,.55),transparent),radial-gradient(1.4px 1.4px at 73% 58%,rgba(255,255,255,.5),transparent),radial-gradient(1.3px 1.3px at 31% 70%,rgba(190,220,255,.5),transparent),radial-gradient(1.6px 1.6px at 85% 46%,rgba(255,255,255,.45),transparent),radial-gradient(1.3px 1.3px at 50% 41%,rgba(255,255,255,.45),transparent),radial-gradient(1.4px 1.4px at 66% 69%,rgba(220,255,240,.45),transparent),radial-gradient(1.3px 1.3px at 16% 60%,rgba(255,255,255,.4),transparent),radial-gradient(1.5px 1.5px at 90% 66%,rgba(255,225,255,.45),transparent),linear-gradient(140deg,#241a3e 0%,#141330 52%,#1a1226 100%);background-repeat:no-repeat}
   .jhero::after{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 40%,rgba(185,128,255,.15),transparent 70%);pointer-events:none}
@@ -486,27 +489,7 @@
 
         <a class="solobar" href="game.html">
           <div class="sicon">🎯</div>
-          <svg class="schart" viewBox="0 0 160 44" preserveAspectRatio="none">
-            <g stroke-width="1.3" stroke-linecap="round">
-              <line x1="8" y1="28" x2="8" y2="37" stroke="#e5484d"/><line x1="19" y1="26" x2="19" y2="36" stroke="#35d07a"/>
-              <line x1="30" y1="22" x2="30" y2="30" stroke="#35d07a"/><line x1="41" y1="23" x2="41" y2="31" stroke="#e5484d"/>
-              <line x1="52" y1="20" x2="52" y2="31" stroke="#35d07a"/><line x1="63" y1="16" x2="63" y2="25" stroke="#35d07a"/>
-              <line x1="74" y1="17" x2="74" y2="24" stroke="#e5484d"/><line x1="85" y1="13" x2="85" y2="24" stroke="#35d07a"/>
-              <line x1="96" y1="10" x2="96" y2="18" stroke="#35d07a"/><line x1="107" y1="11" x2="107" y2="18" stroke="#e5484d"/>
-              <line x1="118" y1="8" x2="118" y2="17" stroke="#35d07a"/><line x1="129" y1="5" x2="129" y2="12" stroke="#35d07a"/>
-              <line x1="140" y1="5" x2="140" y2="11" stroke="#e5484d"/><line x1="151" y1="3" x2="151" y2="10" stroke="#35d07a"/>
-            </g>
-            <g>
-              <rect x="5.4" y="30" width="5.2" height="4" rx="1" fill="#e5484d"/><rect x="16.4" y="28" width="5.2" height="6" rx="1" fill="#35d07a"/>
-              <rect x="27.4" y="25" width="5.2" height="3" rx="1" fill="#35d07a"/><rect x="38.4" y="25" width="5.2" height="4" rx="1" fill="#e5484d"/>
-              <rect x="49.4" y="23" width="5.2" height="6" rx="1" fill="#35d07a"/><rect x="60.4" y="19" width="5.2" height="4" rx="1" fill="#35d07a"/>
-              <rect x="71.4" y="19" width="5.2" height="3" rx="1" fill="#e5484d"/><rect x="82.4" y="16" width="5.2" height="6" rx="1" fill="#35d07a"/>
-              <rect x="93.4" y="13" width="5.2" height="3" rx="1" fill="#35d07a"/><rect x="104.4" y="13" width="5.2" height="3" rx="1" fill="#e5484d"/>
-              <rect x="115.4" y="10" width="5.2" height="6" rx="1" fill="#35d07a"/><rect x="126.4" y="7" width="5.2" height="3" rx="1" fill="#35d07a"/>
-              <rect x="137.4" y="7" width="5.2" height="2" rx="1" fill="#e5484d"/><rect x="148.4" y="4" width="5.2" height="5" rx="1" fill="#35d07a"/>
-            </g>
-            <polyline points="4,33 26,29 48,26 70,21 92,17 114,12 138,8 156,5" fill="none" stroke="#7cf0b5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>
-          </svg>
+          <img class="schart" src="assets/solo_chart.png?v=1" alt="">
           <div class="stext">
             <div class="st1">솔로 모드 <span class="sbadge">🎮 혼자 플레이</span></div>
             <div class="st2">실제 과거 차트를 보고 롱·숏·관망 예측 — 나 혼자 실력 연습하기</div>
