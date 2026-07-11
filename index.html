@@ -28,12 +28,19 @@
   .logo{font-weight:900; font-size:22px; letter-spacing:-.5px; display:flex; align-items:center; gap:9px}
   .logo .g{color:var(--gold)} .logo .lm{font-size:20px}
   .brandlogo{height:38px; display:block; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
-  #splash{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(closest-side at 50% 44%,#1a1b26,#08080c 82%);transition:opacity .5s ease}
-  #splash img{max-width:min(74%,820px);max-height:68%;object-fit:contain;filter:drop-shadow(0 24px 60px rgba(0,0,0,.75));animation:splashPop .85s cubic-bezier(.2,.8,.2,1) both}
+  #splash{position:fixed;inset:0;z-index:9999;overflow:hidden;background:#05070f;transition:opacity .55s ease}
   #splash.out{opacity:0;pointer-events:none}
-  @keyframes splashPop{0%{transform:scale(.82);opacity:0}55%{opacity:1}100%{transform:scale(1);opacity:1}}
-  @media (prefers-reduced-motion:reduce){#splash img{animation:none}}
+  #splash .ldbg{position:absolute;inset:0;background:url(assets/loading_bg.jpg?v=1) center/cover no-repeat;animation:ldZoom 7s ease-out both}
+  #splash .ldveil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,15,.35) 0%,rgba(5,7,15,0) 26%,rgba(5,7,15,0) 52%,rgba(5,7,15,.9) 100%)}
+  #splash .ldlogo{position:absolute;top:5%;left:50%;transform:translateX(-50%);width:min(54%,560px);filter:drop-shadow(0 10px 34px rgba(0,0,0,.75));animation:splashPop .8s cubic-bezier(.2,.8,.2,1) both}
+  #splash .ldtag{position:absolute;bottom:18.5%;left:0;right:0;text-align:center;font-weight:800;font-size:clamp(14px,2.3vw,23px);color:#eaf2ff;text-shadow:0 2px 14px rgba(0,0,0,.95),0 0 20px rgba(76,169,255,.4)}
+  #splash .ldbarwrap{position:absolute;bottom:10.5%;left:50%;transform:translateX(-50%);width:min(58%,640px)}
+  #splash .ldbar{height:17px;border-radius:999px;background:rgba(8,14,32,.72);border:1.5px solid rgba(120,180,255,.45);overflow:hidden;box-shadow:inset 0 1px 4px rgba(0,0,0,.6),0 0 20px rgba(60,140,255,.35)}
+  #splash .ldfill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#2a6fe0,#4CC3FF 55%,#9fe8ff);box-shadow:0 0 16px rgba(76,195,255,.85);transition:width .1s linear}
+  #splash .ldpct{position:absolute;bottom:5.4%;left:0;right:0;text-align:center;font-weight:900;font-size:clamp(12px,1.8vw,17px);letter-spacing:.16em;color:#c7e4ff;text-shadow:0 2px 8px rgba(0,0,0,.9)}
+  @keyframes ldZoom{from{transform:scale(1.09)}to{transform:scale(1)}}
+  @keyframes splashPop{0%{transform:translateX(-50%) scale(.82);opacity:0}55%{opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
+  @media (prefers-reduced-motion:reduce){#splash .ldbg,#splash .ldlogo{animation:none}}
   /* 출석·보상 팝업 */
   .dpop{position:fixed;inset:0;z-index:11000;display:none;align-items:center;justify-content:center;background:rgba(4,7,15,.74)}
   .dpop.show{display:flex}
@@ -577,7 +584,7 @@
 
 </div></div>
 <div class="toast" id="toast"></div>
-<div id="splash"><img src="assets/logo.png?v=3" alt="차트아레나"></div>
+<div id="splash"><div class="ldbg"></div><div class="ldveil"></div><img class="ldlogo" src="assets/logo.png?v=3" alt="차트아레나"><div class="ldtag">차트로 승부하라! 지식으로 이겨라!</div><div class="ldbarwrap"><div class="ldbar"><div class="ldfill" id="ldfill"></div></div></div><div class="ldpct" id="ldpct">LOADING… 0%</div></div>
 <div id="dpop" class="dpop"><div class="dpopcard">
   <div class="dpicon" id="dpIcon">🎁</div>
   <div class="dptitle" id="dpTitle">출석 보상</div>
@@ -626,7 +633,10 @@ window.addEventListener('resize',fit);fit();
   if(seen){if(s.parentNode)s.parentNode.removeChild(s);return;}
   try{sessionStorage.setItem('ca_splash','1');}catch(e){}
   var reduce=false;try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
-  setTimeout(function(){s.classList.add('out');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},520);},reduce?500:1300);})();
+  var fill=$('ldfill'),pct=$('ldpct'),dur=reduce?400:2200,t0=null;
+  function done(){s.classList.add('out');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},560);}
+  function step(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/dur);var v=Math.round(k*100);if(fill)fill.style.width=v+'%';if(pct)pct.textContent='LOADING… '+v+'%';if(k<1){requestAnimationFrame(step);}else{setTimeout(done,300);}}
+  if(window.requestAnimationFrame){requestAnimationFrame(step);}else{if(fill)fill.style.width='100%';if(pct)pct.textContent='LOADING… 100%';setTimeout(done,dur);}})();
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1300);}
 var fmt=function(n){return Math.round(n).toLocaleString();};
 
