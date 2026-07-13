@@ -10,18 +10,18 @@
     --up:#F0616D;--down:#4C8DF6;--green:#35D07A;--gold:#F5C451;--mono:ui-monospace,"Cascadia Mono",Consolas,monospace;
     --sans:"Malgun Gothic","Apple SD Gothic Neo","Segoe UI",system-ui,sans-serif}
   *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%;background:radial-gradient(120% 70% at 50% -10%,#16223f,#0a0e1a 55%);color:var(--txt);font-family:var(--sans);overflow:hidden}
-  .app{width:min(100vw,calc(100vh*1120/640));aspect-ratio:1120/640;max-height:100vh;margin:0 auto;display:flex;flex-direction:column;position:relative}
-  .top{display:flex;align-items:center;gap:10px;padding:11px 16px 6px}
-  .top .home{text-decoration:none;color:var(--sub);font-size:12px;font-weight:700;background:var(--p1);border:1px solid var(--line);border-radius:9px;padding:6px 11px}
+  html,body{height:100%;background:#060a14;color:var(--txt);font-family:var(--sans);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .app{width:min(100vw,calc(100vh*1120/516));aspect-ratio:1120/516;max-height:100vh;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden;background:radial-gradient(110% 90% at 50% -8%,#1a315c 0%,#0b1428 48%,#060b17 100%);box-shadow:0 28px 70px -22px #000}
+  .top{height:46px;flex:none;display:flex;align-items:center;gap:11px;padding:7px 16px;border-bottom:1px solid rgba(91,125,185,.22);background:rgba(5,11,24,.56)}
+  .top .home{text-decoration:none;color:#dce8ff;font-size:12px;font-weight:800;background:rgba(17,31,58,.9);border:1px solid rgba(111,154,224,.34);border-radius:10px;padding:7px 12px}
   .top .ti{font-weight:900;font-size:16px}.top .ti b{color:var(--gold)}
   .top .sp{flex:1}
   .alive{font-weight:900;font-family:var(--mono);font-size:15px;color:var(--green);background:rgba(53,208,122,.12);border:1px solid rgba(53,208,122,.4);border-radius:999px;padding:5px 13px}
   .alive .dead{color:var(--faint)}
-  .body{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:2px 16px 12px}
+  .body{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;padding:7px 14px 10px}
   /* 차트 */
-  .chartcol{height:41%;display:flex;flex-direction:column;gap:6px}
-  .chartwrap{flex:1;min-height:0;position:relative;background:var(--p2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .chartcol{height:34%;display:flex;flex-direction:column;gap:5px}
+  .chartwrap{flex:1;min-height:0;position:relative;background:linear-gradient(180deg,rgba(6,14,31,.94),rgba(9,18,36,.86));border:1px solid rgba(83,120,186,.38);border-radius:13px;overflow:hidden;box-shadow:inset 0 0 34px rgba(30,78,150,.12)}
   canvas{width:100%;height:100%;display:block}
   .qbar{display:flex;align-items:center;gap:10px}
   .qbar .q{font-weight:900;font-size:15px}
@@ -30,8 +30,8 @@
   .qbar .timer.hot{color:var(--up);animation:pulse .5s infinite alternate}
   @keyframes pulse{to{transform:scale(1.14)}}
   /* 두 구역 */
-  .zones{flex:1;min-height:0;display:flex;gap:12px}
-  .zone{flex:1;min-width:0;display:flex;flex-direction:column;border-radius:16px;border:2px solid;padding:10px 10px 8px;position:relative;overflow:hidden;cursor:pointer;transition:.15s}
+  .zones{flex:1;min-height:0;display:flex;gap:14px}
+  .zone{flex:1;min-width:0;display:flex;flex-direction:column;border-radius:17px;border:2px solid;padding:8px 10px 7px;position:relative;overflow:hidden;cursor:pointer;transition:.15s;box-shadow:0 14px 30px -20px #000}
   .zone.zo{border-color:rgba(240,97,109,.45);background:radial-gradient(120% 80% at 50% 0%,rgba(240,97,109,.14),rgba(240,97,109,.03))}
   .zone.zx{border-color:rgba(76,141,246,.45);background:radial-gradient(120% 80% at 50% 0%,rgba(76,141,246,.14),rgba(76,141,246,.03))}
   .zone.zo.sel{border-color:var(--up);box-shadow:inset 0 0 40px -12px var(--up),0 0 22px -8px var(--up)}
@@ -39,26 +39,26 @@
   .zone.right{outline:3px solid var(--green);outline-offset:2px}
   .zone.wrong{outline:3px solid var(--up);outline-offset:2px}
   .zone.locked{cursor:default}
-  .zhd{display:flex;align-items:center;gap:8px;font-weight:900;font-size:16px;flex:none;margin-bottom:6px}
+  .zhd{height:31px;display:flex;align-items:center;gap:8px;font-weight:900;font-size:16px;flex:none;margin-bottom:3px}
   .zhd b{font-size:26px;line-height:1}
   .zone.zo .zhd b{color:var(--up)}.zone.zx .zhd b{color:var(--down)}
   .zhd .zc{margin-left:auto;font-family:var(--mono);font-size:15px}
   .zhd .hint{font-size:11px;color:var(--faint);font-weight:700}
-  .zavs{flex:1;min-height:0;overflow-y:auto;display:flex;flex-wrap:wrap;align-content:flex-start;gap:5px 4px;padding:2px;scrollbar-width:thin}
-  .zavs::-webkit-scrollbar{width:5px}.zavs::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
-  .zav{width:44px;text-align:center;position:relative;animation:hop .28s cubic-bezier(.2,1.4,.4,1)}
+  .zavs{flex:1;min-height:0;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(2,minmax(0,1fr));gap:4px 6px;padding:2px 6px;overflow:hidden;align-items:end}
+  .zav{min-width:0;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;animation:hop .28s cubic-bezier(.2,1.4,.4,1)}
   @keyframes hop{from{transform:translateY(16px) scale(.7);opacity:0}to{transform:none;opacity:1}}
-  .zav img{width:40px;height:44px;object-fit:contain;object-position:bottom;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
-  .zav .zn{font-size:8px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
-  .zav.me img{filter:drop-shadow(0 0 7px var(--gold))}
+  .zav img{width:64px;height:72px;object-fit:contain;object-position:bottom;filter:drop-shadow(0 4px 6px rgba(0,0,0,.58))}
+  .zav .zn{width:100%;font-size:9px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+  .zav.me img{filter:drop-shadow(0 0 8px var(--gold)) drop-shadow(0 4px 6px rgba(0,0,0,.58))}
   .zav.me .zn{color:var(--gold);font-weight:800}
+  .zav .you{position:absolute;top:0;right:4px;z-index:3;border-radius:999px;padding:2px 5px;background:var(--gold);color:#241900;font-size:8px;font-weight:900;box-shadow:0 2px 7px rgba(0,0,0,.45)}
   .zav.fall{animation:fall .7s ease-in forwards}
   @keyframes fall{to{transform:translateY(120px) rotate(18deg);opacity:0}}
   /* 대기(미정) 스트립 */
-  .waiting{flex:none;height:52px;display:flex;align-items:center;gap:4px;overflow-x:auto;padding:0 4px;scrollbar-width:none}
+  .waiting{flex:none;height:40px;display:flex;align-items:center;gap:3px;overflow-x:auto;padding:0 4px;scrollbar-width:none;border-radius:10px;background:rgba(7,15,31,.45)}
   .waiting::-webkit-scrollbar{display:none}
   .waiting .wl{font-size:11px;color:var(--faint);font-weight:700;flex:none;margin-right:4px}
-  .waiting .zav{width:38px}.waiting .zav img{width:34px;height:38px}
+  .waiting .zav{width:40px;min-width:40px;height:38px;display:block}.waiting .zav img{width:36px;height:42px}.waiting .zav .zn,.waiting .zav .you{display:none}
   /* 오버레이(매칭/결과) */
   .ov{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(6,10,20,.92);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);text-align:center;padding:20px}
   .ov.on{display:flex}
@@ -86,6 +86,16 @@
   .banner.o{color:var(--up)}.banner.x{color:var(--down)}
   .toast{position:absolute;left:50%;top:11%;transform:translateX(-50%);z-index:40;background:rgba(20,26,40,.95);border:1px solid rgba(245,196,81,.5);color:#f5e2b0;font-weight:800;font-size:14px;padding:8px 15px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none}
   .toast.on{opacity:1}
+  .svemobar{position:absolute;left:16px;bottom:14px;z-index:28}
+  .svemobtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--gold);background:rgba(6,12,26,.94);font-size:22px;cursor:pointer;box-shadow:0 5px 16px -5px #000}
+  .svemobtn:hover{background:rgba(245,196,81,.18)}
+  .svemopop{position:absolute;left:0;bottom:52px;display:none;grid-template-columns:repeat(5,1fr);gap:3px;width:236px;background:rgba(6,12,26,.98);border:1px solid var(--gold);border-radius:14px;padding:8px;box-shadow:0 12px 34px -8px #000}
+  .svemopop.on{display:grid}
+  .svemopop span{font-size:24px;cursor:pointer;text-align:center;padding:5px 0;border-radius:8px;transition:.12s}
+  .svemopop span:hover{background:rgba(245,196,81,.22);transform:scale(1.15)}
+  .zav .svemote{position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:30px;pointer-events:none;z-index:8;filter:drop-shadow(0 4px 8px rgba(0,0,0,.65));animation:survivalEmoteFloat 1.7s ease-out forwards}
+  @keyframes survivalEmoteFloat{0%{opacity:0;transform:translate(-50%,10px) scale(.5)}16%{opacity:1;transform:translate(-50%,-3px) scale(1.18)}34%{transform:translate(-50%,-13px) scale(1)}100%{opacity:0;transform:translate(-50%,-54px) scale(.84)}}
+  @media (prefers-reduced-motion:reduce){.zav,.zav.fall,.svemote{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -109,6 +119,7 @@
   </div>
   <div class="banner" id="banner"></div>
   <div class="toast" id="toast"></div>
+  <div class="svemobar" id="svEmobar"><button class="svemobtn" id="svEmobtn" type="button" title="이모티콘">😀</button><div class="svemopop" id="svEmopop"></div></div>
 
   <div class="ov on" id="match"><div class="mcard">
     <div class="mt">🏆 서바이벌 · <b>최후의 1인</b></div>
@@ -134,8 +145,8 @@
 (function(){
 var $=function(id){return document.getElementById(id);};
 var hub=(function(){try{return JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){return{};}})();
-var myCh=(hub.equip&&hub.equip.ch)||'hu0', myUpg=(hub.owned&&hub.owned.upg)||[];
-function charSrc(id){ if(String(id).indexOf('hu')===0){ if(myUpg.indexOf(id)>=0) return 'assets/hux'+id.replace('hu','')+'.png?v=2'; return 'assets/'+id+'.png?v=7'; } return 'assets/'+id+'.png'; }
+var myCh=(hub.equip&&hub.equip.ch)||'hu0', mySkin=(hub.equip&&hub.equip.skin)||'normal', myUpg=(hub.owned&&hub.owned.upg)||[];
+function charSrc(id){ if(String(id).indexOf('hu')===0){ if(id===myCh&&mySkin==='lux'&&myUpg.indexOf(id)>=0) return 'assets/hux'+id.replace('hu','')+'.png?v=2'; return 'assets/'+id+'.png?v=7'; } return 'assets/'+id+'.png'; }
 var myNick=(hub.nick||'차트고수').slice(0,10);
 function getBal(){try{var g=JSON.parse(localStorage.getItem('chartarena_web_v1'))||{};return typeof g.balance==='number'?g.balance:25000;}catch(e){return 25000;}}
 function setBal(v){try{var g=JSON.parse(localStorage.getItem('chartarena_web_v1'))||{};g.balance=v;localStorage.setItem('chartarena_web_v1',JSON.stringify(g));}catch(e){}}
@@ -178,7 +189,7 @@ $('mbtn').onclick=function(){
 };
 
 /* 아바타 렌더 (대기 스트립 + 두 구역) */
-function avHTML(p,i){ return '<div class="zav'+(p.me?' me':'')+'" data-i="'+i+'"><img src="'+p.img+'" alt=""><div class="zn">'+(p.me?'나':p.name)+'</div></div>'; }
+function avHTML(p,i){ return '<div class="zav'+(p.me?' me':'')+'" data-i="'+i+'"><img src="'+p.img+'" alt="">'+(p.me?'<span class="you">나</span>':'')+'<div class="zn">'+(p.me?'나':p.name)+'</div></div>'; }
 function renderZones(){
   var wait=[], zo=[], zx=[];
   players.forEach(function(p,i){ if(!p.alive)return; if(p.pick==='O')zo.push(avHTML(p,i)); else if(p.pick==='X')zx.push(avHTML(p,i)); else wait.push(avHTML(p,i)); });
@@ -188,6 +199,36 @@ function renderZones(){
   var un=wait.length; $('undec').textContent=un?('미정 '+un+'명'):'';
   $('alive').innerHTML='🟢 '+aliveCount()+'명 생존 <span class="dead">/ '+N+'</span>';
 }
+function zoneCount(d){ var n=0; players.forEach(function(p){if(p.alive&&p.pick===d)n++;}); return n; }
+function cappedBotPick(preferred){
+  var other=preferred==='O'?'X':'O', preferredCount=zoneCount(preferred), otherCount=zoneCount(other);
+  if(preferredCount>=10&&otherCount<10)return other;
+  if(otherCount>=10&&preferredCount<10)return preferred;
+  return preferred;
+}
+
+/* 4인 배틀과 같은 이모티콘 반응 */
+var SURVIVAL_EMOTES=['😝','😭','⏰','😎','😱','🔥','👍','😂','😡','💪'];
+function floatSurvivalEmote(playerIndex,emoji){
+  var av=document.querySelector('.zav[data-i="'+playerIndex+'"]');
+  if(!av)return;
+  var node=document.createElement('span'); node.className='svemote'; node.textContent=emoji; av.appendChild(node);
+  setTimeout(function(){if(node.parentNode)node.parentNode.removeChild(node);},1750);
+}
+function survivalBotReact(answer){
+  players.forEach(function(p,i){
+    if(i===0||!p.alive||p.pick==null)return;
+    var correct=p.pick===answer, pool=correct?['😎','🔥','👍','💪']:['😭','😱','😡'];
+    if(Math.random()<0.38){ var delay=correct?250+Math.random()*500:40+Math.random()*180;
+      setTimeout(function(){floatSurvivalEmote(i,pool[(Math.random()*pool.length)|0]);},delay); }
+  });
+}
+(function(){ var pop=$('svEmopop'),btn=$('svEmobtn'); if(!pop||!btn)return;
+  pop.innerHTML=SURVIVAL_EMOTES.map(function(e){return '<span data-e="'+e+'">'+e+'</span>';}).join('');
+  btn.onclick=function(ev){ev.stopPropagation();pop.classList.toggle('on');};
+  pop.onclick=function(ev){var choice=ev.target.closest('[data-e]');if(!choice)return;floatSurvivalEmote(0,choice.dataset.e);pop.classList.remove('on');};
+  document.addEventListener('click',function(ev){if(!ev.target.closest('#svEmobar'))pop.classList.remove('on');});
+})();
 
 /* 차트 */
 var cv=$('cv'), ctx=cv.getContext('2d'), revN=0;
@@ -227,12 +268,12 @@ function nextRound(){
       var un=players.filter(function(p){return p.alive&&!p.me&&!p.pick;});
       if(!un.length){ clearInterval(botTimer); return; }
       var mv=1+((Math.random()*3)|0);
-      for(var k=0;k<mv&&un.length;k++){ var idx=(Math.random()*un.length)|0; var p=un.splice(idx,1)[0]; p.pick = Math.random()<0.52 ? CUR.ans : (CUR.ans==='O'?'X':'O'); }
+      for(var k=0;k<mv&&un.length;k++){ var idx=(Math.random()*un.length)|0; var p=un.splice(idx,1)[0]; var preferred=Math.random()<0.52?CUR.ans:(CUR.ans==='O'?'X':'O'); p.pick=cappedBotPick(preferred); }
       renderZones();
     }, 520);
   });
 }
-function pick(d){ if(phase!=='pick'&&phase!=='count')return; players[0].pick=d; sfxPick();
+function pick(d){ if(phase!=='pick'&&phase!=='count')return; if(players[0].pick!==d&&zoneCount(d)>=10){toast('이 구역은 10명으로 가득 찼어요');return;} players[0].pick=d; sfxPick();
   $('zoneO').classList.toggle('sel',d==='O'); $('zoneX').classList.toggle('sel',d==='X');
   renderZones(); if(phase==='pick'&&tleft>3){ tleft=3; $('timer').textContent=tleft; } }
 $('zoneO').onclick=function(){pick('O');}; $('zoneX').onclick=function(){pick('X');};
@@ -242,7 +283,7 @@ function lockAndReveal(){
   if(phase!=='pick')return; phase='reveal'; clearInterval(tmr); clearInterval(botTimer);
   $('zoneO').classList.add('locked'); $('zoneX').classList.add('locked');
   // 남은 미정자 강제 배정 (봇=랜덤, 나=미정이면 그대로 → 탈락)
-  players.forEach(function(p){ if(!p.alive||p.pick)return; if(!p.me){ p.pick=Math.random()<0.5?'O':'X'; } });
+  players.forEach(function(p){ if(!p.alive||p.pick)return; if(!p.me){ p.pick=cappedBotPick(Math.random()<0.5?'O':'X'); } });
   renderZones();
   revTimer=setInterval(function(){ revN++; draw(); if(revN>=30){ clearInterval(revTimer); revealResult(); } }, 45);
 }
@@ -253,6 +294,7 @@ function revealResult(){
   // 틀린 구역 아바타 낙하 애니메이션
   var wrongAvs=$(wrongZ==='zoneO'?'zavO':'zavX').querySelectorAll('.zav');
   wrongAvs.forEach(function(el,k){ setTimeout(function(){ el.classList.add('fall'); }, k*35); });
+  survivalBotReact(ans);
   var aliveBefore=aliveCount(), meJustDied=false;
   players.forEach(function(p){ if(p.alive && p.pick!==ans){ p.alive=false; if(p.me)meJustDied=true; } });
   var elimN=aliveBefore-aliveCount();

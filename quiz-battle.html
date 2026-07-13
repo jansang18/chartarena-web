@@ -91,8 +91,8 @@
   .ctrl .lab{font-size:12px; color:#93A0BC; font-weight:700; margin-right:2px}
   .cgrp{display:flex; align-items:center; gap:5px}
   .clab{font-size:10px; color:#7d8bab; font-weight:800; letter-spacing:.02em}
-  .dir{flex:0 0 auto; width:86px; text-align:center; padding:7px 4px; border-radius:11px; cursor:pointer; border:2px solid transparent; background:#181a22; font-weight:900; font-size:14px}
-  .dir small{display:block; font-size:9px; font-weight:400; opacity:.75}
+  .dir{flex:0 0 auto; width:86px; height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 4px; line-height:1.05; border-radius:11px; cursor:pointer; border:2px solid transparent; background:#181a22; font-weight:900; font-size:14px}
+  .dir small{display:block; margin-top:3px; line-height:1; font-size:9px; font-weight:400; opacity:.75}
   .bets{display:flex; gap:4px}
   .bet{padding:8px 9px; border-radius:9px; background:#181a22; border:1px solid #2c4a35; color:#9fe3bb; font-weight:800; font-size:12px; cursor:pointer; min-width:36px; text-align:center}
   .bet.on{background:linear-gradient(180deg,#8fe3b0,#35D07A); color:#06301c; border-color:transparent}
@@ -148,9 +148,14 @@
   .lobby{position:absolute; inset:0; z-index:40; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
     background:radial-gradient(85% 62% at 50% 15%,#18325f 0%,#0d1a33 45%,#060c1a 100%); padding:14px; overflow:hidden}
   .lobby.hide{display:none}
+  .lobbyback{position:absolute;top:8px;left:20px;z-index:5;display:inline-flex;align-items:center;gap:9px;height:46px;padding:0 17px 0 12px;
+    border:1px solid rgba(142,172,226,.34);border-radius:14px;background:rgba(7,14,31,.72);color:#dce8ff;text-decoration:none;font-size:14px;font-weight:850;
+    box-shadow:0 8px 22px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(10px);transition:transform .16s,border-color .16s,background .16s}
+  .lobbyback::before{content:"‹";width:27px;height:27px;border-radius:9px;display:grid;place-items:center;background:rgba(100,145,225,.18);font-size:25px;line-height:1}
+  .lobbyback:hover{transform:translateX(-3px);border-color:rgba(109,164,255,.72);background:rgba(16,31,61,.9)}
+  .lobbyback:active{transform:translateX(-2px) scale(.98)}
   .lobby::before{content:""; position:absolute; top:-16%; left:50%; transform:translateX(-50%); width:min(90%,600px); aspect-ratio:1; border-radius:50%;
     background:radial-gradient(circle,rgba(70,130,255,.22),transparent 60%); pointer-events:none; z-index:0}
-  .lobby .lbgchart{position:absolute; inset:0; width:100%; height:100%; opacity:.13; z-index:0; pointer-events:none}
   .lobby .llogo{width:min(45%,366px); position:relative; z-index:2; filter:drop-shadow(0 10px 30px rgba(70,130,255,.5)); margin:-40px 0 -44px}
   .lmodes{display:flex; gap:20px; position:relative; z-index:2}
   /* 팔각 네온 프레임 카드 */
@@ -161,13 +166,11 @@
   .lcard:hover{transform:translateY(-5px); filter:drop-shadow(0 0 34px var(--fg)) drop-shadow(0 26px 52px rgba(0,0,0,.72))}
   .lcard.live{--fc:#F0616D; --fg:rgba(240,97,109,.5)}
   .lcard.duel{--fc:#8b7aff; --fg:rgba(139,122,255,.52)}
-  .lcard.sv{--fc:#F5C451; --fg:rgba(245,196,81,.5)}
   .lcard .in{clip-path:polygon(0 19px,19px 0,calc(100% - 19px) 0,100% 19px,100% calc(100% - 19px),calc(100% - 19px) 100%,19px 100%,0 calc(100% - 19px));
     background:linear-gradient(180deg,rgba(16,26,50,.97),rgba(7,13,28,.99)); padding:18px 18px 16px; position:relative; text-align:center}
   .lcard .ltag{position:absolute; top:12px; right:12px; z-index:3; font-size:11px; font-weight:900; letter-spacing:.5px; padding:3px 10px; border-radius:6px;
     background:var(--fc); color:#0a0e1a; box-shadow:0 0 12px var(--fg)}
   .lcard.duel .ltag{background:linear-gradient(180deg,#f6d272,#d8a63a); color:#2a2107}
-  .lcard.sv .ltag{background:#35D07A; color:#04231a}
   .lcard .licwrap{height:104px; display:flex; align-items:center; justify-content:center; position:relative; margin:2px 0}
   .lcard .licwrap::before{content:""; position:absolute; width:140px; height:140px; border-radius:50%; background:radial-gradient(circle,var(--fg),transparent 66%); opacity:.9}
   .lcard .lic{width:100px; height:100px; border-radius:50%; object-fit:cover; position:relative; z-index:1;
@@ -178,7 +181,28 @@
     background:linear-gradient(180deg,#8fd6ff,#3a8fe0); box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 8px 18px -6px rgba(0,0,0,.6);
     clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,7px 100%,0 50%)}
   .lcard.duel .lgo{background:linear-gradient(180deg,#b7a4ff,#6a4fd0); color:#fff}
-  .lcard.sv .lgo{background:linear-gradient(180deg,#5fe08f,#22a45f); color:#04231a}
+  /* 2026 lobby refresh: cohesive game art, clearer hierarchy, tactile actions */
+  .lmodes{gap:16px; perspective:1200px}
+  .lcard{width:304px; clip-path:none; border-radius:24px; padding:1px; background:linear-gradient(145deg,rgba(255,255,255,.42),var(--fc) 38%,rgba(255,255,255,.08));
+    box-shadow:0 20px 45px rgba(0,0,0,.44),0 0 0 1px rgba(255,255,255,.06); filter:none; overflow:hidden;
+    transition:transform .24s cubic-bezier(.2,.8,.2,1),box-shadow .24s,border-color .24s}
+  .lcard:hover{transform:translateY(-8px) scale(1.018); filter:none; box-shadow:0 28px 60px rgba(0,0,0,.56),0 0 30px var(--fg)}
+  .lcard .in{clip-path:none; border-radius:23px; padding:0 15px 15px; overflow:hidden; background:linear-gradient(180deg,#111a31 0%,#0a1122 72%,#080e1d 100%); text-align:left}
+  .lcard .ltag{top:13px;right:13px;border-radius:999px;padding:5px 10px;font-size:9px;letter-spacing:.9px;color:#fff;background:rgba(5,10,24,.72)!important;
+    border:1px solid color-mix(in srgb,var(--fc) 72%,white);box-shadow:0 5px 16px rgba(0,0,0,.35);backdrop-filter:blur(9px)}
+  .lcard.duel .ltag{color:#fff!important}
+  .modeart{height:154px;margin:0 -15px 15px;background-size:cover;background-repeat:no-repeat;background-position:center;position:relative}
+  .modeart::after{content:"";position:absolute;inset:auto 0 0;height:50%;background:linear-gradient(transparent,#111a31)}
+  .modeart.live-art{background-image:linear-gradient(180deg,transparent 62%,#111a31 100%),url(assets/mode-live-characters-v3.png)}
+  .modeart.duel-art{background-image:linear-gradient(180deg,transparent 62%,#111a31 100%),url(assets/mode-duel-characters-v3.png)}
+  .lcard .ln{font-size:20px;line-height:1.1;letter-spacing:-.45px;text-shadow:none;padding:0 2px}
+  .lcard .ld{font-size:11px;line-height:1.52;color:#91a2c2;min-height:36px;margin:7px 2px 0}
+  .lcard .lgo{margin-top:14px;height:43px;padding:0 15px;border-radius:13px;clip-path:none;display:flex;align-items:center;justify-content:center;gap:9px;
+    color:#fff!important;background:linear-gradient(135deg,color-mix(in srgb,var(--fc) 82%,#fff),var(--fc) 58%,color-mix(in srgb,var(--fc) 70%,#000))!important;
+    box-shadow:inset 0 1px rgba(255,255,255,.38),inset 0 -2px rgba(0,0,0,.22),0 8px 18px color-mix(in srgb,var(--fc) 32%,transparent);transition:transform .18s,box-shadow .18s,filter .18s}
+  .lcard .lgo::after{content:"→";width:25px;height:25px;border-radius:9px;display:grid;place-items:center;background:rgba(4,9,23,.24);font-size:15px}
+  .lcard:hover .lgo{transform:translateY(-2px);filter:saturate(1.13) brightness(1.08);box-shadow:inset 0 1px rgba(255,255,255,.45),inset 0 -2px rgba(0,0,0,.18),0 12px 24px var(--fg)}
+  .lcard:active{transform:translateY(-3px) scale(.995)}
   /* 매칭 대기 화면 */
   .lwait{display:none; flex-direction:column; align-items:center; gap:12px}
   .lwait.on{display:flex}
@@ -258,41 +282,23 @@
   <div class="emobar" id="emobar"><button class="emobtn" id="emobtn" type="button" title="이모티콘">😀</button><div class="emopop" id="emopop"></div></div>
 
   <div class="lobby" id="lobby">
-    <svg class="lbgchart" viewBox="0 0 1120 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <g fill="none">
-        <line x1="70" y1="360" x2="70" y2="470" stroke="#4C8DF6" stroke-width="3"/><rect x="58" y="380" width="24" height="70" fill="#4C8DF6"/>
-        <line x1="130" y1="320" x2="130" y2="440" stroke="#F0616D" stroke-width="3"/><rect x="118" y="335" width="24" height="80" fill="#F0616D"/>
-        <line x1="190" y1="300" x2="190" y2="410" stroke="#F0616D" stroke-width="3"/><rect x="178" y="315" width="24" height="70" fill="#F0616D"/>
-        <line x1="250" y1="330" x2="250" y2="450" stroke="#4C8DF6" stroke-width="3"/><rect x="238" y="360" width="24" height="60" fill="#4C8DF6"/>
-        <line x1="900" y1="300" x2="900" y2="420" stroke="#F0616D" stroke-width="3"/><rect x="888" y="320" width="24" height="80" fill="#F0616D"/>
-        <line x1="960" y1="260" x2="960" y2="380" stroke="#F0616D" stroke-width="3"/><rect x="948" y="275" width="24" height="85" fill="#F0616D"/>
-        <line x1="1020" y1="290" x2="1020" y2="410" stroke="#4C8DF6" stroke-width="3"/><rect x="1008" y="320" width="24" height="70" fill="#4C8DF6"/>
-      </g>
-      <polyline points="40,470 130,415 190,385 250,420 900,400 960,360 1020,390 1090,340" stroke="#7fb0ff" stroke-width="2" fill="none" opacity=".5"/>
-    </svg>
+    <a class="lobbyback" href="index.html" aria-label="홈 화면으로 뒤로">뒤로</a>
     <img class="llogo" src="assets/logo_lockup.png?v=3" alt="차트아레나">
     <div class="lmodes" id="lmodes">
       <div class="lcard live" id="modeLive"><div class="in">
         <div class="ltag">LIVE</div>
-        <div class="licwrap"><img class="lic" src="assets/icon_live.png?v=2" alt=""></div>
-        <div class="ln">실시간 4명 대결</div>
-        <div class="ld">지금 접속한 유저 4명이 붙는 10라운드 차트 예측 대결! 상대가 없으면 봇으로 채워 바로 시작해요.</div>
-        <div class="lgo">매칭 시작 ▶</div>
+        <div class="modeart live-art" role="img" aria-label="네 명의 트레이더가 함께 펼치는 실시간 차트 배틀"></div>
+        <div class="ln">4인 실시간 배틀</div>
+        <div class="ld">10라운드 동안 네 명이 동시에 예측하고 순위를 겨뤄요.</div>
+        <div class="lgo">매칭 시작</div>
       </div></div>
       <div class="lcard duel" id="mode1v1"><div class="in">
         <div class="ltag">NEW</div>
-        <div class="licwrap"><img class="lic" src="assets/icon_duel.png?v=2" alt=""></div>
-        <div class="ln">1vs1 맞대결</div>
-        <div class="ld">판돈을 걸고 맞짱! 수익률 차이만큼 상대 돈을 뺏어와, 한쪽 판돈이 바닥나면 승부 끝.</div>
-        <div class="lgo">상대 찾기 ▶</div>
+        <div class="modeart duel-art" role="img" aria-label="두 트레이더가 마주 보는 일대일 라이벌전"></div>
+        <div class="ln">1 대 1 라이벌전</div>
+        <div class="ld">같은 차트를 보고 정면 승부! 더 정확한 예측이 승리합니다.</div>
+        <div class="lgo">라이벌 찾기</div>
       </div></div>
-      <a class="lcard sv" id="modeSv" href="survival.html"><div class="in">
-        <div class="ltag">서바이벌</div>
-        <div class="licwrap"><img class="lic" src="assets/icon_sv.png?v=1" alt=""></div>
-        <div class="ln">최후의 1인 (20명)</div>
-        <div class="ld">20명이 차트 O/X로 대결! 틀리면 즉시 탈락, 끝까지 살아남으면 우승. 큐플레이식 OX 서바이벌.</div>
-        <div class="lgo">입장하기 ▶</div>
-      </div></a>
     </div>
     <div class="lante" id="lante">
       <div class="lq">⚔️ 판돈을 정하세요 (상대도 같은 금액을 겁니다)</div>
@@ -347,11 +353,17 @@ var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(window.requestAnimationFrame){requestAnimationFrame(step);}else{if(fill)fill.style.width='100%';if(pct)pct.textContent='LOADING… 100%';setTimeout(done,dur);}})();
 
 /* 허브(차고)에서 장착한 캐릭터·닉네임 공유 */
-var CHIMG={shark:'assets/char_shark.png',bull:'assets/char_bull.png',bear:'assets/char_bear.png',tiger:'assets/char_tiger.png',dragon:'assets/char_dragon.png',king:'assets/char_king.png'};
+var CHIMG={
+  hu0:'assets/hu0.png',hu1:'assets/hu1.png',hu2:'assets/hu2.png',hu3:'assets/hu3.png',hu4:'assets/hu4.png',hu5:'assets/hu5.png',
+  hu6:'assets/hu6.png',hu7:'assets/hu7.png',hu8:'assets/hu8.png',hu9:'assets/hu9.png',hu10:'assets/hu10.png',hu11:'assets/hu11.png',
+  hu12:'assets/hu12.png',hu13:'assets/hu13.png',hu14:'assets/hu14.png',hu15:'assets/hu15.png',hu16:'assets/hu16.png',
+  shark:'assets/char_shark.png',bull:'assets/char_bull.png',bear:'assets/char_bear.png',tiger:'assets/char_tiger.png',dragon:'assets/char_dragon.png',king:'assets/char_king.png'
+};
 for(var _pi=0;_pi<45;_pi++)CHIMG['pet'+_pi]='assets/pet'+_pi+'.png';
 for(var _hi=0;_hi<17;_hi++)CHIMG['hu'+_hi]='assets/hu'+_hi+'.png?v=7';
 var hub={}; try{hub=JSON.parse(localStorage.getItem('chartarena_hub_v1'))||{};}catch(e){}
-var myCh=(hub.equip&&hub.equip.ch)||'shark', myNick=hub.nick||'차트고수';
+var myCh=(hub.equip&&hub.equip.ch)||'hu0', mySkin=(hub.equip&&hub.equip.skin)||'normal', myUpg=(hub.owned&&hub.owned.upg)||[], myNick=hub.nick||'차트고수';
+var myChImg=(mySkin==='lux'&&myUpg.indexOf(myCh)>=0)?('assets/hux'+myCh.replace('hu','')+'.png?v=3'):(CHIMG[myCh]||CHIMG.hu0);
 /* ===== Firebase (실시간 대결 매칭용 — 랭킹과 같은 프로젝트) ===== */
 var FB=null, myUid=null;
 var FB_CONFIG={ apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"chartarena-3051a.firebaseapp.com", projectId:"chartarena-3051a", storageBucket:"chartarena-3051a.firebasestorage.app", messagingSenderId:"44830019146", appId:"1:44830019146:web:76089575110b3107e460b3", measurementId:"G-WS5EE5TF5N" };
@@ -384,7 +396,7 @@ window.addEventListener('resize',function(){ fit(); drawChart(); }); fit();
 
 /* 플레이어 (나 + 봇3) */
 var players=[
-  {name:myNick, chImg:CHIMG[myCh]||CHIMG.shark, score:0, strat:'me', pick:null, lev:2, dp:0},
+  {name:myNick, chImg:myChImg, score:0, strat:'me', pick:null, lev:2, dp:0},
   {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},
   {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
   {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0},
@@ -762,7 +774,7 @@ var ANTES=[10000,50000,100000], pendOpp=null;
 function showLobby(){ var lb=$('lobby'); if(!lb)return; lb.classList.remove('hide'); $('lmodes').style.display='flex'; $('lante').classList.remove('on'); }
 function hideLobby(){ var lb=$('lobby'); if(lb)lb.classList.add('hide'); }
 function startMode4p(){ MODE='4p'; duel=null; round=1;
-  players=[ {name:myNick, chImg:CHIMG[myCh]||CHIMG.shark, score:0, strat:'me', pick:null, lev:2, dp:0},
+  players=[ {name:myNick, chImg:myChImg, score:0, strat:'me', pick:null, lev:2, dp:0},
     {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},
     {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
     {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0} ];
@@ -780,7 +792,7 @@ function showAnteScreen(){ $('lmodes').style.display='none'; $('lante').classLis
   $('lbtns').innerHTML=html;
 }
 function setupDuel(opp,ante){ MODE='1v1'; round=1;
-  players=[ {name:myNick, chImg:CHIMG[myCh]||CHIMG.shark, score:0, strat:'me', pick:null, lev:2, dp:0},
+  players=[ {name:myNick, chImg:myChImg, score:0, strat:'me', pick:null, lev:2, dp:0},
     {name:opp.on, chImg:CHIMG[opp.oc], score:0, strat:'duel', pick:null, lev:2, dp:0} ];
   duel={ ante:ante, myStack:ante, oppStack:ante, roundNo:0, cap:24 };
   $('podiums').classList.add('duel'); hideLobby(); startRound();
@@ -832,7 +844,7 @@ function hostStart(ref,d){ var cap=d.cap||4, cnt=Object.keys(d.players||{}).leng
   ref.update(upd).catch(function(){ liveFallback('시작 실패 — 봇과 대결'); }); }
 function beginLive(d){ hideWait(); hideLobby(); MODE='live'; duel=null; round=1; LIVE.playing=true; LIVE.picks={}; LIVE.revealedRound=0; LIVE.lastRound=0; LIVE.locked=false;
   var ids=Object.keys(d.players||{}); ids.sort(function(a,b){ if(a===myUid)return -1; if(b===myUid)return 1; return (d.players[a].joinAt||0)-(d.players[b].joinAt||0); });
-  players=ids.map(function(u){ var p=d.players[u]; return {uid:u,name:(p.nick||'유저'),chImg:CHIMG[p.ch]||CHIMG.shark,bot:!!p.bot,score:0,strat:'live',pick:null,lev:2,dp:0}; });
+  players=ids.map(function(u){ var p=d.players[u]; return {uid:u,name:(p.nick||'유저'),chImg:CHIMG[p.ch]||CHIMG.hu0,bot:!!p.bot,score:0,strat:'live',pick:null,lev:2,dp:0}; });
   $('podiums').classList.remove('duel');
   LIVE.gameUnsub=LIVE.ref.onSnapshot(function(s){ if(!s.exists)return; onLiveSnap(s.data()); });
   if(LIVE.host){ startRound(); } else { $('round').textContent='매칭 완료! 시작 대기…'; resetGoHandler(); renderPods(); renderCtrl(); }
