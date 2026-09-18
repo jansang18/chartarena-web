@@ -32,11 +32,11 @@ test('online guest recovers previous round when fast host advances during guest 
   assert.deepEqual(next, expected(2));
 });
 
-test('repeated snapshots and duplicate history entries do not settle or consume powers twice', () => {
+test('repeated snapshots and duplicate history entries do not settle or consume the pass twice', () => {
   const once = Rules.recover(Rules.create('guest'), history.slice(0, 3), move);
   const repeated = Rules.recover(once, history.slice(0, 3).concat(history[0]), move);
   assert.deepEqual(repeated, once);
-  assert.equal(repeated.powerUsed, true);
+  assert.equal(repeated.powerUsed, undefined);
   assert.equal(repeated.passUsed, true);
 });
 
@@ -52,7 +52,7 @@ test('completion snapshot catches up all five rounds for a throttled guest and i
   assert.deepEqual(final, expected(5));
   assert.equal(final.appliedRound, 5);
   assert.deepEqual(Rules.recover(final, history, move), final);
-  assert.equal(final.pick.power, 'none');
+  assert.equal(final.pick.power, undefined);
 });
 
 test('history missing a round cannot silently manufacture a completed match', () => {
@@ -65,7 +65,7 @@ test('recovery selects choice by player id, not host-first list position', () =>
   assert.ok(guest.score > 0);
   assert.ok(host.score < 0);
   const late = Rules.recover(Rules.create('late'), history.slice(0, 1), move);
-  assert.equal(late.score, -200, 'missing confirmed choice remains a timeout');
+  assert.equal(late.score, 0, 'missing confirmed choice remains zero gold');
 });
 
 function liveSnapshotContext() {
@@ -80,7 +80,7 @@ function liveSnapshotContext() {
     beginReveal(picks) { ctx.calls.push(['reveal', ctx.players[0].state.appliedRound]); ctx.phase = 'reveal'; },
     finalResult() { ctx.calls.push(['final', ctx.players[0].state.appliedRound]); ctx.phase = 'final'; },
     abortOnline(msg) { ctx.calls.push(['abort', msg]); },
-    renderPods() {}, renderCtrl() {}, publishReveal() { ctx.calls.push('publish'); },
+    recoverWallet(){return true;}, renderPods() {}, renderCtrl() {}, publishReveal() { ctx.calls.push('publish'); },
   };
   vm.createContext(ctx);
   vm.runInContext(functionsBetween('recoverPlayers', 'publishReveal'), ctx);
@@ -122,7 +122,7 @@ test('actual done snapshot without complete history aborts without paying a fina
 async function runHostStart(fresh) {
   const writes = [], ref = {}, pending = [];
   const ctx = {
-    LIVE: { host: true, ref, attempt: 1 }, mmCurrent: () => true, BOTNAMES: ['bot1', 'bot2'], Date,
+    selectedTable:'standard', LIVE: { host: true, ref, attempt: 1 }, mmCurrent: () => true, BOTNAMES: ['bot1', 'bot2'], Date,
     liveFallback(msg) { throw Error(msg); },
     FB: { runTransaction(work) {
       const p = Promise.resolve().then(() => work({ get: async () => ({ data: () => fresh }), update: (r, value) => writes.push(value) }));
@@ -137,7 +137,7 @@ async function runHostStart(fresh) {
 }
 
 test('actual hostStart transaction uses fresh capacity after the last human joins', async () => {
-  const fresh = { status: 'wait_v2', host: 'host', cap: 4, players: { host: {}, p2: {}, p3: {}, p4: {} } };
+  const fresh = { status: 'wait_v3', rulesVersion:3,tableId:'standard', host: 'host', cap: 4, players: { host: {}, p2: {}, p3: {}, p4: {} } };
   const writes = await runHostStart(fresh);
   assert.equal(writes.length, 1);
   assert.equal(Object.keys(writes[0].players).length, 4);
@@ -146,7 +146,14 @@ test('actual hostStart transaction uses fresh capacity after the last human join
 
 test('actual hostStart transaction cannot resurrect a cancelled room', async () => {
   assert.equal((await runHostStart({ status: 'done', host: 'host', cap: 4, players: { p2: {} } })).length, 0);
-  assert.equal((await runHostStart({ status: 'wait_v2', host: 'host', cap: 4, players: { p2: {} } })).length, 0);
+  assert.equal((await runHostStart({ status: 'wait_v3', rulesVersion:3,tableId:'standard', host: 'host', cap: 4, players: { p2: {} } })).length, 0);
+});
+
+test('host cannot start a different table or old rules version',async()=>{
+  for(const extra of [{rulesVersion:2},{tableId:'expert'}]){
+    const d={status:'wait_v3',rulesVersion:3,tableId:'standard',host:'host',cap:4,players:{host:{}},...extra};
+    assert.equal((await runHostStart(d)).length,0);
+  }
 });
 
 test('actual guest wait times out and responds to a host cancellation', () => {
@@ -183,7 +190,7 @@ function matchmakingHarness() {
   const timers = [], elements = {};
   const deleted = '__delete__';
   const ctx = {
-    Date, Math, Promise, LIVE: null, mmUnsub: null, mmTimer: null, myUid: 'guest', myNick: 'Guest', myCh: 'hu0',
+    selectedTable:'standard', currentTable:()=>Rules.table('standard'),fmtP:String, Date, Math, Promise, LIVE: null, mmUnsub: null, mmTimer: null, myUid: 'guest', myNick: 'Guest', myCh: 'hu0',
     $: id => elements[id] ||= { style: {}, textContent: '', classList: { contains: () => true } },
     fbReady: () => true, showWait() {}, hideWait() {}, backToModes() {},
     renderWait() { calls.render++; }, beginLive() { calls.begin++; }, startMode4p() { calls.bot++; },
@@ -222,12 +229,27 @@ test('cancelling pending query prevents late room creation and energy-consuming 
   assert.equal(h.calls.adds, 0); assert.equal(h.calls.begin, 0); assert.equal(h.ctx.LIVE, null);
 });
 
+test('candidate matching never joins a different rate or old rules',async()=>{
+  const h=matchmakingHarness();h.ctx.startModeLive();
+  const other={status:'wait_v3',rulesVersion:3,tableId:'expert',host:'host',createdAt:Date.now(),players:{host:{}}};
+  h.pendingQuery.resolve({forEach(fn){fn({data:()=>other,ref:{data:other}});fn({data:()=>({...other,tableId:'standard',rulesVersion:2}),ref:{}});}});
+  await flush();assert.equal(h.calls.writes.length,0);assert.equal(h.calls.adds,1);
+});
+
+test('join transaction rechecks table after candidate changes',async()=>{
+  const h=matchmakingHarness();h.ctx.startModeLive();
+  const d={status:'wait_v3',rulesVersion:3,tableId:'standard',host:'host',createdAt:Date.now(),players:{host:{}}};
+  const ref={data:{...d,tableId:'expert'}};
+  h.pendingQuery.resolve({forEach(fn){fn({data:()=>d,ref});}});
+  await flush();assert.equal(h.calls.writes.length,0);assert.equal(h.calls.adds,1);
+});
+
 test('late created room is closed and removes only cancelled attempt membership', async () => {
   const h = matchmakingHarness(); h.ctx.startModeLive();
   const attempt = h.ctx.mmAttempt, tag = h.ctx.mmTag(attempt);
   h.ctx.mmCreate({ nick: 'Guest', matchAttempt: tag }, attempt);
   h.ctx.liveCancel();
-  const ref = { data: { host: 'guest', status: 'wait_v2', players: { guest: { matchAttempt: tag } }, scores: { guest: 0 } } };
+  const ref = { data: { host: 'guest', status: 'wait_v3', rulesVersion:3,tableId:'standard', players: { guest: { matchAttempt: tag } }, scores: { guest: 0 } } };
   h.pendingAdd.resolve(ref); await flush();
   assert.equal(ref.data.status, 'done'); assert.equal(ref.data.players.guest, undefined); assert.equal(h.ctx.LIVE, null); assert.equal(h.calls.begin, 0);
 });
@@ -242,20 +264,20 @@ test('cancellation after join commit but before its response removes late member
     first = false; return result.then(value => commitResponse.promise.then(() => value));
   };
   h.ctx.startModeLive();
-  const ref = { data: { host: 'host', status: 'wait_v2', createdAt: Date.now(), cap: 4, players: { host: {} }, scores: {} } };
+  const ref = { data: { host: 'host', status: 'wait_v3', rulesVersion:3,tableId:'standard', createdAt: Date.now(), cap: 4, players: { host: {} }, scores: {} } };
   h.pendingQuery.resolve({ forEach(fn) { fn({ ref, data: () => ref.data }); } });
   await flush();
   assert.ok(ref.data.players.guest, 'join already committed');
   h.ctx.liveCancel(); commitResponse.resolve(); await flush();
   assert.equal(ref.data.players.guest, undefined);
-  assert.equal(ref.data.status, 'wait_v2', 'guest cleanup must not close the host room');
+  assert.equal(ref.data.status, 'wait_v3', 'guest cleanup must not close the host room');
   assert.equal(h.calls.begin, 0); assert.equal(h.ctx.LIVE, null);
 });
 
 test('old cleanup cannot remove a newer attempt that joined the same room', async () => {
   const h = matchmakingHarness(); h.ctx.startModeLive(); const old = h.ctx.mmAttempt;
   h.ctx.liveCancel(); h.ctx.startModeLive();
-  const ref = { data: { host: 'host', status: 'wait_v2', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) }, host: {} } } };
+  const ref = { data: { host: 'host', status: 'wait_v3', rulesVersion:3,tableId:'standard', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) }, host: {} } } };
   await h.ctx.cleanupMatchMembership(ref, false, old);
   assert.ok(ref.data.players.guest); assert.equal(h.calls.writes.length, 0);
 });
@@ -270,12 +292,12 @@ test('cancelled fallback timeout cannot start bots during a new matchmaking atte
 test('late snapshot and host polling responses cannot start a cancelled room', async () => {
   const h = matchmakingHarness(); h.ctx.startModeLive();
   let snapshot, error; const pendingGet = deferred();
-  const ref = { data: { host: 'guest', status: 'wait_v2', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) } } },
+  const ref = { data: { host: 'guest', status: 'wait_v3', rulesVersion:3,tableId:'standard', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) } } },
     onSnapshot(fn, fail) { snapshot = fn; error = fail; return () => {}; }, get: () => pendingGet.promise };
   h.ctx.enterRoom(ref, true, h.ctx.mmAttempt);
   h.timers.find(t => t.ms === 1200).fn(); h.ctx.liveCancel(); h.ctx.startModeLive();
   const newAttempt = h.ctx.mmAttempt;
   snapshot({ exists: true, data: () => ({ ...ref.data, status: 'play' }) }); error();
-  pendingGet.resolve({ exists: true, data: () => ({ status: 'wait_v2', cap: 1, players: { guest: {} } }) }); await flush();
+  pendingGet.resolve({ exists: true, data: () => ({ status: 'wait_v3', rulesVersion:3,tableId:'standard', cap: 1, players: { guest: {} } }) }); await flush();
   assert.equal(h.calls.begin, 0); assert.equal(h.calls.polls.length, 0); assert.equal(h.ctx.mmAttempt, newAttempt); assert.equal(h.ctx.mmActive, true);
 });

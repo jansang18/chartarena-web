@@ -227,7 +227,7 @@
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=1daf486e5931">
-<link rel="stylesheet" href="gameplay.css?v=286a81505f11">
+<link rel="stylesheet" href="gameplay.css?v=251159366b53">
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -263,11 +263,7 @@
       <button type="button" class="dir watch" data-dir="W" id="dW">◎ 패스<small>경기당 1회</small></button>
     </div>
     <div class="cgrp leverage-group"><span class="clab" id="leverageLabel">레버리지 · 기본 1배</span><div class="levs" id="levs" role="group" aria-label="레버리지 배율, 선택한 배율을 다시 누르면 1배"></div></div>
-    <details class="battle-options" id="battleOptions"><summary id="optionsSummary">전략 설정 · 보통 · 전술 없음</summary><div class="options-body">
-    <div class="cgrp risk-group"><span class="clab">전략</span><div id="riskPresets"></div></div>
-    <details class="advanced-controls"><summary>고급 설정 · 투입 비율 선택</summary><div class="advanced-inner"><div class="cgrp"><span class="clab">투입</span><div class="bets" id="bets"></div></div></div></details>
-    <div class="tactics"><div id="powers"></div><p id="powerHelp"></p></div>
-    </div></details>
+    <div class="gold-equation" id="goldEquation" aria-live="polite"></div>
     <button class="go" id="go" type="button">확정 ▶</button>
   </div>
   <p class="battle-help" id="battleHelp" aria-live="polite"></p>
@@ -282,8 +278,8 @@
         <div class="ltag">동일한 차트 · 4명의 플레이어</div>
         <div class="modeart live-art" role="img" aria-label="네 명의 트레이더가 함께 펼치는 실시간 차트 배틀"></div>
         <h1 class="ln">차트를 읽고,<br>다음 수를 겨루세요.</h1>
-        <div class="ld">5라운드 · 모두 10,000P로 시작하는 공정한 승부.<br>패스 1회, 전술 1회. 참가자를 찾고 빈자리는 봇이 채웁니다.</div>
-        <div class="lobby-action"><button class="lgo" id="modeLive" type="button">매칭 시작</button><p>경기 시작 시 플레이 1회 사용 · 매칭 취소는 차감 없음</p></div>
+        <div class="ld">맞힌 방향의 수익률 × 방의 골드 × 레버리지.<br>5라운드 누적 골드 손익으로 네 명의 순위를 겨룹니다.</div>
+        <div class="lobby-action"><div class="table-heading">방 선택 <span id="lobbyWallet"></span></div><div id="tableChoices" class="table-choices" role="group" aria-label="1%당 골드로 방 선택"></div><p class="table-note" id="tableNote"></p><p class="settlement-note" id="lastSettlement" role="status" hidden></p><button class="lgo" id="modeLive" type="button">매칭 시작</button><p>플레이 1회 사용 · 매칭 취소는 차감 없음 · 빈자리는 봇 참여</p></div>
       </div></div>
     </div>
     <div class="lwait" id="lwait">
@@ -317,7 +313,7 @@
 <script src="xp.js"></script>
 <script src="energy.js?v=d9b323b0c799"></script>
 <script src="charts.js"></script>
-<script src="battle-rules.js?v=232b2b0cbb22"></script>
+<script src="battle-rules.js?v=298a860eca33"></script>
 <script>
 (function(){
 "use strict";
@@ -357,18 +353,38 @@ function fbReady(){ return !!(FB && myUid); }
 /* 보유 포인트(전 앱 공유) — 배팅/배당에 실제로 사용 */
 var GS='chartarena_web_v1';
 function ljg(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch(e){return{};}}
-function getBal(){var g=ljg(GS);return typeof g.balance==='number'?g.balance:25000;}
+function getBal(){return ArenaRules.walletBalance(ljg(GS));}
 function setBal(v){var g=ljg(GS);g.balance=Math.max(0,Math.round(v));localStorage.setItem(GS,JSON.stringify(g));}
-/* 재기(올인 파산) 보상 — 하루 5회까지 각 1,000P */
-var DK='chartarena_daily_v1';
-function _today(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
-function dget(){ var o=ljg(DK); if(o.d!==_today()){ o={d:_today(),att:0,allin:0,streak:o.streak||0,lastAtt:o.lastAtt||''}; localStorage.setItem(DK,JSON.stringify(o)); } return o; }
-function comeback(){ var d=dget(); if(d.allin<5){ d.allin++; localStorage.setItem(DK,JSON.stringify(d)); setBal(1000); return d.allin; } return 0; }
 function fmtP(n){return Math.round(n).toLocaleString();}
-/* 배팅액 = 보유 포인트의 비율 (포커·맞고처럼 스택 일부를 건다) */
-var BETPCTS=[[0.1,'10%'],[0.25,'25%'],[0.5,'50%'],[1,'올인']];
-var roundBet=0;
-function curBet(){return players[0].state?ArenaRules.profit(players[0].state,mySel,0).stake:0;}
+function fmtPct(n){return (n>=0?'+':'')+n.toFixed(4).replace(/0+$/,'').replace(/\.$/,'')+'%';}
+var selectedTable=getBal()>=20000?'standard':getBal()>=2000?'beginner':'practice';
+function currentTable(){return ArenaRules.table(selectedTable);}
+function saveWallet(game){localStorage.setItem(GS,JSON.stringify(game));}
+function finalMove(seg){seg=seg||GD;return(seg.cs[seg.vis+29][3]/seg.cs[seg.vis-1][3]-1)*100;}
+function recordWallet(input,pending,seg,roundNo){
+  try{saveWallet(ArenaRules.walletRound(ljg(GS),matchId,input,finalMove(seg),roundNo||round,pending));return true;}
+  catch(e){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();toast(e.message);return false;}
+}
+function closeWallet(){var g=ljg(GS);if(g.battleActive&&g.battleActive.id===matchId)saveWallet(ArenaRules.walletClose(g,matchId));}
+function recoverWallet(history){
+  for(var e of history.slice().sort(function(a,b){return a.round-b.round;})){
+    if(!recordWallet((e.picks||{})[players[0].state.id],false,pickSegByIdx(e.seg),e.round))return false;
+  }return true;
+}
+function renderTables(){
+  var last=ljg(GS).battleLast,receipt=$('lastSettlement');receipt.hidden=!last;if(last)receipt.textContent='최근 '+ArenaRules.table(last.tableId).name+' · '+last.rounds+'라운드 정산 '+fmtLead(last.delta)+' 골드'+(ArenaRules.table(last.tableId).practice?' (연습 손익 '+fmtLead(last.simulated)+')':'');
+  var t=currentTable(),bal=getBal();$('lobbyWallet').textContent='보유 '+fmtP(bal)+' 골드';
+  $('tableChoices').innerHTML=Object.values(ArenaRules.TABLES).map(function(x){var enough=bal>=x.reserve;return '<button type="button" class="table-choice'+(x.id===selectedTable?' on':'')+'" data-table="'+x.id+'" aria-pressed="'+(x.id===selectedTable)+'"><strong>'+x.name+'</strong><b>'+ (x.practice?'골드 변동 없음':'1%당 '+fmtP(x.rate)+' 골드')+'</b><small>'+ (x.practice?'100골드 기준 모의 경기':(enough?'필요 ':'부족 · 필요 ')+fmtP(x.reserve)+' 골드')+'</small></button>';}).join('');
+  $('tableNote').textContent=t.practice?'연습방은 모의 골드로 진행하며 보유 골드는 변하지 않습니다.':fmtP(t.reserve)+' 골드를 경기용으로 확보합니다. 최대 순손실 '+fmtP(t.reserve)+' 골드 · 남은 금액과 손익은 종료 시 정산됩니다.';
+  $('modeLive').disabled=bal<t.reserve;
+  $('modeLive').textContent=bal<t.reserve?'입장 골드 부족':t.name+' · 매칭 시작';
+}
+$('tableChoices').onclick=function(e){var b=e.target.closest('[data-table]');if(!b||mmActive)return;selectedTable=b.dataset.table;renderTables();};
+// A previous document may have closed during a confirmed reveal. Recover once.
+var recoveredGame=ljg(GS);if(recoveredGame.battleActive){saveWallet(ArenaRules.walletClose(recoveredGame,recoveredGame.battleActive.id));setTimeout(function(){toast('이전 경기의 확정된 선택까지 골드 정산을 마쳤습니다.');},800);}
+window.addEventListener('pagehide',function(){closeWallet();});
+window.addEventListener('pageshow',function(e){if(e.persisted){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();}});
+window.addEventListener('storage',function(e){if(e.key!==GS)return;var g=ljg(GS);if(matchId&&phase!=='idle'&&phase!=='final'&&(!g.battleActive||g.battleActive.id!==matchId)){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();toast('다른 창에서 경기를 정산하여 로비로 돌아왔습니다.');}else if(phase==='idle')renderTables();});
 
 /* 화면폭에 맞춰 가로 무대 스케일 */
 /* 플레이어 (나 + 봇3) */
@@ -388,7 +404,7 @@ function randomizeBots(){
 }
 randomizeBots();
 var ROUNDS=5, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTimer=null, mySel={dir:null,lev:2};
-var MODE='4p', roundBet=0;
+var MODE='4p';
 var battlePass=window.NRG?NRG.createPass():null;
 var autoTimer=null, autoLeft=0;   // 결과 화면 자동 넘김 타이머
 var bind={ma:true, boll:false, ichi:false};   // 차트 지표 토글 (이평선/볼린저/일목)
@@ -458,50 +474,45 @@ function renderPods(){
     var known=phase==='reveal'||phase==='result'||phase==='final', pk=known?(p.revealInput||{}).dir:(i===0&&mySel.dir), rank=ArenaRules.rank(standings,p.state.id);
     var ready=phase==='pick'&&(MODE==='live'?!!(LIVE&&LIVE.picks[p.uid]&&LIVE.picks[p.uid].round===round):p.ready);
     var label=known?({L:'롱 ↗',S:'숏 ↘',W:'패스',N:'미제출'}[pk]||'미제출'):(ready?'확정 ✓':i===0&&pk?({L:'롱 ↗',S:'숏 ↘',W:'패스'}[pk]):'?');
-    var value=standings[i].score, change=p.startRank-rank, power=known&&p.revealInput?({push:'승부수 ×1.5',guard:'방어 ×0.5'}[p.revealInput.power]||''):'';
+    var value=standings[i].score, change=p.startRank-rank, multiplier=known&&p.revealInput?p.revealInput.lev+'배':'';
     var reaction=phase==='result'?(p.dp>0?'win':p.dp<0?'loss':'steady'):ready?'ready':'';
     return '<div class="pod '+reaction+(phase==='final'&&rank===1?' champion':'')+'">'
       +'<div class="pick '+(known?pk:'Q')+' on">'+label+'</div><div class="arena-place">'+(estimated?'예상 ':'')+rank+'위'+(estimated&&change>0?' ↑'+change:'')+'</div>'
       +'<div class="ava">'+(p.chImg?'<img class="ch" src="'+p.chImg+'" alt="'+esc(p.name)+'">':'<span class="em">'+(p.em||'')+'</span>')+'</div>'
       +'<div class="desk'+(i===0?' me':'')+(rank===1&&known?' lead':'')+'"><div class="crown">👑</div>'
-      +'<div class="nm">'+(i===0?'나 · ':p.bot?'봇 · ':'')+esc(p.name)+'</div><div class="led '+(value<0?'negative':value>0?'positive':'neutral')+'">'+fmtLead(value)+'P</div>'
-      +'<div class="power-label">'+(power||(!p.state.powerUsed?'전술 1회 남음':'전술 사용 완료'))+'</div><div class="delta" id="dl'+i+'"></div></div></div>';
+      +'<div class="nm">'+(i===0?'나 · ':p.bot?'봇 · ':'')+esc(p.name)+'</div><div class="led '+(value<0?'negative':value>0?'positive':'neutral')+'">'+fmtLead(value)+'<small> 골드</small></div>'
+      +'<div class="power-label">'+(p.state.balance===0?'경기 골드 소진':multiplier||'선택 대기')+'</div><div class="delta" id="dl'+i+'"></div></div></div>';
   }).join('');
+  if(estimated){var estimate=ArenaRules.profit(players[0].state,players[0].revealInput,currentMove());$('goldEquation').textContent=goldEquation(estimate)+' · 예상';}
 }
 function currentMove(){if(!GD)return 0;var entry=GD.cs[GD.vis-1][3],at=Math.max(GD.vis-1,Math.min(gRev-1,GD.cs.length-1));return (GD.cs[at][3]/entry-1)*100;}
 
 function fmtScore(v){ var s=(v<0?'-':'')+('000'+Math.abs(v)).slice(-4); return s; }
 /* 리더보드용 누적 손익(P) 표기 */
-function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.round(v/1000)+'K':a>=10000?(v/1000).toFixed(1).replace('.0','')+'K':fmtP(v); return (v>0?'+':'')+s; }
+function fmtLead(v){return (v>0?'+':'')+fmtP(v);}
 
 /* 컨트롤 */
+function goldEquation(result){return fmtPct(result.signedPct)+' × '+fmtP(result.rate)+' × '+result.pick.lev+'배 ≈ '+fmtLead(result.delta)+' 골드'+(result.capped?' · 손실 한도 적용':'');}
 function renderCtrl(){
-  var me=players[0].state, locked=phase!=='pick'||!!(LIVE&&(LIVE.locked||LIVE.sending));
-  $('optionsSummary').textContent='전략 설정 · 투입 '+Math.round(mySel.betPct*100)+'%'+' · '+(me.powerUsed?'전술 사용 완료':{none:'전술 없음',push:'승부수 ×1.5',guard:'방어 ×0.5'}[mySel.power]);
+  var me=players[0].state,t=currentTable(),locked=phase!=='pick'||me.balance<=0||!!(LIVE&&(LIVE.locked||LIVE.sending));
   ['L','S','W'].forEach(function(d){$('d'+d).classList.toggle('on',mySel.dir===d);$('d'+d).disabled=locked||(d==='W'&&me.passUsed);});
   $('dW').querySelector('small').textContent=me.passUsed?'사용 완료':'경기당 1회';
-  $('bbal').textContent='경기 '+fmtP(me.balance)+'P';
-  $('riskPresets').innerHTML=[['careful','소극적','10% · 1배'],['normal','보통','25% · 2배'],['bold','공격적','50% · 3배']].map(function(x){return '<button type="button" data-risk="'+x[0]+'" class="risk-preset'+(!mySel.advanced&&mySel.risk===x[0]?' on':'')+'"'+(locked?' disabled':'')+'>'+x[1]+'<small>'+x[2]+'</small></button>';}).join('');
-  $('bets').innerHTML=BETPCTS.map(function(b){return '<button type="button" class="bet'+(mySel.betPct===b[0]?' on':'')+'" data-bp="'+b[0]+'"'+(locked?' disabled':'')+'>'+b[1]+'</button>';}).join('');
+  $('bbal').textContent=(t.practice?'모의 ':'경기 ')+fmtP(me.balance)+'G';
   $('levs').innerHTML=[2,3,5,10].map(function(l){return '<button type="button" class="lev'+(mySel.lev===l?' on':'')+'" aria-pressed="'+(mySel.lev===l)+'" data-lev="'+l+'"'+(locked||mySel.dir==='W'?' disabled':'')+'>'+l+'배</button>';}).join('');
   $('leverageLabel').textContent='레버리지 · '+(mySel.lev===1?'기본 1배':mySel.lev+'배');
-  $('powers').innerHTML=[['none','아껴두기'],['push','승부수 ×1.5'],['guard','방어 ×0.5']].map(function(x){return '<button type="button" data-power="'+x[0]+'" class="power-btn'+(mySel.power===x[0]?' on':'')+'"'+(locked||me.powerUsed||mySel.dir==='W'?' disabled':'')+'>'+x[1]+'</button>';}).join('');
-  $('powerHelp').textContent=me.powerUsed?'이 경기의 전술을 이미 사용했습니다.':'승부수는 득실 ×1.5, 방어는 득실 ×0.5 · 둘 중 하나를 경기당 한 번';
+  $('goldEquation').textContent=phase==='result'||phase==='final'?goldEquation(me):mySel.dir==='W'?'패스 · 이번 라운드 골드 변동 없음':'1%당 '+fmtP(t.rate)+' × '+mySel.lev+'배 = '+fmtP(t.rate*mySel.lev)+' 골드';
   var go=$('go');go.className='go';
-  if(phase==='pick'){go.disabled=locked||mySel.dir===null;go.textContent=LIVE&&LIVE.sending?'전송 중…':locked?'확정 완료 · 함께 공개를 기다려요':mySel.dir===null?'방향을 골라주세요':mySel.dir==='W'?'무료 패스 사용':'선택 확정 · '+mySel.lev+'배 · '+fmtP(curBet())+'P';}
+  if(phase==='pick'){go.disabled=locked||mySel.dir===null;go.textContent=me.balance<=0?'경기 골드 소진 · 관전 중':LIVE&&LIVE.sending?'전송 중…':locked?'확정 완료 · 함께 공개를 기다려요':mySel.dir===null?'방향을 골라주세요':mySel.dir==='W'?'무료 패스 사용':({L:'롱',S:'숏'}[mySel.dir])+' '+mySel.lev+'배 확정 · 1%당 '+fmtP(t.rate*mySel.lev)+'G';}
   else if(phase==='result'){go.className='go next';go.disabled=MODE==='live'&&!LIVE.host;go.textContent=round>=ROUNDS?'최종 결과':'다음 라운드';}
-  else{go.disabled=true;go.textContent='선택 공개 · 예상 순위 변동 중';}
+  else{go.disabled=true;go.textContent='선택 공개 · 골드 손익 계산 중';}
 }
-function canChoose(){return phase==='pick'&&!(LIVE&&(LIVE.locked||LIVE.sending));}
+function canChoose(){return phase==='pick'&&players[0].state.balance>0&&!(LIVE&&(LIVE.locked||LIVE.sending));}
 $('dL').onclick=function(){pick('L');};$('dS').onclick=function(){pick('S');};$('dW').onclick=function(){pick('W');};
-function pick(d){if(!canChoose()||(d==='W'&&players[0].state.passUsed))return;mySel.dir=d;if(d==='W')mySel.power='none';renderCtrl();renderPods();}
-$('riskPresets').onclick=function(e){var el=e.target.closest('[data-risk]');if(!el||!canChoose())return;mySel.risk=el.dataset.risk;mySel.advanced=false;var p=ArenaRules.PRESETS[mySel.risk];mySel.betPct=p.betPct;mySel.lev=p.lev;renderCtrl();};
-$('powers').onclick=function(e){var el=e.target.closest('[data-power]');if(!el||!canChoose()||players[0].state.powerUsed)return;mySel.power=el.dataset.power;renderCtrl();};
-$('levs').onclick=function(e){var l=e.target.closest('[data-lev]');if(l&&canChoose()&&mySel.dir!=='W'){mySel.lev=mySel.lev===+l.dataset.lev?1:+l.dataset.lev;mySel.advanced=true;renderCtrl();}};
-$('bets').onclick=function(e){var b=e.target.closest('[data-bp]');if(b&&canChoose()){mySel.betPct=+b.dataset.bp;mySel.advanced=true;renderCtrl();}};
+function pick(d){if(!canChoose()||(d==='W'&&players[0].state.passUsed))return;mySel.dir=d;renderCtrl();renderPods();}
+$('levs').onclick=function(e){var l=e.target.closest('[data-lev]');if(l&&canChoose()&&mySel.dir!=='W'){mySel.lev=mySel.lev===+l.dataset.lev?1:+l.dataset.lev;renderCtrl();}};
 $('indbar').onclick=function(e){var el=e.target.closest('[data-ind]');if(!el)return;var k=el.dataset.ind;bind[k]=!bind[k];el.classList.toggle('on',bind[k]);drawChart();};
 $('go').onclick=function(){submitChoice();};
-$('endbtn').onclick=function(){stopBattle();if(MODE==='live'){liveLeave();LIVE=null;}MODE='4p';$('verdict').classList.remove('show');showLobby();};
+$('endbtn').onclick=function(){closeWallet();stopBattle();if(MODE==='live'){liveLeave();LIVE=null;}MODE='4p';$('verdict').classList.remove('show');showLobby();};
 function stopBattle(){if(tmr)clearInterval(tmr);clearAutoNext();if(revTimer)clearTimeout(revTimer);revTimer=null;}
 
 function toast(m){ var t=$('msg'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1200); }
@@ -534,14 +545,19 @@ function botPick(p){
 }
 
 var matchId='', matchPaid=false, highlight=null, matchHistory=[];
-function initMatch(){matchId='match-'+Date.now()+'-'+Math.random().toString(36).slice(2);matchPaid=false;highlight=null;matchHistory=[];players.forEach(function(p,i){p.state=ArenaRules.create(p.uid||String(i));p.score=0;p.dp=0;p.startRank=1;});}
+function initMatch(id){
+  matchId=id||'match-'+Date.now()+'-'+Math.random().toString(36).slice(2);matchPaid=false;highlight=null;matchHistory=[];
+  players.forEach(function(p,i){p.state=ArenaRules.create(p.uid||String(i),selectedTable);p.score=0;p.dp=0;p.startRank=1;});
+  try{saveWallet(ArenaRules.walletOpen(ljg(GS),matchId,selectedTable,players[0].state.id));return true;}
+  catch(e){showLobby();toast(e.message);return false;}
+}
 function prepareRound(seg,deadline){
   stopBattle();phase='pick';GD=seg;gRev=GD.vis;resetView();tleft=15;
-  mySel={dir:null,risk:'normal',advanced:true,betPct:.25,lev:1,power:'none'};
+  mySel={dir:null,lev:1};
   if(LIVE){LIVE.locked=false;LIVE.sending=false;LIVE.resolving=false;LIVE.deadline=deadline;LIVE.picks={};}
   players.forEach(function(p){p.startRank=ArenaRules.rank(players.map(function(q){return q.state;}),p.state.id);p.pick=null;p.ready=false;p.revealInput=null;p.dp=0;});
   $('chartid').classList.remove('show');$('bShare').style.display='none';$('verdict').classList.remove('show');$('round').textContent='ROUND '+round+' / '+ROUNDS;
-  $('tvtag').textContent=round===ROUNDS?'마지막 라운드 · 한 수의 역전':'같은 차트 · 같은 시작 자금';$('battleHelp').textContent='패스 1회 무료 · 미제출은 경기 점수 -200P · 상점 골드는 감소하지 않습니다.';
+  $('tvtag').textContent=currentTable().name+' · 1%당 '+fmtP(currentTable().rate)+' 골드';$('battleHelp').textContent='맞힌 방향의 수익률 × '+fmtP(currentTable().rate)+' 골드 × 레버리지 · 패스 1회 · 미제출 0골드';
   resetGoHandler();renderPods();renderCtrl();drawChart();
   function tick(){tleft=Math.max(0,Math.ceil((deadline-Date.now())/1000));$('tnum').textContent=tleft;$('tbar').style.width=(tleft/15*100)+'%';if(!tleft){clearInterval(tmr);if(phase==='pick'){if(MODE==='live'){if(LIVE.host)publishReveal();else if(!LIVE.locked){LIVE.locked=true;renderCtrl();}}else lockIn();}}}
   tick();if(phase==='pick')tmr=setInterval(tick,200);
@@ -550,13 +566,13 @@ function startRound(){
   if(MODE==='live'&&LIVE){if(!LIVE.host)return;var seg=pickSeg(),dline=Date.now()+15000;LIVE.ref.update({round:round,seg:seg.idx,phase:'pick',deadline:dline,picks:{},revealPicks:{},history:matchHistory,ping:Date.now()}).catch(function(){abortOnline('연결이 끊어져 경기를 종료했습니다.');});}
   else prepareRound(pickSeg(),Date.now()+15000);
 }
-function botInput(p){var d=botPick(p);if(d==='W'&&p.state.passUsed)d='L';var risk=['careful','normal','bold'][(round+p.name.length)%3];return {dir:d,risk:risk,power:!p.state.powerUsed&&round===2+(p.name.length%3)?(p.state.score<0?'push':'guard'):'none'};}
+function botInput(p){var d=botPick(p);if(d==='W'&&p.state.passUsed)d='L';return {dir:d,lev:[1,2,3,5,10][(round+p.name.length)%5]};}
 function submitChoice(){if(phase==='result'){if(MODE!=='live'||LIVE.host)nextRound();return;}if(!canChoose()||!mySel.dir)return;if(MODE==='live')liveConfirm();else{players[0].ready=true;players[0].pending=ArenaRules.choice(players[0].state,mySel);lockIn();}}
 function lockIn(){if(phase!=='pick')return;var picks={};players.forEach(function(p,i){picks[p.state.id]=i===0?(p.ready?p.pending:null):botInput(p);});beginReveal(picks,Date.now());}
 function beginReveal(picks,at){
   if(phase==='reveal'||phase==='result'||phase==='final')return;if(tmr)clearInterval(tmr);phase='reveal';$('tnum').textContent='공개';
   players.forEach(function(p){p.revealInput=ArenaRules.choice(p.state,picks[p.state.id]);p.pick=p.revealInput.dir;p.lev=p.revealInput.lev;});
-  roundBet=ArenaRules.profit(players[0].state,players[0].revealInput,0).stake;
+  if(!recordWallet(players[0].revealInput,true))return;
   renderCtrl();resetView();var target=GD.vis+30,started=at||Date.now();
   function step(){if(phase!=='reveal')return;var elapsed=Date.now()-started,count=elapsed<3300?Math.floor(elapsed/150):22+Math.floor((elapsed-3300)/400);gRev=reduce?target:Math.min(target,GD.vis+Math.max(0,count));drawChart();renderPods();if(gRev>=target){revTimer=null;finishRound();return;}revTimer=setTimeout(step,100);}
   step();
@@ -564,13 +580,14 @@ function beginReveal(picks,at){
 function finishRound(){
   if(phase!=='reveal')return;gRev=GD.vis+30;drawChart();var move=currentMove();
   players.forEach(function(p){p.state=ArenaRules.settle(p.state,p.revealInput,move,round);p.score=p.state.score;p.dp=p.state.delta;});
+  if(!recordWallet(players[0].revealInput,false))return;
   players.forEach(function(p){var place=ArenaRules.rank(players.map(function(q){return q.state;}),p.state.id),gain=p.startRank-place;if(gain>0&&(!highlight||gain>highlight.gain))highlight={name:p.name,round:round,gain:gain,from:p.startRank,to:place};});
   var resolved={};players.forEach(function(p){resolved[p.state.id]=p.revealInput;});matchHistory=matchHistory.filter(function(x){return x.round<round;});matchHistory.push({round:round,seg:GD.idx,picks:resolved});
   if(MODE==='live'&&LIVE&&LIVE.host&&round===ROUNDS)LIVE.ref.update({phase:'complete',history:matchHistory,ping:Date.now()}).catch(function(){toast('결과 연결이 지연됩니다.');});
   phase='result';renderPods();renderCtrl();
   $('chartid').innerHTML='실제 구간 · <b>'+esc(GD.sym+' '+GD.tf)+'</b>'; $('chartid').classList.add('show');
   var me=players[0],label={L:'롱',S:'숏',W:'무료 패스',N:'시간 내 미제출'}[me.pick];
-  $('verdict').innerHTML='<div class="mv">차트 '+(move>=0?'▲':'▼')+' '+Math.abs(move).toFixed(2)+'%</div><div class="pl">'+label+' · '+(me.dp>0?'+':'')+fmtP(me.dp)+'P</div><div class="bl">경기 자금 '+fmtP(me.state.balance)+'P · 상점 골드 유지</div>';$('verdict').classList.add('show');
+  $('verdict').innerHTML='<div class="mv">차트 '+fmtPct(move)+'</div><div class="pl">'+label+' '+me.state.pick.lev+'배 · '+fmtLead(me.dp)+' 골드</div><div class="bl">'+goldEquation(me.state)+'<br>남은 경기 골드 '+fmtP(me.state.balance)+(currentTable().practice?' · 모의 경기':'')+'</div>';$('verdict').classList.add('show');
   $('battleHelp').textContent=highlight&&highlight.round===round?highlight.name+' · '+highlight.from+'위 → '+highlight.to+'위 역전!':'라운드 확정 · 다음 차트에서 새로운 판단을 해보세요.';
   botReact();_battleCard();startAutoNext();
 }
@@ -581,10 +598,10 @@ function updateGoCountdown(){var go=$('go');if(go&&phase==='result')go.textConte
 function startAutoNext(){clearAutoNext();autoLeft=6;updateGoCountdown();autoTimer=setInterval(function(){autoLeft--;if(autoLeft<=0){clearAutoNext();if(round>=ROUNDS)finalResult();else if(MODE!=='live'||(LIVE&&LIVE.host))nextRound();else $('go').textContent='다음 라운드 동기화 중…';}else updateGoCountdown();},1000);}
 function finalResult(){
   if(phase==='final')return;stopBattle();phase='final';var states=players.map(function(p){return p.state;}),place=ArenaRules.rank(states,players[0].state.id),champions=players.filter(function(p){return ArenaRules.rank(states,p.state.id)===1;});
-  var reward=ArenaRules.reward(place);if(!matchPaid){matchPaid=true;var ledger=ljg('chartarena_battle_rewards_v2');if(!ledger[matchId]){ledger[matchId]=reward;var keys=Object.keys(ledger);keys.slice(0,Math.max(0,keys.length-100)).forEach(function(k){delete ledger[k];});localStorage.setItem('chartarena_battle_rewards_v2',JSON.stringify(ledger));setBal(getBal()+reward);battleXp(players[0].score);}}
+  if(!matchPaid){closeWallet();matchPaid=true;if(!currentTable().practice)battleXp(players[0].score);}
   renderPods();$('tnum').textContent='완료';var title=place===1?'우승! 축하합니다':place+'위 · 다음 판에서 다시 도전';
-  $('verdict').innerHTML='<div class="mv">'+title+'</div><div class="pl">우승: '+champions.map(function(p){return esc(p.name);}).join(', ')+'</div><div class="bl">완주 보상 +'+fmtP(reward)+' 골드 · 경기 손익 '+fmtLead(players[0].score)+'P</div>';$('verdict').classList.add('show');
-  $('battleHelp').textContent=highlight?'이번 경기 최고의 역전: '+highlight.name+' · '+highlight.round+'라운드 '+highlight.from+'위 → '+highlight.to+'위':'5라운드 완주! 경기 점수는 초기화되고 골드 보상은 유지됩니다.';
+  $('verdict').innerHTML='<div class="mv">'+title+'</div><div class="pl">우승: '+champions.map(function(p){return esc(p.name);}).join(', ')+'</div><div class="bl">'+(currentTable().practice?'모의 손익 ':'골드 정산 ')+fmtLead(players[0].score)+' 골드<br>보유 '+fmtP(getBal())+' 골드</div>';$('verdict').classList.add('show');
+  $('battleHelp').textContent=highlight?'이번 경기 최고의 역전: '+highlight.name+' · '+highlight.round+'라운드 '+highlight.from+'위 → '+highlight.to+'위':'5라운드 완료 · '+(currentTable().practice?'보유 골드 변동 없음':'경기 손익을 보유 골드에 반영했습니다.');
   var go=$('go');go.className='go next';go.disabled=false;go.textContent='한 판 더 · 로비로';go.onclick=function(){if(MODE==='live')liveLeave();LIVE=null;MODE='4p';$('verdict').classList.remove('show');showLobby();};
 }
 
@@ -643,8 +660,8 @@ function shareCard(d){ if(!d)return; makeCard(d,function(C){ C.toBlob(function(b
 },'image/png'); }); }
 function _battleCard(){ var me=players[0]; if(!me||!GD)return;
   var vis=GD.vis, cs=GD.cs, entry=cs[vis-1][3], exit=cs[vis-1+30][3];
-  var ret=me.state&&me.state.stake?me.dp/me.state.stake*100:0;
-  var kind=me.pick==='W'?'watch':(ret<=-100?'liq':ret>0?'profit':'loss');
+  var ret=me.state?me.state.signedPct*me.state.pick.lev:0;
+  var kind=me.pick==='W'||me.pick==='N'?'watch':(me.state.balance===0?'liq':ret>0?'profit':'loss');
   var pctS=me.pick==='W'?'관망':((ret>=0?'+':'')+ret.toFixed(2)+'%');
   var dirKo={L:'롱',S:'숏',W:'관망'}[me.pick]||'관망', w0=Math.max(0,vis-1-40);
   _cardData={ kind:kind, pct:pctS, dirKo:dirKo, lev:me.lev, sym:GD.sym||'', tf:GD.tf||'',
@@ -652,20 +669,20 @@ function _battleCard(){ var me=players[0]; if(!me||!GD)return;
     badge:kind==='liq'?'💥 청산':kind==='profit'?(ret>=50?'🚀 떡상':'👍 익절'):kind==='loss'?'💧 손실':'◎ 관망',
     meme:kind==='liq'?'다음 판단으로 다시 도전':kind==='profit'?(ret>=50?'떡상! 이번 판 접수 🚀':'배틀 익절 👍'):kind==='loss'?'물렸다… 다음 판 복수 💧':'관망도 전략 ◎',
     cs:cs.slice(w0,vis-1+31), entryIdx:Math.min(40,vis-1),
-    shareText:'차트아레나 배틀 '+pctS+'! 너도 도전 → jansang18.github.io/chartarena-web' };
+    shareText:'차트아레나 배틀 '+fmtLead(me.dp)+' 골드 ('+pctS+')! 너도 도전 → jansang18.github.io/chartarena-web' };
   var b=$('bShare'); if(b){b.style.display=''; b.onclick=function(){ if(_cardData)shareCard(_cardData); };}
 }
 window.addEventListener('resize',drawChart);
 
 /* ===== 로비 / 모드 선택 ===== */
-function showLobby(){ phase='idle';document.documentElement.removeAttribute('data-playing');if(battlePass)battlePass.reset(); var lb=$('lobby'); if(!lb)return; lb.classList.remove('hide'); $('lmodes').style.display='flex';window.scrollTo(0,0); }
-function hideLobby(){ var lb=$('lobby'); if(lb)lb.classList.add('hide');document.documentElement.dataset.playing='true';$('battleOptions').open=!matchMedia('(max-width:1100px), (max-height:700px)').matches;window.scrollTo(0,0);requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));}); }
-function startMode4p(){ if(!nrgGate(true))return; MODE='4p'; round=1; document.querySelector('.live').textContent='봇 포함 4인';
+function showLobby(){ phase='idle';renderTables();document.documentElement.removeAttribute('data-playing');if(battlePass)battlePass.reset(); var lb=$('lobby'); if(!lb)return; lb.classList.remove('hide'); $('lmodes').style.display='flex';window.scrollTo(0,0); }
+function hideLobby(){ var lb=$('lobby'); if(lb)lb.classList.add('hide');document.documentElement.dataset.playing='true';window.scrollTo(0,0);requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));}); }
+function startMode4p(){ if(!nrgGate(false)||getBal()<currentTable().reserve){showLobby();return;} MODE='4p'; round=1; document.querySelector('.live').textContent='봇 포함 4인';
   players=[ {name:myNick, chImg:myChImg, score:0, strat:'me', pick:null, lev:2, dp:0},
     {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},
     {name:'슬라임', em:'🟢', score:0, strat:'counter', pick:null, lev:1, dp:0},
     {name:'주황버섯', em:'🍄', score:0, strat:'random', pick:null, lev:3, dp:0} ];
-  randomizeBots(); players.forEach(function(p,i){p.bot=i>0;}); initMatch(); hideLobby(); startRound();
+  randomizeBots(); players.forEach(function(p,i){p.bot=i>0;}); if(!initMatch())return;if(!nrgGate(true)){closeWallet();showLobby();return;} hideLobby(); startRound();
 }
 /* ===== 실시간 대결 (Firestore 매칭 + 봇 폴백) ===== */
 var LIVE=null, mmUnsub=null, mmTimer=null;
@@ -694,7 +711,7 @@ function clearMatchWait(){if(mmUnsub){mmUnsub();mmUnsub=null;}if(mmTimer){clearI
 function startModeLive(){
   if(mmActive)liveCancel();var attempt=++mmAttempt;mmActive=true;
   showWait();renderWait([{uid:'me',nick:myNick,ch:myCh,me:true}],4,'상대를 찾는 중…');
-  if($('lwsub'))$('lwsub').textContent='지금 접속한 유저를 찾고 있어요';if($('lwspin'))$('lwspin').style.display='';
+  if($('lwsub'))$('lwsub').textContent=currentTable().name+' · 1%당 '+fmtP(currentTable().rate)+' 골드 · 같은 방의 상대를 찾고 있어요';if($('lwspin'))$('lwspin').style.display='';
   $('lwcancel').onclick=function(){if(!mmCurrent(attempt))return;liveCancel();backToModes();};
   if(fbReady())mmFindOrCreate(attempt);
   else setTimeout(function(){if(!mmCurrent(attempt))return;if(fbReady())mmFindOrCreate(attempt);else liveFallback('지금은 접속한 상대가 없어요',attempt);},2200);
@@ -712,10 +729,10 @@ function liveFallback(msg,attempt){
 }
 function mmFindOrCreate(attempt){
   if(!mmCurrent(attempt))return;var me={nick:(myNick||'플레이어').slice(0,12),ch:myCh,bot:false,joinAt:Date.now(),matchAttempt:mmTag(attempt)};
-  FB.collection('rooms').where('status','==','wait_v2').orderBy('createdAt','desc').limit(8).get().then(function(qs){
-    if(!mmCurrent(attempt))return;var joinRef=null;qs.forEach(function(dd){if(joinRef)return;var x=dd.data();if(!x||x.status!=='wait_v2'||!x.players||!x.players[x.host])return;if(Date.now()-(x.createdAt||0)>22000)return;if(Object.keys(x.players).length<(x.cap||4))joinRef=dd.ref;});
+  FB.collection('rooms').where('status','==','wait_v3').orderBy('createdAt','desc').limit(8).get().then(function(qs){
+    if(!mmCurrent(attempt))return;var joinRef=null;qs.forEach(function(dd){if(joinRef)return;var x=dd.data();if(!x||x.status!=='wait_v3'||x.rulesVersion!==3||x.tableId!==selectedTable||!x.players||!x.players[x.host])return;if(Date.now()-(x.createdAt||0)>22000)return;if(Object.keys(x.players).length<(x.cap||4))joinRef=dd.ref;});
     if(joinRef){FB.runTransaction(function(tx){return tx.get(joinRef).then(function(s){
-      if(!mmCurrent(attempt))return false;var x=s.data();if(!x||x.status!=='wait_v2'||!x.players||!x.players[x.host])throw Error('closed');if(Object.keys(x.players).length>=(x.cap||4))throw Error('full');
+      if(!mmCurrent(attempt))return false;var x=s.data();if(!x||x.status!=='wait_v3'||x.rulesVersion!==3||x.tableId!==selectedTable||!x.players||!x.players[x.host])throw Error('closed');if(Object.keys(x.players).length>=(x.cap||4))throw Error('full');
       var u={};u['players.'+myUid]=me;u['scores.'+myUid]=0;tx.update(joinRef,u);return true;
     });}).then(function(joined){if(!joined)return;if(!mmCurrent(attempt)){cleanupMatchMembership(joinRef,false,attempt);return;}enterRoom(joinRef,false,attempt);}).catch(function(){if(mmCurrent(attempt))mmCreate(me,attempt);});}
     else mmCreate(me,attempt);
@@ -723,7 +740,7 @@ function mmFindOrCreate(attempt){
 }
 function mmCreate(me,attempt){
   if(!mmCurrent(attempt))return;var pl={};pl[myUid]=me;var sc={};sc[myUid]=0;
-  FB.collection('rooms').add({status:'wait_v2',rulesVersion:2,host:myUid,cap:4,createdAt:Date.now(),players:pl,scores:sc,round:0,phase:'pick',ping:Date.now()})
+  FB.collection('rooms').add({status:'wait_v3',rulesVersion:3,tableId:selectedTable,host:myUid,cap:4,createdAt:Date.now(),players:pl,scores:sc,round:0,phase:'pick',ping:Date.now()})
     .then(function(ref){if(!mmCurrent(attempt)){cleanupMatchMembership(ref,true,attempt);return;}enterRoom(ref,true,attempt);}).catch(function(){if(mmCurrent(attempt))liveFallback('매칭 방 생성 실패 — 봇과 대결',attempt);});
 }
 function enterRoom(ref,host,attempt){
@@ -740,32 +757,32 @@ function enterRoom(ref,host,attempt){
   },function(){if(mmCurrent(attempt)&&LIVE===session)liveFallback('매칭 오류 — 봇과 대결',attempt);});
   if(host){mmTimer=setInterval(function(){
     if(!mmCurrent(attempt)||LIVE!==session||session.started)return;
-    ref.get().then(function(s){if(!mmCurrent(attempt)||LIVE!==session||session.started||!s.exists)return;var d=s.data();if(d.status!=='wait_v2')return;var humans=Object.keys(d.players||{}).filter(function(u){return !d.players[u].bot;}).length;
+    ref.get().then(function(s){if(!mmCurrent(attempt)||LIVE!==session||session.started||!s.exists)return;var d=s.data();if(d.status!=='wait_v3')return;var humans=Object.keys(d.players||{}).filter(function(u){return !d.players[u].bot;}).length;
       if(humans>=(d.cap||4)||Date.now()>=startAt)hostStart(ref,d);
     }).catch(function(){});
   },1200);}else mmTimer=setTimeout(function(){if(mmCurrent(attempt)&&LIVE===session&&!session.started)liveFallback('매칭 대기 시간이 초과됐어요',attempt);},25000);
 }
 function hostStart(ref,d){
   if(!LIVE||LIVE.starting)return;LIVE.starting=true;var session=LIVE;
-  FB.runTransaction(function(tx){return tx.get(ref).then(function(s){var fresh=s.data();if(LIVE!==session||!mmCurrent(session.attempt)||!fresh||fresh.status!=='wait_v2'||!fresh.players||!fresh.players[fresh.host])return;var cap=fresh.cap||4,playersMap=Object.assign({},fresh.players),count=Object.keys(playersMap).length,b=0;while(count<cap){var bid='bot_'+b++;if(playersMap[bid])continue;playersMap[bid]={nick:BOTNAMES[(b*7)%BOTNAMES.length],ch:'hu'+((b*5)%17),bot:true};count++;}tx.update(ref,{status:'play',players:playersMap,round:0,phase:'pick',history:[],ping:Date.now()});});}).catch(function(){if(LIVE===session)liveFallback('시작 실패 — 봇과 대결');}).finally(function(){if(LIVE===session)session.starting=false;});
+  FB.runTransaction(function(tx){return tx.get(ref).then(function(s){var fresh=s.data();if(LIVE!==session||!mmCurrent(session.attempt)||!fresh||fresh.status!=='wait_v3'||fresh.rulesVersion!==3||fresh.tableId!==selectedTable||!fresh.players||!fresh.players[fresh.host])return;var cap=fresh.cap||4,playersMap=Object.assign({},fresh.players),count=Object.keys(playersMap).length,b=0;while(count<cap){var bid='bot_'+b++;if(playersMap[bid])continue;playersMap[bid]={nick:BOTNAMES[(b*7)%BOTNAMES.length],ch:'hu'+((b*5)%17),bot:true};count++;}tx.update(ref,{status:'play',players:playersMap,round:0,phase:'pick',history:[],ping:Date.now()});});}).catch(function(){if(LIVE===session)liveFallback('시작 실패 — 봇과 대결');}).finally(function(){if(LIVE===session)session.starting=false;});
 }
 function beginLive(d){
-  if(!nrgGate(true)){liveCancel();backToModes();return;}hideWait();hideLobby();MODE='live';round=1;LIVE.playing=true;
+  if(d.rulesVersion!==3||d.tableId!==selectedTable||!nrgGate(false)||getBal()<currentTable().reserve){liveCancel();backToModes();toast('방 규칙이나 입장 골드를 확인해 주세요.');return;}MODE='live';round=1;LIVE.playing=true;
   var ids=Object.keys(d.players||{}).sort(function(a,b){if(a===myUid)return -1;if(b===myUid)return 1;return a.localeCompare(b);});
   players=ids.map(function(u){var p=d.players[u];return {uid:u,name:p.nick||'유저',chImg:u===myUid?myChImg:(CHIMG[p.ch]||CHIMG.hu0),bot:!!p.bot,strat:p.bot?'trend':'live',pick:null,score:0,dp:0};});
   document.querySelector('.live').textContent=players.some(function(p){return p.bot;})?'온라인 · 봇 포함 4인':'온라인 4인';
-  initMatch();matchId='v2-'+LIVE.ref.id;LIVE.lastRound=0;LIVE.lastSnap=Date.now();
+  if(!initMatch('v3-'+LIVE.ref.id+'-'+myUid)){liveLeave();LIVE=null;MODE='4p';hideWait();showLobby();return;}if(!nrgGate(true)){closeWallet();liveLeave();LIVE=null;showLobby();return;}hideWait();hideLobby();LIVE.lastRound=0;LIVE.lastSnap=Date.now();
   LIVE.gameUnsub=LIVE.ref.onSnapshot(function(s){if(!LIVE)return;if(!s.exists){abortOnline('경기 방이 닫혔습니다.');return;}onLiveSnap(s.data());},function(){abortOnline('경기 연결이 끊어졌습니다.');});
   LIVE.watchdog=setInterval(function(){if(LIVE&&phase!=='final'&&Date.now()-LIVE.lastSnap>45000)abortOnline('호스트 응답이 없어 경기를 종료했습니다.');},3000);
   if(LIVE.host)startRound();else{$('round').textContent='매칭 완료 · 차트 준비 중';renderPods();}
 }
 function recoverPlayers(history){
-  players.forEach(function(p){p.state=ArenaRules.recover(p.state,history,function(idx){var seg=pickSegByIdx(idx);return(seg.cs[seg.vis+29][3]/seg.cs[seg.vis-1][3]-1)*100;});p.score=p.state.score;p.dp=p.state.delta;p.pick=p.state.pick?p.state.pick.dir:null;p.revealInput=p.state.pick||null;});matchHistory=history.slice();
+  players.forEach(function(p){p.state=ArenaRules.recover(p.state,history,function(idx){var seg=pickSegByIdx(idx);return(seg.cs[seg.vis+29][3]/seg.cs[seg.vis-1][3]-1)*100;});p.score=p.state.score;p.dp=p.state.delta;p.pick=p.state.pick?p.state.pick.dir:null;p.revealInput=p.state.pick||null;});matchHistory=history.slice();return recoverWallet(history);
 }
 function onLiveSnap(d){
   if(!LIVE||!LIVE.playing||phase==='final')return;LIVE.lastSnap=Date.now();
-  if(d.status==='done'){if(d.history&&d.history.some(function(x){return x.round===ROUNDS;})){stopBattle();recoverPlayers(d.history);round=ROUNDS;var last=d.history.find(function(x){return x.round===ROUNDS;});GD=pickSegByIdx(last.seg);gRev=GD.vis+30;phase='result';finalResult();}else if(phase!=='final')abortOnline('호스트가 경기를 종료했습니다.');return;}
-  if(d.round>LIVE.lastRound){recoverPlayers((d.history||[]).filter(function(x){return x.round<d.round;}));LIVE.lastRound=d.round;round=d.round;prepareRound(pickSegByIdx(d.seg),d.deadline);}
+  if(d.status==='done'){if(d.history&&d.history.some(function(x){return x.round===ROUNDS;})){stopBattle();if(!recoverPlayers(d.history))return;round=ROUNDS;var last=d.history.find(function(x){return x.round===ROUNDS;});GD=pickSegByIdx(last.seg);gRev=GD.vis+30;phase='result';finalResult();}else if(phase!=='final')abortOnline('호스트가 경기를 종료했습니다.');return;}
+  if(d.round>LIVE.lastRound){if(!recoverPlayers((d.history||[]).filter(function(x){return x.round<d.round;})))return;LIVE.lastRound=d.round;round=d.round;prepareRound(pickSegByIdx(d.seg),d.deadline);}
   LIVE.picks=d.picks||{};
   if((d.phase==='reveal'||d.phase==='complete')&&d.round===round&&phase==='pick')beginReveal(d.revealPicks||{},d.revealAt);
   else if(d.phase==='pick'&&d.round===round&&phase==='pick'){
@@ -783,10 +800,10 @@ function publishReveal(){
   });}).then(function(){if(LIVE===session)session.resolving=false;}).catch(function(){if(LIVE===session)abortOnline('결과 동기화에 실패했습니다.');});
 }
 function liveConfirm(){
-  if(!LIVE||!canChoose()||!mySel.dir)return;var session=LIVE,roundNo=round,input=ArenaRules.choice(players[0].state,mySel);session.sending=true;renderCtrl();
-  FB.runTransaction(function(tx){return tx.get(session.ref).then(function(s){var d=s.data();if(!d||d.round!==roundNo||d.phase!=='pick'||Date.now()>d.deadline)throw Error('expired');if(d.picks&&d.picks[myUid]&&d.picks[myUid].round===roundNo)return;var u={};u['picks.'+myUid]=Object.assign({round:roundNo},input);tx.update(session.ref,u);});}).then(function(){if(LIVE!==session)return;session.sending=false;session.locked=true;renderCtrl();renderPods();}).catch(function(){if(LIVE!==session)return;session.sending=false;if(phase==='pick')toast('확정하지 못했습니다. 연결을 확인하고 다시 눌러주세요.');renderCtrl();});
+  if(!LIVE||!canChoose()||!mySel.dir)return;var session=LIVE,roundNo=round,input=ArenaRules.choice(players[0].state,mySel);if(!recordWallet(input,true))return;session.sending=true;renderCtrl();
+  FB.runTransaction(function(tx){return tx.get(session.ref).then(function(s){var d=s.data();if(!d||d.round!==roundNo||d.phase!=='pick'||Date.now()>d.deadline)throw Error('expired');if(d.picks&&d.picks[myUid]&&d.picks[myUid].round===roundNo)return;var u={};u['picks.'+myUid]=Object.assign({round:roundNo},input);tx.update(session.ref,u);});}).then(function(){if(LIVE!==session)return;session.sending=false;session.locked=true;renderCtrl();renderPods();}).catch(function(){if(LIVE!==session)return;session.sending=false;abortOnline('연결 오류로 경기를 종료합니다. 확정 시도한 선택까지 정산합니다.');});
 }
-function abortOnline(message){if(!LIVE)return;stopBattle();liveLeave();LIVE=null;MODE='4p';phase='idle';$('verdict').classList.remove('show');showLobby();toast(message+' · 상점 골드는 유지됩니다.');}
+function abortOnline(message){if(!LIVE)return;closeWallet();stopBattle();liveLeave();LIVE=null;MODE='4p';phase='idle';$('verdict').classList.remove('show');showLobby();toast(message+' · 확정된 선택까지 정산했습니다.');}
 function liveLeave(){try{if(LIVE&&LIVE.gameUnsub)LIVE.gameUnsub();if(LIVE&&LIVE.watchdog)clearInterval(LIVE.watchdog);if(mmUnsub){mmUnsub();mmUnsub=null;}if(mmTimer){clearInterval(mmTimer);mmTimer=null;}if(LIVE&&LIVE.ref&&fbReady()&&LIVE.host)LIVE.ref.update({status:'done',ping:Date.now()}).catch(function(){});}catch(e){}}
 
 /* 경험치: 배틀 라운드에서만. 승 +10 / 패 -5 / 무·관망 0. 100 XP = 1레벨. 레벨업 보상 = 골드+보석 */
@@ -799,7 +816,7 @@ function battleXp(dp){ if(!window.XP) return; var amt = dp>0?10 : dp<0?-5 : 0; i
   } else { XP.toast((amt>0?'+':'')+amt+' XP'); } }
 function nrgGate(consume){ if(!battlePass)return true; if(consume?battlePass.consume():battlePass.available())return true;
   var ov=$('bNoNrg'); if(ov){ var m=$('bNrgMsg'); if(m)m.textContent=NRG.nextRefillText()+' 후 10판 충전 · 허브에서 보석으로 즉시 충전할 수 있어요.'; ov.classList.add('on'); } return false; }
-$('modeLive').onclick=function(){ if(nrgGate(false)) startModeLive(); };
+$('modeLive').onclick=function(){ if(getBal()>=currentTable().reserve&&nrgGate(false)) startModeLive(); };
 showLobby();
 })();
 </script>

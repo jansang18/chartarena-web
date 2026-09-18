@@ -1,13 +1,52 @@
-/* Deterministic match-only rules. No storage, DOM or hidden chart data. */
+/* Deterministic percentage-gold rules and atomic local-wallet transitions. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const START=10000,ROUNDS=5,PRESETS={careful:{betPct:.1,lev:1},normal:{betPct:.25,lev:2},bold:{betPct:.5,lev:3}};
-function create(id){return {id:String(id),balance:START,score:0,delta:0,passUsed:false,powerUsed:false,appliedRound:0};}
-function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if(dir==='W'&&player.passUsed)dir='N';const risk=Object.hasOwn(PRESETS,input.risk)?input.risk:'normal',preset=PRESETS[risk];const advanced=input.advanced===true;const betPct=advanced&&[.1,.25,.5,1].includes(input.betPct)?input.betPct:preset.betPct;const lev=advanced&&[1,2,3,5,10].includes(input.lev)?input.lev:preset.lev;const power=!player.powerUsed&&['L','S'].includes(dir)&&['push','guard'].includes(input.power)?input.power:'none';return {dir,risk,advanced,betPct,lev,power};}
-function profit(player,input,move){const pick=choice(player,input),stake=pick.dir==='L'||pick.dir==='S'?Math.min(player.balance,Math.round(player.balance*pick.betPct)):0;let delta=0;if(pick.dir==='N')delta=-Math.min(200,player.balance);else if(pick.dir!=='W'){const multiplier=pick.power==='push'?1.5:pick.power==='guard'?.5:1;const raw=stake*(pick.dir==='L'?1:-1)*Number(move)/100*pick.lev*multiplier;delta=Math.max(-stake,Math.round(Number.isFinite(raw)?raw:0));}return {delta,stake,pick};}
-function settle(player,input,move,round){if(round<=player.appliedRound)return player;if(round!==player.appliedRound+1||round>ROUNDS)throw Error('Round must advance exactly once');const p=profit(player,input,move);return Object.assign({},player,{balance:player.balance+p.delta,score:player.score+p.delta,delta:p.delta,stake:p.stake,pick:p.pick,passUsed:player.passUsed||p.pick.dir==='W',powerUsed:player.powerUsed||p.pick.power!=='none',appliedRound:round});}
+const VERSION=3,ROUNDS=5;
+const TABLES=Object.freeze({
+ practice:Object.freeze({id:'practice',name:'연습방',rate:100,reserve:0,capital:2000,practice:true}),
+ beginner:Object.freeze({id:'beginner',name:'입문방',rate:100,reserve:2000,capital:2000}),
+ standard:Object.freeze({id:'standard',name:'일반방',rate:1000,reserve:20000,capital:20000}),
+ expert:Object.freeze({id:'expert',name:'고수방',rate:10000,reserve:200000,capital:200000})
+});
+function table(id){id=id||'standard';if(!Object.hasOwn(TABLES,id))throw Error('Unknown table');return TABLES[id];}
+function create(id,tableId){const t=table(tableId);return {id:String(id),tableId:t.id,balance:t.capital,score:0,delta:0,passUsed:false,appliedRound:0};}
+function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if((dir==='W'&&player.passUsed)||player.balance<=0)dir='N';return {dir,lev:[1,2,3,5,10].includes(input.lev)?input.lev:1};}
+function goldRound(v){return Math.sign(v)*Math.round(Math.abs(v)+1e-8)||0;}
+function profit(player,input,move){
+ if(typeof move!=='number'||!Number.isFinite(move))throw Error('Invalid chart move');
+ // Quote the same four-decimal percentage used by the on-screen equation.
+ move=Number(move.toFixed(4));
+ const pick=choice(player,input),t=table(player.tableId),signedPct=pick.dir==='L'?move:pick.dir==='S'?-move:0;
+ const raw=signedPct*t.rate*pick.lev;if(!Number.isSafeInteger(Math.trunc(raw)))throw Error('Gold result exceeds range');
+ const uncapped=goldRound(raw),delta=Math.max(-player.balance,uncapped);
+ return {delta,pick,signedPct,rate:t.rate,capped:delta!==uncapped};
+}
+function settle(player,input,move,round){
+ if(!Number.isInteger(round)||round<1||round>ROUNDS)throw Error('Invalid round');
+ if(round<=player.appliedRound)return player;if(round!==player.appliedRound+1)throw Error('Round must advance exactly once');
+ const p=profit(player,input,move);return Object.assign({},player,p,{balance:player.balance+p.delta,score:player.score+p.delta,passUsed:player.passUsed||p.pick.dir==='W',appliedRound:round});
+}
 function recover(state,history,moveForSegment){let next=state;for(const entry of history.slice().sort((a,b)=>a.round-b.round)){if(entry.round<=next.appliedRound)continue;next=settle(next,(entry.picks||{})[next.id],moveForSegment(entry.seg),entry.round);}return next;}
 function rank(players,id){const me=players.find(p=>p.id===id);return me?1+players.filter(p=>p.score>me.score).length:players.length;}
-function reward(place){return [2000,1200,800,500][Math.max(0,Math.min(3,place-1))];}
-return {START,ROUNDS,PRESETS,create,choice,profit,settle,recover,rank,reward};
+function walletBalance(game){return Number.isSafeInteger(game.balance)&&game.balance>=0?game.balance:25000;}
+function walletOpen(game,id,tableId,playerId){
+ const t=table(tableId),balance=walletBalance(game);
+ if(game.battleActive)throw Error('이미 진행 중인 경기가 있습니다.');
+ if(!id||(game.battleClosed||[]).includes(id))throw Error('이미 정산한 경기입니다.');
+ if(balance<t.reserve)throw Error('입장에 필요한 골드가 부족합니다.');
+ return Object.assign({},game,{balance:balance-t.reserve,battleActive:{id,tableId:t.id,reserve:t.reserve,state:create(playerId,t.id),pending:null}});
+}
+function walletRound(game,id,input,move,round,pending){
+ const a=game.battleActive;if(!a||a.id!==id)throw Error('경기가 다른 창에서 정산되었습니다.');
+ if(round<=a.state.appliedRound)return game;
+ const next=settle(a.state,input,move,round);
+ return Object.assign({},game,{battleActive:Object.assign({},a,pending?{pending:next}:{state:next,pending:null})});
+}
+function walletClose(game,id){
+ const a=game.battleActive;if(!a||a.id!==id)return game;
+ const t=table(a.tableId),state=a.pending||a.state,returned=t.practice?0:state.balance;
+ const closed=(game.battleClosed||[]).concat(id).slice(-100);
+ return Object.assign({},game,{balance:walletBalance(game)+returned,battleActive:null,battleClosed:closed,battleLast:{id,tableId:t.id,delta:t.practice?0:state.score,simulated:state.score,rounds:state.appliedRound}});
+}
+return {VERSION,ROUNDS,TABLES,table,create,choice,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
 });
