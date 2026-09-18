@@ -12,7 +12,7 @@ for(const file of files){
   for(const m of markup.matchAll(/(?:src|href)="((?:assets\/)[^"<>]+)"/g)){
     assert.ok(fs.existsSync(m[1].split('?')[0]),`${file}: missing ${m[1]}`);
   }
-  assert.ok(html.includes('app-shell.css?v=1')&&html.includes('app-shell.js?v=1'),file+' missing common shell');
+  assert.ok(html.includes('app-shell.css?v=')&&html.includes('app-shell.js?v='),file+' missing common shell');
 }
 assert.equal(fs.readFileSync('index.html','utf8'),fs.readFileSync('landscape.html','utf8'));
 const battle=fs.readFileSync('quiz-battle.html','utf8');

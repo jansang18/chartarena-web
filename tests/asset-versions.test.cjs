@@ -1,0 +1,13 @@
+const fs = require('node:fs');
+const crypto = require('node:crypto');
+const test = require('node:test');
+const assert = require('node:assert/strict');
+test('every shared runtime reference matches its content version', () => {
+  for (const page of fs.readdirSync('.').filter(p => p.endsWith('.html'))) {
+    const html = fs.readFileSync(page, 'utf8');
+    for (const match of html.matchAll(/(?:src|href)="(energy\.js|app-shell\.js|app-shell\.css)([^\"]*)"/g)) {
+      const hash = crypto.createHash('sha256').update(fs.readFileSync(match[1])).digest('hex').slice(0, 12);
+      assert.equal(match[2], '?v=' + hash, `${page}: ${match[1]} must invalidate the previous cached runtime`);
+    }
+  }
+});
