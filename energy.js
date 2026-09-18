@@ -28,6 +28,16 @@
   function add(n) { var s = sync(); s.plays += (n | 0); save(s); return s.plays; }   // 구매 등(최대 초과 허용)
   function setMax() { var s = sync(); s.plays = MAX; s.last = Date.now(); save(s); }
 
+  // One pass per new solo question or battle. Browsing and retries never charge.
+  function createPass() {
+    var paid = false;
+    return {
+      available: function () { return paid || has(); },
+      consume: function () { if (paid) return true; paid = use(); return paid; },
+      reset: function () { paid = false; }
+    };
+  }
+
   window.NRG = { MAX: MAX, plays: plays, has: has, use: use, add: add, setMax: setMax,
-    nextRefillMs: nextRefillMs, nextRefillText: nextRefillText };
+    nextRefillMs: nextRefillMs, nextRefillText: nextRefillText, createPass: createPass };
 })();

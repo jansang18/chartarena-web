@@ -1,5 +1,7 @@
 # 차트아레나 (ChartArena) — 웹 디자인 작업 가이드 (for coding agents)
 
+> 2026-09-19 업데이트: 현재 화면은 `app-shell.css`/`app-shell.js`의 공통 반응형 다크 UI를 사용합니다. 고정 프레임 축소와 1대1 대전은 제거되었습니다. 아래의 옛 프레임/라이트 테마 설명보다 `UPDATE-NOTES.md` 및 현재 코드를 우선하세요. localhost/file에서는 운영 Firebase를 초기화하지 않습니다.
+
 주식 **차트 교육 게임**. 이 저장소 = **웹(HTML/CSS/JS) 빌드**이며, 두 곳으로 나갑니다:
 1. **GitHub Pages 라이브**: <https://jansang18.github.io/chartarena-web/> (push하면 자동 배포)
 2. **안드로이드 앱에 번들**: `C:\Users\whaak\Desktop\JUSIK\app\src\main\assets\web\` 로 복사되어 WebView로 로드됨 (오프라인). 앱은 별개 저장소이므로, 여기서 디자인만 하고 앱 반영은 사용자가 요청할 때만.

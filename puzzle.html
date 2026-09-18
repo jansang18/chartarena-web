@@ -2,12 +2,13 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script src="app-shell.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트 퍼즐 퀘스트 — 차트아레나">
 <meta property="og:description" content="레벨을 깨는 차트 예측 퍼즐! 다음은 오른다? 내린다? 별을 모으고 월드를 정복하세요.">
 <meta property="og:image" content="https://jansang18.github.io/chartarena-web/assets/og.png">
-<title>차트 퍼즐 퀘스트 — 차트아레나</title>
+<title>차트아레나 — 차트 퍼즐</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1122'/%3E%3Crect x='8.5' y='9' width='4' height='14' rx='1.5' fill='%2335D07A'/%3E%3Crect x='19' y='6' width='4' height='17' rx='1.5' fill='%23FF5C8A'/%3E%3C/svg%3E">
 <style>
   :root{
@@ -110,12 +111,13 @@
   .foot{text-align:center;color:var(--tm);font-size:10.5px;line-height:1.5;margin-top:26px}
   @media(max-width:540px){ .lv{width:calc(33.3% - 12px)} .lv .disc{width:58px;height:58px;font-size:19px} .maphd h2{font-size:22px} }
 </style>
+<link rel="stylesheet" href="app-shell.css?v=1">
 </head>
 <body>
 <div class="scaler" id="scaler"><div class="frame">
 <div class="top">
   <a class="home" href="index.html">← 홈</a>
-  <h1>🧩 차트 퍼즐 퀘스트</h1>
+  <h1>차트 퍼즐</h1>
   <div class="stat s" id="tStars">⭐ 0</div>
   <div class="stat g"><img class="coindot" src="assets/coin.png?v=1" alt=""><span id="tPts">0</span></div>
 </div>
@@ -125,7 +127,7 @@
 <div id="map" class="wrap">
   <div class="maphd">
     <img class="hicon" src="assets/tile_puzzle.png" alt="차트 퍼즐 퀘스트">
-    <h2>월드를 정복하라! 🗺️</h2>
+    <h2>한 문제씩, 감각을 쌓아보세요.</h2>
     <p>차트를 보고 <b style="color:var(--green)">오른다</b> / <b style="color:var(--pink)">내린다</b> 를 맞혀 별을 모으세요. 실제 코인 차트로 만든 퍼즐이에요.</p>
   </div>
   <div id="worlds"></div>
@@ -175,10 +177,9 @@
 <script src="xp.js"></script>
 <script src="charts.js"></script>
 <script>
-function fitP(){var s=Math.min(1.49,(window.innerWidth-12)/1120,(window.innerHeight-14)/516);var sc=document.getElementById('scaler');if(sc){sc.style.transform='scale('+s+')';sc.style.height=(516*s)+'px';sc.style.width='1120px';}}   // 1.49 → 허브와 같은 크기로 채움
-window.addEventListener('resize',fitP); fitP();
+/* Responsive layout is owned by app-shell.css. */
 (function(){
-"use strict";
+'use strict';
 var $=function(id){return document.getElementById(id);};
 var CH = (window.CHARTS && window.CHARTS.length) ? window.CHARTS : [];
 /* ---------- 저장 ---------- */
@@ -351,7 +352,7 @@ function finishLevel(){
   $('ovNext').style.display = (pass&&hasNext)?'':'none';
   $('ov').classList.add('on');
   if(pass&&st===3)bigBurst();
-  /* 경험치는 배틀·1v1에서만 (퍼즐 미부여) */
+  /* 경험치는 배틀에서만 (퍼즐 미부여) */
 }
 $('ovMap').onclick=function(){$('ov').classList.remove('on');show('map');};
 $('ovRetry').onclick=function(){$('ov').classList.remove('on');startLevel(CUR.wi,CUR.li);};

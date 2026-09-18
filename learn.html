@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<script src="app-shell.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>차트아레나 · 학습 센터</title>
 <style>
@@ -42,6 +43,7 @@
   .dot{width:12px;height:12px;border-radius:3px}
   .disc{margin-top:36px;padding:16px 18px;border-radius:14px;border:1px dashed var(--line);color:var(--faint);font-size:13px;background:#0d1526}
 </style>
+<link rel="stylesheet" href="app-shell.css?v=1">
 </head>
 <body>
 <div class="top"><div class="bar">
@@ -219,7 +221,7 @@ function render(el, arr){ const g=document.getElementById(el);
     c.innerHTML=`<div class="ct">${o.t}${sig}</div><div class="viz">${svg}</div><div class="d">${o.d}</div>`;
     g.appendChild(c);});}
 render('g-basic',BASIC); render('g-cpat',CPAT); render('g-chart',CHART); render('g-ind',IND);
-/* 경험치는 배틀·1v1에서만 획득 (학습은 무료·무제한, XP 미부여) */
+/* 경험치는 배틀에서만 획득 (학습은 무료·무제한, XP 미부여) */
 // tabs
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));

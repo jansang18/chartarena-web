@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<script src="app-shell.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트아레나 — 차트로 배틀하는 트레이딩 게임">
@@ -6,7 +7,7 @@
 <meta property="og:image" content="https://jansang18.github.io/chartarena-web/assets/og.png">
 <meta property="og:url" content="https://jansang18.github.io/chartarena-web/">
 <meta name="twitter:card" content="summary_large_image">
-<title>차트아레나 — 가로 앱 (홈 허브)</title>
+<title>차트아레나 — 홈</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a1122'/%3E%3Crect x='8.5' y='9' width='4' height='14' rx='1.5' fill='%2335D07A'/%3E%3Crect x='19' y='6' width='4' height='17' rx='1.5' fill='%23FF5C8A'/%3E%3C/svg%3E">
 <style>
   :root{
@@ -452,6 +453,7 @@
   .gme{font-size:10px;font-weight:800;color:var(--gold);background:rgba(233,185,73,.14);border-radius:5px;padding:1px 5px;margin-left:3px}
   .gmc,.grv{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--gold);flex:0 0 auto}
 </style>
+<link rel="stylesheet" href="app-shell.css?v=1">
 
 <div class="scaler" id="scaler"><div class="frame">
 
@@ -464,11 +466,6 @@
       <div class="pill coin"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span></div>
       <div class="pill gem"><img class="cico" src="assets/gem.png?v=1" alt=""><span id="tbGem">120</span></div>
     </div>
-    <div class="ticons">
-      <div class="ticon" data-toast="메일 — 준비 중">✉️</div>
-      <div class="ticon" data-toast="알림 — 준비 중">🔔<span class="dot"></span></div>
-      <div class="ticon" data-toast="설정 — 준비 중">⚙️</div>
-    </div>
   </div>
 
   <div class="body">
@@ -477,15 +474,11 @@
       <div class="charshow" id="charShow"></div>
       <div class="csname"><span class="pname" id="pName">차트고수</span><span class="edit" id="pEdit">✏️</span></div>
       <div class="plevel"><span class="lv" id="pLv">Lv.1</span><div class="bar"><i id="pBar"></i></div><span class="pct" id="pPct">0%</span></div>
-      <div class="nav">
-        <a data-go="home" class="on"><span class="ic">🏠</span>홈</a>
-        <a href="learn.html"><span class="ic">📚</span>학습</a>
-        <a data-go="rank"><span class="ic">🏆</span>랭킹</a>
-        <a data-go="garage"><span class="ic">🛒</span>상점</a>
-        <a data-go="guild"><span class="ic">🛡️</span>길드</a>
-        <a href="puzzle.html"><span class="ic">🧩</span>퍼즐</a>
-        <a data-go="train"><span class="ic">🥷</span>훈련</a>
-      </div>
+      <nav class="nav" aria-label="내 계정 메뉴">
+        <a data-go="home">대시보드</a><a data-go="rank">내 기록</a>
+        <a data-go="garage">상점</a>
+        <a data-go="guild">길드</a>
+      </nav>
       <div class="sfoot">본 앱은 교육용 모의 트레이딩 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.</div>
     </div>
 
@@ -494,60 +487,47 @@
 
       <!-- HOME -->
       <div class="view on" id="v-home">
-        <div class="statrow">
-          <div class="mhi"><span class="mhic">📊</span><span>내 순위</span></div>
-          <div class="stat"><div class="ic" style="background:rgba(53,208,122,.14);color:var(--green)">📈</div><div class="sv"><div class="l">주간 수익률</div><div class="v">7위 <span class="d up">▲ 2</span></div></div></div>
-          <div class="stat"><div class="ic" style="background:rgba(233,185,73,.14);color:var(--gold)">🪙</div><div class="sv"><div class="l">월간 수익률</div><div class="v">16위 <span class="d fl">–</span></div></div></div>
-          <div class="stat"><div class="ic" style="background:rgba(255,92,138,.14);color:var(--pink)">👑</div><div class="sv"><div class="l">전체 순위</div><div class="v">8위 <span class="d dn">▼ 1</span></div></div></div>
-          <div class="timer"><div class="ic">🕐</div><div><div class="l">시즌 남은 기간</div><div class="v">12일 08:45:32</div></div></div>
+        <section class="hub-intro"><p class="eyebrow">YOUR NEXT MOVE</p><h1>예측은 연습으로 완성됩니다.</h1><p>차트를 읽고, 판단하고, 지난 선택을 돌아보세요.</p></section>
+        <div class="statrow" aria-label="내 플레이 기록">
+          <div class="stat"><div class="sv"><div class="l">차트 연습 기록</div><div class="v" id="homePlayed">0회</div></div></div>
+          <div class="stat"><div class="sv"><div class="l">승률</div><div class="v" id="homeWin">—</div></div></div>
+          <div class="stat"><div class="sv"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div>
         </div>
-
         <a class="solobar" href="game.html">
-          <div class="sicon">🎯</div>
           <img class="schart" src="assets/solo_chart.png?v=1" alt="">
-          <div class="stext">
-            <div class="st1">솔로 모드 <span class="sbadge">🎮 혼자 플레이</span></div>
-            <div class="st2">실제 과거 차트를 보고 롱·숏·관망 예측 — 나 혼자 실력 연습하기</div>
-          </div>
-          <div class="sgo">차트 예측 시작 →</div>
+          <div class="stext"><div class="st1">다음 움직임을 읽어보세요.</div><div class="st2">과거 차트로 연습하는 롱·숏·관망.<br>나의 속도로 판단하고 결과를 확인하세요.</div></div>
+          <div class="sgo">차트 연습 시작 →</div>
         </a>
-
         <div class="dash3">
-          <div class="hero">
-            <div class="hhead"><h3>차트 배틀 LIVE</h3><span class="status">진행 중</span></div>
-            <div class="hsub">실시간으로 펼쳐지는 치열한 차트 배틀!</div>
-            <div class="himg"><img src="assets/battle_cute.png" alt="귀여운 황소 vs 곰"></div>
-            <div class="hstats">
-              <div class="hstat"><div class="l">롱 포지션</div><div class="v up">58%</div></div>
-              <div class="hstat"><div class="l">참여자 수</div><div class="v">1,248명</div></div>
-              <div class="hstat"><div class="l">숏 포지션</div><div class="v dn">42%</div></div>
-            </div>
-            <a class="hbtn" href="quiz-battle.html">지금 참여하기</a>
-          </div>
-
-          <div class="jhero">
-            <div class="hhead"><h3>🧩 퍼즐 퀘스트</h3><span class="jbadge">🎮 혼자 플레이</span></div>
-            <div class="hsub">차트 보고 ↑/↓ 맞히기! 레벨 깨고 별 모으는 차트 퍼즐</div>
+          <section class="hero">
+            <div class="hhead"><h3>4인 차트 배틀</h3><span class="status">10라운드</span></div>
+            <p class="hsub">같은 차트, 서로 다른 판단. 누적 수익으로 순위를 겨룹니다.</p>
+            <div class="himg"><img src="assets/mode-live-characters-v3.png" alt="함께 경쟁하는 네 명의 트레이더"></div>
+            <p class="mode-note">접속한 상대와 매칭하며, 빈자리는 봇이 참여합니다.</p>
+            <a class="hbtn" href="quiz-battle.html">배틀 입장 →</a>
+          </section>
+          <section class="jhero">
+            <div class="hhead"><h3>차트 퍼즐</h3><span class="jbadge">횟수 제한 없음</span></div>
+            <p class="hsub">짧은 예측을 반복하며 차트를 읽는 감각을 쌓으세요.</p>
             <div class="jpath" id="jHeroPath"></div>
             <div class="hstats">
               <div class="hstat"><div class="l">획득 별</div><div class="v" id="jHeroStars">0/90</div></div>
               <div class="hstat"><div class="l">클리어</div><div class="v" id="jHeroPct">0/30</div></div>
-              <div class="hstat"><div class="l">다음 도전</div><div class="v jvsm" id="jHeroNext">-</div></div>
+              <div class="hstat"><div class="l">다음 도전</div><div class="v jvsm" id="jHeroNext">레벨 1</div></div>
             </div>
-            <a class="hbtn jbtn" href="puzzle.html">퍼즐 풀러 가기 →</a>
-          </div>
-
+            <a class="hbtn jbtn" href="puzzle.html">퍼즐 이어하기 →</a>
+          </section>
           <div class="rcol3">
-            <div class="mcard m-learn" onclick="location.href='learn.html'"><div class="glow" style="background:#4a9bff"></div><img class="art" src="assets/learn_cute.png?v=1" alt=""><h4>학습 센터</h4><p>캔들·패턴·RSI 배우기</p><div class="cgo">차트 배우기 ›</div></div>
-            <div class="mcard m-shop" data-go="garage"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/shop_cute.png?v=2" alt=""><h4>상점</h4><p>아이템 · 펫 · 꾸미기</p><div class="cgo">상점 바로가기 ›</div></div>
-            <div class="mcard m-rank" data-go="rank"><div class="glow" style="background:var(--gold)"></div><img class="art" src="assets/rank_cute.png?v=2" alt=""><h4>랭킹</h4><p>최고의 트레이더는?</p><div class="cgo">랭킹 보기 ›</div></div>
+            <a class="mcard" href="learn.html"><h4>차트 학습</h4><p>캔들부터 보조지표까지</p><span class="cgo">기초 살펴보기 →</span></a>
+            <div class="mcard" data-go="rank"><h4>나의 기록</h4><p>플레이와 수익 기록 확인</p><span class="cgo">기록 보기 →</span></div>
+            <div class="mcard" data-go="garage"><h4>상점 · 꾸미기</h4><p>나의 캐릭터와 보유 아이템</p><span class="cgo">상점 열기 →</span></div>
           </div>
         </div>
       </div>
 
       <!-- RANKING -->
       <div class="view" id="v-rank">
-        <div class="vh">🏆 랭킹</div>
+        <div class="vh">나의 기록과 랭킹</div><p class="rank-note" id="rankNote" role="status">기록을 불러오는 중입니다.</p>
         <div class="tabs" id="pTabs"></div>
         <div class="tabs" id="mTabs" style="margin-bottom:14px"></div>
         <div class="rankwrap"><div class="podium" id="podium"></div><div class="rlist" id="rlist"></div></div>
@@ -565,12 +545,6 @@
         </div>
       </div>
 
-      <!-- TRAIN -->
-      <div class="view" id="v-train">
-        <div class="vh">🥷 훈련</div>
-        <div class="trainGrid" id="trainGrid"></div>
-      </div>
-
       <!-- GUILD -->
       <div class="view" id="v-guild">
         <div class="vh">🛡️ 길드 <span class="gsub" id="gdSub"></span></div>
@@ -579,15 +553,6 @@
       </div>
 
     </div>
-  </div>
-
-  <!-- ===== BOTTOM NAV ===== -->
-  <div class="bottomnav">
-    <a class="bnav on" data-go="home"><span class="bi">🏠</span>홈</a>
-    <a class="bnav" href="quiz-battle.html"><span class="bi">⚔️</span>배틀</a>
-    <a class="bnav" href="learn.html"><span class="bi">📚</span>학습</a>
-    <a class="bnav" data-go="guild"><span class="bi">🛡️</span>길드</a>
-    <span class="bnav" data-toast="설정 — 준비 중"><span class="bi">⚙️</span>설정</span>
   </div>
 
 </div></div>
@@ -633,9 +598,7 @@ var FB_CONFIG = { apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"
 var FB=null, myUid=null, LB=null;
 /* ══════════════════════════════════════════════════════ */
 var $=function(id){return document.getElementById(id);};
-function fit(){var s=Math.min(1,(window.innerWidth-12)/1672,(window.innerHeight-14)/770);var sc=$('scaler');sc.style.transform='scale('+s+')';sc.style.height=(770*s)+'px';sc.style.width='1672px';
-  var ss=document.querySelector('.ssc'); if(ss){var s2=Math.min(1,(window.innerWidth-16)/1672,(window.innerHeight-16)/770);ss.style.transform='scale('+s2+')';}}
-window.addEventListener('resize',fit);fit();
+/* Responsive layout is owned by app-shell.css. */
 /* 인트로 스플래시 (세션당 1회) */
 (function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash');}catch(e){}
   if(seen){if(s.parentNode)s.parentNode.removeChild(s);return;}
@@ -735,7 +698,13 @@ function refreshProfile(){
     var bE=$('pBar'); if(bE)bE.style.width=pg+'%';
     var pE=$('pPct'); if(pE)pE.textContent=pg+'%'; }
 }
-function renderHome(){ refreshProfile(); renderPuzzleHero(); }
+function renderHome(){
+  refreshProfile(); renderPuzzleHero();
+  var s=myStats();
+  $('homePlayed').textContent=s.played+'회';
+  $('homeWin').textContent=(s.played>0?s.win+'%':'—');
+  $('homeBest').textContent=s.best>0?'+'+fmt(s.best)+'P':'—';
+}
 var PWORLDS=[['🌱','새싹 마을','#35D07A'],['🌊','파도 해변','#4CA9FF'],['🏜️','모래 사막','#FF9A3C'],['🏔️','눈보라 설산','#2FE6C4'],['🌋','용암 화산','#F0616D'],['🚀','우주 정거장','#B266FF']];
 function renderPuzzleHero(){ if(!$('jHeroPath'))return; var LVW=5, totalLv=PWORLDS.length*LVW;
   var ps=lj('chartarena_puzzle_v1'); var stars=(ps&&ps.stars)||{};
@@ -753,11 +722,12 @@ function renderPuzzleHero(){ if(!$('jHeroPath'))return; var LVW=5, totalLv=PWORL
 
 /* nav */
 function go(v){
+  if(['home','rank','garage','guild'].indexOf(v)<0)v='home';
   var vs=document.querySelectorAll('.view'); for(var i=0;i<vs.length;i++)vs[i].classList.remove('on');
   var el=$('v-'+v); if(el)el.classList.add('on');
   var ns=document.querySelectorAll('.nav a[data-go], .bnav[data-go]'); for(var j=0;j<ns.length;j++)ns[j].classList.toggle('on', ns[j].dataset.go===v);
   var m=$('mainScroll'); if(m)m.scrollTop=0;
-  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='train')renderTrain(); else if(v==='guild')guildEnter();
+  if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='guild')guildEnter();
 }
 document.addEventListener('click',function(e){
   var g=e.target.closest('[data-go]'); if(g){go(g.dataset.go);return;}
@@ -768,9 +738,6 @@ var pe=$('pEdit'); if(pe)pe.addEventListener('click',function(){var v=prompt('�
 /* RANKING */
 var MET=[['points','자산'],['win','승률'],['best','최고']];
 var rm='points';
-var BN=['존버왕','숏충이','불장러','캔들도사','존리형','물타기장인','추매요정','매수의신','청산킹','우상향고고','따상가자','칼손절'];
-var BCH=['🤴','🐲','🐯','🦈','🐻','🐂','🦈','🐻','🐲','🐯','🐂','🐻'],BT=['🐋 고래','전설','청산 마스터','존버의 신','','개미','','','청산 마스터','존버의 신','',''];
-var BP=[182000,151000,138000,120000,98000,86000,73000,61000,52000,44000,33000,21000],BW=[64,58,71,44,60,55,67,48,53,62,50,41],BB=[9200,7400,12500,3100,6000,5200,8800,2600,4300,6900,3600,1500];
 function myStats(){ var g=lj(GS),w=g.wins||0,l=g.losses||0,tt=w+l; return {points:getBal(),win:tt?Math.round(w/tt*100):0,best:g.best||0,played:g.played||0}; }
 /* Firebase 실시간 랭킹 (설정 없으면 데모로 폴백) */
 function loadFB(cb){ var mods=['app','auth','firestore'],i=0; (function nx(){ if(i>=mods.length){cb();return;} var s=document.createElement('script'); s.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-'+mods[i++]+'-compat.js'; s.onload=nx; s.onerror=function(){cb();}; document.head.appendChild(s); })(); }
@@ -779,7 +746,7 @@ function submitScore(){ if(!FB||!myUid)return; var s=myStats();
   FB.collection('scores').doc(myUid).set({nick:(st.nick||'익명').slice(0,12),ch:st.ch,points:s.points,win:s.win,best:s.best,played:s.played,at:Date.now()},{merge:true}).catch(function(){}); }
 function fetchLB(cb){ if(!FB){cb(null);return;} FB.collection('scores').orderBy('points','desc').limit(50).get()
   .then(function(qs){ var a=[]; qs.forEach(function(d){var x=d.data();x._id=d.id;a.push(x);}); cb(a); }).catch(function(){cb(null);}); }
-(function(){ try{ if(!FB_CONFIG.apiKey)return; loadFB(function(){ try{ if(typeof firebase==='undefined')return;
+(function(){ try{ if(!FB_CONFIG.apiKey||window.CA_LOCAL_PREVIEW)return; loadFB(function(){ try{ if(typeof firebase==='undefined')return;
   firebase.initializeApp(FB_CONFIG); FB=firebase.firestore();
   firebase.auth().signInAnonymously().then(function(c){ myUid=c.user.uid; submitScore();
     var vr=$('v-rank'); if(vr&&vr.classList.contains('on'))renderRank();
@@ -789,17 +756,16 @@ function mval(e){return rm==='points'?e.points:rm==='win'?e.win:e.best;}
 function mv(e){return rm==='points'?kf(e.points)+'P':rm==='win'?e.win+'%':'+'+kf(e.best);}
 function mc(e){return rm==='best'?'up':'';}
 function sub(e){var a=[];if(rm!=='points')a.push('자산 '+kf(e.points)+'P');if(rm!=='win')a.push('승률 '+e.win+'%');if(rm!=='best')a.push('최고 +'+kf(e.best));return a.join(' · ');}
-function bots(){ return BN.map(function(n,i){return {n:n,ch:BCH[i],t:BT[i],points:BP[i],win:BW[i],best:BB[i]};}); }
 function build(){ var rows;
-  if(LB){ rows=LB.filter(function(p){return p._id!==myUid && ((p.played||0)>0||(p.win||0)>0||(p.best||0)>0);}).map(function(p){return {n:(p.nick||'익명'),ch:EMO[p.ch]||(IMG[p.ch]?'🧑':'❓'),t:'',points:p.points||0,win:p.win||0,best:p.best||0};}).concat(bots()); }
-  else { rows=bots(); }
+  if(LB){ rows=LB.filter(function(p){return p._id!==myUid && ((p.played||0)>0||(p.win||0)>0||(p.best||0)>0);}).map(function(p){return {n:(p.nick||'익명'),ch:EMO[p.ch]||(IMG[p.ch]?'🧑':'❓'),t:'',points:p.points||0,win:p.win||0,best:p.best||0};}); }
+  else { rows=[]; }
   var ms=myStats(); rows.push({n:(st.nick||'나'),ch:EMO[st.ch]||'🧑',t:st.title,points:ms.points,win:ms.win,best:ms.best,me:true});
   rows.sort(function(a,b){return mval(b)-mval(a);}); return rows; }
 function renderRank(){ refreshProfile();
-  $('pTabs').innerHTML='<div class="tab on">'+(FB?'🌐 실시간 랭킹':'🎮 데모 랭킹')+'</div><div class="tab" id="rkRefresh">🔄 새로고침</div>';
+  $('pTabs').innerHTML='<div class="tab on">'+(FB?'저장된 랭킹':'내 기기 기록')+'</div><div class="tab" id="rkRefresh">🔄 새로고침</div>';
   $('mTabs').innerHTML=MET.map(function(m){return '<div class="tab sm'+(rm===m[0]?' on':'')+'" data-met="'+m[0]+'">'+m[1]+'</div>';}).join('');
   if(FB)submitScore();
-  fetchLB(function(lb){ if(lb)LB=lb; drawRank(); });
+  fetchLB(function(lb){ LB=lb; $('rankNote').textContent=lb ? '서버에 저장된 기록입니다. 기존 테스트 기록이 포함될 수 있습니다.' : '서버 기록에 연결하지 못해 이 기기에 저장된 내 기록을 표시합니다.'; drawRank(); });
   drawRank(); }
 function drawRank(){ var L=build();
   $('podium').innerHTML=[[1,'🥈','p2'],[0,'🥇','p1'],[2,'🥉','p3']].map(function(o){var e=L[o[0]];if(!e)return '';return '<div class="ped '+o[2]+'"><div class="med">'+o[1]+'</div><div class="pav">'+e.ch+'</div><div class="pn" style="'+(e.me?'color:var(--gold)':'')+'">'+e.n+'</div><div class="pt">'+(e.t||'')+'</div><div class="ps '+mc(e)+'">'+mv(e)+'</div></div>';}).join('');
@@ -968,11 +934,6 @@ function renderJourney(){
 document.addEventListener('click',function(e){var jn=e.target.closest('[data-jn]');if(!jn)return;var id=jn.dataset.jn;if(!jUnl(id))return;
   var s=1+((id.charCodeAt(1)+id.charCodeAt(3)*3)%3); jstars[id]=Math.max(jstars[id]||0,s); saveHS();
   toast('레벨 '+(+id[1]+1)+'-'+(+id[3]+1)+' 클리어! '+'★'.repeat(s)); renderJourney();});
-
-/* TRAIN */
-var TRAIN=[{ic:'💀',n:'생존 모드',d:'롱/숏만으로 연속 도전 — 손익<0이면 종료',rec:'최고 12라운드'},{ic:'🕯️',n:'캔들 도장',d:'강조된 캔들 패턴 4지선다(17종 감지)',rec:'정답률 78%'},{ic:'📐',n:'황금비율 던전',d:'피보나치 되돌림 위치 예측',rec:'정답률 64%'},{ic:'⚔️',n:'롱숏 아레나',d:'트레이딩 봇 6명과 레이팅 대결',rec:'레이팅 1180'}];
-function renderTrain(){ $('trainGrid').innerHTML=TRAIN.map(function(t){return '<div class="tcard"><div class="ic">'+t.ic+'</div><div class="b"><h4>'+t.n+'</h4><p>'+t.d+'</p><div class="rec">'+t.rec+'</div></div><button class="start" type="button" data-train="'+t.n+'">시작</button></div>';}).join(''); }
-document.addEventListener('click',function(e){var t=e.target.closest('[data-train]');if(t)toast(t.dataset.train+' — 데모');});
 
 /* ═══════════════ 길드 시스템 (Firebase 실데이터 + 데모/오프라인 폴백) ═══════════════ */
 var GLK='chartarena_guild_v1';
