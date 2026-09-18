@@ -1,0 +1,13 @@
+/* Deterministic match-only rules. No storage, DOM or hidden chart data. */
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
+'use strict';
+const START=10000,ROUNDS=5,PRESETS={careful:{betPct:.1,lev:1},normal:{betPct:.25,lev:2},bold:{betPct:.5,lev:3}};
+function create(id){return {id:String(id),balance:START,score:0,delta:0,passUsed:false,powerUsed:false,appliedRound:0};}
+function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if(dir==='W'&&player.passUsed)dir='N';const risk=Object.hasOwn(PRESETS,input.risk)?input.risk:'normal',preset=PRESETS[risk];const advanced=input.advanced===true;const betPct=advanced&&[.1,.25,.5,1].includes(input.betPct)?input.betPct:preset.betPct;const lev=advanced&&[1,2,3,5,10].includes(input.lev)?input.lev:preset.lev;const power=!player.powerUsed&&['L','S'].includes(dir)&&['push','guard'].includes(input.power)?input.power:'none';return {dir,risk,advanced,betPct,lev,power};}
+function profit(player,input,move){const pick=choice(player,input),stake=pick.dir==='L'||pick.dir==='S'?Math.min(player.balance,Math.round(player.balance*pick.betPct)):0;let delta=0;if(pick.dir==='N')delta=-Math.min(200,player.balance);else if(pick.dir!=='W'){const multiplier=pick.power==='push'?1.5:pick.power==='guard'?.5:1;const raw=stake*(pick.dir==='L'?1:-1)*Number(move)/100*pick.lev*multiplier;delta=Math.max(-stake,Math.round(Number.isFinite(raw)?raw:0));}return {delta,stake,pick};}
+function settle(player,input,move,round){if(round<=player.appliedRound)return player;if(round!==player.appliedRound+1||round>ROUNDS)throw Error('Round must advance exactly once');const p=profit(player,input,move);return Object.assign({},player,{balance:player.balance+p.delta,score:player.score+p.delta,delta:p.delta,stake:p.stake,pick:p.pick,passUsed:player.passUsed||p.pick.dir==='W',powerUsed:player.powerUsed||p.pick.power!=='none',appliedRound:round});}
+function recover(state,history,moveForSegment){let next=state;for(const entry of history.slice().sort((a,b)=>a.round-b.round)){if(entry.round<=next.appliedRound)continue;next=settle(next,(entry.picks||{})[next.id],moveForSegment(entry.seg),entry.round);}return next;}
+function rank(players,id){const me=players.find(p=>p.id===id);return me?1+players.filter(p=>p.score>me.score).length:players.length;}
+function reward(place){return [2000,1200,800,500][Math.max(0,Math.min(3,place-1))];}
+return {START,ROUNDS,PRESETS,create,choice,profit,settle,recover,rank,reward};
+});

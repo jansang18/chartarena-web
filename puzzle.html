@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<script src="app-shell.js?v=c1c2a77c836c"></script>
+<script src="app-shell.js?v=d9dc0a0be3ea"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트 퍼즐 퀘스트 — 차트아레나">
@@ -110,6 +110,15 @@
   #confetti{position:fixed;inset:0;pointer-events:none;z-index:60;display:none}
   .foot{text-align:center;color:var(--tm);font-size:10.5px;line-height:1.5;margin-top:26px}
   @media(max-width:540px){ .lv{width:calc(33.3% - 12px)} .lv .disc{width:58px;height:58px;font-size:19px} .maphd h2{font-size:22px} }
+  .practice-panel{margin:20px 0;padding:18px;border:1px solid #465b85;border-radius:18px;background:#172438}
+  .practice-panel h3{margin:0 0 6px;font-size:18px}.practice-panel p{margin:0 0 14px;font-size:13px;line-height:1.6;color:#b6c5dc}
+  .practice-choices{display:flex;flex-wrap:wrap;gap:8px}.practice-choices button{border:1px solid #547ebc;border-radius:10px;background:#253f65;color:#edf5ff;padding:12px 16px;min-height:44px;font:700 14px var(--sans);cursor:pointer}
+  .question-prompt{font-size:clamp(18px,2vw,23px);line-height:1.5;margin:6px 0 8px;word-break:keep-all}.question-hint,.chart-guides{font-size:13px;color:#bdcbe0;line-height:1.7;margin:6px 0 12px;overflow-wrap:anywhere}
+  .ans{grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr))}.ans .choice{color:#edf5ff;background:#233957;border:2px solid #42628c;font-size:18px;min-width:0;min-height:74px;word-break:keep-all;overflow-wrap:anywhere}.ans .choice.selected{border-color:#f1c65d}.ans .choice.correct{border-color:#5dedb1;background:#183c36}.ans .choice:disabled{opacity:.8}.ans .sub{font-size:12px;line-height:1.5}
+  .keyboard-hint{font-size:11px;color:#96a9c5;margin:8px 0 0}.reveal-msg{line-height:1.8;text-align:left}.verdict{font-size:clamp(20px,5vw,36px);white-space:nowrap}.contbtn:disabled{opacity:.6;cursor:wait}
+  button:focus-visible{outline:3px solid #ffdc7b;outline-offset:3px}
+  @media(max-width:540px){.practice-choices button{flex:1 1 130px}.ans{gap:8px}.ans .choice{font-size:16px;padding:14px 8px}.phd{flex-wrap:wrap}.phd .pmeta{margin-left:0}.qbox{padding:10px}.qtop .ttl{font-size:14px}}
+  @media(prefers-reduced-motion:reduce){.lv.cur .disc,.lv.cur .disc::after,.verdict.show{animation:none}.verdict.show{opacity:1;transform:translate(-50%,-50%)}.combo,.ans button{transition:none}#confetti{display:none!important}}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=2801d66fee59">
 </head>
@@ -128,8 +137,19 @@
   <div class="maphd">
     <img class="hicon" src="assets/tile_puzzle.png" alt="차트 퍼즐 퀘스트">
     <h2>한 문제씩, 감각을 쌓아보세요.</h2>
-    <p>차트를 보고 <b style="color:var(--green)">오른다</b> / <b style="color:var(--pink)">내린다</b> 를 맞혀 별을 모으세요. 실제 코인 차트로 만든 퍼즐이에요.</p>
+    <p>방향·구간·위험 거리·돌파를 차례로 익히고, 보스에서 네 가지 판단에 함께 도전하세요.</p>
   </div>
+  <section class="practice-panel" aria-labelledby="practiceTitle">
+    <h3 id="practiceTitle">유형별 자유 연습</h3>
+    <p>모든 유형을 바로 체험하세요. 연습은 별·보상·진행 기록에 영향을 주지 않습니다.</p>
+    <div id="practiceChoices" class="practice-choices">
+      <button type="button" data-practice="direction">방향 예측</button>
+      <button type="button" data-practice="region">지지·저항 구간</button>
+      <button type="button" data-practice="risk">위험 거리 비교</button>
+      <button type="button" data-practice="breakout">돌파 유지 판단</button>
+      <button type="button" data-practice="mixed">보스 종합 연습</button>
+    </div>
+  </section>
   <div id="worlds"></div>
   <div class="foot">본 앱은 교육용 모의 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.<br>차트는 과거 실데이터이며 특정 종목의 매수·매도 추천이 아닙니다.</div>
 </div>
@@ -143,14 +163,14 @@
   </div>
   <div class="rdots" id="rdots"></div>
   <div class="qbox">
-    <div class="qtop"><div class="ttl">이 차트, 다음은? 📈</div><div class="combo" id="combo"></div></div>
-    <div class="chartwrap"><canvas id="pchart"></canvas><div class="verdict" id="verdict"></div></div>
-    <div class="ans">
-      <button class="up" id="bUp" type="button">📈 오른다<span class="sub">UP</span></button>
-      <button class="dn" id="bDn" type="button">📉 내린다<span class="sub">DOWN</span></button>
-    </div>
+    <div class="qtop"><div class="ttl" id="qType"></div><div class="combo" id="combo"></div></div>
+    <h2 class="question-prompt" id="qPrompt"></h2><p class="question-hint" id="qHint"></p>
+    <div class="chartwrap"><canvas id="pchart" role="img" aria-label="문제 차트"></canvas><div class="verdict" id="verdict"></div></div>
+    <p id="chartGuides" class="chart-guides"></p>
+    <div class="ans" id="answers" aria-label="정답 선택"></div>
+    <p class="keyboard-hint">숫자 1–3으로 선택 · 다음 버튼에서 Enter</p>
     <div class="contbar" id="contbar">
-      <div class="reveal-msg" id="revealMsg"></div>
+      <div class="reveal-msg" id="revealMsg" role="status" aria-live="polite"></div>
       <button class="contbtn" id="contbtn" type="button">다음 ›</button>
     </div>
   </div>
@@ -176,6 +196,7 @@
 
 <script src="xp.js"></script>
 <script src="charts.js"></script>
+<script src="puzzle-rules.js?v=1d7966f82844"></script>
 <script>
 /* Responsive layout is owned by app-shell.css. */
 (function(){
@@ -211,7 +232,7 @@ function totalStars(){var s=0;for(var k in PS.stars)s+=PS.stars[k];return s;}
 function maxStars(){return WORLDS.length*LVW*3;}
 
 /* ---------- 화면 전환 ---------- */
-function show(which){ $('map').style.display=which==='map'?'':'none'; $('play').classList.toggle('on',which==='play'); if(which==='map'){renderMap();window.scrollTo(0,0);} }
+function show(which){ $('map').style.display=which==='map'?'':'none'; $('play').classList.toggle('on',which==='play'); if(which==='map')renderMap();window.scrollTo(0,0); }
 
 /* ---------- 맵 ---------- */
 function renderMap(){
@@ -230,7 +251,7 @@ function renderMap(){
       lvs+='<div class="'+cls+'" '+(un?'data-w="'+wi+'" data-l="'+li+'"':'')+'>'
         +'<div class="disc">'+inner+'</div>'
         +(cur?'<div class="cur-tag">도전!</div>':'<div class="stars">'+stars+'</div>')
-        +'<div class="nm">'+(boss?'보스':('레벨 '+(li+1)))+'</div></div>';
+        +'<div class="nm">'+(boss?'종합 보스':PuzzleRules.NAMES[PuzzleRules.TYPES[li]])+'</div></div>';
     }
     var open = wi===0 || starsOf(lvId(wi-1,LVW-1))>0;
     html+='<div class="world" style="--wc:'+w.c+';--wl:'+w.c+'44;--wa:'+w.c+'14">'
@@ -242,19 +263,21 @@ function renderMap(){
 $('worlds').addEventListener('click',function(e){ var el=e.target.closest('.lv[data-w]'); if(!el)return; startLevel(+el.dataset.w,+el.dataset.l); });
 
 /* ---------- 라운드 데이터 ---------- */
-function pickRound(w){
-  if(!CH.length) return null;
-  for(var t=0;t<60;t++){
-    var c=CH[Math.floor(Math.random()*CH.length)]; var cs=c.cs; if(!cs||cs.length<70) continue;
-    var E=46+Math.floor(Math.random()*12), H=w.H;
-    if(E+H>=cs.length-1) continue;
-    var a=cs[E][3], b=cs[E+H][3]; var chg=b/a-1;
-    if(Math.abs(chg)<w.thr) continue;
-    return {c:c, E:E, H:H, up:chg>0, chg:chg};
+function pickRound(w,type){
+  if(!CH.length)return null;
+  var start=Math.floor(Math.random()*CH.length);
+  // Eligibility uses only visible history, never a future return threshold.
+  for(var t=0;t<CH.length;t++){
+    var c=CH[(start+t)%CH.length],cs=c.cs;if(!cs||cs.length<45+w.H)continue;
+    var end=Math.min(cs.length-w.H-1,90),first=30+Math.floor(Math.random()*Math.max(1,end-29));
+    for(var j=0;j<=end-30;j++){
+      var E=30+(first-30+j)%(end-29),history=cs.slice(Math.max(0,E-44),E+1);
+      if(type==='breakout'&&!PuzzleRules.breakout(history))continue;
+      try{return {c:c,E:E,H:w.H,history:history,question:PuzzleRules.create({type:type,history:history,horizon:w.H,seed:Math.floor(Math.random()*100000)})};}
+      catch(e){ /* Try another valid historical slice. */ }
+    }
   }
-  // 폴백: 아무거나
-  var c2=CH[Math.floor(Math.random()*CH.length)], E2=52, H2=w.H;
-  return {c:c2,E:E2,H:H2,up:c2.cs[E2+H2][3]>c2.cs[E2][3],chg:c2.cs[E2+H2][3]/c2.cs[E2][3]-1};
+  return null;
 }
 
 /* ---------- 차트 그리기 ---------- */
@@ -264,77 +287,97 @@ function drawChart(reveal){
   var W=r.width,H=r.height; ctx.clearRect(0,0,W,H);
   var rd=CUR.round, cs=rd.c.cs, from=Math.max(0,rd.E-44), qto=rd.E+1, rto=reveal?rd.E+rd.H+1:qto;
   var padL=8,axisW=40,plotR=W-axisW,pT=12,pB=H-14;
-  var scaleTo = reveal? rto : qto;
+  var rn=(CUR.revN!=null)?CUR.revN:rd.H;
+  var drawTo=reveal?Math.min(rto,rd.E+1+rn):qto;
+  var scaleTo = drawTo;
   var lo=1e9,hi=-1e9; for(var i=from;i<scaleTo;i++){ if(cs[i][2]<lo)lo=cs[i][2]; if(cs[i][1]>hi)hi=cs[i][1]; }
+  rd.question.guides.forEach(function(g){if(g.price!=null){lo=Math.min(lo,g.price);hi=Math.max(hi,g.price);}});
   var pad=(hi-lo)*0.12||1; lo-=pad; hi+=pad;
-  var span=Math.max(1,(rd.E+rd.H+1)-from);
+  var span=Math.max(1,(rd.E+(rd.question.revealsFuture?rd.H:0)+1)-from);
   var cw=(plotR-padL)/span, cx=function(i){return padL+cw*(i-from+0.5);}, yOf=function(p){return pB-(p-lo)/(hi-lo)*(pB-pT);};
   // grid
   for(var g=0;g<=3;g++){var yy=pT+(pB-pT)*g/3;ctx.strokeStyle='rgba(40,70,120,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(plotR,yy);ctx.stroke();}
   // future zone shade
   var zx=cx(rd.E)+cw/2;
-  ctx.fillStyle='rgba(233,185,73,.06)';ctx.fillRect(zx,pT,plotR-zx,pB-pT);
+  if(rd.question.revealsFuture){ctx.fillStyle='rgba(233,185,73,.06)';ctx.fillRect(zx,pT,plotR-zx,pB-pT);
   ctx.strokeStyle='rgba(233,185,73,.4)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(zx,pT);ctx.lineTo(zx,pB);ctx.stroke();ctx.setLineDash([]);
-  if(!reveal){ctx.fillStyle='rgba(233,185,73,.6)';ctx.font='700 11px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='center';ctx.fillText('다음은?',(zx+plotR)/2,pT+14);}
+  if(!reveal){ctx.fillStyle='rgba(233,185,73,.6)';ctx.font='700 11px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='center';ctx.fillText('다음은?',(zx+plotR)/2,pT+14);}}
   // candles
-  var upc='#35D07A',dnc='#F0616D',upf='rgba(53,208,122,.9)',dnf='rgba(240,97,109,.9)';
-  var rn=(CUR.revN!=null)?CUR.revN:rd.H; var drawTo=reveal?Math.min(rto,rd.E+1+rn):qto;
+  var upc='#F0616D',dnc='#4CA9FF',upf='#F0616D',dnf='#4CA9FF';
+
   for(var k=from;k<drawTo;k++){ var o=cs[k][0],hg=cs[k][1],lw=cs[k][2],cl=cs[k][3],x=cx(k);
     var isFut=k>rd.E; var up=cl>=o; var col=up?upc:dnc, fil=up?upf:dnf;
-    if(isFut){ col=up?'#8fe3b0':'#ff9db0'; fil=col; }
+    if(isFut){ col=up?'#ff9db0':'#8fcaff'; fil=col; }
     ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x,yOf(hg));ctx.lineTo(x,yOf(lw));ctx.stroke();
     var bw=Math.max(1.5,cw*0.62),y1=yOf(o),y2=yOf(cl),bh=Math.max(1,Math.abs(y2-y1));
     ctx.fillStyle=fil;ctx.fillRect(x-bw/2,Math.min(y1,y2),bw,bh);
   }
+  // Guides depend only on the visible candles.
+  if(rd.question.type==='region'){var recentX=cx(rd.E-23)-cw/2;ctx.fillStyle='rgba(8,12,20,.65)';ctx.fillRect(padL,pT,recentX-padL,pB-pT);ctx.strokeStyle='#dae6fa';ctx.setLineDash([2,5]);ctx.beginPath();ctx.moveTo(recentX,pT);ctx.lineTo(recentX,pB);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#dae6fa';ctx.font='10px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';ctx.fillText('최근 24개 →',recentX+4,pT+12);}
+  var colors=['#79c4ff','#bda1ff','#ffc76f'];
+  rd.question.guides.forEach(function(g,i){
+    var color=colors[i%colors.length];ctx.strokeStyle=color;ctx.fillStyle=color;ctx.font='700 12px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';
+    if(g.price!=null){var yy=yOf(g.price);ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(padL,yy);ctx.lineTo(plotR,yy);ctx.stroke();ctx.setLineDash([]);ctx.fillText(g.label,padL+4,Math.max(pT+12,yy-4));}
+    else {var y1=yOf(g.high),y2=yOf(g.low),sx=cx(Math.max(from,rd.E-23))-cw/2;ctx.globalAlpha=.10;ctx.fillRect(sx,y1,zx-sx,y2-y1);ctx.globalAlpha=1;ctx.fillText(g.label,padL+4,(y1+y2)/2);ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(padL,y1);ctx.lineTo(zx,y1);ctx.stroke();ctx.setLineDash([]);}
+  });
   // entry dot
   ctx.fillStyle='#E9B949';ctx.beginPath();ctx.arc(cx(rd.E),yOf(cs[rd.E][3]),3.2,0,6.29);ctx.fill();
   // axis labels
   ctx.fillStyle='#5b7bb0';ctx.font='9px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';ctx.textBaseline='middle';
-  for(var g2=0;g2<=3;g2++){var yy2=pT+(pB-pT)*g2/3;ctx.fillText((hi-(hi-lo)*g2/3).toFixed(1),plotR+3,yy2);}
+  for(var g2=0;g2<=3;g2++){var yy2=pT+(pB-pT)*g2/3;ctx.fillText(Number((hi-(hi-lo)*g2/3).toPrecision(4)).toString(),plotR+3,yy2);}
 }
 
 /* ---------- 레벨 진행 ---------- */
 var CUR={wi:0,li:0,w:null,round:null,ri:0,correct:0,combo:0,results:[],answered:false,revN:null,revAnim:null};
-function startLevel(wi,li){
-  CUR={wi:wi,li:li,w:WORLDS[wi],round:null,ri:0,correct:0,combo:0,results:[],answered:false};
-  $('pTitle').textContent=WORLDS[wi].emo+' '+WORLDS[wi].nm+' · '+(isBoss(li)?'👑 보스':('레벨 '+(li+1)));
+function startLevel(wi,li,practice){
+  CUR={wi:wi,li:li,w:WORLDS[wi],practice:practice||null,round:null,ri:0,correct:0,combo:0,results:[],answered:false};
+  $('pTitle').textContent=practice?'자유 연습 · '+(practice==='mixed'?'종합':PuzzleRules.NAMES[practice]):WORLDS[wi].emo+' '+WORLDS[wi].nm+' · '+(isBoss(li)?'👑 보스':('레벨 '+(li+1)));
   show('play'); nextRound();
 }
 function renderDots(){ var h=''; for(var i=0;i<ROUNDS;i++){ var c=CUR.results[i]; h+='<i class="'+(c===true?'ok':c===false?'no':(i===CUR.ri?'now':''))+'"></i>'; } $('rdots').innerHTML=h; }
 function nextRound(){
   if(CUR.revAnim){clearInterval(CUR.revAnim);CUR.revAnim=null;} CUR.revN=null;
-  CUR.round=pickRound(CUR.w); CUR.answered=false;
+  var type=CUR.practice&&CUR.practice!=='mixed'?CUR.practice:PuzzleRules.typeForLevel(CUR.wi,CUR.practice==='mixed'?4:CUR.li,CUR.ri);
+  CUR.round=pickRound(CUR.w,type);CUR.answered=false;
+  if(!CUR.round){$('qType').textContent='문제를 불러오지 못했습니다';$('qPrompt').textContent='맵으로 돌아가 다른 유형을 선택해 주세요.';$('qHint').textContent='';$('answers').replaceChildren();$('contbar').classList.remove('on');return;}
+  var q=CUR.round.question;
+  $('qType').textContent=q.name;$('qPrompt').textContent=q.prompt;$('qHint').textContent=q.hint;
+  $('pchart').setAttribute('aria-label',q.name+' 차트. '+q.hint);
+  $('chartGuides').textContent=q.guides.length?'차트 표시: '+q.guides.map(function(g){return g.label+(g.price!=null?' '+PuzzlePrice(g.price):' 구간');}).join(' · '):'노란 점: 현재 종가 · 빨강: 상승 캔들 · 파랑: 하락 캔들';
+  $('answers').innerHTML=q.options.map(function(o,i){return '<button type="button" class="choice" data-answer="'+o.id+'"><span>'+(i+1)+'. '+o.label+'</span><span class="sub">'+o.detail+'</span></button>';}).join('');
+  $('answers').dataset.type=type;
   $('pMeta').textContent='라운드 '+(CUR.ri+1)+' / '+ROUNDS;
   renderDots();
   $('contbar').classList.remove('on'); $('verdict').classList.remove('show'); $('verdict').textContent='';
-  $('bUp').disabled=false; $('bDn').disabled=false;
   var cm=$('combo'); if(CUR.combo>=2){cm.textContent='🔥 '+CUR.combo+' 콤보!';cm.classList.add('show');}else cm.classList.remove('show');
   drawChart(false);
 }
-function answer(guessUp){
-  if(CUR.answered||!CUR.round)return; CUR.answered=true;
-  $('bUp').disabled=true; $('bDn').disabled=true;
-  var ok=(guessUp===CUR.round.up);
-  CUR.results[CUR.ri]=ok;
-  if(ok){CUR.correct++;CUR.combo++;} else {CUR.combo=0;}
-  renderDots();
-  // 미래 캔들을 1초에 하나씩 긴장감 있게 공개
-  var _H=CUR.round.H; CUR.revN=0; drawChart(true);
+function PuzzlePrice(n){return Number(n).toLocaleString('ko-KR',{maximumFractionDigits:10,maximumSignificantDigits:8});}
+function answer(selected){
+  if(CUR.answered||!CUR.round)return;CUR.answered=true;
+  Array.from($('answers').querySelectorAll('button')).forEach(function(b){b.disabled=true;b.classList.toggle('selected',b.dataset.answer===selected);});
+  var rd=CUR.round;CUR.grade=PuzzleRules.grade(rd.question,rd.history,rd.c.cs.slice(rd.E+1,rd.E+rd.H+1),selected);
+  var ok=CUR.grade.ok;CUR.results[CUR.ri]=ok;if(ok){CUR.correct++;CUR.combo++;}else CUR.combo=0;renderDots();
+  if(!rd.question.revealsFuture){drawChart(false);revealResult(ok);return;}
+  CUR.revN=0;drawChart(true);$('revealMsg').textContent='캔들을 하나씩 확인하는 중…';$('contbar').classList.add('on');$('contbtn').disabled=true;
   if(CUR.revAnim)clearInterval(CUR.revAnim);
-  CUR.revAnim=setInterval(function(){ CUR.revN++; drawChart(true);
-    if(CUR.revN>=_H){ clearInterval(CUR.revAnim); CUR.revAnim=null; CUR.revN=null; drawChart(true); revealResult(ok); } }, 1000);
+  CUR.revAnim=setInterval(function(){CUR.revN++;drawChart(true);
+    if(CUR.revN>=rd.H){clearInterval(CUR.revAnim);CUR.revAnim=null;CUR.revN=null;drawChart(true);revealResult(ok);}
+  },1000);
 }
 function revealResult(ok){
-  var v=$('verdict'); v.textContent=ok?'✅':'❌'; v.style.color=ok?'var(--green)':'var(--red)'; v.classList.add('show');
-  if(ok)burst();
-  var pct=(CUR.round.chg*100); var dir=CUR.round.up?'올랐어요 ▲':'내렸어요 ▼';
-  $('revealMsg').innerHTML=(ok?'<b style="color:var(--green)">정답!</b> ':'<b style="color:var(--red)">아쉬워요!</b> ')
-    +'다음 '+CUR.round.H+'칸 동안 <b>'+Math.abs(pct).toFixed(1)+'%</b> '+dir
-    +' <span style="color:var(--tm)">('+CUR.round.c.sym+' '+CUR.round.c.tf+')</span>';
-  $('contbtn').textContent = (CUR.ri>=ROUNDS-1)?'결과 보기 ›':'다음 ›';
-  $('contbar').classList.add('on');
+  var v=$('verdict');v.textContent=ok?'정답':'다시 살펴봐요';v.style.color=ok?'var(--green)':'var(--red)';v.classList.add('show');
+  if(ok&&!matchMedia('(prefers-reduced-motion: reduce)').matches)burst();
+  $('revealMsg').textContent=(ok?'정답! ':'아쉬워요. ')+CUR.grade.explanation+' ('+CUR.round.c.sym+' '+CUR.round.c.tf+')';
+  Array.from($('answers').querySelectorAll('button')).forEach(function(b){b.classList.toggle('correct',CUR.grade.correct.indexOf(b.dataset.answer)>=0);});
+  $('contbtn').disabled=false;$('contbtn').textContent=CUR.ri>=ROUNDS-1?'결과 보기 ›':'다음 ›';$('contbar').classList.add('on');
 }
-$('bUp').onclick=function(){answer(true);}; $('bDn').onclick=function(){answer(false);};
+$('answers').onclick=function(e){var b=e.target.closest('button[data-answer]');if(b)answer(b.dataset.answer);};
+$('practiceChoices').onclick=function(e){var b=e.target.closest('button[data-practice]');if(b)startLevel(0,0,b.dataset.practice);};
+document.addEventListener('keydown',function(e){
+  if(e.altKey||e.ctrlKey||e.metaKey||e.repeat||!$('play').classList.contains('on')||$('ov').classList.contains('on'))return;
+  if(/^[1-3]$/.test(e.key)){var b=$('answers').querySelectorAll('button')[Number(e.key)-1];if(b&&!b.disabled){e.preventDefault();b.click();}}
+});
 $('contbtn').onclick=function(){ if(CUR.ri>=ROUNDS-1){finishLevel();} else {CUR.ri++;nextRound();} };
 $('pback').onclick=function(){ if(CUR.revAnim){clearInterval(CUR.revAnim);CUR.revAnim=null;} show('map');};
 
@@ -342,20 +385,20 @@ function finishLevel(){
   var id=lvId(CUR.wi,CUR.li), c=CUR.correct;
   var st = c>=ROUNDS?3 : c===ROUNDS-1?2 : c>=ROUNDS-2?1 : 0; // 5→3,4→2,3→1,else 0
   var prev=starsOf(id), reward=0;
-  if(st>prev){ reward=(st-prev)*300 + (st===3?200:0); addBal(reward); PS.stars[id]=st; savePS(); }
+  if(!CUR.practice&&st>prev){ reward=(st-prev)*300 + (st===3?200:0); addBal(reward); PS.stars[id]=st; savePS(); }
   var pass=st>0;
-  $('ovTitle').textContent = pass?(st===3?'⭐ 퍼펙트 클리어!':'레벨 클리어!'):'조금 아쉬워요';
+  $('ovTitle').textContent = CUR.practice?'자유 연습 완료':pass?(st===3?'⭐ 퍼펙트 클리어!':'레벨 클리어!'):'조금 아쉬워요';
   $('ovStars').innerHTML='<span class="'+(st>=1?'on':'off')+'">★</span><span class="'+(st>=2?'on':'off')+'">★</span><span class="'+(st>=3?'on':'off')+'">★</span>';
   $('ovLine').textContent = c+' / '+ROUNDS+' 정답'+(pass?'':' · 3개 이상 맞히면 클리어!');
-  $('ovReward').textContent = reward>0?('+'+fmt(reward)+' P 획득! 💰'):(pass?'별 갱신 없음':'');
+  $('ovReward').textContent = CUR.practice?'연습은 별과 보상을 변경하지 않습니다.':reward>0?('+'+fmt(reward)+' P 획득! 💰'):(pass?'별 갱신 없음':'');
   var nextLi=CUR.li+1, hasNext = nextLi<LVW || CUR.wi+1<WORLDS.length;
-  $('ovNext').style.display = (pass&&hasNext)?'':'none';
+  $('ovNext').style.display = (!CUR.practice&&pass&&hasNext)?'':'none';
   $('ov').classList.add('on');
-  if(pass&&st===3)bigBurst();
+  if(pass&&st===3&&!matchMedia('(prefers-reduced-motion: reduce)').matches)bigBurst();
   /* 경험치는 배틀에서만 (퍼즐 미부여) */
 }
 $('ovMap').onclick=function(){$('ov').classList.remove('on');show('map');};
-$('ovRetry').onclick=function(){$('ov').classList.remove('on');startLevel(CUR.wi,CUR.li);};
+$('ovRetry').onclick=function(){$('ov').classList.remove('on');startLevel(CUR.wi,CUR.li,CUR.practice);};
 $('ovNext').onclick=function(){ $('ov').classList.remove('on');
   var nl=CUR.li+1, nw=CUR.wi;
   if(nl>=LVW){nw++;nl=0;}
@@ -375,7 +418,7 @@ function runC(){ cx2.clearRect(0,0,cvC.width,cvC.height); var alive=false;
 function startC(){ sizeC();cvC.style.display='block'; if(!craf)craf=requestAnimationFrame(runC); }
 function burst(){ var r=$('pchart').getBoundingClientRect(); spawn(36,r.left+r.width/2,r.top+r.height*0.4,7); startC(); }
 function bigBurst(){ spawn(120,innerWidth/2,innerHeight*0.4,11); spawn(60,innerWidth*0.25,innerHeight*0.5,9); spawn(60,innerWidth*0.75,innerHeight*0.5,9); startC(); }
-addEventListener('resize',function(){ if($('play').classList.contains('on'))drawChart(CUR.answered); });
+addEventListener('resize',function(){ if($('play').classList.contains('on')){if(CUR.round)drawChart(CUR.answered&&CUR.round.question.revealsFuture);} });
 
 /* ---------- 시작 ---------- */
 if(!CH.length){ $('worlds').innerHTML='<div style="text-align:center;color:var(--ts);padding:40px">차트를 불러오지 못했어요. 새로고침 해주세요.</div>'; }

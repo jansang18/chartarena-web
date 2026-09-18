@@ -7,10 +7,12 @@
     ['learn', 'learn.html', '학습']
   ];
   var page = routes.find(function (r) { return location.pathname.endsWith('/' + r[1]); });
-  var key = page ? page[0] : 'home';
+  var key = location.pathname.endsWith('/daily.html') ? 'daily' : page ? page[0] : 'home';
   document.documentElement.dataset.page = key;
   document.documentElement.lang = 'ko';
 
+  function applyRewards(){try{var r=JSON.parse(localStorage.getItem('chartarena_rewards_v1'))||{};document.documentElement.dataset.rewardFrame=['blue','violet','gold'].includes(r.frame)?r.frame:'none';document.documentElement.dataset.rewardPose=['salute','celebrate'].includes(r.pose)?r.pose:'none';}catch(e){}}
+  applyRewards();window.addEventListener('storage',applyRewards);
   function ready() {
     var header = document.createElement('header');
     header.className = 'site-header';

@@ -1,0 +1,15 @@
+(function(root,factory){var api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.DailyRules=api;})(typeof window==='object'?window:this,function(){
+  'use strict';
+  var VERSION='daily-2026-09-v1';
+  function day(now){return new Date((now==null?Date.now():new Date(now).getTime())+9*3600000).toISOString().slice(0,10);}
+  function hash(s){var n=2166136261;for(var i=0;i<s.length;i++){n^=s.charCodeAt(i);n=Math.imul(n,16777619);}return n>>>0;}
+  function questions(date,charts){return charts.filter(function(c){return c.id&&Array.isArray(c.cs)&&c.vis>=12&&c.cs.length>c.vis;}).slice().sort(function(a,b){var x=hash(VERSION+date+a.id),y=hash(VERSION+date+b.id);return x-y||String(a.id).localeCompare(String(b.id),'en');}).filter(function(c,i,a){return a.findIndex(function(x){return x.id===c.id;})===i;}).slice(0,3);}
+  function create(date,charts,now){var qs=questions(date,charts);if(qs.length!==3)throw new Error('문제 데이터가 부족합니다.');return {version:VERSION,date:date,ids:qs.map(function(c){return c.id;}),answers:[],score:0,startedAt:now||Date.now(),completedAt:null};}
+  function outcome(chart){var entry=chart.cs[chart.vis-1][3],end=chart.cs[chart.cs.length-1][3];return {move:(end-entry)/entry*100,direction:end>=entry?'L':'S'};}
+  function answer(attempt,index,pick,charts,now){if(attempt.completedAt||attempt.answers.length!==index)return attempt;if(pick!=='L'&&pick!=='S')throw new Error('방향을 선택해 주세요.');var c=charts.find(function(x){return x.id===attempt.ids[index];});if(!c)throw new Error('차트 데이터가 없습니다.');var next=JSON.parse(JSON.stringify(attempt)),out=outcome(c);next.answers.push({pick:pick,correct:pick===out.direction,points:pick===out.direction?100:0});next.score=next.answers.reduce(function(n,a){return n+a.points;},0);if(next.answers.length===3)next.completedAt=now||Date.now();return next;}
+  function same(a,b){return !!a&&!!b&&a.version===b.version&&a.date===b.date&&JSON.stringify(a.ids)===JSON.stringify(b.ids);}
+  function resumeDate(today,active){return active&&!active.completedAt&&active.version===VERSION?active.date:today;}
+  function reconcile(local,remote){if(!remote)return local;if(!same(local,remote))return remote;for(var i=0;i<Math.min(local.answers.length,remote.answers.length);i++)if(local.answers[i].pick!==remote.answers[i].pick)return remote;return remote.completedAt||remote.answers.length>=local.answers.length?remote:local;}
+  function rewards(old,date){var r=Object.assign({days:[],frame:'none',pose:'none'},old||{});r.days=Array.from(new Set(r.days.concat(date))).sort();r.unlockedFrames=['none'].concat(r.days.length>=1?['blue']:[],r.days.length>=3?['violet']:[],r.days.length>=7?['gold']:[]);r.unlockedPoses=['none'].concat(r.days.length>=1?['salute']:[],r.days.length>=7?['celebrate']:[]);if(!r.unlockedFrames.includes(r.frame))r.frame='none';if(!r.unlockedPoses.includes(r.pose))r.pose='none';return r;}
+  return {VERSION:VERSION,day:day,questions:questions,create:create,answer:answer,outcome:outcome,same:same,resumeDate:resumeDate,reconcile:reconcile,rewards:rewards};
+});

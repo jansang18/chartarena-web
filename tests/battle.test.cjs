@@ -1,57 +1,8 @@
-const fs = require('node:fs');
-const vm = require('node:vm');
-const test = require('node:test');
-const assert = require('node:assert/strict');
-const html = fs.readFileSync('quiz-battle.html', 'utf8');
-const code = html.slice(html.indexOf('function lockIn(){'), html.indexOf('function resetGoHandler(){'));
-
-function round(pick, move, reduced = false) {
-  let balance = 10000, next = 0, draws = 0;
-  const tasks = [], nodes = new Map();
-  const cs = Array.from({length:80}, (_, i) => [100, 110, 90, i < 48 ? 100 : 100 + move]);
-  const context = {
-    phase:'pick', tmr:null, MODE:'4p', LIVE:null, reduce:reduced, revTimer:null,
-    GD:{cs, vis:48, sym:'TEST', tf:'1h'}, gRev:48, roundBet:0,
-    mySel:{betPct:.25}, players:[
-      {pick, lev:2, score:0}, {pick:null, lev:1, score:0},
-      {pick:null, lev:1, score:0}, {pick:null, lev:1, score:0}
-    ],
-    getBal:()=>balance, setBal:n=>{balance=n;},
-    botPick:()=> 'L', renderPods(){}, renderCtrl(){}, resetView(){},
-    drawChart(){draws++;}, battleXp(){}, botReact(){}, _battleCard(){},
-    startAutoNext(){next++;}, clearAutoNext(){}, finalResult(){},
-    comeback(){return 0;}, toast(){}, fmtP:String,
-    clearInterval(){}, clearTimeout(){}, setTimeout(fn){tasks.push(fn);return tasks.length;},
-    $(id){if(!nodes.has(id)) nodes.set(id,{style:{},classList:{add(){},remove(){}},innerHTML:'',textContent:''});return nodes.get(id);}
-  };
-  vm.createContext(context); vm.runInContext(code, context);
-  context.lockIn(); const before = {balance, phase:context.phase};
-  while(tasks.length) tasks.shift()();
-  return {context, balance, next, draws, before};
-}
-
-test('four-player confirmation reveals sequentially, then settles and advances', () => {
-  const r = round('L',10);
-  assert.equal(r.before.phase,'reveal');
-  assert.equal(r.before.balance,10000);
-  assert.equal(r.context.gRev,78);
-  assert.equal(r.context.phase,'result');
-  assert.equal(r.balance,10500);
-  assert.equal(r.context.players[0].score,500);
-  assert.equal(r.next,1);
-  assert.ok(r.draws>=30);
-});
-
-test('short loss remains bounded by the chosen stake', () => {
-  const r=round('S',100,true);
-  assert.equal(r.balance,7500);
-  assert.equal(r.context.players[0].dp,-2500);
-  assert.equal(r.context.phase,'result');
-});
-
-test('timeout defaults to observation and retains the existing penalty rule', () => {
-  const r=round(null,10,true);
-  assert.equal(r.context.players[0].pick,'W');
-  assert.equal(r.balance,9500);
-  assert.equal(r.next,1);
-});
+const fs=require('fs'),vm=require('vm'),test=require('node:test'),assert=require('node:assert/strict');
+const R=require('../battle-rules.js'),html=fs.readFileSync('quiz-battle.html','utf8');
+const code=html.slice(html.indexOf('function lockIn(){'),html.indexOf('function resetGoHandler(){'));
+function play(input,move,reduced=false){let wallet=777777,now=1000,draws=0,next=0;const tasks=[],nodes=new Map();const players=[0,1,2,3].map(i=>({state:R.create(String(i)),name:'P'+i,ready:i===0&&!!input,pending:input,dp:0,startRank:1}));const c={ArenaRules:R,players,matchHistory:[],MODE:'4p',LIVE:null,phase:'pick',tmr:null,revTimer:null,reduce:reduced,round:1,highlight:null,GD:{vis:48,cs:Array.from({length:80},(_,i)=>[100,110,90,i<48?100:100+move]),sym:'TEST',tf:'1h'},gRev:48,roundBet:0,Date:{now:()=>now},botInput:()=>({dir:'L',risk:'normal'}),renderCtrl(){},renderPods(){},resetView(){},drawChart(){draws++;},currentMove(){return(c.GD.cs[Math.max(47,c.gRev-1)][3]/100-1)*100;},botReact(){},_battleCard(){},startAutoNext(){next++;},getBal:()=>wallet,setBal(v){wallet=v;},esc:String,fmtP:String,clearInterval(){},setTimeout(fn,ms){tasks.push(()=>{now+=ms;fn();});return tasks.length;},$(id){if(!nodes.has(id))nodes.set(id,{style:{},classList:{add(){},remove(){}},innerHTML:'',textContent:''});return nodes.get(id);}};vm.createContext(c);vm.runInContext(code,c);c.lockIn();const before=c.players[0].state.balance;while(tasks.length)tasks.shift()();return{c,wallet,next,draws,before};}
+test('sequential reveal settles match wallet and never spends saved gold',()=>{const r=play({dir:'L',risk:'normal'},10);assert.equal(r.before,10000);assert.equal(r.c.gRev,78);assert.equal(r.c.phase,'result');assert.equal(r.c.players[0].state.balance,10500);assert.equal(r.wallet,777777);assert.equal(r.next,1);assert.ok(r.draws>30);});
+test('reduced motion preserves capped loss without animation',()=>{const r=play({dir:'S',risk:'normal'},100,true);assert.equal(r.c.players[0].state.balance,7500);assert.equal(r.c.phase,'result');});
+test('timeout is a missed turn while an intentional pass is free',()=>{const r=play(null,10,true),p=play({dir:'W'},10,true);assert.equal(r.c.players[0].state.balance,9800);assert.equal(r.c.players[0].state.passUsed,false);assert.equal(p.c.players[0].state.balance,10000);assert.equal(p.c.players[0].state.passUsed,true);});
+test('duplicate finish callbacks cannot apply a second result',()=>{const r=play({dir:'L'},10,true);r.c.finishRound();assert.equal(r.c.players[0].state.balance,10500);assert.equal(r.next,1);});

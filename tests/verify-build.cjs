@@ -1,7 +1,7 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
-const files=['index.html','landscape.html','game.html','quiz-battle.html','puzzle.html','learn.html'];
+const files=['index.html','landscape.html','game.html','quiz-battle.html','puzzle.html','learn.html','daily.html'];
 let count=0;
 for(const file of files){
   const html=fs.readFileSync(file,'utf8');

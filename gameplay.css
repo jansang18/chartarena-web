@@ -1,0 +1,61 @@
+/* Gameplay controls and action states; chart colors keep their meaning. */
+html[data-page=battle] .ctrl { align-items:flex-start; }
+html[data-page=battle] .dir { font-family:inherit; font-size:15px; font-weight:800; line-height:1.4; }
+html[data-page=battle] .dir:disabled { opacity:.45; cursor:default; }
+html[data-page=battle] .dir small { display:block; }
+html[data-page=battle] .bbal { white-space:nowrap; }
+#riskPresets,#powers { display:flex; flex-wrap:wrap; gap:8px; }
+#riskPresets { flex:1; }
+.risk-preset,.power-btn { border:1px solid #5074a9; background:#213d68; color:#edf4ff; border-radius:10px; min-height:46px; padding:8px 16px; font-family:inherit; font-size:14px; font-weight:700; line-height:1.4; cursor:pointer; }
+.risk-preset small { display:block; font-size:11px; font-weight:400; color:#c0d7f5; }
+.risk-preset.on,.power-btn.on { background:#376ee0; border-color:#9fcaff; box-shadow:0 0 0 1px #72adff55; }
+.power-btn[data-power=push].on { background:#9e5137; border-color:#ffc595; }
+.power-btn[data-power=guard].on { background:#216e76; border-color:#8ff7e8; }
+.risk-preset:disabled,.power-btn:disabled { opacity:.5; cursor:default; }
+.risk-group { flex:1; min-width:260px; }
+.risk-preset { flex:1; min-width:74px; padding-inline:8px; }
+.advanced-controls { flex-basis:100%; font-size:12px; color:#c2d6f3; order:4; }
+.advanced-controls summary { cursor:pointer; min-height:44px; padding:12px 0; }
+.advanced-inner { display:flex; flex-wrap:wrap; gap:16px; padding-bottom:12px; }
+.tactics { flex:1; min-width:270px; }
+.tactics p { color:#bdd2ee; font-size:11px; margin:8px 0 0; line-height:1.6; }
+.power-btn { flex:1; font-size:12px; padding-inline:10px; }
+.battle-help { margin:4px 24px 12px; color:#d0e0f7; font-size:13px; line-height:1.7; }
+.arena-place { position:absolute; z-index:7; left:10px; top:10px; font-size:12px; font-weight:800; padding:4px 8px; color:#fff; background:#102342dc; border:1px solid #5c82b2; border-radius:7px; }
+.power-label { font-size:11px; color:#aac2e3; min-height:18px; }
+html[data-page=battle] .led.negative { color:#ff9db3; text-shadow:0 0 12px #ff6b9140; }
+html[data-page=battle] .led.neutral { color:#e4edff; text-shadow:none; }
+html[data-page=battle] .pod.ready .ava { box-shadow:inset 0 0 25px #b1e4ff44; }
+html[data-page=battle] .pod.ready .ch { transform:translateY(-4px); transition:transform .18s ease-out; }
+html[data-page=battle] .pod.win .ch { animation:arena-cheer .55s ease-out; }
+html[data-page=battle] .pod.loss .ch { transform:translateY(5px) rotate(-3deg); filter:saturate(.7); }
+html[data-page=battle] .pod.champion { border-color:#ffe19b; box-shadow:0 0 0 2px #ffd569,0 0 30px #ffd56944; }
+html[data-page=battle] .pod.champion .ch { transform:translateY(-5px) rotate(-4deg); }
+html[data-page=battle] .tv { height:clamp(280px,35vh,460px); }
+html[data-page=battle] .verdict { max-width:calc(100% - 32px); }
+html[data-page=battle] .verdict .mv { font-size:clamp(18px,2vw,28px); }
+html[data-page=battle] .verdict .bl { font-size:12px; line-height:1.7; white-space:normal; }
+.daily-entry { display:flex; gap:20px; align-items:center; justify-content:space-between; margin:0 0 20px; padding:22px 24px; border-radius:14px; background:linear-gradient(115deg,#fff6d9,#f5edff); border:1px solid #e5d3aa; }
+.daily-entry h2 { margin:0 0 6px; font-size:22px; }
+.daily-entry p { margin:0; color:#655677; font-size:13px; }
+.daily-entry a { background:#6842b7; color:#fff; text-decoration:none; white-space:nowrap; padding:12px 20px; border-radius:10px; font-weight:700; min-height:44px; }
+html[data-reward-frame=blue] { --reward-stroke:#46b8ff; }
+html[data-reward-frame=violet] { --reward-stroke:#ae7eff; }
+html[data-reward-frame=gold] { --reward-stroke:#e8ae36; }
+html[data-reward-frame=blue] .charshow,html[data-reward-frame=violet] .charshow,html[data-reward-frame=gold] .charshow { outline:3px solid var(--reward-stroke); outline-offset:-3px; border-radius:12px; }
+html[data-reward-frame=blue] .pod:has(.desk.me),html[data-reward-frame=violet] .pod:has(.desk.me),html[data-reward-frame=gold] .pod:has(.desk.me) { border-color:var(--reward-stroke); box-shadow:0 0 0 2px var(--reward-stroke); }
+html[data-reward-pose=salute] .pod.champion:has(.desk.me) .ch { transform:translateY(-8px) rotate(-8deg); }
+html[data-reward-pose=celebrate] .pod.champion:has(.desk.me) .ch { transform:translateY(-12px) rotate(5deg); }
+@keyframes arena-cheer { 0%,100%{transform:translateY(0)}45%{transform:translateY(-14px) rotate(-4deg)} }
+@media(max-width:760px){
+  html[data-page=battle] .ctrl .risk-group { min-width:0; }
+  .tactics { min-width:0; flex-basis:100%; }
+  .battle-help { order:4; margin-inline:12px; font-size:12px; }
+  .arena-place { left:5px; top:6px; font-size:10px; padding:3px 5px; }
+  html[data-page=battle] .tv { height:clamp(240px,34vh,300px); }
+  .daily-entry { flex-direction:column; align-items:stretch; padding:18px; gap:14px; }
+  .daily-entry a { text-align:center; }
+  .daily-entry h2 { font-size:20px; }
+  .power-btn { padding-inline:6px; }
+}
+@media(prefers-reduced-motion:reduce){ .pod .ch { animation:none!important; transition:none!important; } }
