@@ -227,7 +227,7 @@
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=2801d66fee59">
-<link rel="stylesheet" href="gameplay.css?v=0e2b5ef8d1d5">
+<link rel="stylesheet" href="gameplay.css?v=9c82d0de0e2b">
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -257,14 +257,16 @@
   <div class="podiums" id="podiums"></div>
 
   <div class="ctrl">
-    <div class="cgrp"><span class="clab">방향</span>
+    <div class="cgrp direction-group"><span class="clab">방향</span>
       <button type="button" class="dir long" data-dir="L" id="dL">↗ 롱<small>상승</small></button>
       <button type="button" class="dir short" data-dir="S" id="dS">↘ 숏<small>하락</small></button>
       <button type="button" class="dir watch" data-dir="W" id="dW">◎ 패스<small>경기당 1회</small></button>
     </div>
+    <details class="battle-options" id="battleOptions"><summary id="optionsSummary">전략 설정 · 보통 · 전술 없음</summary><div class="options-body">
     <div class="cgrp risk-group"><span class="clab">전략</span><div id="riskPresets"></div></div>
     <details class="advanced-controls"><summary>고급 설정 · 투입/배율 직접 선택</summary><div class="advanced-inner"><div class="cgrp"><span class="clab">투입</span><div class="bets" id="bets"></div></div><div class="cgrp"><span class="clab">배율</span><div class="levs" id="levs"></div></div></div></details>
     <div class="tactics"><div id="powers"></div><p id="powerHelp"></p></div>
+    </div></details>
     <button class="go" id="go" type="button">확정 ▶</button>
   </div>
   <p class="battle-help" id="battleHelp" aria-live="polite"></p>
@@ -474,6 +476,7 @@ function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.ro
 /* 컨트롤 */
 function renderCtrl(){
   var me=players[0].state, locked=phase!=='pick'||!!(LIVE&&(LIVE.locked||LIVE.sending));
+  $('optionsSummary').textContent='전략 설정 · '+(mySel.advanced?'직접 설정':{careful:'소극적',normal:'보통',bold:'공격적'}[mySel.risk])+' · '+(me.powerUsed?'전술 사용 완료':{none:'전술 없음',push:'승부수 ×1.5',guard:'방어 ×0.5'}[mySel.power]);
   ['L','S','W'].forEach(function(d){$('d'+d).classList.toggle('on',mySel.dir===d);$('d'+d).disabled=locked||(d==='W'&&me.passUsed);});
   $('dW').querySelector('small').textContent=me.passUsed?'사용 완료':'경기당 1회';
   $('bbal').textContent='경기 '+fmtP(me.balance)+'P';
@@ -653,8 +656,8 @@ function _battleCard(){ var me=players[0]; if(!me||!GD)return;
 window.addEventListener('resize',drawChart);
 
 /* ===== 로비 / 모드 선택 ===== */
-function showLobby(){ phase='idle';if(battlePass)battlePass.reset(); var lb=$('lobby'); if(!lb)return; lb.classList.remove('hide'); $('lmodes').style.display='flex'; }
-function hideLobby(){ var lb=$('lobby'); if(lb)lb.classList.add('hide'); }
+function showLobby(){ phase='idle';document.documentElement.removeAttribute('data-playing');if(battlePass)battlePass.reset(); var lb=$('lobby'); if(!lb)return; lb.classList.remove('hide'); $('lmodes').style.display='flex';window.scrollTo(0,0); }
+function hideLobby(){ var lb=$('lobby'); if(lb)lb.classList.add('hide');document.documentElement.dataset.playing='true';$('battleOptions').open=!matchMedia('(max-width:1100px), (max-height:700px)').matches;window.scrollTo(0,0);requestAnimationFrame(function(){window.dispatchEvent(new Event('resize'));}); }
 function startMode4p(){ if(!nrgGate(true))return; MODE='4p'; round=1; document.querySelector('.live').textContent='봇 포함 4인';
   players=[ {name:myNick, chImg:myChImg, score:0, strat:'me', pick:null, lev:2, dp:0},
     {name:'핑크빈', em:'🐷', score:0, strat:'trend', pick:null, lev:2, dp:0},

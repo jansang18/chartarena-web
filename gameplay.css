@@ -59,3 +59,59 @@ html[data-reward-pose=celebrate] .pod.champion:has(.desk.me) .ch { transform:tra
   .power-btn { padding-inline:6px; }
 }
 @media(prefers-reduced-motion:reduce){ .pod .ch { animation:none!important; transition:none!important; } }
+
+/* Match focus: spend the first screen on the chart and the actual decision. */
+.battle-options { flex:1 1 580px; min-width:0; }
+.battle-options>summary { min-height:44px; padding:12px; color:#cce0ff; cursor:pointer; font-size:12px; border:1px solid #426391; border-radius:9px; }
+.options-body { display:flex; flex-wrap:wrap; gap:12px; padding-top:12px; }
+html[data-page=battle][data-playing] .site-header { display:none; }
+html[data-page=battle][data-playing] .scaler { margin-top:8px; }
+@media (max-width:1100px), (max-height:700px) {
+  html[data-page=battle][data-playing] body { padding-bottom:env(safe-area-inset-bottom,0px); }
+  html[data-page=battle][data-playing] .scaler { width:100%; margin:0; }
+  html[data-page=battle][data-playing] .frame { min-height:0; border:0; border-radius:0; padding:0 0 8px; }
+  html[data-page=battle][data-playing] .frame>.top { min-height:48px; height:48px; padding:2px 8px; gap:8px; flex-wrap:nowrap; }
+  html[data-page=battle][data-playing] .live { font-size:10px; padding:3px 5px; white-space:nowrap; }
+  html[data-page=battle][data-playing] .round { margin-left:auto; font-size:12px; white-space:nowrap; }
+  html[data-page=battle][data-playing] .bbal { padding:3px 5px; font-size:11px; }
+  html[data-page=battle][data-playing] .coindot { display:none; }
+  html[data-page=battle][data-playing] .endbtn { padding:4px 8px; min-width:44px; font-size:12px; }
+  html[data-page=battle][data-playing] .tv { order:1; width:calc(100% - 12px); margin:6px; padding:3px; height:clamp(180px,36dvh,340px); border-radius:10px; }
+  html[data-page=battle][data-playing] .tvtag { display:none; }
+  html[data-page=battle][data-playing] .indbar { top:7px; left:8px; gap:4px; }
+  html[data-page=battle][data-playing] .ind { min-height:44px; padding:4px 8px; font-size:11px; background:#12233bd9; border-radius:7px; }
+  html[data-page=battle][data-playing] .ind.on { background:#68d3ff; color:#071a2a; }
+  html[data-page=battle][data-playing] .timer { top:8px; right:8px; width:70px; }
+  html[data-page=battle][data-playing] .timer .n { font-size:24px; }
+  html[data-page=battle][data-playing] .ctrl { order:2; display:grid; grid-template-columns:minmax(0,1fr); gap:6px; padding:6px 8px; min-height:0; }
+  html[data-page=battle][data-playing] .direction-group { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; width:100%; }
+  html[data-page=battle][data-playing] .direction-group>.clab { display:none; }
+  html[data-page=battle][data-playing] .dir { width:100%; min-width:0; min-height:48px; padding:4px; }
+  html[data-page=battle][data-playing] .go { grid-row:2; width:100%; margin:0; min-height:48px; }
+  html[data-page=battle][data-playing] .battle-options { grid-row:3; width:100%; }
+  html[data-page=battle][data-playing] .options-body { gap:8px; padding:8px 0; }
+  html[data-page=battle][data-playing] .risk-group,html[data-page=battle][data-playing] .tactics { min-width:0; width:100%; flex-basis:100%; }
+  html[data-page=battle][data-playing] .podiums { order:3; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:6px 8px; }
+  html[data-page=battle][data-playing] .pod { border-radius:8px; }
+  html[data-page=battle][data-playing] .pod .ava { height:54px; border-radius:7px 7px 0 0; }
+  html[data-page=battle][data-playing] .pod .ava .ch { height:108px; }
+  html[data-page=battle][data-playing] .desk { padding:5px 2px; border-radius:0 0 7px 7px; }
+  html[data-page=battle][data-playing] .desk .nm { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:10px; }
+  html[data-page=battle][data-playing] .desk .led { font-size:14px; }
+  html[data-page=battle][data-playing] .power-label,html[data-page=battle][data-playing] .crown { display:none; }
+  html[data-page=battle][data-playing] .arena-place { top:3px; left:3px; font-size:9px; padding:1px 3px; }
+  html[data-page=battle][data-playing] .pod .pick { top:31px; right:2px; min-width:0; min-height:0; padding:1px 3px; font-size:9px; }
+  html[data-page=battle][data-playing] .battle-help { order:4; margin:4px 8px; font-size:11px; }
+  html[data-page=battle][data-playing] .emobar,html[data-page=battle][data-playing] .bshare { order:5; margin:4px 8px; }
+}
+@media (min-width:700px) and (max-height:650px) {
+  html[data-page=battle][data-playing] .frame { display:grid; grid-template-columns:minmax(0,1fr) 300px; align-content:start; }
+  html[data-page=battle][data-playing] .frame>.top { grid-column:1/-1; }
+  html[data-page=battle][data-playing] .tv { grid-column:1; grid-row:2; height:calc(100dvh - 164px); min-height:180px; margin:6px; }
+  html[data-page=battle][data-playing] .ctrl { grid-column:2; grid-row:2/4; align-content:start; border-top:0; border-left:1px solid #426391; }
+  html[data-page=battle][data-playing] .podiums { grid-column:1; grid-row:3; }
+  html[data-page=battle][data-playing] .pod .ava { height:32px; }
+  html[data-page=battle][data-playing] .pod .ava .ch { height:80px; }
+  html[data-page=battle][data-playing] .pod .pick { top:12px; }
+  html[data-page=battle][data-playing] .battle-help { grid-column:1/-1; }
+}
