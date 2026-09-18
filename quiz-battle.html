@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<script src="app-shell.js?v=254cf1426199"></script>
+<script src="app-shell.js?v=c1c2a77c836c"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트아레나 — 차트로 배틀하는 트레이딩 게임">
@@ -226,7 +226,7 @@
   .desk .stak{font-family:var(--mono); font-weight:900; font-size:15px; color:#FCE9A6}
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
-<link rel="stylesheet" href="app-shell.css?v=dd2ccd671768">
+<link rel="stylesheet" href="app-shell.css?v=5a854808b16e">
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -271,14 +271,13 @@
 
   <div class="lobby" id="lobby">
     <a class="lobbyback" href="index.html" aria-label="홈 화면으로 뒤로">뒤로</a>
-    <div class="lobby-heading"><p>READ. DECIDE. COMPETE.</p><h1>4인 차트 배틀</h1><p>10번의 판단으로 나만의 전략을 시험하세요.</p></div>
     <div class="lmodes" id="lmodes">
-      <div class="lcard live" id="modeLive"><div class="in">
+      <div class="lcard"><div class="in">
         <div class="ltag">동일한 차트 · 4명의 플레이어</div>
         <div class="modeart live-art" role="img" aria-label="네 명의 트레이더가 함께 펼치는 실시간 차트 배틀"></div>
-        <div class="ln">4인 실시간 배틀</div>
-        <div class="ld">실제 참가자와 매칭합니다. 인원이 부족하면 봇이 함께합니다. 경기 시작 시 플레이 1회를 사용합니다.</div>
-        <div class="lgo">매칭 시작</div>
+        <h1 class="ln">차트를 읽고,<br>다음 수를 겨루세요.</h1>
+        <div class="ld">10라운드의 판단, 누적 수익으로 결정되는 순위.<br>참가자를 찾고 빈자리는 봇과 함께 시작합니다.</div>
+        <div class="lobby-action"><button class="lgo" id="modeLive" type="button">매칭 시작</button><p>경기 시작 시 플레이 1회 사용 · 매칭 취소는 차감 없음</p></div>
       </div></div>
     </div>
     <div class="lwait" id="lwait">

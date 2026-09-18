@@ -22,7 +22,7 @@
     document.body.prepend(header);
 
     // Existing data-driven controls also work with keyboard, including rerenders.
-    var selector = '[data-go], [data-met], [data-dir], [data-ind], [data-bet], [data-lev], [data-go-play], .lcard, #worlds .lv:not(.locked), .tab, .bet, .lev';
+    var selector = '[data-go], [data-met], [data-dir], [data-ind], [data-bet], [data-lev], [data-go-play], #worlds .lv:not(.locked), .tab, .bet, .lev';
     function enhance(root) {
       root.querySelectorAll(selector).forEach(function (el) {
         if (el.matches('button, input, a[href]')) return;
