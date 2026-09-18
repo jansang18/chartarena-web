@@ -2,8 +2,8 @@
 (function () {
   window.CA_LOCAL_PREVIEW = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var routes = [
-    ['home', 'index.html', '홈'], ['solo', 'game.html', '차트 연습'],
-    ['battle', 'quiz-battle.html', '4인 배틀'], ['puzzle', 'puzzle.html', '퍼즐'],
+    ['home', 'index.html', '홈'], ['battle', 'quiz-battle.html', '4인 배틀'],
+    ['solo', 'game.html', '차트 연습'], ['puzzle', 'puzzle.html', '퍼즐'],
     ['learn', 'learn.html', '학습']
   ];
   var page = routes.find(function (r) { return location.pathname.endsWith('/' + r[1]); });
@@ -20,7 +20,7 @@
       + '<img src="assets/logo_wordmark.png?v=3" alt="차트아레나"></a>'
       + '<nav class="site-nav" aria-label="주요 메뉴">' + routes.map(function (r) {
         return '<a href="' + r[1] + '"' + (key === r[0] ? ' aria-current="page"' : '') + '>' + r[2] + '</a>';
-      }).join('') + '</nav><span class="site-caption">차트로 배우는 투자 감각</span></div>';
+      }).join('') + '</nav><span class="site-caption">'+(key==='home'?'4인 차트 배틀':'차트로 배우는 투자 감각')+'</span></div>';
     document.body.prepend(header);
 
     // Existing data-driven controls also work with keyboard, including rerenders.

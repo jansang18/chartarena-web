@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<script src="app-shell.js?v=d9dc0a0be3ea"></script>
+<script src="app-shell.js?v=ab96d67aef07"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트아레나 — 차트로 배틀하는 트레이딩 게임">
@@ -453,7 +453,7 @@
   .gme{font-size:10px;font-weight:800;color:var(--gold);background:rgba(233,185,73,.14);border-radius:5px;padding:1px 5px;margin-left:3px}
   .gmc,.grv{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--gold);flex:0 0 auto}
 </style>
-<link rel="stylesheet" href="app-shell.css?v=2801d66fee59">
+<link rel="stylesheet" href="app-shell.css?v=1daf486e5931">
 <link rel="stylesheet" href="gameplay.css?v=286a81505f11">
 
 <div class="scaler" id="scaler"><div class="frame">
@@ -486,45 +486,26 @@
     <!-- ===== MAIN ===== -->
     <div class="main" id="mainScroll">
 
-      <!-- HOME -->
+      <!-- HOME: four-player battle is the primary destination. -->
       <div class="view on" id="v-home">
-        <section class="hub-intro"><p class="eyebrow">YOUR NEXT MOVE</p><h1>오늘의 차트, 나의 한 수.</h1><p>가볍게 연습하고, 4인 배틀에서 실력을 펼쳐보세요.</p></section>
-        <div class="statrow" aria-label="내 플레이 기록">
-          <div class="stat"><div class="sv"><div class="l">차트 연습 기록</div><div class="v" id="homePlayed">0회</div></div></div>
-          <div class="stat"><div class="sv"><div class="l">승률</div><div class="v" id="homeWin">—</div></div></div>
-          <div class="stat"><div class="sv"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div>
-        </div>
-        <a class="solobar" href="game.html">
-          <img class="schart" src="assets/solo_chart.png?v=1" alt="">
-          <div class="stext"><div class="st1">다음 움직임을 읽어보세요.</div><div class="st2">과거 차트로 연습하는 롱·숏·관망.<br>나의 속도로 판단하고 결과를 확인하세요.</div></div>
-          <div class="sgo">차트 연습 시작 →</div>
-        </a>
-        <section class="daily-entry"><div><h2>오늘의 차트 3문제</h2><p>모두에게 같은 문제 · 첫 기록으로 도전하고 나만의 테두리를 모으세요.</p></div><a href="daily.html">일일 도전 시작 →</a></section>
-        <div class="dash3">
-          <section class="hero">
-            <div class="hhead"><h3>4인 차트 배틀</h3><span class="status">5라운드</span></div>
-            <p class="hsub">같은 10,000P로 시작. 패스와 승부수로 5라운드 역전에 도전하세요.</p>
-            <div class="himg"><img src="assets/mode-live-characters-v3.png" alt="함께 경쟁하는 네 명의 트레이더"></div>
-            <p class="mode-note">접속한 상대와 매칭하며, 빈자리는 봇이 참여합니다.</p>
-            <a class="hbtn" href="quiz-battle.html">배틀 입장 →</a>
-          </section>
-          <section class="jhero">
-            <div class="hhead"><h3>차트 퍼즐</h3><span class="jbadge">횟수 제한 없음</span></div>
-            <p class="hsub">짧은 예측을 반복하며 차트를 읽는 감각을 쌓으세요.</p>
-            <div class="jpath" id="jHeroPath"></div>
-            <div class="hstats">
-              <div class="hstat"><div class="l">획득 별</div><div class="v" id="jHeroStars">0/90</div></div>
-              <div class="hstat"><div class="l">클리어</div><div class="v" id="jHeroPct">0/30</div></div>
-              <div class="hstat"><div class="l">다음 도전</div><div class="v jvsm" id="jHeroNext">레벨 1</div></div>
-            </div>
-            <a class="hbtn jbtn" href="puzzle.html">퍼즐 이어하기 →</a>
-          </section>
-          <div class="rcol3">
-            <a class="mcard" href="learn.html"><h4>차트 학습</h4><p>캔들부터 보조지표까지</p><span class="cgo">기초 살펴보기 →</span></a>
-            <div class="mcard" data-go="rank"><h4>나의 기록</h4><p>플레이와 수익 기록 확인</p><span class="cgo">기록 보기 →</span></div>
-            <div class="mcard" data-go="garage"><h4>상점 · 꾸미기</h4><p>나의 캐릭터와 보유 아이템</p><span class="cgo">상점 열기 →</span></div>
+        <section class="arena-stage" aria-labelledby="arenaTitle">
+          <img class="arena-stage-art" src="assets/mode-live-characters-v3.png" alt="차트 앞에 모인 네 명의 트레이더">
+          <div class="arena-stage-copy">
+            <p class="arena-kicker">CHART ARENA · 4 PLAYER BATTLE</p>
+            <h1 id="arenaTitle">차트 하나,<br><span>네 명의 승부.</span></h1>
+            <p class="arena-description">같은 차트, 서로 다른 판단.<br>마지막 캔들까지 순위는 바뀝니다.</p>
+            <div class="arena-rules"><span>4인 대전</span><span>5라운드</span><span>동일한 시작 자금</span></div>
+            <a class="arena-start" href="quiz-battle.html">4인 배틀 입장 <span aria-hidden="true">→</span></a>
+            <p class="arena-match-note">상대를 찾고, 빈자리는 봇이 채웁니다.</p>
           </div>
+        </section>
+        <div class="lobby-support-heading"><h2>다음 승부를 준비하세요</h2><a href="learn.html">차트 기초 살펴보기 →</a></div>
+        <div class="lobby-support">
+          <a class="lobby-practice" href="game.html"><span class="lobby-mode-label">PRACTICE</span><h3>차트 연습</h3><p>시간 부담 없이 나의 판단을 다듬어보세요.</p><span class="lobby-text-link">연습 시작 →</span></a>
+          <section class="lobby-puzzle"><span class="lobby-mode-label">PUZZLE</span><h3>차트 퍼즐</h3><p>방향부터 돌파까지, 한 문제씩 실력을 쌓으세요.</p><div class="puzzle-summary"><span>별 <b id="jHeroStars">0/90</b></span><span>클리어 <b id="jHeroPct">0/30</b></span><span id="jHeroNext">레벨 1</span></div><div id="jHeroPath" hidden></div><a class="lobby-text-link" href="puzzle.html">퍼즐 이어하기 →</a></section>
         </div>
+        <section class="lobby-daily"><div><span class="lobby-mode-label">DAILY CHALLENGE</span><h3>오늘의 차트 3문제</h3><p>모두에게 같은 문제. 첫 기록으로 도전하세요.</p></div><a href="daily.html">일일 도전 →</a></section>
+        <div class="lobby-record"><span>나의 연습 기록</span><div class="statrow" aria-label="내 플레이 기록"><div class="stat"><div class="l">플레이</div><div class="v" id="homePlayed">0회</div></div><div class="stat"><div class="l">승률</div><div class="v" id="homeWin">—</div></div><div class="stat"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div><button type="button" data-go="rank">기록 보기 →</button></div>
       </div>
 
       <!-- RANKING -->
