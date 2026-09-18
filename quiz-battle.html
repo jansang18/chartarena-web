@@ -227,7 +227,7 @@
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=2801d66fee59">
-<link rel="stylesheet" href="gameplay.css?v=9c82d0de0e2b">
+<link rel="stylesheet" href="gameplay.css?v=286a81505f11">
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -262,9 +262,10 @@
       <button type="button" class="dir short" data-dir="S" id="dS">↘ 숏<small>하락</small></button>
       <button type="button" class="dir watch" data-dir="W" id="dW">◎ 패스<small>경기당 1회</small></button>
     </div>
+    <div class="cgrp leverage-group"><span class="clab" id="leverageLabel">레버리지 · 기본 1배</span><div class="levs" id="levs" role="group" aria-label="레버리지 배율, 선택한 배율을 다시 누르면 1배"></div></div>
     <details class="battle-options" id="battleOptions"><summary id="optionsSummary">전략 설정 · 보통 · 전술 없음</summary><div class="options-body">
     <div class="cgrp risk-group"><span class="clab">전략</span><div id="riskPresets"></div></div>
-    <details class="advanced-controls"><summary>고급 설정 · 투입/배율 직접 선택</summary><div class="advanced-inner"><div class="cgrp"><span class="clab">투입</span><div class="bets" id="bets"></div></div><div class="cgrp"><span class="clab">배율</span><div class="levs" id="levs"></div></div></div></details>
+    <details class="advanced-controls"><summary>고급 설정 · 투입 비율 선택</summary><div class="advanced-inner"><div class="cgrp"><span class="clab">투입</span><div class="bets" id="bets"></div></div></div></details>
     <div class="tactics"><div id="powers"></div><p id="powerHelp"></p></div>
     </div></details>
     <button class="go" id="go" type="button">확정 ▶</button>
@@ -476,17 +477,18 @@ function fmtLead(v){ v=Math.round(v); var a=Math.abs(v); var s=a>=100000?Math.ro
 /* 컨트롤 */
 function renderCtrl(){
   var me=players[0].state, locked=phase!=='pick'||!!(LIVE&&(LIVE.locked||LIVE.sending));
-  $('optionsSummary').textContent='전략 설정 · '+(mySel.advanced?'직접 설정':{careful:'소극적',normal:'보통',bold:'공격적'}[mySel.risk])+' · '+(me.powerUsed?'전술 사용 완료':{none:'전술 없음',push:'승부수 ×1.5',guard:'방어 ×0.5'}[mySel.power]);
+  $('optionsSummary').textContent='전략 설정 · 투입 '+Math.round(mySel.betPct*100)+'%'+' · '+(me.powerUsed?'전술 사용 완료':{none:'전술 없음',push:'승부수 ×1.5',guard:'방어 ×0.5'}[mySel.power]);
   ['L','S','W'].forEach(function(d){$('d'+d).classList.toggle('on',mySel.dir===d);$('d'+d).disabled=locked||(d==='W'&&me.passUsed);});
   $('dW').querySelector('small').textContent=me.passUsed?'사용 완료':'경기당 1회';
   $('bbal').textContent='경기 '+fmtP(me.balance)+'P';
   $('riskPresets').innerHTML=[['careful','소극적','10% · 1배'],['normal','보통','25% · 2배'],['bold','공격적','50% · 3배']].map(function(x){return '<button type="button" data-risk="'+x[0]+'" class="risk-preset'+(!mySel.advanced&&mySel.risk===x[0]?' on':'')+'"'+(locked?' disabled':'')+'>'+x[1]+'<small>'+x[2]+'</small></button>';}).join('');
   $('bets').innerHTML=BETPCTS.map(function(b){return '<button type="button" class="bet'+(mySel.betPct===b[0]?' on':'')+'" data-bp="'+b[0]+'"'+(locked?' disabled':'')+'>'+b[1]+'</button>';}).join('');
-  $('levs').innerHTML=[1,2,3,5,10].map(function(l){return '<button type="button" class="lev'+(mySel.lev===l?' on':'')+'" data-lev="'+l+'"'+(locked?' disabled':'')+'>'+l+'배</button>';}).join('');
+  $('levs').innerHTML=[2,3,5,10].map(function(l){return '<button type="button" class="lev'+(mySel.lev===l?' on':'')+'" aria-pressed="'+(mySel.lev===l)+'" data-lev="'+l+'"'+(locked||mySel.dir==='W'?' disabled':'')+'>'+l+'배</button>';}).join('');
+  $('leverageLabel').textContent='레버리지 · '+(mySel.lev===1?'기본 1배':mySel.lev+'배');
   $('powers').innerHTML=[['none','아껴두기'],['push','승부수 ×1.5'],['guard','방어 ×0.5']].map(function(x){return '<button type="button" data-power="'+x[0]+'" class="power-btn'+(mySel.power===x[0]?' on':'')+'"'+(locked||me.powerUsed||mySel.dir==='W'?' disabled':'')+'>'+x[1]+'</button>';}).join('');
   $('powerHelp').textContent=me.powerUsed?'이 경기의 전술을 이미 사용했습니다.':'승부수는 득실 ×1.5, 방어는 득실 ×0.5 · 둘 중 하나를 경기당 한 번';
   var go=$('go');go.className='go';
-  if(phase==='pick'){go.disabled=locked||mySel.dir===null;go.textContent=LIVE&&LIVE.sending?'전송 중…':locked?'확정 완료 · 함께 공개를 기다려요':mySel.dir===null?'방향을 골라주세요':mySel.dir==='W'?'무료 패스 사용':'선택 확정 · '+fmtP(curBet())+'P';}
+  if(phase==='pick'){go.disabled=locked||mySel.dir===null;go.textContent=LIVE&&LIVE.sending?'전송 중…':locked?'확정 완료 · 함께 공개를 기다려요':mySel.dir===null?'방향을 골라주세요':mySel.dir==='W'?'무료 패스 사용':'선택 확정 · '+mySel.lev+'배 · '+fmtP(curBet())+'P';}
   else if(phase==='result'){go.className='go next';go.disabled=MODE==='live'&&!LIVE.host;go.textContent=round>=ROUNDS?'최종 결과':'다음 라운드';}
   else{go.disabled=true;go.textContent='선택 공개 · 예상 순위 변동 중';}
 }
@@ -495,7 +497,7 @@ $('dL').onclick=function(){pick('L');};$('dS').onclick=function(){pick('S');};$(
 function pick(d){if(!canChoose()||(d==='W'&&players[0].state.passUsed))return;mySel.dir=d;if(d==='W')mySel.power='none';renderCtrl();renderPods();}
 $('riskPresets').onclick=function(e){var el=e.target.closest('[data-risk]');if(!el||!canChoose())return;mySel.risk=el.dataset.risk;mySel.advanced=false;var p=ArenaRules.PRESETS[mySel.risk];mySel.betPct=p.betPct;mySel.lev=p.lev;renderCtrl();};
 $('powers').onclick=function(e){var el=e.target.closest('[data-power]');if(!el||!canChoose()||players[0].state.powerUsed)return;mySel.power=el.dataset.power;renderCtrl();};
-$('levs').onclick=function(e){var l=e.target.closest('[data-lev]');if(l&&canChoose()){mySel.lev=+l.dataset.lev;mySel.advanced=true;renderCtrl();}};
+$('levs').onclick=function(e){var l=e.target.closest('[data-lev]');if(l&&canChoose()&&mySel.dir!=='W'){mySel.lev=mySel.lev===+l.dataset.lev?1:+l.dataset.lev;mySel.advanced=true;renderCtrl();}};
 $('bets').onclick=function(e){var b=e.target.closest('[data-bp]');if(b&&canChoose()){mySel.betPct=+b.dataset.bp;mySel.advanced=true;renderCtrl();}};
 $('indbar').onclick=function(e){var el=e.target.closest('[data-ind]');if(!el)return;var k=el.dataset.ind;bind[k]=!bind[k];el.classList.toggle('on',bind[k]);drawChart();};
 $('go').onclick=function(){submitChoice();};
@@ -535,7 +537,7 @@ var matchId='', matchPaid=false, highlight=null, matchHistory=[];
 function initMatch(){matchId='match-'+Date.now()+'-'+Math.random().toString(36).slice(2);matchPaid=false;highlight=null;matchHistory=[];players.forEach(function(p,i){p.state=ArenaRules.create(p.uid||String(i));p.score=0;p.dp=0;p.startRank=1;});}
 function prepareRound(seg,deadline){
   stopBattle();phase='pick';GD=seg;gRev=GD.vis;resetView();tleft=15;
-  mySel={dir:null,risk:'normal',advanced:false,betPct:.25,lev:2,power:'none'};
+  mySel={dir:null,risk:'normal',advanced:true,betPct:.25,lev:1,power:'none'};
   if(LIVE){LIVE.locked=false;LIVE.sending=false;LIVE.resolving=false;LIVE.deadline=deadline;LIVE.picks={};}
   players.forEach(function(p){p.startRank=ArenaRules.rank(players.map(function(q){return q.state;}),p.state.id);p.pick=null;p.ready=false;p.revealInput=null;p.dp=0;});
   $('chartid').classList.remove('show');$('bShare').style.display='none';$('verdict').classList.remove('show');$('round').textContent='ROUND '+round+' / '+ROUNDS;

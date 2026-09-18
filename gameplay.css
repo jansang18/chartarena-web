@@ -62,6 +62,8 @@ html[data-reward-pose=celebrate] .pod.champion:has(.desk.me) .ch { transform:tra
 
 /* Match focus: spend the first screen on the chart and the actual decision. */
 .battle-options { flex:1 1 580px; min-width:0; }
+.leverage-group { min-width:0; }
+.leverage-group .levs { display:flex; gap:5px; }
 .battle-options>summary { min-height:44px; padding:12px; color:#cce0ff; cursor:pointer; font-size:12px; border:1px solid #426391; border-radius:9px; }
 .options-body { display:flex; flex-wrap:wrap; gap:12px; padding-top:12px; }
 html[data-page=battle][data-playing] .site-header { display:none; }
@@ -83,12 +85,17 @@ html[data-page=battle][data-playing] .scaler { margin-top:8px; }
   html[data-page=battle][data-playing] .ind.on { background:#68d3ff; color:#071a2a; }
   html[data-page=battle][data-playing] .timer { top:8px; right:8px; width:70px; }
   html[data-page=battle][data-playing] .timer .n { font-size:24px; }
-  html[data-page=battle][data-playing] .ctrl { order:2; display:grid; grid-template-columns:minmax(0,1fr); gap:6px; padding:6px 8px; min-height:0; }
-  html[data-page=battle][data-playing] .direction-group { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; width:100%; }
+  html[data-page=battle][data-playing] .ctrl { order:2; display:grid; grid-template-columns:minmax(0,1fr) 136px; gap:6px; padding:6px 8px; min-height:0; }
+  html[data-page=battle][data-playing] .direction-group { grid-row:1; grid-column:1; align-self:end; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; width:100%; }
   html[data-page=battle][data-playing] .direction-group>.clab { display:none; }
-  html[data-page=battle][data-playing] .dir { width:100%; min-width:0; min-height:48px; padding:4px; }
-  html[data-page=battle][data-playing] .go { grid-row:2; width:100%; margin:0; min-height:48px; }
-  html[data-page=battle][data-playing] .battle-options { grid-row:3; width:100%; }
+  html[data-page=battle][data-playing] .dir { width:100%; min-width:0; min-height:48px; padding:4px 1px; font-size:13px; white-space:nowrap; }
+  html[data-page=battle][data-playing] .dir small { font-size:9px; }
+  html[data-page=battle][data-playing] .leverage-group { grid-row:1; grid-column:2; display:flex; flex-direction:column; align-items:stretch; gap:2px; width:100%; }
+  html[data-page=battle][data-playing] .leverage-group .clab { font-size:10px; flex-shrink:0; width:100%; margin:0; line-height:14px; min-height:14px; white-space:nowrap; }
+  html[data-page=battle][data-playing] .leverage-group .levs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px; }
+  html[data-page=battle][data-playing] .leverage-group .lev { min-width:0; width:100%; min-height:44px; padding:4px 0; font-size:12px; }
+  html[data-page=battle][data-playing] .go { grid-row:2; grid-column:1/-1; width:100%; margin:0; min-height:48px; }
+  html[data-page=battle][data-playing] .battle-options { grid-row:3; grid-column:1/-1; width:100%; }
   html[data-page=battle][data-playing] .options-body { gap:8px; padding:8px 0; }
   html[data-page=battle][data-playing] .risk-group,html[data-page=battle][data-playing] .tactics { min-width:0; width:100%; flex-basis:100%; }
   html[data-page=battle][data-playing] .podiums { order:3; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; padding:6px 8px; }
