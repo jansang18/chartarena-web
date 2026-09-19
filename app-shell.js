@@ -2,9 +2,7 @@
 (function () {
   window.CA_LOCAL_PREVIEW = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var routes = [
-    ['home', 'index.html', '홈'], ['battle', 'quiz-battle.html', '4인 배틀'],
-    ['solo', 'game.html', '차트 연습'], ['puzzle', 'puzzle.html', '퍼즐'],
-    ['learn', 'learn.html', '학습']
+    ['home', 'index.html', '홈'], ['battle', 'quiz-battle.html', '4인 배틀']
   ];
   var page = routes.find(function (r) { return location.pathname.endsWith('/' + r[1]); });
   var key = location.pathname.endsWith('/daily.html') ? 'daily' : page ? page[0] : 'home';

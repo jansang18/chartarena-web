@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<script src="app-shell.js?v=ab96d67aef07"></script>
+<script src="app-shell.js?v=b3810da044e7"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트아레나 — 차트로 배틀하는 트레이딩 게임">
@@ -499,11 +499,6 @@
             <p class="arena-match-note">상대를 찾고, 빈자리는 봇이 채웁니다.</p>
           </div>
         </section>
-        <div class="lobby-support-heading"><h2>다음 승부를 준비하세요</h2><a href="learn.html">차트 기초 살펴보기 →</a></div>
-        <div class="lobby-support">
-          <a class="lobby-practice" href="game.html"><span class="lobby-mode-label">PRACTICE</span><h3>차트 연습</h3><p>시간 부담 없이 나의 판단을 다듬어보세요.</p><span class="lobby-text-link">연습 시작 →</span></a>
-          <section class="lobby-puzzle"><span class="lobby-mode-label">PUZZLE</span><h3>차트 퍼즐</h3><p>방향부터 돌파까지, 한 문제씩 실력을 쌓으세요.</p><div class="puzzle-summary"><span>별 <b id="jHeroStars">0/90</b></span><span>클리어 <b id="jHeroPct">0/30</b></span><span id="jHeroNext">레벨 1</span></div><div id="jHeroPath" hidden></div><a class="lobby-text-link" href="puzzle.html">퍼즐 이어하기 →</a></section>
-        </div>
         <section class="lobby-daily"><div><span class="lobby-mode-label">DAILY CHALLENGE</span><h3>오늘의 차트 3문제</h3><p>모두에게 같은 문제. 첫 기록으로 도전하세요.</p></div><a href="daily.html">일일 도전 →</a></section>
         <div class="lobby-record"><span>나의 연습 기록</span><div class="statrow" aria-label="내 플레이 기록"><div class="stat"><div class="l">플레이</div><div class="v" id="homePlayed">0회</div></div><div class="stat"><div class="l">승률</div><div class="v" id="homeWin">—</div></div><div class="stat"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div><button type="button" data-go="rank">기록 보기 →</button></div>
       </div>
@@ -682,27 +677,12 @@ function refreshProfile(){
     var pE=$('pPct'); if(pE)pE.textContent=pg+'%'; }
 }
 function renderHome(){
-  refreshProfile(); renderPuzzleHero();
+  refreshProfile();
   var s=myStats();
   $('homePlayed').textContent=s.played+'회';
   $('homeWin').textContent=(s.played>0?s.win+'%':'—');
   $('homeBest').textContent=s.best>0?'+'+fmt(s.best)+'P':'—';
 }
-var PWORLDS=[['🌱','새싹 마을','#35D07A'],['🌊','파도 해변','#4CA9FF'],['🏜️','모래 사막','#FF9A3C'],['🏔️','눈보라 설산','#2FE6C4'],['🌋','용암 화산','#F0616D'],['🚀','우주 정거장','#B266FF']];
-function renderPuzzleHero(){ if(!$('jHeroPath'))return; var LVW=5, totalLv=PWORLDS.length*LVW;
-  var ps=lj('chartarena_puzzle_v1'); var stars=(ps&&ps.stars)||{};
-  var tot=0,cleared=0,nextW=0,nextL=0,found=false;
-  for(var w=0;w<PWORLDS.length;w++)for(var l=0;l<LVW;l++){ var st=stars[w+'_'+l]||0; tot+=st; if(st>0)cleared++; if(!found&&st===0){nextW=w;nextL=l;found=true;} }
-  var s=$('jHeroStars'); if(s)s.textContent=tot+'/'+(totalLv*3);
-  var p=$('jHeroPct'); if(p)p.textContent=cleared+'/'+totalLv;
-  var n=$('jHeroNext'); if(n)n.textContent=found?(PWORLDS[nextW][0]+' '+(nextL+1<LVW?('레벨 '+(nextL+1)):'보스')):'올클리어!';
-  $('jHeroPath').innerHTML=PWORLDS.map(function(wd,wi){ var g=0; for(var l=0;l<LVW;l++)g+=(stars[wi+'_'+l]||0);
-    var done=g>=LVW, started=g>0, cur=found&&wi===nextW;
-    var conn=wi>0?'<div class="jpconn'+(started?' on':'')+'"></div>':'';
-    return conn+'<div class="jpnode'+(done?' done':(cur?' cur':''))+'" style="--cc:'+wd[2]+'"><span class="jpi">'+(done?'✓':(wi+1))+'</span><span class="jpn">'+wd[1]+'</span></div>';
-  }).join('');
-}
-
 /* nav */
 function go(v){
   if(['home','rank','garage','guild'].indexOf(v)<0)v='home';
