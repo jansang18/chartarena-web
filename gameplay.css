@@ -150,3 +150,4 @@ html[data-page=battle] .ind:focus-visible {outline:2px solid #fff;outline-offset
 }
 html[data-page=battle][data-playing] .ind.ma-short.on,
 html[data-page=battle][data-playing] .ind.ma-long.on {background:#102139;border-style:solid;border-width:1px}
+@media(max-width:599px){html[data-page=battle][data-playing] .chartid {top:auto;bottom:8px;max-width:calc(100% - 16px);box-sizing:border-box;white-space:normal;text-align:center}}
