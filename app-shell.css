@@ -672,3 +672,55 @@ html[data-page=home] .lobby-record .stat .v { font-size:16px; color:#cbdaf0; }
   .arena-start { min-height:48px; padding:10px 16px; font-size:16px; }
   .arena-match-note { font-size:10px; margin-top:8px; }
 }
+
+/* Stake-first game lobby: treasury above, rooms at center, player dock below. */
+html[data-page=home] .site-header{display:none}
+html[data-page=home] body{background:radial-gradient(ellipse at 50% 15%,#214c70 0,#101e34 65%);padding-bottom:16px}
+html[data-page=home] .scaler{max-width:1500px;width:calc(100% - 32px);margin:16px auto 0}
+html[data-page=home] .scaler>.frame{border:1px solid #6b7591;border-radius:20px;background:linear-gradient(130deg,#172d47,#142237);box-shadow:0 24px 70px #0005;min-height:calc(100dvh - 32px)}
+html[data-page=home] .topbar{padding:12px 28px;background:linear-gradient(90deg,#1a304a,#142139);border-bottom:1px solid #68728366;min-height:76px;flex-wrap:nowrap}
+html[data-page=home] .topbar:before{display:none}
+html[data-page=home] .topbar .brandlogo{display:block;width:120px;height:auto}
+html[data-page=home] .body{display:flex;flex-direction:column;min-width:0}
+html[data-page=home] .main{order:0;width:100%;padding:30px 40px 16px;min-width:0;box-sizing:border-box}
+html[data-page=home] .side{order:1;display:grid;grid-template-columns:130px minmax(100px,170px) 1fr;width:100%;padding:0 30px;gap:0 18px;border:0;border-top:1px solid #667c9966;background:linear-gradient(90deg,#213d59,#19283f);box-sizing:border-box;position:relative;min-height:136px;align-items:center}
+html[data-page=home] .charshow{grid-column:1;grid-row:1/3;width:130px;height:136px;overflow:hidden;align-self:end;position:relative;display:block}
+html[data-page=home] .charshow .csch{position:absolute;left:50%;top:6px;transform:translateX(-50%);height:250px;max-height:none;max-width:none;width:auto;filter:drop-shadow(0 0 15px #87c9ff33)}
+html[data-page=home] .csname{grid-column:2;grid-row:1;align-self:end;margin:0;justify-content:flex-start}
+html[data-page=home] .plevel{grid-column:2;grid-row:2;align-self:start;margin:0;max-width:180px}
+html[data-page=home] .side .nav{grid-column:3;grid-row:1/3;display:flex;flex-direction:row;justify-content:flex-end;gap:10px;margin:0;flex-wrap:wrap}
+html[data-page=home] .side .nav a{display:flex;align-items:center;justify-content:center;min-width:80px;min-height:58px;padding:12px 18px;background:#243c58;border:1px solid #71829a77;color:#edf6ff;border-radius:12px;font-weight:700}
+html[data-page=home] .side .nav a.on{border-color:#f1cd7c;background:linear-gradient(#52607a,#334159);color:#ffe2a1}
+html[data-page=home] .sfoot{grid-column:1/-1;font-size:10px;padding:8px 0;margin:0;text-align:center;color:#aebfd0}
+.table-lobby{position:relative;isolation:isolate}
+.table-lobby-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:28px}
+.table-eyebrow{margin:0 0 6px;color:#e9c47b;font-size:10px;font-weight:800;letter-spacing:.2em}
+.table-lobby-heading h1{margin:0;color:#fff2d6;font-size:clamp(23px,2.5vw,36px);letter-spacing:-.05em;font-weight:850;line-height:1.25}
+.table-lobby-heading p:not(.table-eyebrow){margin:8px 0 0;color:#b8c8da;font-size:13px}
+.table-rule-tag{flex-shrink:0;padding:8px 14px;border:1px solid #8492aa66;border-radius:30px;font-size:12px;color:#d3e0ed;background:#102038}
+.stake-rooms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:stretch}
+.stake-room{--room-glow:#62d8c5;--room-dark:#174d51;position:relative;display:flex;flex-direction:column;align-items:center;min-width:0;padding:18px 20px 20px;border-radius:18px;border:1px solid #d3b97666;background:radial-gradient(ellipse at 50% 45%,var(--room-dark),#14283e 75%);text-decoration:none;color:#fff;box-shadow:inset 0 1px #fff2,0 12px 28px #0003;transition:transform .18s,border-color .18s,box-shadow .18s}
+.stake-room:hover{transform:translateY(-4px);border-color:#f9dc94;box-shadow:0 12px 36px #0004,0 0 24px #d8b46d22}
+.standard-room{--room-glow:#8dbbff;--room-dark:#294d85;border-color:#ecc97f;background:radial-gradient(ellipse at 50% 45%,#345d8f,#182d4a 75%)}
+.expert-room{--room-glow:#c9a3ff;--room-dark:#533e74}
+.room-tier{color:#fbe2ad;font-size:16px;letter-spacing:.06em;font-weight:800;margin-bottom:15px}
+.stake-medallion{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:min(100%,240px);aspect-ratio:1;border-radius:50%;border:9px solid #ceaa66;background:radial-gradient(circle at 40% 25%,var(--room-dark),#0c1a2d 80%);box-shadow:0 0 0 2px #6f5030,0 0 0 5px #e7c78355,inset 0 0 0 3px #fff1,inset 0 0 22px #0008,0 14px 22px #0005;margin:4px 0 20px;box-sizing:border-box}
+.stake-medallion:before{content:'';position:absolute;inset:-9px;border-radius:50%;background:repeating-conic-gradient(from 5deg,transparent 0deg 39deg,#fff7 40deg 43deg,transparent 44deg 45deg);mask:radial-gradient(transparent 65%,#000 66%);pointer-events:none}
+.stake-unit{font-size:12px;color:#cbd8e6;margin-bottom:4px}
+.stake-medallion strong{font-size:clamp(30px,3.6vw,56px);line-height:1.1;letter-spacing:-.06em;color:#ffedbd;font-weight:900;text-shadow:0 2px 8px #0008;font-variant-numeric:tabular-nums}
+.stake-medallion strong span{display:block;text-align:center;font-size:13px;letter-spacing:.15em;margin-top:9px;color:#e8c882}
+.stake-name{font-size:12px;margin-top:16px;color:var(--room-glow)}
+.room-funds{font-size:12px;color:#bdcadd;margin-bottom:16px}.room-funds b{color:#edf3fb;margin-left:5px}
+.room-enter{display:flex;justify-content:center;gap:15px;align-items:center;width:100%;min-height:48px;border-radius:9px;background:linear-gradient(#ffe8a3,#d7aa54);box-shadow:inset 0 1px #fffb,0 3px 0 #745126;color:#2d230f;font-size:14px;font-weight:850}
+.funds-low .room-enter{background:#293c56;box-shadow:inset 0 0 0 1px #8d9ab555;color:#cbd6e5}
+.table-lobby-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:17px 0 6px;color:#aebed3;font-size:11px}.table-lobby-foot p{margin:0}.table-lobby-foot a{color:#d7e6f7;min-height:44px;display:flex;align-items:center;flex-shrink:0;text-decoration:none}
+.lobby-utility{display:flex;align-items:center;gap:20px;padding:13px 0;border-block:1px solid #7b8caa44;margin-top:6px}.lobby-utility a{min-height:46px;display:flex;align-items:center;gap:12px;color:#dfedff;text-decoration:none;font-size:13px}.lobby-utility a>span{font-size:9px;letter-spacing:.1em;color:#8dd1ed;border:1px solid #81b8dd66;padding:4px 7px;border-radius:5px}.lobby-utility p{flex:1;text-align:center;color:#aebfd4;font-size:12px}.lobby-utility .quick-seat{background:#4979b6;color:white;border:1px solid #7ba9e2;padding:0 22px;border-radius:9px;font-weight:800}
+html[data-page=home] .lobby-record{margin:12px 0 0;padding:0;border:0;background:none;gap:15px}
+html[data-page=home] .lobby-record .statrow{padding:0}.lobby-record .stat .v{font-size:15px!important;margin:0!important}
+@media(min-width:1600px){html[data-page=home] .main{padding:40px 60px 20px}.stake-room{padding:24px 30px}.stake-medallion{width:260px}}
+@media(max-width:850px){html[data-page=home] .main{padding:24px 20px 12px}.stake-rooms{gap:14px}.stake-room{padding:16px 12px}.stake-medallion{border-width:7px}.stake-name{font-size:10px;margin-top:10px}.stake-medallion strong{font-size:36px}.table-lobby-heading{margin-bottom:22px}.table-rule-tag{display:none}html[data-page=home] .side{grid-template-columns:100px 130px 1fr;padding:0 18px;gap:0 10px}html[data-page=home] .charshow{width:100px}html[data-page=home] .side .nav{gap:6px}html[data-page=home] .side .nav a{min-width:64px;padding:8px 10px;font-size:12px}.lobby-utility p{display:none}.lobby-utility .quick-seat{margin-left:auto}.table-lobby-foot{flex-wrap:wrap;gap:0}}
+@media(max-width:540px){html[data-page=home] .scaler{width:calc(100% - 16px);margin:8px auto 0}html[data-page=home] .scaler>.frame{border-radius:14px;min-height:calc(100dvh - 16px)}html[data-page=home] .topbar{padding:10px 12px;gap:8px;min-height:64px}html[data-page=home] .topbar .brandlogo{width:78px}html[data-page=home] .topbar .tsp{display:none}html[data-page=home] .curr{margin-left:auto;gap:4px}html[data-page=home] .topbar .pill{padding:5px;min-height:34px;gap:3px}html[data-page=home] .topbar .pill .cico{width:16px;height:16px}html[data-page=home] .topbar .pill span{font-size:10px}html[data-page=home] #tbPlayWrap{display:none}html[data-page=home] .main{padding:20px 12px 12px}.table-eyebrow{font-size:8px}.table-lobby-heading h1{font-size:24px}.table-lobby-heading p:not(.table-eyebrow){font-size:11px}.table-lobby-heading{margin-bottom:18px}.stake-rooms{grid-template-columns:1fr;gap:10px}.stake-room{display:grid;grid-template-columns:88px 1fr;grid-template-rows:auto auto auto;gap:4px 18px;padding:14px 16px;border-radius:12px}.stake-medallion{grid-column:1;grid-row:1/4;width:86px;border-width:4px;margin:0;box-shadow:0 0 0 2px #e7c78366,inset 0 0 15px #0008,0 5px 10px #0005}.stake-medallion:before{display:none}.stake-medallion strong{font-size:23px}.stake-medallion strong span{font-size:8px;margin-top:3px}.stake-unit{font-size:8px;margin-bottom:2px}.stake-name{display:none}.room-tier{grid-column:2;grid-row:1;font-size:14px;margin:0}.room-funds{grid-column:2;grid-row:2;font-size:10px;margin:0}.room-enter{grid-column:2;grid-row:3;min-height:44px;font-size:12px;border-radius:7px;margin-top:3px}.table-lobby-foot{font-size:10px;line-height:1.6;margin-top:12px}.table-lobby-foot a{min-height:36px}.lobby-utility{gap:8px;padding:8px 0}.lobby-utility a{font-size:11px;gap:6px}.lobby-utility .quick-seat{padding:0 12px}.lobby-utility a>span{font-size:8px;padding:2px 4px}html[data-page=home] .lobby-record{display:none}html[data-page=home] .side{grid-template-columns:80px 1fr;padding:0 12px;gap:0 10px;min-height:0}html[data-page=home] .charshow{width:80px;height:105px;grid-row:1/3}html[data-page=home] .charshow .csch{height:195px}html[data-page=home] .csname{font-size:14px}html[data-page=home] .side .nav{grid-column:1/-1;grid-row:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0 0 10px}html[data-page=home] .side .nav a{min-width:0;min-height:44px;font-size:11px;padding:6px}.table-lobby-heading p{word-break:keep-all}}
+@media(prefers-reduced-motion:reduce){.stake-room{transition:none}.stake-room:hover{transform:none}}
+html[data-page=home] .charshow{max-height:none}
+html[data-page=home] .sfoot{display:block}
+@media(min-width:541px) and (max-height:650px){html[data-page=home] .main{padding-top:16px}.table-lobby-heading{margin-bottom:15px}.stake-medallion{width:130px;margin:0 0 12px}.stake-medallion strong{font-size:30px}.stake-name{font-size:9px;margin-top:8px}.stake-medallion strong span{font-size:10px;margin-top:4px}.room-tier{margin-bottom:10px}.stake-room{padding:12px}.room-funds{margin-bottom:10px}.table-lobby-foot{margin-top:8px}}

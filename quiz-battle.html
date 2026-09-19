@@ -226,7 +226,7 @@
   .desk .stak{font-family:var(--mono); font-weight:900; font-size:15px; color:#FCE9A6}
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
-<link rel="stylesheet" href="app-shell.css?v=1daf486e5931">
+<link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
 <link rel="stylesheet" href="gameplay.css?v=251159366b53">
 
 <div class="scaler" id="scaler">
@@ -358,6 +358,8 @@ function setBal(v){var g=ljg(GS);g.balance=Math.max(0,Math.round(v));localStorag
 function fmtP(n){return Math.round(n).toLocaleString();}
 function fmtPct(n){return (n>=0?'+':'')+n.toFixed(4).replace(/0+$/,'').replace(/\.$/,'')+'%';}
 var selectedTable=getBal()>=20000?'standard':getBal()>=2000?'beginner':'practice';
+var linkedTable=new URLSearchParams(location.search).get('table');
+if(Object.hasOwn(ArenaRules.TABLES,linkedTable))selectedTable=linkedTable;
 function currentTable(){return ArenaRules.table(selectedTable);}
 function saveWallet(game){localStorage.setItem(GS,JSON.stringify(game));}
 function finalMove(seg){seg=seg||GD;return(seg.cs[seg.vis+29][3]/seg.cs[seg.vis-1][3]-1)*100;}
