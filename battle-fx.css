@@ -8,3 +8,20 @@
 .arena-fx-coin{position:absolute;width:29px;height:29px;will-change:transform,opacity}.arena-fx-coin img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 6px #e3a42f88)}
 .arena-fx-spark{position:absolute;width:5px;height:10px;border-radius:2px;background:#ffe5a0;box-shadow:0 0 7px #ffcc60}
 @media(prefers-reduced-motion:reduce){.arena-fx-coin,.arena-fx-spark{display:none}}
+/* Premium metal, bloom and depth pass. */
+.arena-fx-badge{isolation:isolate;text-align:center;border:0;border-radius:0;background:none!important;box-shadow:none;padding:18px 26px;filter:drop-shadow(0 6px 7px #000b);max-width:calc(100vw - 20px)}
+.arena-fx-badge:before{content:'';position:absolute;z-index:-1;inset:0 -45px;background:radial-gradient(ellipse,#362814ed,transparent 72%)}
+.arena-fx-badge strong{display:block;font-size:clamp(24px,4vw,56px);font-weight:1000;letter-spacing:-.045em;color:#ffdc86;background:linear-gradient(#fffef1 8%,#ffe5a1 27%,#d39a39 47%,#fff0ba 53%,#efbc59 75%,#a56b20);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none;filter:drop-shadow(0 2px 0 #79501d) drop-shadow(0 4px 0 #3d2715) drop-shadow(0 0 14px #efba4d50)}
+.arena-fx-label{display:block;font-size:9px;font-weight:700;letter-spacing:.27em;color:#f7dba7;text-shadow:0 0 9px #ffbf4066;margin-bottom:8px;white-space:normal;line-height:1.4}
+.arena-fx-badge.hero strong{font-size:clamp(42px,7vw,88px);font-style:italic;letter-spacing:.025em}
+.arena-fx-badge.hero:after{content:'';display:block;width:90%;height:2px;margin:12px auto 0;background:linear-gradient(90deg,transparent,#e8b55c,#fff7d1,#e8b55c,transparent);box-shadow:0 0 14px #e8b55c99}
+.arena-fx-badge.blue strong{background-image:linear-gradient(#f4fcff,#aee3ff 40%,#4a99d1 50%,#c5efff 58%,#77c6ee);filter:drop-shadow(0 2px 0 #245578) drop-shadow(0 4px 0 #122f44)}
+.arena-fx-badge.loss strong{background-image:linear-gradient(#ffedea,#fba2a0 40%,#be6277 50%,#ffb8c0 60%,#dd8296);filter:drop-shadow(0 2px 0 #743448)}
+.arena-fx-coin{width:46px;height:46px;perspective:400px;z-index:3}.arena-fx-coin img{filter:drop-shadow(0 3px 5px #0009) drop-shadow(0 0 9px #ffcc5b77)}
+.arena-fx-coin:before{content:'';position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(#ffca4b55,transparent 68%);z-index:-1}
+.arena-fx-badge{z-index:5}.arena-fx-spark{width:3px;height:3px;border-radius:50%;background:#fff2ca;box-shadow:0 0 4px #fff,0 0 10px #ffc15a;z-index:2}.arena-fx-spark.streak{width:3px;height:3px;background:none;box-shadow:none}.arena-fx-spark.streak:after{content:'';display:block;width:35px;height:2px;transform:rotate(var(--angle));transform-origin:left;background:linear-gradient(90deg,#fff9dc,#ffd275aa,transparent);box-shadow:0 0 7px #f3b63d44}
+.arena-fx-halo{position:absolute;width:350px;height:220px;background:radial-gradient(ellipse,#ffdfa744,#dca12b22 40%,transparent 70%);mix-blend-mode:screen;z-index:1}
+.arena-fx-flare{position:absolute;height:4px;background:linear-gradient(90deg,transparent,#eab54588,#fff8d6,#eab54588,transparent);box-shadow:0 0 16px #ffcd6788,0 0 35px #edb73866;z-index:1}
+.arena-fx-ring{position:absolute;width:160px;height:90px;border-radius:50%;border:1px solid #ffe3a888;box-shadow:0 0 15px #eaba4944,inset 0 0 12px #eaba4922;z-index:1}
+@media(max-width:540px){.arena-fx-badge{padding:12px 8px}.arena-fx-label{font-size:8px;letter-spacing:.16em}.arena-fx-coin{width:36px;height:36px}}
+@media(prefers-reduced-motion:reduce){.arena-fx-halo,.arena-fx-flare,.arena-fx-ring{display:none}}
