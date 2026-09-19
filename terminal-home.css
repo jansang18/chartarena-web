@@ -82,3 +82,19 @@ html[data-page=home] .lobby-record .statrow{flex:0 0 auto}html[data-page=home] .
 }
 @media(min-width:741px) and (max-width:999px){html[data-page=home] .main{padding-top:24px}}
 @media(min-width:1000px){html[data-page=home] .terminal-brief>p:last-of-type,html[data-page=home] .terminal-brief>a{display:none}html[data-page=home] .lobby-record{height:29%;gap:.5cqw}html[data-page=home] .lobby-record .stat{padding:.65cqw 0}html[data-page=home] .lobby-record button{min-height:25px}}
+/* Unfolded phones: use the whole canvas, not a narrow main monitor and empty rail. */
+@media (min-width:600px) and (max-width:999px) {
+ html[data-page=home] .main {padding:20px 16px 28px;min-width:0;width:100%;box-sizing:border-box}
+ html[data-page=home] #v-home.on {display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.55fr);grid-template-rows:auto auto;gap:16px}
+ html[data-page=home] .table-lobby {grid-column:1/-1;grid-row:1;width:100%;padding:20px;box-sizing:border-box}
+ html[data-page=home] .table-lobby:after {display:none}
+ html[data-page=home] .terminal-chart {height:clamp(180px,28dvh,280px)}
+ html[data-page=home] .lobby-record {grid-column:1;grid-row:2;position:static;transform:none;margin:0;width:100%;padding:16px;box-sizing:border-box;gap:8px;box-shadow:none}
+ html[data-page=home] .lobby-record h2 {font-size:16px}
+ html[data-page=home] .lobby-record .statrow {flex-direction:row;gap:12px;margin:0}
+ html[data-page=home] .lobby-record .stat {flex:1;display:block;padding:6px 0}
+ html[data-page=home] .lobby-record .stat .v {font-size:18px!important;margin-top:6px}
+ html[data-page=home] .lobby-utility {grid-column:2;grid-row:2;width:100%;align-self:stretch;justify-content:center}
+ html[data-page=home] .lobby-utility .quick-seat {width:100%;box-sizing:border-box;margin:0;min-height:64px}
+ html[data-page=home] .terminal-brief {display:none}
+}

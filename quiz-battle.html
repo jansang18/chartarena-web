@@ -228,7 +228,7 @@
 </style>
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
 <link rel="stylesheet" href="battle-fx.css?v=0c6b672cbebb">
-<link rel="stylesheet" href="gameplay.css?v=251159366b53">
+<link rel="stylesheet" href="gameplay.css?v=6850b339bd78">
 <link rel="stylesheet" href="exchange-theme.css?v=3d3faa1ffe13">
 
 <div class="scaler" id="scaler">
@@ -247,7 +247,8 @@
     <canvas id="chart"></canvas>
     <div class="tvtag" id="tvtag">난이도 ◆◆◆◆◇</div>
     <div class="indbar" id="indbar">
-      <div class="ind on" data-ind="ma">이평선</div>
+      <button type="button" class="ind on ma-short" data-ind="ma" aria-pressed="true"><span>MA 5</span> · <span>20</span></button>
+      <button type="button" class="ind on ma-long" data-ind="ma60" aria-pressed="true">MA 60</button>
       <div class="ind" data-ind="boll">볼린저</div>
       <div class="ind" data-ind="ichi">일목</div>
     </div>
@@ -412,16 +413,37 @@ var ROUNDS=5, round=1, phase='pick', tleft=15, tmr=null, GD=null, gRev=48, revTi
 var MODE='4p';
 var battlePass=window.NRG?NRG.createPass():null;
 var autoTimer=null, autoLeft=0;   // 결과 화면 자동 넘김 타이머
-var bind={ma:true, boll:false, ichi:false};   // 차트 지표 토글 (이평선/볼린저/일목)
+var bind={ma:true, ma60:true, boll:false, ichi:false};   // 차트 지표 토글 (이평선/볼린저/일목)
 
 /* 실제 바이낸스 차트 데이터 (종목 숨김·가격 정규화, 각 100캔들 = 공개70 + 예측30) */
 var BATTLE_DATA=(window.CHARTS&&window.CHARTS.length)?window.CHARTS:[];
-var _segBag=[];
+// Classify ONLY the already-visible candles; never inspect the hidden outcome.
+function swingScore(seg){
+  var cs=seg.cs,end=cs.length-30,steps=[],travel=0;
+  for(var i=5;i<end;i+=5){var d=(cs[i][3]-cs[i-5][3])/cs[i-5][3];steps.push(d);travel+=Math.abs(d);}
+  if(!travel)return 0;
+  var turns=0;for(var j=1;j<steps.length;j++)if(steps[j]*steps[j-1]<0)turns++;
+  var net=Math.abs(steps.reduce(function(a,b){return a+b;},0));
+  return (turns/Math.max(1,steps.length-1))*(1-Math.min(1,net/travel));
+}
+var _segPools=null,_segBags=[[],[]];
+function nextSegmentIndex(){
+  if(!_segPools){
+    var ranked=BATTLE_DATA.map(function(seg,i){return {i:i,s:swingScore(seg)};}).sort(function(a,b){return b.s-a.s||a.i-b.i;});
+    var cut=Math.ceil(ranked.length/3);
+    _segPools=[ranked.slice(0,cut).map(function(x){return x.i;}),ranked.slice(cut).map(function(x){return x.i;})];
+  }
+  // 70% from the most changeable third; retain trends for varied decisions.
+  var group=Math.random()<.7?0:1;if(!_segPools[group].length)group=1-group;
+  if(!_segBags[group].length){
+    _segBags[group]=_segPools[group].slice();
+    for(var i=_segBags[group].length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=_segBags[group][i];_segBags[group][i]=_segBags[group][j];_segBags[group][j]=t;}
+  }
+  return _segBags[group].pop();
+}
 function pickSeg(){
-  if(!_segBag.length){ _segBag=BATTLE_DATA.map(function(_,i){return i;});
-    for(var i=_segBag.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=_segBag[i];_segBag[i]=_segBag[j];_segBag[j]=t;} }
-  var _i=_segBag.pop(), seg=BATTLE_DATA[_i];
-  return {idx:_i, cs:seg.cs, vis:seg.cs.length-30, n:seg.cs.length, sym:seg.sym, tf:seg.tf};
+  var _i=nextSegmentIndex(),seg=BATTLE_DATA[_i];
+  return {idx:_i,cs:seg.cs,vis:seg.cs.length-30,n:seg.cs.length,sym:seg.sym,tf:seg.tf};
 }
 function pickSegByIdx(i){ var seg=BATTLE_DATA[i]; if(!seg)return pickSeg(); return {idx:i, cs:seg.cs, vis:seg.cs.length-30, n:seg.cs.length, sym:seg.sym, tf:seg.tf}; }
 /* 차트 뷰포트(윈도우): 1000+봉 중 일부만 크게 보여주고 드래그/휠로 과거 탐색 */
@@ -463,6 +485,7 @@ function drawChart(){
     glow('#2BD4C4',ic.tenkan,1.1); glow('#E0679F',ic.kijun,1.1); }
   if(bind.boll){ var bb=bollB(cl,20,2,rev); glow('rgba(120,180,240,.85)',bb.mid,1); glow('rgba(120,180,240,.5)',bb.up,1); glow('rgba(120,180,240,.5)',bb.lo,1); }
   if(bind.ma){ glow('#FFD54A',sma(cl,5,rev),1.3); glow('#4CC3FF',sma(cl,20,rev),1.3); }
+  if(bind.ma60){ glow('#D9A5FF',sma(cl,60,rev),1.6); }
   var bw=Math.max(1,cw*0.62),gl=cw>3?3:0;
   for(var i=v0;i<Math.min(rev,v1);i++){var c=cs[i],up=c[3]>=c[0],col=up?'#F0616D':'#4C8DF6',x=cx(i);
     ctx.strokeStyle=col;ctx.lineWidth=1;ctx.shadowColor=col;ctx.shadowBlur=gl;ctx.beginPath();ctx.moveTo(x,yOf(c[1]));ctx.lineTo(x,yOf(c[2]));ctx.stroke();ctx.shadowBlur=0;
@@ -515,7 +538,7 @@ function canChoose(){return phase==='pick'&&players[0].state.balance>0&&!(LIVE&&
 $('dL').onclick=function(){pick('L');};$('dS').onclick=function(){pick('S');};$('dW').onclick=function(){pick('W');};
 function pick(d){if(!canChoose()||(d==='W'&&players[0].state.passUsed))return;mySel.dir=d;renderCtrl();renderPods();}
 $('levs').onclick=function(e){var l=e.target.closest('[data-lev]');if(l&&canChoose()&&mySel.dir!=='W'){mySel.lev=mySel.lev===+l.dataset.lev?1:+l.dataset.lev;renderCtrl();}};
-$('indbar').onclick=function(e){var el=e.target.closest('[data-ind]');if(!el)return;var k=el.dataset.ind;bind[k]=!bind[k];el.classList.toggle('on',bind[k]);drawChart();};
+$('indbar').onclick=function(e){var el=e.target.closest('[data-ind]');if(!el)return;var k=el.dataset.ind;bind[k]=!bind[k];el.classList.toggle('on',bind[k]);el.setAttribute('aria-pressed',String(bind[k]));drawChart();};
 $('go').onclick=function(){submitChoice();};
 $('endbtn').onclick=function(){closeWallet();stopBattle();if(MODE==='live'){liveLeave();LIVE=null;}MODE='4p';$('verdict').classList.remove('show');showLobby();};
 function stopBattle(){if(typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.clear();if(tmr)clearInterval(tmr);clearAutoNext();if(revTimer)clearTimeout(revTimer);revTimer=null;}
