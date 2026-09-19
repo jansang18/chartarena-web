@@ -454,17 +454,17 @@
   .gmc,.grv{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--gold);flex:0 0 auto}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
-<link rel="stylesheet" href="gameplay.css?v=fa08c841758d">
-<link rel="stylesheet" href="exchange-theme.css?v=3d3faa1ffe13">
-<link rel="stylesheet" href="terminal-home.css?v=77a29f11401e">
-<script src="terminal-home.js?v=8861f2d70e9a" defer></script>
+<link rel="stylesheet" href="gameplay.css?v=6b62afe2bbc8">
+<link rel="stylesheet" href="exchange-theme.css?v=44ef2c984b85">
+<link rel="stylesheet" href="terminal-home.css?v=e3f154c6f5ca">
+<script src="terminal-home.js?v=3d1fe17433f5" defer></script>
 
 <div class="scaler" id="scaler"><div class="frame">
 
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
-    <span class="exchange-brand" aria-label="차트아레나"><span>CHART ARENA<small>TRADER TERMINAL</small></span></span>
-    <div class="tsp"></div>
+    <span class="exchange-brand" aria-label="차트아레나"><span>CHART ARENA<small>TRADE · COMPETE · WIN</small></span></span>
+    <nav class="terminal-nav" aria-label="주요 메뉴"><button type="button" class="on" aria-current="page" data-go="home">홈</button><a href="quiz-battle.html">배틀</a><button type="button" data-go="rank">기록</button><button type="button" data-go="garage">상점</button></nav><div class="tsp"></div>
     <div class="curr">
       <div class="pill play" id="tbPlayWrap" data-go-play="1"><span class="pico">⚡</span><span id="tbPlay">10/10</span></div>
       <div class="pill coin"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span></div>
@@ -478,17 +478,16 @@
 
       <!-- HOME: four-player battle is the primary destination. -->
       <div class="view on" id="v-home">
-        <aside class="terminal-brief" aria-label="경기 안내"><p class="terminal-kicker">THE TRADING FLOOR</p><h2>같은 차트.<br>다른 판단.</h2><div class="terminal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><dl><div><dt>참가자</dt><dd>4명</dd></div><div><dt>경기</dt><dd>5라운드</dd></div><div><dt>레버리지</dt><dd>최대 10배</dd></div></dl><p>차트를 읽고 방향을 선택하세요.<br>마지막 캔들이 승부를 가릅니다.</p><a href="quiz-battle.html?table=practice">골드 없이 체험 →</a></aside><section class="table-lobby" aria-labelledby="arenaTitle">
-          <div class="table-lobby-heading"><div><p class="table-eyebrow">PREDICT / COMPETE / WIN</p><h1 id="arenaTitle">CHART <em>ARENA</em></h1><p>예측이 경쟁이 되는 곳, 차트 아레나</p></div><span class="table-rule-tag">4인 배틀 · 5라운드</span></div>
-          <div class="terminal-chart"><canvas id="terminalChart" aria-label="로비 장식용 예시 차트"></canvas><span>CHART PREVIEW · 예시 차트</span></div><div class="stake-rooms" aria-label="배틀 방 선택">
+        <aside class="terminal-brief" aria-label="경기 안내"><p class="terminal-kicker">CHART ARENA</p><h2>차트로 겨루는<br>트레이딩 아레나</h2><p>같은 차트, 다른 판단.<br>당신의 다음 수를 보여주세요.</p><dl><div><dt>참가자</dt><dd>4명</dd></div><div><dt>경기</dt><dd>5라운드</dd></div><div><dt>레버리지</dt><dd>1–10배</dd></div></dl><div class="terminal-guide"><b>01</b><span>방 선택</span><b>02</b><span>롱·숏과 배율 선택</span><b>03</b><span>차트 공개 · 골드 정산</span></div><a href="quiz-battle.html?table=practice">골드 없이 체험 →</a><small>게임 재화는 현금으로 환전되지 않습니다.</small></aside><section class="table-lobby" aria-labelledby="arenaTitle">
+          <div class="table-lobby-heading"><h1 id="arenaTitle">배틀 터미널</h1><span class="table-rule-tag">4인 · 5라운드</span><span class="market-status">과거 차트 미리보기</span></div><div class="chart-toolbar"><div class="chart-symbols" role="group" aria-label="미리보기 종목"><button type="button" data-preview="0" aria-pressed="true">BTC</button><button type="button" data-preview="1" aria-pressed="false">ETH</button><button type="button" data-preview="2" aria-pressed="false">SOL</button></div><span id="previewMeta"></span></div><div class="terminal-chart"><canvas id="terminalChart" aria-label="실제 과거 데이터 차트 미리보기"></canvas><span>기준가 100으로 환산 · 실시간 시세 아님</span></div><div class="stake-rooms" aria-label="배틀 방 선택">
             <a class="stake-room entry-room" href="quiz-battle.html?table=beginner" data-room-reserve="1"><span class="room-tier">입문방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>100<span>골드</span></strong><span class="stake-name">가볍게 한 판</span></div><span class="room-funds"><b>보유 골드 전체 사용</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
             <a class="stake-room standard-room" href="quiz-battle.html?table=standard" data-room-reserve="1"><span class="room-tier">일반방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>1,000<span>골드</span></strong><span class="stake-name">본격적인 승부</span></div><span class="room-funds"><b>보유 골드 전체 사용</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
             <a class="stake-room expert-room" href="quiz-battle.html?table=expert" data-room-reserve="1"><span class="room-tier">고수방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>10,000<span>골드</span></strong><span class="stake-name">더 큰 승부의 무대</span></div><span class="room-funds"><b>보유 골드 전체 사용</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
           </div>
           <div class="table-lobby-foot"><p>방은 1%당 단가만 다릅니다. 보유 골드 전체로 플레이합니다.</p><a href="quiz-battle.html?table=practice">골드 없이 체험하기 →</a></div>
         </section>
-        <div class="lobby-utility"><a href="daily.html"><span>DAILY</span> 오늘의 도전 <b aria-hidden="true">↗</b></a><p>차트 변동률 × 방 단가 × 레버리지</p><a class="quick-seat" id="quickSeat" href="quiz-battle.html?table=standard">바로 입장 <b aria-hidden="true">→</b></a></div>
-        <div class="lobby-record"><span>MY PERFORMANCE</span><h2>나의 전적</h2><div class="statrow" aria-label="내 플레이 기록"><div class="stat"><div class="l">플레이</div><div class="v" id="homePlayed">0회</div></div><div class="stat"><div class="l">승률</div><div class="v" id="homeWin">—</div></div><div class="stat"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div><button type="button" data-go="rank">기록 보기 →</button></div>
+        <div class="lobby-utility"><a href="quiz-battle.html?table=practice">연습 경기 <b aria-hidden="true">↗</b></a><p>차트 변동률 × 방 단가 × 레버리지</p><a class="quick-seat" id="quickSeat" href="quiz-battle.html?table=standard">바로 입장 <b aria-hidden="true">→</b></a></div>
+        <div class="lobby-record"><span>MY ARENA</span><h2>나의 전적</h2><div class="statrow" aria-label="내 플레이 기록"><div class="stat"><div class="l">플레이</div><div class="v" id="homePlayed">0회</div></div><div class="stat"><div class="l">승률</div><div class="v" id="homeWin">—</div></div><div class="stat"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div><button type="button" data-go="rank">기록 보기 →</button><section class="preview-moves" aria-label="선택한 과거 차트의 최근 봉 등락"><h3>미리보기 등락 <small>최근 6봉</small></h3><div id="previewMoves"></div><p>종가 기준 봉별 변화 · 실제 과거 구간</p></section></div>
       </div>
 
       <!-- RANKING -->
@@ -684,7 +683,7 @@ function renderHome(){
   var s=myStats();
   $('homePlayed').textContent=s.played+'회';
   $('homeWin').textContent=(s.played>0?s.win+'%':'—');
-  $('homeBest').textContent=s.best>0?'+'+fmt(s.best)+'P':'—';
+  $('homeBest').textContent=s.best>0?'+'+fmt(s.best)+' G':'—';
 }
 /* nav */
 function go(v){
@@ -692,6 +691,7 @@ function go(v){
   var vs=document.querySelectorAll('.view'); for(var i=0;i<vs.length;i++)vs[i].classList.remove('on');
   var el=$('v-'+v); if(el)el.classList.add('on');
   var ns=document.querySelectorAll('.nav a[data-go], .bnav[data-go]'); for(var j=0;j<ns.length;j++)ns[j].classList.toggle('on', ns[j].dataset.go===v);
+  document.querySelectorAll('.terminal-nav [data-go]').forEach(function(b){b.classList.toggle('on',b.dataset.go===v);if(b.dataset.go===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
   var m=$('mainScroll'); if(m)m.scrollTop=0;
   if(v==='home')renderHome(); else if(v==='rank')renderRank(); else if(v==='garage')renderGarage(); else if(v==='guild')guildEnter();
 }
