@@ -1,15 +1,15 @@
 /* Deterministic percentage-gold rules and atomic local-wallet transitions. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION=3,ROUNDS=5;
+const VERSION=4,ROUNDS=5;
 const TABLES=Object.freeze({
  practice:Object.freeze({id:'practice',name:'연습방',rate:100,reserve:0,capital:2000,practice:true}),
- beginner:Object.freeze({id:'beginner',name:'입문방',rate:100,reserve:2000,capital:2000}),
- standard:Object.freeze({id:'standard',name:'일반방',rate:1000,reserve:20000,capital:20000}),
- expert:Object.freeze({id:'expert',name:'고수방',rate:10000,reserve:200000,capital:200000})
+ beginner:Object.freeze({id:'beginner',name:'입문방',rate:100,reserve:1,capital:2000}),
+ standard:Object.freeze({id:'standard',name:'일반방',rate:1000,reserve:1,capital:20000}),
+ expert:Object.freeze({id:'expert',name:'고수방',rate:10000,reserve:1,capital:200000})
 });
 function table(id){id=id||'standard';if(!Object.hasOwn(TABLES,id))throw Error('Unknown table');return TABLES[id];}
-function create(id,tableId){const t=table(tableId);return {id:String(id),tableId:t.id,balance:t.capital,score:0,delta:0,passUsed:false,appliedRound:0};}
+function create(id,tableId,capital){const t=table(tableId);if(capital!==undefined&&(!Number.isSafeInteger(capital)||capital<0))throw Error('Invalid starting gold');return {id:String(id),tableId:t.id,balance:t.practice||capital===undefined?t.capital:capital,score:0,delta:0,passUsed:false,appliedRound:0};}
 function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if((dir==='W'&&player.passUsed)||player.balance<=0)dir='N';return {dir,lev:[1,2,3,5,10].includes(input.lev)?input.lev:1};}
 function goldRound(v){return Math.sign(v)*Math.round(Math.abs(v)+1e-8)||0;}
 function profit(player,input,move){
@@ -34,7 +34,8 @@ function walletOpen(game,id,tableId,playerId){
  if(game.battleActive)throw Error('이미 진행 중인 경기가 있습니다.');
  if(!id||(game.battleClosed||[]).includes(id))throw Error('이미 정산한 경기입니다.');
  if(balance<t.reserve)throw Error('입장에 필요한 골드가 부족합니다.');
- return Object.assign({},game,{balance:balance-t.reserve,battleActive:{id,tableId:t.id,reserve:t.reserve,state:create(playerId,t.id),pending:null}});
+ const reserved=t.practice?0:balance;
+ return Object.assign({},game,{balance:balance-reserved,battleActive:{id,tableId:t.id,reserve:reserved,state:create(playerId,t.id,balance),pending:null}});
 }
 function walletRound(game,id,input,move,round,pending){
  const a=game.battleActive;if(!a||a.id!==id)throw Error('경기가 다른 창에서 정산되었습니다.');

@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),R=require('../battle-rules.js');
-test('equal room capital independent from persistent gold',()=>{assert.equal(R.create('a').balance,20000);assert.equal(R.create('b').balance,20000);});
+test('default bot capital is deterministic without a supplied player wallet',()=>{assert.equal(R.create('a').balance,20000);assert.equal(R.create('b').balance,20000);});
 test('one pass is free; missing choice does not spend pass or gold',()=>{let p=R.settle(R.create('a'),{dir:'W'},40,1);assert.equal(p.delta,0);assert.equal(p.passUsed,true);p=R.settle(p,{dir:'W'},40,2);assert.equal(p.pick.dir,'N');assert.equal(p.delta,0);assert.equal(R.settle(R.create('b'),null,40,1).passUsed,false);});
 test('duplicate and stale rounds are idempotent; gaps reject',()=>{let p=R.settle(R.create('a'),{dir:'L',lev:2},1,1);assert.deepEqual(R.settle(p,{dir:'S'},-10,1),p);assert.throws(()=>R.settle(p,{dir:'L'},10,3));});
 test('host/guest order yields identical scores by id and ties remain equal',()=>{let a=R.create('a'),b=R.create('b'),picks={a:{dir:'S',lev:1},b:{dir:'L',lev:3}};const settle=ps=>Object.fromEntries(ps.map(p=>[p.id,R.settle(p,picks[p.id],3,1).balance]));assert.deepEqual(settle([a,b]),settle([b,a]));assert.equal(R.rank([{id:'a',score:4},{id:'b',score:4},{id:'c',score:0}],'b'),1);});

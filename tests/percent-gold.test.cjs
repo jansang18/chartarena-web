@@ -23,7 +23,7 @@ test('loss is capped to match funds and bankrupt players cannot reopen exposure'
 });
 test('reserve is not a fee; pending loss settles once and unrelated fields survive',()=>{
  const original={balance:25000,wins:3};
- let g=R.walletOpen(original,'m1','standard','me');assert.equal(g.balance,5000);assert.equal(original.balance,25000);
+ let g=R.walletOpen(original,'m1','standard','me');assert.equal(g.balance,0);assert.equal(g.battleActive.state.balance,25000);assert.equal(original.balance,25000);
  g=R.walletRound(g,'m1',{dir:'L',lev:10},-1,1,true);
  assert.equal(g.battleActive.state.score,0);assert.equal(g.battleActive.pending.score,-10000);
  g=R.walletClose(g,'m1');assert.equal(g.balance,15000);assert.equal(g.wins,3);assert.equal(g.battleLast.delta,-10000);
@@ -35,14 +35,14 @@ test('reload resolves confirmed choice and repeated recovery cannot pay again',(
  const closed=R.walletClose(JSON.parse(JSON.stringify(g)),'m2');assert.equal(closed.balance,35000);
  assert.deepEqual(R.walletClose(closed,'m2'),closed);assert.throws(()=>R.walletOpen(closed,'m2','standard','me'));
 });
-test('completed and duplicate rounds never debit outside reserved funds',()=>{
+test('completed and duplicate rounds cannot debit more than the full wallet',()=>{
  let g=R.walletOpen({balance:25000},'m3','standard','me');
  g=R.walletRound(g,'m3',{dir:'S',lev:10},100,1,false);
  g=R.walletRound(g,'m3',{dir:'S',lev:10},100,1,false);
- g=R.walletClose(g,'m3');assert.equal(g.balance,5000);assert.equal(g.battleLast.delta,-20000);
+ g=R.walletClose(g,'m3');assert.equal(g.balance,0);assert.equal(g.battleLast.delta,-25000);
 });
 test('unselected round is refundable and insufficient funds reject',()=>{
- assert.throws(()=>R.walletOpen({balance:19999},'m','standard','me'),/골드/);
+ assert.throws(()=>R.walletOpen({balance:0},'m','standard','me'),/골드/);
  const g=R.walletOpen({balance:25000},'m','standard','me');
  assert.equal(R.walletClose(g,'m').balance,25000);assert.throws(()=>R.walletOpen(g,'other','standard','me'));
 });
