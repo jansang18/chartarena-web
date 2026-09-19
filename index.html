@@ -455,12 +455,13 @@
 </style>
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
 <link rel="stylesheet" href="gameplay.css?v=251159366b53">
+<link rel="stylesheet" href="exchange-theme.css?v=3d3faa1ffe13">
 
 <div class="scaler" id="scaler"><div class="frame">
 
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
-    <img class="brandlogo" src="assets/logo_wordmark.png?v=3" alt="차트아레나">
+    <span class="exchange-brand" aria-label="차트아레나"><span>CHART ARENA<small>TRADING FLOOR</small></span></span>
     <div class="tsp"></div>
     <div class="curr">
       <div class="pill play" id="tbPlayWrap" data-go-play="1"><span class="pico">⚡</span><span id="tbPlay">10/10</span></div>
@@ -469,14 +470,14 @@
     </div>
   </div>
 
-  <div class="body">
+  <div class="exchange-ticker" aria-label="게임 방별 가상 골드 단가"><span class="ticker-title">ROOM BOARD</span><span>입문 <b>100 G / 1%</b></span><span>일반 <b>1,000 G / 1%</b></span><span>고수 <b>10,000 G / 1%</b></span></div><div class="body">
     <!-- ===== MAIN ===== -->
     <div class="main" id="mainScroll">
 
       <!-- HOME: four-player battle is the primary destination. -->
       <div class="view on" id="v-home">
         <section class="table-lobby" aria-labelledby="arenaTitle">
-          <div class="table-lobby-heading"><div><p class="table-eyebrow">CHART ARENA · BATTLE LOBBY</p><h1 id="arenaTitle">오늘의 승부, 어느 방에서?</h1><p>같은 차트 위에서 겨루는 네 명의 트레이더</p></div><span class="table-rule-tag">4인 배틀 · 5라운드</span></div>
+          <div class="table-lobby-heading"><div><p class="table-eyebrow">CHART ARENA / TRADING FLOOR</p><h1 id="arenaTitle">차트가 움직이면, 승부가 시작된다.</h1><p>같은 차트 위에서 겨루는 네 명의 트레이더</p></div><span class="table-rule-tag">4인 배틀 · 5라운드</span></div>
           <div class="stake-rooms" aria-label="배틀 방 선택">
             <a class="stake-room entry-room" href="quiz-battle.html?table=beginner" data-room-reserve="2000"><span class="room-tier">입문방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>100<span>골드</span></strong><span class="stake-name">가볍게 한 판</span></div><span class="room-funds">필요 골드 <b>2,000</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
             <a class="stake-room standard-room" href="quiz-battle.html?table=standard" data-room-reserve="20000"><span class="room-tier">일반방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>1,000<span>골드</span></strong><span class="stake-name">본격적인 승부</span></div><span class="room-funds">필요 골드 <b>20,000</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
