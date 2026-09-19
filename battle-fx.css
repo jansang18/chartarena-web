@@ -1,0 +1,10 @@
+.arena-fx-layer{position:fixed;inset:0;z-index:900;pointer-events:none;overflow:hidden;contain:strict}
+.arena-fx-badge{position:absolute;max-width:calc(100vw - 32px);white-space:nowrap;transform:translate(-50%,-50%);border:1px solid #ebce8299;border-radius:10px;padding:11px 25px;background:linear-gradient(120deg,#30220ef5,#1c273cf5);box-shadow:0 8px 35px #0006,0 0 24px #e1ab4529;color:#ffe6a2;font:900 clamp(18px,3vw,34px)/1.15 "Segoe UI","Malgun Gothic",sans-serif;letter-spacing:-.03em;text-shadow:0 2px 8px #0008}
+.arena-fx-badge.blue{color:#aee4ff;border-color:#7edbff99;background:linear-gradient(120deg,#123b57f5,#14233bf5)}
+.arena-fx-badge.loss{color:#ffb4b9;border-color:#f1879299;background:#371f2ef2}
+.arena-fx-frame{position:absolute;border-radius:12px;border:2px solid #edc967;box-shadow:inset 0 0 25px #ecc24a30,0 0 25px #ecc24a44;box-sizing:border-box}
+.arena-fx-frame.blue{border-color:#6bd4ff;box-shadow:inset 0 0 22px #43aaff22,0 0 22px #43aaff44}
+.arena-fx-frame.loss{border-color:#d67784;box-shadow:inset 0 0 18px #d6778422}
+.arena-fx-coin{position:absolute;width:29px;height:29px;will-change:transform,opacity}.arena-fx-coin img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 6px #e3a42f88)}
+.arena-fx-spark{position:absolute;width:5px;height:10px;border-radius:2px;background:#ffe5a0;box-shadow:0 0 7px #ffcc60}
+@media(prefers-reduced-motion:reduce){.arena-fx-coin,.arena-fx-spark{display:none}}

@@ -227,6 +227,7 @@
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
+<link rel="stylesheet" href="battle-fx.css?v=c5342c27e296">
 <link rel="stylesheet" href="gameplay.css?v=251159366b53">
 
 <div class="scaler" id="scaler">
@@ -313,6 +314,7 @@
 <script src="xp.js"></script>
 <script src="energy.js?v=d9b323b0c799"></script>
 <script src="charts.js"></script>
+<script src="battle-fx.js?v=a84ff833f116"></script>
 <script src="battle-rules.js?v=298a860eca33"></script>
 <script>
 (function(){
@@ -515,7 +517,7 @@ $('levs').onclick=function(e){var l=e.target.closest('[data-lev]');if(l&&canChoo
 $('indbar').onclick=function(e){var el=e.target.closest('[data-ind]');if(!el)return;var k=el.dataset.ind;bind[k]=!bind[k];el.classList.toggle('on',bind[k]);drawChart();};
 $('go').onclick=function(){submitChoice();};
 $('endbtn').onclick=function(){closeWallet();stopBattle();if(MODE==='live'){liveLeave();LIVE=null;}MODE='4p';$('verdict').classList.remove('show');showLobby();};
-function stopBattle(){if(tmr)clearInterval(tmr);clearAutoNext();if(revTimer)clearTimeout(revTimer);revTimer=null;}
+function stopBattle(){if(typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.clear();if(tmr)clearInterval(tmr);clearAutoNext();if(revTimer)clearTimeout(revTimer);revTimer=null;}
 
 function toast(m){ var t=$('msg'); t.textContent=m; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},1200); }
 
@@ -575,8 +577,9 @@ function beginReveal(picks,at){
   if(phase==='reveal'||phase==='result'||phase==='final')return;if(tmr)clearInterval(tmr);phase='reveal';$('tnum').textContent='공개';
   players.forEach(function(p){p.revealInput=ArenaRules.choice(p.state,picks[p.state.id]);p.pick=p.revealInput.dir;p.lev=p.revealInput.lev;});
   if(!recordWallet(players[0].revealInput,true))return;
-  renderCtrl();resetView();var target=GD.vis+30,started=at||Date.now();
-  function step(){if(phase!=='reveal')return;var elapsed=Date.now()-started,count=elapsed<3300?Math.floor(elapsed/150):22+Math.floor((elapsed-3300)/400);gRev=reduce?target:Math.min(target,GD.vis+Math.max(0,count));drawChart();renderPods();if(gRev>=target){revTimer=null;finishRound();return;}revTimer=setTimeout(step,100);}
+  renderCtrl();resetView();var target=GD.vis+30,started=at||Date.now(),fxLast=0;
+  if(typeof window!=="undefined"&&window.ArenaFX&&["L","S"].includes(players[0].revealInput.dir))window.ArenaFX.commit({from:$("go"),anchor:$("chart"),lev:players[0].revealInput.lev});
+  function step(){if(phase!=='reveal')return;var elapsed=Date.now()-started,count=elapsed<3300?Math.floor(elapsed/150):22+Math.floor((elapsed-3300)/400);gRev=reduce?target:Math.min(target,GD.vis+Math.max(0,count));drawChart();renderPods();var left=target-gRev;if(!reduce&&left>0&&left<=3&&left!==fxLast){fxLast=left;if(typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.last({anchor:$("chart"),count:left});}if(gRev>=target){revTimer=null;finishRound();return;}revTimer=setTimeout(step,100);}
   step();
 }
 function finishRound(){
@@ -591,6 +594,7 @@ function finishRound(){
   var me=players[0],label={L:'롱',S:'숏',W:'무료 패스',N:'시간 내 미제출'}[me.pick];
   $('verdict').innerHTML='<div class="mv">차트 '+fmtPct(move)+'</div><div class="pl">'+label+' '+me.state.pick.lev+'배 · '+fmtLead(me.dp)+' 골드</div><div class="bl">'+goldEquation(me.state)+'<br>남은 경기 골드 '+fmtP(me.state.balance)+(currentTable().practice?' · 모의 경기':'')+'</div>';$('verdict').classList.add('show');
   $('battleHelp').textContent=highlight&&highlight.round===round?highlight.name+' · '+highlight.from+'위 → '+highlight.to+'위 역전!':'라운드 확정 · 다음 차트에서 새로운 판단을 해보세요.';
+  if(typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.result({anchor:$("chart"),target:document.querySelector("#podiums .pod"),amount:me.dp,practice:currentTable().practice});
   botReact();_battleCard();startAutoNext();
 }
 function resetGoHandler(){$('go').onclick=submitChoice;}
@@ -604,6 +608,7 @@ function finalResult(){
   renderPods();$('tnum').textContent='완료';var title=place===1?'우승! 축하합니다':place+'위 · 다음 판에서 다시 도전';
   $('verdict').innerHTML='<div class="mv">'+title+'</div><div class="pl">우승: '+champions.map(function(p){return esc(p.name);}).join(', ')+'</div><div class="bl">'+(currentTable().practice?'모의 손익 ':'골드 정산 ')+fmtLead(players[0].score)+' 골드<br>보유 '+fmtP(getBal())+' 골드</div>';$('verdict').classList.add('show');
   $('battleHelp').textContent=highlight?'이번 경기 최고의 역전: '+highlight.name+' · '+highlight.round+'라운드 '+highlight.from+'위 → '+highlight.to+'위':'5라운드 완료 · '+(currentTable().practice?'보유 골드 변동 없음':'경기 손익을 보유 골드에 반영했습니다.');
+  if(typeof window!=="undefined"&&window.ArenaFX&&place===1)window.ArenaFX.victory({anchor:$('chart')});
   var go=$('go');go.className='go next';go.disabled=false;go.textContent='한 판 더 · 로비로';go.onclick=function(){if(MODE==='live')liveLeave();LIVE=null;MODE='4p';$('verdict').classList.remove('show');showLobby();};
 }
 
