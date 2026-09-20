@@ -230,7 +230,7 @@
   <div class="spot s1"></div><div class="spot s2"></div><div class="spot s3"></div><div class="spot s4"></div>
 
   <div class="top">
-    <img class="blogo" src="assets/arena-wordmark.svg" alt="차트아레나">
+    <img class="blogo" src="assets/royal-gold/wordmark-v1.svg" alt="차트아레나">
     <a class="battle-wordmark" href="index.html" aria-label="차트아레나 홈">CHART<span>ARENA</span></a><span class="live">CHART BATTLE</span>
     <span class="round" id="round">ROUND 1 / 5</span>
     <span class="bbal"><img class="coindot" src="assets/coin.png?v=1" alt=""><span id="bbal">0</span></span>
@@ -301,7 +301,7 @@
 </div>
 
 <div id="splash" class="arena-loading" role="status" aria-label="차트아레나 준비 중">
-  <div class="loading-top"><img src="assets/arena-wordmark.svg" alt="CHART ARENA"><span>READ THE CHART. OWN THE MOMENT.</span></div>
+  <div class="loading-top"><img src="assets/royal-gold/wordmark-v1.svg" alt="CHART ARENA"><span>READ THE CHART. OWN THE MOMENT.</span></div>
   <div class="loading-cast" aria-hidden="true"><div class="loading-trader trader-0"><span>01</span><img src="assets/traders/kai-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-1"><span>02</span><img src="assets/traders/seon-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-2"><span>03</span><img src="assets/traders/hyesu-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-3"><span>04</span><img src="assets/traders/doyun-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-4"><span>05</span><img src="assets/traders/rin-v1.png" alt="" fetchpriority="high"></div></div>
   <div class="loading-bottom"><div class="loading-copy"><span class="section-kicker">YOUR NEXT MOVE</span><h1>판을 읽고, 승부를 걸다.</h1><p>같은 차트. 서로 다른 선택.</p></div><div class="loading-state"><span id="ldpct">아레나를 준비하고 있어요</span><div class="ldbar" aria-hidden="true"><div class="ldfill" id="ldfill"></div></div><small>CHART ARENA / TRADER SERIES 01</small></div></div>
 </div>
@@ -328,6 +328,7 @@
 <script src="battle-rivals.js?v=bd1bd54581ad"></script>
 <script src="battle-presentation.js?v=98b1a555fb04"></script>
 <link rel="stylesheet" href="battle-presentation.css?v=e578127f352b">
+<link rel="stylesheet" href="royal-gold.css?v=a5b0411666e5">
 <script src="battle-fx.js?v=632f079ca815"></script>
 <script src="battle-rules.js?v=523c47da1558"></script>
 <script>
@@ -842,7 +843,7 @@ function _spark(x,d,acc,X,Y,W2,H2){ var cs=d.cs; if(!cs||cs.length<2)return; var
 function makeCard(d,cb){
   var W=1080,H=1080,C=document.createElement('canvas');C.width=W;C.height=H;var x=C.getContext('2d');
   var acc=d.kind==='liq'?'#FF4D5E':d.kind==='profit'?'#35D07A':d.kind==='loss'?'#FF7A9C':'#E9B949';
-  Promise.all([_limg('assets/arena-wordmark.svg'),_limg('assets/qr.png'),_limg(d.chImg)]).then(function(im){
+  Promise.all([_limg('assets/royal-gold/wordmark-v1.svg'),_limg('assets/qr.png'),_limg(d.chImg)]).then(function(im){
     var logo=im[0],qr=im[1],av=im[2];
     var g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#181a22');g.addColorStop(1,'#08080c');x.fillStyle=g;x.fillRect(0,0,W,H);
     var rg=x.createRadialGradient(W/2,470,60,W/2,470,660);rg.addColorStop(0,acc+'2e');rg.addColorStop(1,'rgba(5,7,15,0)');x.fillStyle=rg;x.fillRect(0,0,W,H);
