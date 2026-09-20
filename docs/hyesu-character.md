@@ -25,3 +25,13 @@ The static PNG comes from the first clean video frame. Existing visibility, redu
 - 844×390 home, 390×844 deathmatch lobby and 1440×900 home inspected. No horizontal overflow; head remains visible. Final home and VS images resolve to the new animated WebP.
 - 191 Node tests pass; build, asset versions, home parity and whitespace verification pass. Reduced-motion/data-saver/error behavior retains automated coverage.
 - Physical-phone animation performance was not measured; the new motion file is about 9 MB.
+
+## v2 cutout correction
+
+The initial key treated weakly saturated dark green pockets between curls as foreground. Backing-color subtraction also produced purple edge pixels. The Hyesu-only key now removes those green pockets; an outer four-pixel band reconstructs foreground color from nearby opaque interior pixels. A narrow alpha smoothing pass retains a soft boundary without adding an external glow. Other characters' key thresholds are unchanged.
+
+The source video and its original body movement are retained. No additional Dreamina generation or credits were used. New `hyesu-v2.png` and `hyesu-idle-v2.webp` filenames bypass the previous image cache.
+
+Skin edges on shoulders and arms use a separate green-dominance matte, selected only near confident skin pixels. This avoids the stepped contours produced by aggressively tightening the hair matte. A narrow antialiasing transition keeps skin outlines defined without a wide translucent halo.
+
+V2 verification: 7,634,368 bytes, 768x1024, 134 encoded frames. Every frame decodes with transparent corners and an intact head. Dark/light head and shoulder composites were inspected at multiple poses. The 1440x900 and 844x390 home use the v2 animated asset without horizontal overflow. All 191 Node tests and build verification pass. No new credits were consumed.

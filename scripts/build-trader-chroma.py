@@ -114,6 +114,10 @@ def cutout(pixels, name):
     # Generated backing also has darker saturated pockets behind hair/arms.
     # Hue dominance catches those pockets even when their brightness differs.
     key = ((distance < .22) & (chroma > .15)) | (chroma > .22)
+    if name == 'hyesu' and green_screen:
+        # This clip has dark, weakly saturated green pockets between curls.
+        # The former thresholds incorrectly marked those pockets as foreground.
+        key = ((distance < .30) & (chroma > .04)) | (chroma > .08)
     # Kai's generated backing includes white corners outside the magenta field.
     # Only border-connected white is background; keep his white pocket square.
     white = np.min(rgb, axis=2) > .92

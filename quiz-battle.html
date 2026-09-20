@@ -222,7 +222,7 @@
 <link rel="stylesheet" href="arena-design.css?v=b4c51af67cfa">
 <link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8">
 <link rel="stylesheet" href="battle-controls.css?v=c6f6779d4c46">
-<script src="arena-characters.js?v=1200dfc9fe5e"></script>
+<script src="arena-characters.js?v=6971e1a98b13"></script>
 <script src="arena-motion.js?v=0f5c18738ddc" defer></script>
 
 <div class="scaler" id="scaler">
@@ -284,7 +284,7 @@
     <a class="lobbyback" href="index.html" aria-label="홈 화면으로 뒤로">← 로비로</a><span class="lobby-brand">CHART<span>ARENA</span></span>
     <div class="lmodes" id="lmodes">
       <div class="lcard"><div class="in">
-        <div class="lobby-feature"><span class="section-kicker">YOUR NEXT MATCH</span><h1 class="ln">당신의 판단을<br>보여줄 시간.</h1><p class="ld">같은 차트 위에서 펼쳐지는<br>네 명의 트레이딩 배틀.</p><img id="lobbyTrader" src="assets/traders/hyesu-v1.png" alt="선택한 트레이더"><div class="lobby-trader-caption"><small>YOUR TRADER</small><strong id="lobbyTraderName">혜수</strong><span>4 PLAYERS / 5 ROUNDS · 3 DECISIONS</span></div></div>
+        <div class="lobby-feature"><span class="section-kicker">YOUR NEXT MATCH</span><h1 class="ln">당신의 판단을<br>보여줄 시간.</h1><p class="ld">같은 차트 위에서 펼쳐지는<br>네 명의 트레이딩 배틀.</p><img id="lobbyTrader" src="assets/traders/hyesu-v2.png" alt="선택한 트레이더"><div class="lobby-trader-caption"><small>YOUR TRADER</small><strong id="lobbyTraderName">혜수</strong><span>4 PLAYERS / 5 ROUNDS · 3 DECISIONS</span></div></div>
         <div class="lobby-action"><div class="table-heading"><h2>테이블 선택</h2><span id="lobbyWallet"></span></div><div id="tableChoices" class="table-choices" role="group" aria-label="1%당 골드로 방 선택"></div><p class="table-note" id="tableNote"></p><p class="settlement-note" id="lastSettlement" role="status" hidden></p><button class="lgo" id="modeLive" type="button">매칭 시작</button><p>플레이 1회 사용 · 빈자리는 봇이 참여합니다.</p><a href="index.html" class="lobby-change">트레이더 변경 ↗</a></div>
       </div></div>
     </div>
@@ -302,7 +302,7 @@
 
 <div id="splash" class="arena-loading" role="status" aria-label="차트아레나 준비 중">
   <div class="loading-top"><img src="assets/arena-wordmark.svg" alt="CHART ARENA"><span>READ THE CHART. OWN THE MOMENT.</span></div>
-  <div class="loading-cast" aria-hidden="true"><div class="loading-trader trader-0"><span>01</span><img src="assets/traders/kai-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-1"><span>02</span><img src="assets/traders/seon-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-2"><span>03</span><img src="assets/traders/hyesu-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-3"><span>04</span><img src="assets/traders/doyun-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-4"><span>05</span><img src="assets/traders/rin-v1.png" alt="" fetchpriority="high"></div></div>
+  <div class="loading-cast" aria-hidden="true"><div class="loading-trader trader-0"><span>01</span><img src="assets/traders/kai-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-1"><span>02</span><img src="assets/traders/seon-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-2"><span>03</span><img src="assets/traders/hyesu-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-3"><span>04</span><img src="assets/traders/doyun-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-4"><span>05</span><img src="assets/traders/rin-v1.png" alt="" fetchpriority="high"></div></div>
   <div class="loading-bottom"><div class="loading-copy"><span class="section-kicker">YOUR NEXT MOVE</span><h1>판을 읽고, 승부를 걸다.</h1><p>같은 차트. 서로 다른 선택.</p></div><div class="loading-state"><span id="ldpct">아레나를 준비하고 있어요</span><div class="ldbar" aria-hidden="true"><div class="ldfill" id="ldfill"></div></div><small>CHART ARENA / TRADER SERIES 01</small></div></div>
 </div>
 <div id="bNoNrg" class="bnonrg"><div class="bnonrgcard">
@@ -879,7 +879,7 @@ function _battleCard(){ var me=players[0]; if(!me||!GD)return;
   var pctS=me.pick==='W'?'관망':((ret>=0?'+':'')+ret.toFixed(2)+'%');
   var dirKo=me.revealInput.switches&&me.revealInput.switches.length?'전환 '+me.revealInput.switches.length+'회':({L:'롱',S:'숏',W:'관망'}[me.pick]||'관망'), w0=Math.max(0,vis-1-40);
   _cardData={ kind:kind, pct:pctS, dirKo:dirKo, lev:me.lev, sym:GD.sym||'', tf:GD.tf||'',
-    entry:(Math.round(entry*100)/100), exit:(Math.round(exit*100)/100), nick:myNick||'트레이더', chImg:me.chImg||'assets/traders/hyesu-v1.png',
+    entry:(Math.round(entry*100)/100), exit:(Math.round(exit*100)/100), nick:myNick||'트레이더', chImg:me.chImg||'assets/traders/hyesu-v2.png',
     badge:kind==='liq'?'💥 청산':kind==='profit'?(ret>=50?'🚀 떡상':'👍 익절'):kind==='loss'?'💧 손실':'◎ 관망',
     meme:kind==='liq'?'다음 판단으로 다시 도전':kind==='profit'?(ret>=50?'떡상! 이번 판 접수 🚀':'배틀 익절 👍'):kind==='loss'?'물렸다… 다음 판 복수 💧':'관망도 전략 ◎',
     cs:cs.slice(w0,vis+ArenaRules.exitAt(me.revealInput)), entryIdx:Math.min(40,vis-1),
