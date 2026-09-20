@@ -15,11 +15,11 @@ function finish(tableId){
  return{game,writes,xp,nodes,ctx};
 }
 test('actual final handler returns reserve plus exact cumulative gain, once, with no rank bonus',()=>{
- const r=finish('standard');assert.equal(r.game.balance,28000);assert.equal(r.game.battleLast.delta,3000);
- assert.equal(r.writes,1);assert.equal(r.xp,1);assert.match(r.nodes.verdict.innerHTML,/골드 정산 3000 골드/);
+ const r=finish('standard');assert.equal(r.game.balance,30000);assert.equal(r.game.battleLast.delta,5000);
+ assert.equal(r.writes,1);assert.equal(r.xp,1);assert.match(r.nodes.verdict.innerHTML,/골드 정산 5000 골드/);
  assert.equal(r.nodes.go.disabled,false);assert.equal(r.ctx.phase,'final');
 });
 test('actual practice final shows simulated results without wallet or XP rewards',()=>{
  const r=finish('practice');assert.equal(r.game.balance,25000);assert.equal(r.xp,0);
- assert.equal(r.game.battleLast.delta,0);assert.match(r.nodes.verdict.innerHTML,/모의 손익 300 골드/);
+ assert.equal(r.game.battleLast.delta,0);assert.match(r.nodes.verdict.innerHTML,/모의 손익 500 골드/);
 });

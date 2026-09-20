@@ -15,6 +15,7 @@ const history = [
   { round: 2, seg: 22, picks: { guest: { dir: 'W' }, host: { dir: 'L' } } },
   { round: 3, seg: 33, picks: { guest: { dir: 'S', risk: 'bold' }, host: { dir: 'L' } } },
 ];
+history.push({round:4,seg:44,picks:{guest:{dir:'L'},host:{dir:'S'}}},{round:5,seg:55,picks:{guest:{dir:'S'},host:{dir:'L'}}});
 const moves = { 11: 5, 22: -3, 33: -8, 44: -2, 55: 7 };
 const move = seg => moves[seg];
 function expected(through) {
@@ -45,10 +46,10 @@ test('unordered history catches up in round order and never changes history inpu
   assert.equal(JSON.stringify(unordered), before);
 });
 
-test('completion snapshot catches up all three rounds for a throttled guest and is idempotent', () => {
+test('completion snapshot catches up all five rounds for a throttled guest and is idempotent', () => {
   const final = Rules.recover(expected(1), history, move);
-  assert.deepEqual(final, expected(3));
-  assert.equal(final.appliedRound, 3);
+  assert.deepEqual(final, expected(5));
+  assert.equal(final.appliedRound, 5);
   assert.deepEqual(Rules.recover(final, history, move), final);
   assert.equal(final.pick.power, undefined);
 });
@@ -71,8 +72,8 @@ function liveSnapshotContext() {
     ArenaRules: Rules, Date, ROUNDS: Rules.ROUNDS, round: 1, phase: 'reveal', myUid: 'guest',
     LIVE: { playing: true, host: false, lastRound: 1 },
     players: [{ uid: 'guest', bot: false, state: Rules.create('guest') }],
-    matchHistory: [], calls: [],
-    pickSegByIdx(idx) { const cs = Array.from({ length: 40 }, () => [100, 110, 90, 100]); cs[39][3] = 100 + move(idx); return { idx, cs, vis: 10 }; },
+    matchHistory: [], calls: [], finalMove: (seg) => move(seg.idx),
+    pickSegByIdx(idx) { const cs = Array.from({ length: 100 }, () => [100, 110, 90, 100]); cs[99][3] = 100 + move(idx); return { idx, cs, vis: 10 }; },
     stopBattle() { ctx.calls.push('stop'); },
     prepareRound(seg, deadline) { ctx.calls.push(['prepare', ctx.players[0].state.appliedRound, seg.idx, deadline]); ctx.phase = 'pick'; },
     beginReveal(picks) { ctx.calls.push(['reveal', ctx.players[0].state.appliedRound]); ctx.phase = 'reveal'; },
@@ -103,11 +104,11 @@ test('actual completion snapshot recovers old rounds before revealing final roun
 
 test('actual done snapshot finalizes all three rounds even if guest missed reveal', () => {
   const ctx = liveSnapshotContext();
-  ctx.onLiveSnap({ status: 'done', round: 3, history });
-  assert.deepEqual(ctx.players[0].state, expected(3));
-  assert.deepEqual(ctx.calls, ['stop', ['final', 3]]);
+  ctx.onLiveSnap({ status: 'done', round: 5, history });
+  assert.deepEqual(ctx.players[0].state, expected(5));
+  assert.deepEqual(ctx.calls, ['stop', ['final', 5]]);
   assert.equal(ctx.phase, 'final');
-  assert.equal(ctx.GD.idx, 33);
+  assert.equal(ctx.GD.idx, 55);
 });
 
 test('actual done snapshot without complete history aborts without paying a final reward', () => {
@@ -135,7 +136,7 @@ async function runHostStart(fresh) {
 }
 
 test('actual hostStart transaction uses fresh capacity after the last human joins', async () => {
-  const fresh = { status: 'wait_v5', rulesVersion:5,tableId:'standard', host: 'host', cap: 4, players: { host: {}, p2: {}, p3: {}, p4: {} } };
+  const fresh = { status: 'wait_v6', rulesVersion:6,tableId:'standard', host: 'host', cap: 4, players: { host: {}, p2: {}, p3: {}, p4: {} } };
   const writes = await runHostStart(fresh);
   assert.equal(writes.length, 1);
   assert.equal(Object.keys(writes[0].players).length, 4);
@@ -144,12 +145,12 @@ test('actual hostStart transaction uses fresh capacity after the last human join
 
 test('actual hostStart transaction cannot resurrect a cancelled room', async () => {
   assert.equal((await runHostStart({ status: 'done', host: 'host', cap: 4, players: { p2: {} } })).length, 0);
-  assert.equal((await runHostStart({ status: 'wait_v5', rulesVersion:5,tableId:'standard', host: 'host', cap: 4, players: { p2: {} } })).length, 0);
+  assert.equal((await runHostStart({ status: 'wait_v6', rulesVersion:6,tableId:'standard', host: 'host', cap: 4, players: { p2: {} } })).length, 0);
 });
 
 test('host cannot start a different table or old rules version',async()=>{
   for(const extra of [{rulesVersion:4},{tableId:'expert'}]){
-    const d={status:'wait_v5',rulesVersion:5,tableId:'standard',host:'host',cap:4,players:{host:{}},...extra};
+    const d={status:'wait_v6',rulesVersion:6,tableId:'standard',host:'host',cap:4,players:{host:{}},...extra};
     assert.equal((await runHostStart(d)).length,0);
   }
 });
@@ -229,14 +230,14 @@ test('cancelling pending query prevents late room creation and energy-consuming 
 
 test('candidate matching never joins a different rate or old rules',async()=>{
   const h=matchmakingHarness();h.ctx.startModeLive();
-  const other={status:'wait_v5',rulesVersion:5,tableId:'expert',host:'host',createdAt:Date.now(),players:{host:{}}};
+  const other={status:'wait_v6',rulesVersion:6,tableId:'expert',host:'host',createdAt:Date.now(),players:{host:{}}};
   h.pendingQuery.resolve({forEach(fn){fn({data:()=>other,ref:{data:other}});fn({data:()=>({...other,tableId:'standard',rulesVersion:2}),ref:{}});}});
   await flush();assert.equal(h.calls.writes.length,0);assert.equal(h.calls.adds,1);
 });
 
 test('join transaction rechecks table after candidate changes',async()=>{
   const h=matchmakingHarness();h.ctx.startModeLive();
-  const d={status:'wait_v5',rulesVersion:5,tableId:'standard',host:'host',createdAt:Date.now(),players:{host:{}}};
+  const d={status:'wait_v6',rulesVersion:6,tableId:'standard',host:'host',createdAt:Date.now(),players:{host:{}}};
   const ref={data:{...d,tableId:'expert'}};
   h.pendingQuery.resolve({forEach(fn){fn({data:()=>d,ref});}});
   await flush();assert.equal(h.calls.writes.length,0);assert.equal(h.calls.adds,1);
@@ -247,7 +248,7 @@ test('late created room is closed and removes only cancelled attempt membership'
   const attempt = h.ctx.mmAttempt, tag = h.ctx.mmTag(attempt);
   h.ctx.mmCreate({ nick: 'Guest', matchAttempt: tag }, attempt);
   h.ctx.liveCancel();
-  const ref = { data: { host: 'guest', status: 'wait_v5', rulesVersion:5,tableId:'standard', players: { guest: { matchAttempt: tag } }, scores: { guest: 0 } } };
+  const ref = { data: { host: 'guest', status: 'wait_v6', rulesVersion:6,tableId:'standard', players: { guest: { matchAttempt: tag } }, scores: { guest: 0 } } };
   h.pendingAdd.resolve(ref); await flush();
   assert.equal(ref.data.status, 'done'); assert.equal(ref.data.players.guest, undefined); assert.equal(h.ctx.LIVE, null); assert.equal(h.calls.begin, 0);
 });
@@ -262,20 +263,20 @@ test('cancellation after join commit but before its response removes late member
     first = false; return result.then(value => commitResponse.promise.then(() => value));
   };
   h.ctx.startModeLive();
-  const ref = { data: { host: 'host', status: 'wait_v5', rulesVersion:5,tableId:'standard', createdAt: Date.now(), cap: 4, players: { host: {} }, scores: {} } };
+  const ref = { data: { host: 'host', status: 'wait_v6', rulesVersion:6,tableId:'standard', createdAt: Date.now(), cap: 4, players: { host: {} }, scores: {} } };
   h.pendingQuery.resolve({ forEach(fn) { fn({ ref, data: () => ref.data }); } });
   await flush();
   assert.ok(ref.data.players.guest, 'join already committed');
   h.ctx.liveCancel(); commitResponse.resolve(); await flush();
   assert.equal(ref.data.players.guest, undefined);
-  assert.equal(ref.data.status, 'wait_v5', 'guest cleanup must not close the host room');
+  assert.equal(ref.data.status, 'wait_v6', 'guest cleanup must not close the host room');
   assert.equal(h.calls.begin, 0); assert.equal(h.ctx.LIVE, null);
 });
 
 test('old cleanup cannot remove a newer attempt that joined the same room', async () => {
   const h = matchmakingHarness(); h.ctx.startModeLive(); const old = h.ctx.mmAttempt;
   h.ctx.liveCancel(); h.ctx.startModeLive();
-  const ref = { data: { host: 'host', status: 'wait_v5', rulesVersion:5,tableId:'standard', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) }, host: {} } } };
+  const ref = { data: { host: 'host', status: 'wait_v6', rulesVersion:6,tableId:'standard', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) }, host: {} } } };
   await h.ctx.cleanupMatchMembership(ref, false, old);
   assert.ok(ref.data.players.guest); assert.equal(h.calls.writes.length, 0);
 });
@@ -290,12 +291,12 @@ test('cancelled fallback timeout cannot start bots during a new matchmaking atte
 test('late snapshot and host polling responses cannot start a cancelled room', async () => {
   const h = matchmakingHarness(); h.ctx.startModeLive();
   let snapshot, error; const pendingGet = deferred();
-  const ref = { data: { host: 'guest', status: 'wait_v5', rulesVersion:5,tableId:'standard', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) } } },
+  const ref = { data: { host: 'guest', status: 'wait_v6', rulesVersion:6,tableId:'standard', players: { guest: { matchAttempt: h.ctx.mmTag(h.ctx.mmAttempt) } } },
     onSnapshot(fn, fail) { snapshot = fn; error = fail; return () => {}; }, get: () => pendingGet.promise };
   h.ctx.enterRoom(ref, true, h.ctx.mmAttempt);
   h.timers.find(t => t.ms === 1200).fn(); h.ctx.liveCancel(); h.ctx.startModeLive();
   const newAttempt = h.ctx.mmAttempt;
   snapshot({ exists: true, data: () => ({ ...ref.data, status: 'play' }) }); error();
-  pendingGet.resolve({ exists: true, data: () => ({ status: 'wait_v5', rulesVersion:5,tableId:'standard', cap: 1, players: { guest: {} } }) }); await flush();
+  pendingGet.resolve({ exists: true, data: () => ({ status: 'wait_v6', rulesVersion:6,tableId:'standard', cap: 1, players: { guest: {} } }) }); await flush();
   assert.equal(h.calls.begin, 0); assert.equal(h.calls.polls.length, 0); assert.equal(h.ctx.mmAttempt, newAttempt); assert.equal(h.ctx.mmActive, true);
 });
