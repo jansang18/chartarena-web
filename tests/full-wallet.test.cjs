@@ -28,7 +28,7 @@ test('online history produces consistent per-player outcomes for unequal wallets
  for(const ids of [['a','b'],['b','a']]){const states=ids.map(id=>R.recover(R.create(id,'standard',id==='a'?75000:5000),hist,()=>2));assert.equal(states.find(p=>p.id==='a').balance,55000);assert.equal(states.find(p=>p.id==='b').balance,0);}
 });
 test('actual initMatch uses purchased wallet and render control allows next choice',()=>{
- let g={balance:75000};const nodes={};const ctx={ArenaRules:R,players:[{uid:'me'}],selectedTable:'standard',getBal:()=>g.balance,GS:'wallet',ljg:()=>g,saveWallet:v=>g=v,showLobby(){throw Error('unexpected lobby');},toast:assert.fail,Date,Math};
+ let g={balance:75000};const nodes={};const ctx={myCh:'tr_seon',skillArmed:false,renderSkill(){},ArenaRules:R,players:[{uid:'me'}],selectedTable:'standard',getBal:()=>g.balance,GS:'wallet',ljg:()=>g,saveWallet:v=>g=v,showLobby(){throw Error('unexpected lobby');},toast:assert.fail,Date,Math};
  vm.createContext(ctx);vm.runInContext(html.slice(html.indexOf('function initMatch('),html.indexOf('function prepareRound(')),ctx);
  assert.equal(ctx.initMatch('actual'),true);assert.equal(ctx.players[0].state.balance,75000);
  ctx.players[0].state=R.settle(ctx.players[0].state,{dir:'S',lev:10},2,1);

@@ -446,6 +446,7 @@
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
 <link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
+<script src="battle-rules.js?v=523c47da1558"></script>
 <script src="arena-characters.js?v=7ae6cc688cb7"></script>
 <script src="arena-motion.js?v=0f5c18738ddc" defer></script>
 <script src="terminal-home.js?v=3d1fe17433f5" defer></script>
@@ -695,8 +696,8 @@ function renderArenaHero(){
   if(!window.ArenaCharacters||!$('traderRoster'))return;
   var list=ArenaCharacters.list,c=ArenaCharacters.get(st.ch);
   $('arenaHero').src=c.image;$('arenaHero').alt=c.name;
-  $('arenaHeroName').textContent=c.name;$('arenaHeroRole').textContent=c.role;
-  $('arenaHeroQuote').textContent=c.quote;$('arenaHeroWord').textContent=c.en;
+  $('arenaHeroName').textContent=c.name;$('arenaHeroRole').textContent=c.role+' · '+ArenaRules.skillFor(c.id).name;
+  $('arenaHeroQuote').textContent=ArenaRules.skillFor(c.id).description+' · 경기당 1회';$('arenaHeroWord').textContent=c.en;
   $('arenaHeroIndex').textContent=String(list.indexOf(c)+1).padStart(2,'0');
   document.querySelector('.arena-showcase').style.setProperty('--trader-accent',c.color);
   $('traderRoster').innerHTML=list.map(function(t){return '<button type="button" class="trader-choice'+(t.id===c.id?' on':'')+'" data-trader="'+t.id+'" aria-pressed="'+(t.id===c.id)+'" aria-label="'+t.name+' 선택"><span><img src="'+t.image+'" alt=""></span><b>'+t.name+'</b></button>';}).join('');
@@ -800,7 +801,7 @@ function renderGarage(){ refreshProfile();
   var CN=[['char','트레이더'],['exch','보석 교환'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<button type="button" class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</button>';}).join('');
   if(gcat==='char'&&window.ArenaCharacters){
-    $('shop').innerHTML='<div class="trader-collection-heading"><h2>당신의 트레이더</h2><p>다섯 가지 개성. 마음에 드는 트레이더를 선택하세요.</p></div>'+ArenaCharacters.list.map(function(c){return '<button type="button" class="collection-trader'+(st.ch===c.id?' on':'')+'" data-trader="'+c.id+'" aria-pressed="'+(st.ch===c.id)+'"><div><img src="'+c.image+'" alt=""></div><span><b>'+c.name+'</b><small>'+c.role+'</small></span><em>'+(st.ch===c.id?'선택 중':'선택하기')+'</em></button>';}).join('');
+    $('shop').innerHTML='<div class="trader-collection-heading"><h2>당신의 트레이더</h2><p>다섯 가지 개성. 마음에 드는 트레이더를 선택하세요.</p></div>'+ArenaCharacters.list.map(function(c){return '<button type="button" class="collection-trader'+(st.ch===c.id?' on':'')+'" data-trader="'+c.id+'" aria-pressed="'+(st.ch===c.id)+'"><div><img src="'+c.image+'" alt=""></div><span><b>'+c.name+'</b><small>'+c.role+'</small><small class="collection-skill">'+ArenaRules.skillFor(c.id).name+' · '+ArenaRules.skillFor(c.id).description+'</small></span><em>'+(st.ch===c.id?'선택 중':'선택하기')+'</em></button>';}).join('');
     return;
   }
   if(gcat==='exch'){ renderExchange(); return; }

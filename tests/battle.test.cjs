@@ -4,7 +4,7 @@ const code=html.slice(html.indexOf('function lockIn(){'),html.indexOf('function 
 function play(input,moves,reduced=false,decisions=['GO','GO']){
  let now=1000,draws=0,next=0,seq=0;const tasks=new Map(),nodes=new Map(),checkpoints=[];
  const players=[0,1,2,3].map(i=>({state:R.create(String(i)),name:'P'+i,ready:i===0&&!!input,pending:input,dp:0,startRank:1}));
- const c={ArenaPresentation:require('../battle-presentation.js'),ArenaRules:R,players,matchHistory:[],MODE:'4p',LIVE:null,phase:'pick',tmr:null,revTimer:null,checkpointTimer:null,checkpointChoice:null,checkpointDeadline:0,revealStage:0,reduce:reduced,round:1,highlight:null,
+ const c={ArenaRivals:require('../battle-rivals.js'),armedSkill:p=>p,botSkill:(p,pick)=>pick,ArenaPresentation:require('../battle-presentation.js'),ArenaRules:R,players,matchHistory:[],MODE:'4p',LIVE:null,phase:'pick',tmr:null,revTimer:null,checkpointTimer:null,checkpointChoice:null,checkpointDeadline:0,revealStage:0,reduce:reduced,round:1,highlight:null,
   GD:{vis:210,n:300,cs:Array.from({length:300},(_,i)=>[100,210,1,i<210?100:100+moves[Math.floor((i-210)/30)]]),sym:'TEST',tf:'1h'},gRev:210,view:{count:170,start:80},Date:{now:()=>now},
   botInput:()=>({dir:'L'}),recordWallet(){return true;},currentTable:()=>R.table(),goldEquation:()=>"formula",fmtPct:String,fmtLead:String,renderPods(){},drawChart(){draws++;},
   renderCtrl(){if(c.phase==='checkpoint'){checkpoints.push(c.revealStage);const d=decisions[c.revealStage-1];if(d)c.setTimeout(()=>c.decideCheckpoint(d),1);}},

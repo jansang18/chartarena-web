@@ -6,7 +6,7 @@ function finish(tableId){
  for(let i=1;i<=R.ROUNDS;i++)game=R.walletRound(game,'m',{dir:'L',lev:2},.5,i,false);
  const nodes={},me={name:'me',score:game.battleActive.state.score,state:game.battleActive.state};
  const ctx={ArenaRules:R,phase:'result',players:[me],matchPaid:false,highlight:null,MODE:'4p',LIVE:null,
-  stopBattle(){},renderPods(){},currentTable:()=>R.table(tableId),getBal:()=>game.balance,
+  stopBattle(){},renderPods(){},decisiveSummary:()=>'',setupRematch(){nodes.go={disabled:false};},currentTable:()=>R.table(tableId),getBal:()=>game.balance,
   closeWallet(){game=R.walletClose(game,'m');writes++;},battleXp(){xp++;},
   fmtP:String,fmtLead:String,esc:String,
   $(id){return nodes[id]||=( {classList:{add(){}},textContent:'',innerHTML:''} );}
