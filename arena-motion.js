@@ -6,21 +6,13 @@ var selector='#arenaHero,#lobbyTrader,#lobbyPortrait,#lobbyOpponent,#mePortrait,
 var records=new Map(),failed=new Set(),reduce=window.matchMedia('(prefers-reduced-motion: reduce)');
 var catalog=window.ArenaCharacters.list;
 function character(src){return catalog.find(function(c){return src.split('?')[0].endsWith(c.image)||src.split('?')[0].endsWith(c.motion);});}
-function blocked(){return document.hidden||reduce.matches||!!(window.navigator.connection&&window.navigator.connection.saveData)||window.ArenaMotion.paused;}
+function blocked(){return document.hidden||reduce.matches||!!(window.navigator.connection&&window.navigator.connection.saveData);}
 function render(img,r){
  var desired=r.visible&&!blocked()&&!failed.has(r.character.id)?r.character.motion:r.character.image;
  if(img.getAttribute('src')!==desired)img.setAttribute('src',desired);
 }
 function refresh(){
  records.forEach(function(r,img){render(img,r);});
- document.querySelectorAll('[data-motion-toggle]').forEach(function(button){
-  var stopped=window.ArenaMotion.paused||reduce.matches;
-  button.textContent=stopped?'▶ 모션':'Ⅱ 모션';
-  button.setAttribute('aria-pressed',String(stopped));
-  button.setAttribute('aria-label',stopped?'캐릭터 움직임 켜기':'캐릭터 움직임 멈추기');
-  button.disabled=reduce.matches;
-  button.title=reduce.matches?'기기의 모션 줄이기 설정이 켜져 있습니다':'';
- });
 }
 var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){var r=records.get(e.target);if(r){r.visible=e.isIntersecting;render(e.target,r);}});},{threshold:0});
 function sync(){
@@ -35,12 +27,8 @@ function sync(){
   observer.observe(img);
  });
 }
-var paused=false;
-try{paused=window.localStorage.getItem('chartarena-motion-paused')==='1';}catch(ignore){}
-window.ArenaMotion={paused:paused,setPaused:function(value){this.paused=!!value;try{window.localStorage.setItem('chartarena-motion-paused',this.paused?'1':'0');}catch(ignore){}refresh();}};
 function start(){
  sync();
- document.querySelectorAll('[data-motion-toggle]').forEach(function(button){button.addEventListener('click',function(){window.ArenaMotion.setPaused(!window.ArenaMotion.paused);});});
  refresh();
  new MutationObserver(sync).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['src','class']});
  document.addEventListener('visibilitychange',refresh);

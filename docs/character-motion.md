@@ -14,7 +14,7 @@ Seon, Yuna, Kai and Doyun use new magenta-backed sources. Rin's first source ret
 
 The intermediate v5 pass removes generated camera zoom. Each processed frame is registered to its first frame using stable interior features and a similarity transform. This removes generated camera scale/pan while retaining local blinking and breathing. Per-frame corrections are saved to `exports/character-idle-regenerated/*-stabilization.json`. Premultiplied RGBA resampling protects translucent edges.
 
-`arena-motion.js` enhances home, lobby, podium and selected collection portraits. Visibility, hidden tabs, reduced motion, data saver, manual pause and media-load failure retain their static-PNG fallbacks. Original PNGs and ownership IDs are preserved. Deathmatch shows the selected player and actual bot on opposite sides of VS.
+`arena-motion.js` enhances home, lobby, podium and selected collection portraits. Motion plays automatically; the in-game motion toggle is removed and the old saved manual-pause preference no longer blocks playback. Visibility, hidden tabs, reduced motion, data saver and media-load failure retain their static-PNG fallbacks. Original PNGs and ownership IDs are preserved. Deathmatch shows the selected player and actual bot on opposite sides of VS.
 
 ## Offline preparation
 
