@@ -1,0 +1,33 @@
+html[data-page=battle][data-playing] .top .emobar{display:block;position:relative;inset:auto;margin:0;flex:0 0 44px;order:0;align-self:center;z-index:30}
+html[data-page=battle][data-playing] .emobtn{display:grid;place-items:center;width:44px;height:44px;min-height:44px;padding:0;border-radius:12px;font-size:23px;border:1px solid #917d5f;background:linear-gradient(#344857,#1a2c39);box-shadow:inset 0 1px #fff3,0 2px 0 #091720}
+html[data-page=battle][data-playing] .emobtn[aria-expanded=true]{border-color:#f4d18c;background:#574c37}
+html[data-page=battle] .emopop{position:fixed;inset:52px 10px auto auto;display:none;width:min(340px,calc(100vw - 20px));max-height:calc(100dvh - 110px);overflow:auto;padding:12px;border:1px solid #a38b60;border-radius:16px;background:linear-gradient(145deg,#263c4c,#142430);box-shadow:0 16px 44px #0009,inset 0 1px #fff2;color:#eff5f8;z-index:100;text-align:left}
+html[data-page=battle] .emopop.on{display:block}
+.reaction-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:15px;color:#f5dba5}
+.reaction-heading button{border:0;background:none;color:#c7d4dd;width:32px;height:32px;font-size:24px;cursor:pointer}
+.reaction-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.reaction-grid button{display:flex;align-items:center;gap:9px;min-height:54px;padding:7px 9px;border:1px solid #4a6070;border-radius:10px;background:linear-gradient(#344b5b,#243b4b);box-shadow:inset 0 1px #fff1,0 2px 0 #0f1e28;color:#eef4f7;cursor:pointer;text-align:left}
+html[data-page=battle] .reaction-grid button span{padding:0;font-size:28px;line-height:1;pointer-events:none;transform:none;background:none}
+.reaction-grid button b{font-size:12px;line-height:1.25}
+.reaction-grid button:hover{border-color:#f0cd86;background:#41566a}
+.reaction-grid button:active{box-shadow:inset 0 2px 6px #0006}
+.reaction-footer{display:flex;flex-direction:column;align-items:start;gap:8px;padding-top:12px}
+.reaction-footer small{font-size:11px;color:#c1d0da}
+.reaction-footer button{min-height:36px;border:0;background:none;padding:4px 0;color:#dfbf86;font-size:12px;cursor:pointer}
+.emobar button:focus-visible{outline:2px solid #ffe2a4;outline-offset:2px}
+.arena-reaction-layer{position:fixed;inset:0;pointer-events:none;z-index:25;overflow:hidden}
+.arena-reaction-bubble{position:absolute;display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:6px 9px;box-sizing:border-box;border:1px solid #efd39a;border-radius:13px 13px 3px 13px;background:linear-gradient(145deg,#fff2c9,#ddba73);box-shadow:0 5px 14px #0007,inset 0 1px #fff9;color:#293039;animation:arenaReactionPop 2.6s both;transform-origin:85% 80%}
+.arena-reaction-bubble span{font-size:28px;line-height:1}
+.arena-reaction-bubble b{font-size:13px;line-height:1.2;word-break:keep-all}
+.arena-reaction-bubble.tone-blue{background:linear-gradient(145deg,#e1f1ff,#9dbdd8);border-color:#c7e8ff}
+.arena-reaction-bubble.tone-coral{background:linear-gradient(145deg,#ffe4da,#eeaaa0);border-color:#ffcec0}
+.reaction-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@keyframes arenaReactionPop{0%{opacity:0;transform:scale(.65) rotate(-6deg)}12%{opacity:1;transform:scale(1.06) rotate(2deg)}22%,82%{opacity:1;transform:scale(1) rotate(0)}100%{opacity:0;transform:translateY(-6px) scale(.95)}}
+@media(max-width:600px){html[data-page=battle][data-playing] .frame>.top{gap:6px;padding:0 8px}html[data-page=battle][data-playing] .top .battle-wordmark{font-size:12px}html[data-page=battle][data-playing] .top .round{font-size:10px}html[data-page=battle][data-playing] .top .bbal{font-size:10px}.arena-reaction-bubble b{font-size:11px}.arena-reaction-bubble span{font-size:24px}}
+@media(max-width:359px){html[data-page=battle][data-playing] .top .battle-wordmark{font-size:10px}html[data-page=battle][data-playing] .top .endbtn{padding:2px 5px;min-width:32px}}
+@media(max-height:450px) and (min-width:600px){html[data-page=battle] .emopop{width:450px;max-height:calc(100dvh - 100px)}.reaction-grid{grid-template-columns:repeat(4,1fr)}.reaction-grid button{flex-direction:column;text-align:center;gap:5px;min-height:68px;padding:6px 3px}.reaction-grid button b{font-size:11px}.reaction-footer{flex-direction:row;align-items:center;justify-content:space-between;padding-top:6px}.reaction-heading{margin-bottom:4px}}
+@media(prefers-reduced-motion:reduce){.arena-reaction-bubble{animation:none;transform:none}}
+
+html[data-page=battle][data-playing] .frame>.top:has(.emopop.on){z-index:40}
+.arena-reaction-bubble.compact{min-height:32px;padding:3px 6px;gap:5px}.arena-reaction-bubble.compact span{font-size:23px}.arena-reaction-bubble.compact b{font-size:11px}
+@media(max-height:550px) and (min-width:600px){html[data-page=battle][data-playing] .scaler>.frame{grid-template-rows:44px 64px minmax(0,1fr) 84px}html[data-page=battle][data-playing] .frame>.top{height:44px;min-height:44px}}
