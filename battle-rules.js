@@ -1,7 +1,7 @@
 /* Deterministic percentage-gold rules and atomic local-wallet transitions. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION=6,ROUNDS=5;
+const VERSION=7,ROUNDS=5;
 const TABLES=Object.freeze({
  practice:Object.freeze({id:'practice',name:'연습방',rate:100,reserve:0,capital:2000,practice:true}),
  beginner:Object.freeze({id:'beginner',name:'입문방',rate:100,reserve:1,capital:2000}),
@@ -10,28 +10,42 @@ const TABLES=Object.freeze({
 });
 function table(id){id=id||'standard';if(!Object.hasOwn(TABLES,id))throw Error('Unknown table');return TABLES[id];}
 function create(id,tableId,capital){const t=table(tableId);if(capital!==undefined&&(!Number.isSafeInteger(capital)||capital<0))throw Error('Invalid starting gold');return {id:String(id),tableId:t.id,balance:t.practice||capital===undefined?t.capital:capital,score:0,delta:0,passUsed:false,appliedRound:0};}
-function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if((dir==='W'&&player.passUsed)||player.balance<=0)dir='N';const pick={dir,lev:[1,2,3,5,10].includes(input.lev)?input.lev:1};if([30,60,90].includes(input.exit))pick.exit=input.exit;return pick;}
+function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if((dir==='W'&&player.passUsed)||player.balance<=0)dir='N';const pick={dir,lev:[1,2,3,5,10].includes(input.lev)?input.lev:1};if([30,60,90].includes(input.exit))pick.exit=input.exit;
+ if(input.switches!==undefined){if(!Array.isArray(input.switches)||input.switches.length>2||input.switches.some((at,i)=>![30,60].includes(at)||at>exitAt(pick)||(i&&at<=input.switches[i-1])))throw Error('Invalid switch path');if(['L','S'].includes(dir)&&input.switches.length)pick.switches=input.switches.slice();}return pick;}
 function exitAt(input){return input&&[30,60,90].includes(input.exit)?input.exit:90;}
+function directionAt(input,through=90){let dir=(input||{}).dir;for(const at of (input||{}).switches||[])if(at<=Math.min(through,exitAt(input)))dir=dir==='L'?'S':dir==='S'?'L':dir;return dir;}
 function checkpoint(picks,decisions,stage){
  if(![1,2].includes(stage))throw Error('Invalid checkpoint');
- const next={};for(const [id,pick] of Object.entries(picks)){next[id]=Object.assign({},pick);if(['L','S'].includes(pick.dir)&&exitAt(pick)>stage*30&&decisions[id]!=='GO')next[id].exit=stage*30;}return next;
+ const next={};for(const [id,pick] of Object.entries(picks)){next[id]=Object.assign({},pick);if(pick.switches)next[id].switches=pick.switches.slice();if(!['L','S'].includes(pick.dir)||exitAt(pick)<=stage*30)continue;
+  if(decisions[id]==='SWITCH'){if(!(pick.switches||[]).some(at=>at>=stage*30))next[id].switches=(pick.switches||[]).concat(stage*30);}
+  else if(decisions[id]!=='GO')next[id].exit=stage*30;
+ }return next;
 }
 function goldRound(v){return Math.sign(v)*Math.round(Math.abs(v)+1e-8)||0;}
-function profit(player,input,move){
- if(typeof move!=='number'||!Number.isFinite(move))throw Error('Invalid chart move');
- // Quote the same four-decimal percentage used by the on-screen equation.
- move=Number(move.toFixed(4));
- const pick=choice(player,input),t=table(player.tableId),signedPct=pick.dir==='L'?move:pick.dir==='S'?-move:0;
- const raw=signedPct*t.rate*pick.lev;if(!Number.isSafeInteger(Math.trunc(raw)))throw Error('Gold result exceeds range');
- const uncapped=goldRound(raw),delta=Math.max(-player.balance,uncapped);
- return {delta,pick,signedPct,rate:t.rate,capped:delta!==uncapped};
+function profit(player,input,move,through){
+ const pick=choice(player,input),t=table(player.tableId),end=Math.min(through===undefined?90:through,exitAt(pick));
+ if(!Number.isInteger(end)||end<0||end>90)throw Error('Invalid reveal endpoint');
+ if((pick.switches||[]).length&&typeof move!=='function')throw Error('Switch prices are required');
+ const quote=at=>{const v=at===0?0:typeof move==='function'?move(at):move;if(typeof v!=='number'||!Number.isFinite(v)||v<=-100)throw Error('Invalid chart move');return v;};
+ // Validate numeric inputs even for no-position or zero-length previews.
+ if(typeof move!=='function'&&(typeof move!=='number'||!Number.isFinite(move)))throw Error('Invalid chart move');
+ const points=(pick.switches||[]).filter(at=>at<=end).concat(end),legs=[];let from=0,dir=pick.dir,delta=0,signedPct=0,lockedDelta=0,openDelta=0,capped=false;
+ for(let i=0;i<points.length;i++){
+  const to=points[i],pct=Number(((1+quote(to)/100)/(1+quote(from)/100)*100-100).toFixed(4));
+  const signed=dir==='L'?pct:dir==='S'?-pct:0,raw=signed*t.rate*pick.lev;if(!Number.isSafeInteger(Math.trunc(raw)))throw Error('Gold result exceeds range');
+  const uncapped=goldRound(raw),part=Math.max(-(player.balance+delta),uncapped),closed=i<points.length-1;
+  delta+=part;signedPct+=signed;capped=capped||part!==uncapped;legs.push({from,to,dir,signedPct:signed,delta:part,closed});if(closed)lockedDelta+=part;else openDelta=part;
+  if(!Number.isSafeInteger(player.balance+delta))throw Error('Gold result exceeds range');
+  if(player.balance+delta===0)break;from=to;dir=dir==='L'?'S':dir==='S'?'L':dir;
+ }
+ return {delta,pick,signedPct:Number(signedPct.toFixed(4)),rate:t.rate,capped,legs,lockedDelta,openDelta,currentDir:directionAt(pick,end)};
 }
-function settle(player,input,move,round){
+function settle(player,input,move,round,through){
  if(!Number.isInteger(round)||round<1||round>ROUNDS)throw Error('Invalid round');
  if(round<=player.appliedRound)return player;if(round!==player.appliedRound+1)throw Error('Round must advance exactly once');
- const p=profit(player,input,move);return Object.assign({},player,p,{balance:player.balance+p.delta,score:player.score+p.delta,passUsed:player.passUsed||p.pick.dir==='W',appliedRound:round});
+ const p=profit(player,input,move,through);return Object.assign({},player,p,{balance:player.balance+p.delta,score:player.score+p.delta,passUsed:player.passUsed||p.pick.dir==='W',appliedRound:round});
 }
-function recover(state,history,moveForSegment){let next=state;for(const entry of history.slice().sort((a,b)=>a.round-b.round)){if(entry.round<=next.appliedRound)continue;const input=(entry.picks||{})[next.id];next=settle(next,input,moveForSegment(entry.seg,exitAt(input)),entry.round);}return next;}
+function recover(state,history,moveForSegment){let next=state;for(const entry of history.slice().sort((a,b)=>a.round-b.round)){if(entry.round<=next.appliedRound)continue;const input=(entry.picks||{})[next.id];next=settle(next,input,at=>moveForSegment(entry.seg,at),entry.round);}return next;}
 function rank(players,id){const me=players.find(p=>p.id===id);return me?1+players.filter(p=>p.score>me.score).length:players.length;}
 function walletBalance(game){return Number.isSafeInteger(game.balance)&&game.balance>=0?game.balance:25000;}
 function walletOpen(game,id,tableId,playerId){
@@ -43,10 +57,10 @@ function walletOpen(game,id,tableId,playerId){
  const reserved=t.practice?0:balance;
  return Object.assign({},game,{balance:balance-reserved,battleActive:{id,tableId:t.id,reserve:reserved,state:create(playerId,t.id,balance),pending:null}});
 }
-function walletRound(game,id,input,move,round,pending){
+function walletRound(game,id,input,move,round,pending,through){
  const a=game.battleActive;if(!a||a.id!==id)throw Error('경기가 다른 창에서 정산되었습니다.');
  if(round<=a.state.appliedRound)return game;
- const next=settle(a.state,input,move,round);
+ const next=settle(a.state,input,move,round,through);
  return Object.assign({},game,{battleActive:Object.assign({},a,pending?{pending:next}:{state:next,pending:null})});
 }
 function walletClose(game,id){
@@ -55,5 +69,5 @@ function walletClose(game,id){
  const closed=(game.battleClosed||[]).concat(id).slice(-100);
  return Object.assign({},game,{balance:walletBalance(game)+returned,battleActive:null,battleClosed:closed,battleLast:{id,tableId:t.id,delta:t.practice?0:state.score,simulated:state.score,rounds:state.appliedRound}});
 }
-return {VERSION,ROUNDS,TABLES,table,create,choice,exitAt,checkpoint,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
+return {VERSION,ROUNDS,TABLES,table,create,choice,exitAt,directionAt,checkpoint,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
 });

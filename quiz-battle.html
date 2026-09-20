@@ -218,7 +218,7 @@
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
 <link rel="stylesheet" href="battle-fx.css?v=0c6b672cbebb">
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
-<link rel="stylesheet" href="arena-design.css?v=6fd991937af5">
+<link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
 <link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8">
 <script src="arena-characters.js?v=34458f7f0b6b"></script>
 
@@ -256,6 +256,7 @@
       <div class="checkpoint-copy"><strong id="checkpointTitle">계속 갈까요?</strong><small id="checkpointHint">시간이 지나면 자동 STOP</small></div>
       <button type="button" id="continueGo">GO <small>다음 30봉</small></button>
       <button type="button" id="stopHere">STOP <small>현재 손익 확정</small></button>
+      <button type="button" id="switchHere">SWITCH <small id="switchDirection">숏으로 전환</small></button>
     </div>
     <div class="cgrp direction-group"><span class="clab">방향</span>
       <button type="button" class="dir long" data-dir="L" id="dL">↗ 롱<small>상승</small></button>
@@ -317,7 +318,7 @@
 <script src="arena-reactions.js?v=2ee78e94f486"></script>
 <script src="battle-data.js?v=e970b5771900"></script>
 <script src="battle-fx.js?v=632f079ca815"></script>
-<script src="battle-rules.js?v=abe2a125754f"></script>
+<script src="battle-rules.js?v=78cb35af7240"></script>
 <script>
 (function(){
 "use strict";
@@ -369,10 +370,10 @@ if(linkedTable==='practice'||linkedTable==='deathmatch')location.replace('deathm
 if(Object.hasOwn(ArenaRules.TABLES,linkedTable))selectedTable=linkedTable;
 function currentTable(){return ArenaRules.table(selectedTable);}
 function saveWallet(game){localStorage.setItem(GS,JSON.stringify(game));}
-function finalMove(seg,exit){seg=seg||GD;return(seg.cs[seg.vis+(exit||90)-1][3]/seg.cs[seg.vis-1][3]-1)*100;}
+function finalMove(seg,exit){seg=seg||GD;if(exit===0)return 0;return(seg.cs[seg.vis+(exit||90)-1][3]/seg.cs[seg.vis-1][3]-1)*100;}
 function recordWallet(input,pending,seg,roundNo,through){
   var exit=Math.min(ArenaRules.exitAt(input),through||90);
-  try{saveWallet(ArenaRules.walletRound(ljg(GS),matchId,input,finalMove(seg,exit),roundNo||round,pending));return true;}
+  try{saveWallet(ArenaRules.walletRound(ljg(GS),matchId,input,function(at){return finalMove(seg,at);},roundNo||round,pending,exit));return true;}
   catch(e){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();toast(e.message);return false;}
 }
 function closeWallet(){var g=ljg(GS);if(g.battleActive&&g.battleActive.id===matchId)saveWallet(ArenaRules.walletClose(g,matchId));if(window.ArenaWallet)ArenaWallet.release();}
@@ -505,15 +506,17 @@ function drawChart(){
     ctx.strokeStyle=col;ctx.lineWidth=1;ctx.shadowColor=col;ctx.shadowBlur=gl;ctx.beginPath();ctx.moveTo(x,yOf(c[1]));ctx.lineTo(x,yOf(c[2]));ctx.stroke();ctx.shadowBlur=0;
     var yo=yOf(c[0]),yc=yOf(c[3]);ctx.fillStyle=col;ctx.fillRect(x-bw/2,Math.min(yo,yc),bw,Math.max(1,Math.abs(yc-yo)));}
   ctx.restore();
-  var entry=cs[vis-1][3],ey=yOf(entry);ctx.strokeStyle='rgba(233,185,73,.6)';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,ey);ctx.lineTo(plotR,ey);ctx.stroke();ctx.setLineDash([]);
+  var path=(players[0]&&players[0].revealInput||{}).switches||[],known=path.filter(function(at){return at<=rev-vis;}),entryAt=known.length?known[known.length-1]:0;
+  var entry=cs[vis-1+entryAt][3],ey=yOf(entry);ctx.strokeStyle='rgba(233,185,73,.6)';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(padL,ey);ctx.lineTo(plotR,ey);ctx.stroke();ctx.setLineDash([]);
+  if(entryAt&&ey>=pT&&ey<=pB){ctx.fillStyle='#81d5c7';ctx.font='10px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';ctx.fillText('SWITCH · 전환 진입',padL+4,Math.max(pT+10,ey-7));}
   if(phase==='pick'){ctx.fillStyle='rgba(147,160,188,.55)';ctx.font='9px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='left';ctx.fillText('◀ 드래그·휠로 확대/축소',padL+4,pB-3);}
 }
 
 /* 단상 렌더 */
 function renderPods(){
-  var estimated=['reveal','checkpoint','checkpoint-wait'].includes(phase), standings=players.map(function(p){return {id:p.state.id,score:p.state.score+(estimated?ArenaRules.profit(p.state,p.revealInput,playerMove(p)).delta:0)};});
+  var estimated=['reveal','checkpoint','checkpoint-wait'].includes(phase), standings=players.map(function(p){return {id:p.state.id,score:p.state.score+(estimated?playerProfit(p).delta:0)};});
   $('podiums').innerHTML=players.map(function(p,i){
-    var known=estimated||phase==='result'||phase==='final', pk=known?(p.revealInput||{}).dir:(i===0&&mySel.dir), rank=ArenaRules.rank(standings,p.state.id);
+    var known=estimated||phase==='result'||phase==='final', pk=known?ArenaRules.directionAt(p.revealInput,Math.max(0,gRev-GD.vis)):(i===0&&mySel.dir), rank=ArenaRules.rank(standings,p.state.id);
     var ready=phase==='pick'&&(MODE==='live'?!!(LIVE&&LIVE.picks[p.uid]&&LIVE.picks[p.uid].round===round):p.ready);
     var label=known?({L:'롱 ↗',S:'숏 ↘',W:'패스',N:'미제출'}[pk]||'미제출'):(ready?'확정 ✓':i===0&&pk?({L:'롱 ↗',S:'숏 ↘',W:'패스'}[pk]):'?');
     if(known&&ArenaRules.exitAt(p.revealInput)<90)label='STOP · '+ArenaRules.exitAt(p.revealInput)+'봉';
@@ -526,7 +529,7 @@ function renderPods(){
       +'<div class="nm"><span class="arena-place" title="'+(estimated?'예상 순위':'순위')+'">'+rank+'위</span><span class="player-name">'+(i===0?'나 · ':p.bot?'봇 · ':'')+esc(p.name)+'</span></div><div class="player-result"><div class="led '+(value<0?'negative':value>0?'positive':'neutral')+'" aria-label="누적 손익 '+fmtLead(value)+' 골드">'+fmtLead(value)+'<small> G</small></div><span class="pick '+(known?pk:'Q')+' on">'+(label==='?'?'선택 중':label)+'</span></div>'
       +'<div class="power-label">'+(p.state.balance===0?'보유 골드 소진':multiplier||'선택 대기')+'</div><div class="delta" id="dl'+i+'"></div></div></div>';
   }).join('');
-  if(estimated){var estimate=ArenaRules.profit(players[0].state,players[0].revealInput,playerMove(players[0]));$('goldEquation').textContent=goldEquation(estimate)+(ArenaRules.exitAt(players[0].revealInput)<90?' · STOP 확정':' · 현재 손익');}
+  if(estimated){var estimate=playerProfit(players[0]);$('goldEquation').textContent=goldEquation(estimate)+(ArenaRules.exitAt(players[0].revealInput)<90?' · STOP 확정':' · 현재 손익');}
 }
 function playerMove(p){var offset=Math.min(Math.max(0,gRev-GD.vis),ArenaRules.exitAt(p.revealInput));return offset?finalMove(GD,offset):0;}
 function currentMove(){if(!GD)return 0;var entry=GD.cs[GD.vis-1][3],at=Math.max(GD.vis-1,Math.min(gRev-1,GD.cs.length-1));return (GD.cs[at][3]/entry-1)*100;}
@@ -536,10 +539,10 @@ function fmtScore(v){ var s=(v<0?'-':'')+('000'+Math.abs(v)).slice(-4); return s
 function fmtLead(v){return (v>0?'+':'')+fmtP(v);}
 
 /* 컨트롤 */
-function goldEquation(result){return fmtPct(result.signedPct)+' × '+fmtP(result.rate)+' × '+result.pick.lev+'배 ≈ '+fmtLead(result.delta)+' 골드'+(result.capped?' · 손실 한도 적용':'');}
+function goldEquation(result){if((result.pick.switches||[]).length)return '전환 전 확정 '+fmtLead(result.lockedDelta)+'G + '+(result.currentDir==='L'?'롱':'숏')+' '+fmtLead(result.openDelta)+'G = '+fmtLead(result.delta)+'G'+(result.capped?' · 손실 한도 적용':'');return fmtPct(result.signedPct)+' × '+fmtP(result.rate)+' × '+result.pick.lev+'배 ≈ '+fmtLead(result.delta)+' 골드'+(result.capped?' · 손실 한도 적용':'');}
 function renderCtrl(){
   var checkpoint=phase==='checkpoint';$('battleControls').classList.toggle('at-checkpoint',checkpoint);$('checkpointControls').hidden=!checkpoint;
-  if(checkpoint){var active=checkpointActive(players[0]),waiting=checkpointChoice!==null;$('checkpointTitle').textContent='결정 '+(revealStage+1)+'/3 · '+(revealStage*30)+'봉 공개';$('checkpointHint').textContent=!active?'손익 확정 · 남은 구간 관전':waiting?checkpointChoice+' 확정 · 상대를 기다리는 중':'진입가·배율 유지 · 시간 초과 시 STOP';$('continueGo').disabled=$('stopHere').disabled=!active||waiting;}
+  if(checkpoint){var active=checkpointActive(players[0]),waiting=checkpointChoice!==null,nextDirection=ArenaRules.directionAt(players[0].revealInput)==='L'?'숏':'롱';$('checkpointTitle').textContent='결정 '+(revealStage+1)+'/3 · '+(revealStage*30)+'봉 공개';$('checkpointHint').textContent=!active?'손익 확정 · 남은 구간 관전':waiting?checkpointChoice+' 확정 · 상대를 기다리는 중':'SWITCH: 손익 확정 후 반대 진입 · 배율 유지';$('switchDirection').textContent=nextDirection+'으로 전환';$('switchHere').setAttribute('aria-label','SWITCH · '+nextDirection+'으로 전환');$('continueGo').disabled=$('stopHere').disabled=$('switchHere').disabled=!active||waiting;}
   var me=players[0].state,t=currentTable(),locked=phase!=='pick'||me.balance<=0||!!(LIVE&&(LIVE.locked||LIVE.sending));
   ['L','S','W'].forEach(function(d){$('d'+d).classList.toggle('on',mySel.dir===d);$('d'+d).disabled=locked||(d==='W'&&me.passUsed);});
   $('dW').querySelector('small').textContent=me.passUsed?'사용 완료':'경기당 1회';
@@ -621,7 +624,7 @@ function submitChoice(){if(phase==='result'){if(MODE!=='live'||LIVE.host)nextRou
 function lockIn(){if(phase!=='pick')return;var picks={};players.forEach(function(p,i){picks[p.state.id]=i===0?(p.ready?p.pending:null):botInput(p);});beginReveal(picks,Date.now());}
 function beginReveal(picks,at,stage){
   stage=stage||1;if(stage<=revealStage||phase==='result'||phase==='final')return;if(tmr)clearInterval(tmr);if(checkpointTimer)clearInterval(checkpointTimer);if(revTimer)clearTimeout(revTimer);checkpointTimer=null;revealStage=stage;phase='reveal';$('tnum').textContent=String(stage*30);$('tbar').style.width='100%';
-  players.forEach(function(p){p.revealInput=ArenaRules.choice(p.state,picks[p.state.id]);p.pick=p.revealInput.dir;p.lev=p.revealInput.lev;});
+  players.forEach(function(p){p.revealInput=ArenaRules.choice(p.state,picks[p.state.id]);p.pick=ArenaRules.directionAt(p.revealInput);p.lev=p.revealInput.lev;});
   if(!recordWallet(players[0].revealInput,true,null,null,stage*30))return;
   renderCtrl();var base=GD.vis+(stage-1)*30,target=base+30,started=at||Date.now(),fxLast=0;
   $('tvtag').textContent=currentTable().name+' · 공개 '+stage+'/3';
@@ -629,9 +632,10 @@ function beginReveal(picks,at,stage){
   function step(){if(phase!=='reveal')return;var elapsed=Date.now()-started,count=elapsed<6000?Math.floor(elapsed/250):24+Math.floor((elapsed-6000)/600);gRev=Math.min(target,base+Math.max(0,count));if(gRev>view.start+view.count-10)view.start=Math.min(GD.n-view.count,gRev-view.count+10);drawChart();renderPods();var left=target-gRev;$('tbar').style.width=((30-left)/30*100)+'%';if(!reduce&&left>0&&left<=3&&left!==fxLast){fxLast=left;if(typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.last({anchor:$("chart"),count:left});}if(gRev>=target){revTimer=null;if(stage===3)finishRound();else openCheckpoint();return;}revTimer=setTimeout(step,100);}
   step();
 }
-function checkpointActive(p){return ['L','S'].includes((p.revealInput||{}).dir)&&ArenaRules.exitAt(p.revealInput)>revealStage*30;}
+function playerProfit(p){return ArenaRules.profit(p.state,p.revealInput,function(at){return finalMove(GD,at);},Math.max(0,gRev-GD.vis));}
+function checkpointActive(p){return ['L','S'].includes((p.revealInput||{}).dir)&&ArenaRules.exitAt(p.revealInput)>revealStage*30&&p.state.balance+playerProfit(p).delta>0;}
 function roundPicks(){var picks={};players.forEach(function(p){picks[p.state.id]=p.revealInput;});return picks;}
-function botCheckpoint(p){var pnl=ArenaRules.profit(p.state,p.revealInput,playerMove(p)).delta;return pnl< -p.state.balance*.2||((round+revealStage+p.name.length)%4===0)?'STOP':'GO';}
+function botCheckpoint(p){var pnl=playerProfit(p).delta;if(pnl< -p.state.balance*.2||((round+revealStage+p.name.length)%4===0))return 'STOP';var at=GD.vis+revealStage*30-1,trend=GD.cs[at][3]>=GD.cs[at-10][3]?'L':'S';return trend!==ArenaRules.directionAt(p.revealInput)&&((round+p.name.length)%3===0)?'SWITCH':'GO';}
 function openCheckpoint(){
   if(MODE==='live'){
     phase='checkpoint-wait';renderCtrl();
@@ -641,22 +645,22 @@ function openCheckpoint(){
 function enterCheckpoint(deadline){
   if(typeof window!=='undefined'&&window.ArenaReactions)ArenaReactions.close();
   if(phase==='checkpoint')return;if(revTimer)clearTimeout(revTimer);if(tmr)clearInterval(tmr);revTimer=null;phase='checkpoint';gRev=GD.vis+revealStage*30;checkpointChoice=null;checkpointDeadline=deadline;
-  $('tvtag').textContent=currentTable().name+' · 결정 '+(revealStage+1)+'/3';$('battleHelp').textContent='GO: 같은 진입가·배율로 다음 30봉 계속 · STOP: 현재 손익 확정 후 관전 · 시간 초과 시 STOP';
+  $('tvtag').textContent=currentTable().name+' · 결정 '+(revealStage+1)+'/3';$('battleHelp').textContent='GO: 유지 · STOP: 손익 확정 후 관전 · SWITCH: 손익 확정 후 현재가에 반대 진입 · 시간 초과 시 STOP';
   renderCtrl();renderPods();drawChart();
   function tick(){if(phase!=='checkpoint')return;var left=Math.max(0,Math.ceil((checkpointDeadline-Date.now())/1000));$('tnum').textContent=left;$('tbar').style.width=(left*10)+'%';if(!left){if(MODE==='live'){if(LIVE&&LIVE.host)publishContinuation();}else decideCheckpoint('STOP');}}
   tick();if(phase==='checkpoint')checkpointTimer=setInterval(tick,200);
   if(MODE!=='live'&&!checkpointActive(players[0]))decideCheckpoint('STOP');
 }
 function decideCheckpoint(decision){
-  if(phase!=='checkpoint'||checkpointChoice!==null)return;decision=decision==='GO'?'GO':'STOP';
+  if(phase!=='checkpoint'||checkpointChoice!==null)return;decision=['GO','SWITCH'].includes(decision)&&checkpointActive(players[0])?decision:'STOP';
   if(MODE==='live'){if(checkpointActive(players[0]))liveCheckpoint(decision);return;}
   checkpointChoice=decision;var decisions={};players.forEach(function(p,i){decisions[p.state.id]=i===0?decision:botCheckpoint(p);});
   var picks=ArenaRules.checkpoint(roundPicks(),decisions,revealStage);beginReveal(picks,Date.now(),revealStage+1);
 }
-$('continueGo').onclick=function(){decideCheckpoint('GO');};$('stopHere').onclick=function(){decideCheckpoint('STOP');};
+$('continueGo').onclick=function(){decideCheckpoint('GO');};$('stopHere').onclick=function(){decideCheckpoint('STOP');};$('switchHere').onclick=function(){decideCheckpoint('SWITCH');};
 function finishRound(){
   if(phase!=='reveal')return;gRev=GD.vis+90;drawChart();var move=currentMove();
-  players.forEach(function(p){p.state=ArenaRules.settle(p.state,p.revealInput,finalMove(GD,ArenaRules.exitAt(p.revealInput)),round);p.score=p.state.score;p.dp=p.state.delta;});
+  players.forEach(function(p){p.state=ArenaRules.settle(p.state,p.revealInput,function(at){return finalMove(GD,at);},round);p.score=p.state.score;p.dp=p.state.delta;});
   if(!recordWallet(players[0].revealInput,false))return;
   players.forEach(function(p){var place=ArenaRules.rank(players.map(function(q){return q.state;}),p.state.id),gain=p.startRank-place;if(gain>0&&(!highlight||gain>highlight.gain))highlight={name:p.name,round:round,gain:gain,from:p.startRank,to:place};});
   var resolved={};players.forEach(function(p){resolved[p.state.id]=p.revealInput;});matchHistory=matchHistory.filter(function(x){return x.round<round;});matchHistory.push({round:round,seg:GD.idx,picks:resolved});
@@ -742,7 +746,7 @@ function _battleCard(){ var me=players[0]; if(!me||!GD)return;
   var ret=me.state?me.state.signedPct*me.state.pick.lev:0;
   var kind=me.pick==='W'||me.pick==='N'?'watch':(me.state.balance===0?'liq':ret>0?'profit':'loss');
   var pctS=me.pick==='W'?'관망':((ret>=0?'+':'')+ret.toFixed(2)+'%');
-  var dirKo={L:'롱',S:'숏',W:'관망'}[me.pick]||'관망', w0=Math.max(0,vis-1-40);
+  var dirKo=me.revealInput.switches&&me.revealInput.switches.length?'전환 '+me.revealInput.switches.length+'회':({L:'롱',S:'숏',W:'관망'}[me.pick]||'관망'), w0=Math.max(0,vis-1-40);
   _cardData={ kind:kind, pct:pctS, dirKo:dirKo, lev:me.lev, sym:GD.sym||'', tf:GD.tf||'',
     entry:(Math.round(entry*100)/100), exit:(Math.round(exit*100)/100), nick:myNick||'트레이더', chImg:me.chImg||'assets/traders/seon-v1.png',
     badge:kind==='liq'?'💥 청산':kind==='profit'?(ret>=50?'🚀 떡상':'👍 익절'):kind==='loss'?'💧 손실':'◎ 관망',
@@ -808,10 +812,10 @@ function liveFallback(msg,attempt){
 }
 function mmFindOrCreate(attempt){
   if(!mmCurrent(attempt))return;var me={nick:(myNick||'플레이어').slice(0,12),ch:myCh,bot:false,startingGold:getBal(),joinAt:Date.now(),matchAttempt:mmTag(attempt)};
-  FB.collection('rooms').where('status','==','wait_v6').orderBy('createdAt','desc').limit(8).get().then(function(qs){
-    if(!mmCurrent(attempt))return;var joinRef=null;qs.forEach(function(dd){if(joinRef)return;var x=dd.data();if(!x||x.status!=='wait_v6'||x.rulesVersion!==6||x.tableId!==selectedTable||!x.players||!x.players[x.host])return;if(Date.now()-(x.createdAt||0)>22000)return;if(Object.keys(x.players).length<(x.cap||4))joinRef=dd.ref;});
+  FB.collection('rooms').where('status','==','wait_v7').orderBy('createdAt','desc').limit(8).get().then(function(qs){
+    if(!mmCurrent(attempt))return;var joinRef=null;qs.forEach(function(dd){if(joinRef)return;var x=dd.data();if(!x||x.status!=='wait_v7'||x.rulesVersion!==7||x.tableId!==selectedTable||!x.players||!x.players[x.host])return;if(Date.now()-(x.createdAt||0)>22000)return;if(Object.keys(x.players).length<(x.cap||4))joinRef=dd.ref;});
     if(joinRef){FB.runTransaction(function(tx){return tx.get(joinRef).then(function(s){
-      if(!mmCurrent(attempt))return false;var x=s.data();if(!x||x.status!=='wait_v6'||x.rulesVersion!==6||x.tableId!==selectedTable||!x.players||!x.players[x.host])throw Error('closed');if(Object.keys(x.players).length>=(x.cap||4))throw Error('full');
+      if(!mmCurrent(attempt))return false;var x=s.data();if(!x||x.status!=='wait_v7'||x.rulesVersion!==7||x.tableId!==selectedTable||!x.players||!x.players[x.host])throw Error('closed');if(Object.keys(x.players).length>=(x.cap||4))throw Error('full');
       var u={};u['players.'+myUid]=me;u['scores.'+myUid]=0;tx.update(joinRef,u);return true;
     });}).then(function(joined){if(!joined)return;if(!mmCurrent(attempt)){cleanupMatchMembership(joinRef,false,attempt);return;}enterRoom(joinRef,false,attempt);}).catch(function(){if(mmCurrent(attempt))mmCreate(me,attempt);});}
     else mmCreate(me,attempt);
@@ -819,7 +823,7 @@ function mmFindOrCreate(attempt){
 }
 function mmCreate(me,attempt){
   if(!mmCurrent(attempt))return;var pl={};pl[myUid]=me;var sc={};sc[myUid]=0;
-  FB.collection('rooms').add({status:'wait_v6',rulesVersion:6,tableId:selectedTable,host:myUid,cap:4,createdAt:Date.now(),players:pl,scores:sc,round:0,phase:'pick',ping:Date.now()})
+  FB.collection('rooms').add({status:'wait_v7',rulesVersion:7,tableId:selectedTable,host:myUid,cap:4,createdAt:Date.now(),players:pl,scores:sc,round:0,phase:'pick',ping:Date.now()})
     .then(function(ref){if(!mmCurrent(attempt)){cleanupMatchMembership(ref,true,attempt);return;}enterRoom(ref,true,attempt);}).catch(function(){if(mmCurrent(attempt))liveFallback('매칭 방 생성 실패 — 봇과 대결',attempt);});
 }
 function enterRoom(ref,host,attempt){
@@ -836,17 +840,17 @@ function enterRoom(ref,host,attempt){
   },function(){if(mmCurrent(attempt)&&LIVE===session)liveFallback('매칭 오류 — 봇과 대결',attempt);});
   if(host){mmTimer=setInterval(function(){
     if(!mmCurrent(attempt)||LIVE!==session||session.started)return;
-    ref.get().then(function(s){if(!mmCurrent(attempt)||LIVE!==session||session.started||!s.exists)return;var d=s.data();if(d.status!=='wait_v6')return;var humans=Object.keys(d.players||{}).filter(function(u){return !d.players[u].bot;}).length;
+    ref.get().then(function(s){if(!mmCurrent(attempt)||LIVE!==session||session.started||!s.exists)return;var d=s.data();if(d.status!=='wait_v7')return;var humans=Object.keys(d.players||{}).filter(function(u){return !d.players[u].bot;}).length;
       if(humans>=(d.cap||4)||Date.now()>=startAt)hostStart(ref,d);
     }).catch(function(){});
   },1200);}else mmTimer=setTimeout(function(){if(mmCurrent(attempt)&&LIVE===session&&!session.started)liveFallback('매칭 대기 시간이 초과됐어요',attempt);},25000);
 }
 function hostStart(ref,d){
   if(!LIVE||LIVE.starting)return;LIVE.starting=true;var session=LIVE;
-  FB.runTransaction(function(tx){return tx.get(ref).then(function(s){var fresh=s.data();if(LIVE!==session||!mmCurrent(session.attempt)||!fresh||fresh.status!=='wait_v6'||fresh.rulesVersion!==6||fresh.tableId!==selectedTable||!fresh.players||!fresh.players[fresh.host])return;var cap=fresh.cap||4,playersMap=Object.assign({},fresh.players),count=Object.keys(playersMap).length,b=0;while(count<cap){var bid='bot_'+b++;if(playersMap[bid])continue;playersMap[bid]={nick:BOTNAMES[(b*7)%BOTNAMES.length],ch:(typeof window!=='undefined'&&window.ArenaCharacters?ArenaCharacters.list[b%ArenaCharacters.list.length].id:'hu'+((b*5)%17)),bot:true};count++;}tx.update(ref,{status:'play',players:playersMap,round:0,phase:'pick',history:[],ping:Date.now()});});}).catch(function(){if(LIVE===session)liveFallback('시작 실패 — 봇과 대결');}).finally(function(){if(LIVE===session)session.starting=false;});
+  FB.runTransaction(function(tx){return tx.get(ref).then(function(s){var fresh=s.data();if(LIVE!==session||!mmCurrent(session.attempt)||!fresh||fresh.status!=='wait_v7'||fresh.rulesVersion!==7||fresh.tableId!==selectedTable||!fresh.players||!fresh.players[fresh.host])return;var cap=fresh.cap||4,playersMap=Object.assign({},fresh.players),count=Object.keys(playersMap).length,b=0;while(count<cap){var bid='bot_'+b++;if(playersMap[bid])continue;playersMap[bid]={nick:BOTNAMES[(b*7)%BOTNAMES.length],ch:(typeof window!=='undefined'&&window.ArenaCharacters?ArenaCharacters.list[b%ArenaCharacters.list.length].id:'hu'+((b*5)%17)),bot:true};count++;}tx.update(ref,{status:'play',players:playersMap,round:0,phase:'pick',history:[],ping:Date.now()});});}).catch(function(){if(LIVE===session)liveFallback('시작 실패 — 봇과 대결');}).finally(function(){if(LIVE===session)session.starting=false;});
 }
 function beginLive(d){
-  if(d.rulesVersion!==6||d.tableId!==selectedTable||!nrgGate(false)||getBal()<currentTable().reserve){liveCancel();backToModes();toast('방 규칙이나 입장 골드를 확인해 주세요.');return;}MODE='live';round=1;LIVE.playing=true;
+  if(d.rulesVersion!==7||d.tableId!==selectedTable||!nrgGate(false)||getBal()<currentTable().reserve){liveCancel();backToModes();toast('방 규칙이나 입장 골드를 확인해 주세요.');return;}MODE='live';round=1;LIVE.playing=true;
   if(Object.values(d.players||{}).some(function(p){return !p.bot&&(!Number.isSafeInteger(p.startingGold)||p.startingGold<0);})||!d.players[myUid]||d.players[myUid].startingGold!==getBal()){liveCancel();backToModes();toast('보유 골드가 변경됐습니다. 다시 매칭해 주세요.');return;}
   var ids=Object.keys(d.players||{}).sort(function(a,b){if(a===myUid)return -1;if(b===myUid)return 1;return a.localeCompare(b);});
   players=ids.map(function(u){var p=d.players[u];return {uid:u,name:p.nick||'유저',chImg:u===myUid?myChImg:ArenaCharacters.get(p.ch).image,bot:!!p.bot,startingGold:p.startingGold,strat:p.bot?'trend':'live',pick:null,score:0,dp:0};});
@@ -861,7 +865,7 @@ function queueLiveSnap(d){
   session.loading=(session.loading||Promise.resolve()).then(function(){if(LIVE!==session)return;var indices=(d.history||[]).map(function(h){return h.seg;});if(Number.isInteger(d.seg))indices.push(d.seg);return Promise.all(Array.from(new Set(indices)).map(function(i){return ArenaData.load(i);})).then(function(){if(LIVE===session){if(Number.isInteger(d.seg))rememberSegment(d.seg);onLiveSnap(d);}});}).catch(function(){if(LIVE===session)abortOnline('동기화 차트 로딩에 실패했습니다.');});
 }
 function recoverPlayers(history){
-  players.forEach(function(p){p.state=ArenaRules.recover(p.state,history,function(idx,exit){return finalMove(pickSegByIdx(idx),exit);});p.score=p.state.score;p.dp=p.state.delta;p.pick=p.state.pick?p.state.pick.dir:null;p.revealInput=p.state.pick||null;});matchHistory=history.slice();return recoverWallet(history);
+  players.forEach(function(p){p.state=ArenaRules.recover(p.state,history,function(idx,exit){return finalMove(pickSegByIdx(idx),exit);});p.score=p.state.score;p.dp=p.state.delta;p.pick=p.state.pick?ArenaRules.directionAt(p.state.pick):null;p.revealInput=p.state.pick||null;});matchHistory=history.slice();return recoverWallet(history);
 }
 function onLiveSnap(d){
   if(!LIVE||!LIVE.playing||phase==='final')return;LIVE.lastSnap=Date.now();
@@ -872,7 +876,7 @@ function onLiveSnap(d){
   if((d.phase==='reveal'||d.phase==='complete')&&d.round===round)beginReveal(d.revealPicks||{},d.revealAt,d.stage||1);
   else if(d.phase==='checkpoint'&&d.round===round&&phase!=='result'&&(d.stage||1)>=revealStage){
     if(revealStage<d.stage){if(checkpointTimer)clearInterval(checkpointTimer);phase='checkpoint-wait';}
-    revealStage=d.stage;players.forEach(function(p){p.revealInput=ArenaRules.choice(p.state,(d.revealPicks||{})[p.state.id]);p.pick=p.revealInput.dir;p.lev=p.revealInput.lev;});
+    revealStage=d.stage;players.forEach(function(p){p.revealInput=ArenaRules.choice(p.state,(d.revealPicks||{})[p.state.id]);p.pick=ArenaRules.directionAt(p.revealInput);p.lev=p.revealInput.lev;});
     if(phase!=='checkpoint'&&!recordWallet(players[0].revealInput,true,null,null,revealStage*30))return;
     enterCheckpoint(d.checkpointDeadline);LIVE.decisions=d.checkpointChoices||{};var mine=LIVE.decisions[myUid];if(mine&&mine.round===round&&mine.stage===revealStage)checkpointChoice=mine.decision;
     renderCtrl();renderPods();if(LIVE.host)publishContinuation();
@@ -887,7 +891,7 @@ function publishReveal(){
   if(!LIVE||!LIVE.host||phase!=='pick'||LIVE.resolving)return;LIVE.resolving=true;var session=LIVE,roundNo=round;
   FB.runTransaction(function(tx){return tx.get(session.ref).then(function(s){var d=s.data();if(!d||d.round!==roundNo||d.phase!=='pick')return false;
     var picks=d.picks||{},humans=players.filter(function(p){return !p.bot;});if(Date.now()<d.deadline&&!humans.every(function(p){return picks[p.uid]&&picks[p.uid].round===roundNo;}))return false;
-    var revealed={};players.forEach(function(p){revealed[p.state.id]=ArenaRules.choice(p.state,p.bot?botInput(p):(picks[p.uid]&&picks[p.uid].round===roundNo?picks[p.uid]:null));});
+    var revealed={};players.forEach(function(p){var raw=p.bot?botInput(p):(picks[p.uid]&&picks[p.uid].round===roundNo?picks[p.uid]:{});revealed[p.state.id]=ArenaRules.choice(p.state,{dir:raw.dir,lev:raw.lev});});
     tx.update(session.ref,{phase:'reveal',stage:1,revealPicks:revealed,revealAt:Date.now(),ping:Date.now()});return true;
   });}).then(function(){if(LIVE===session)session.resolving=false;}).catch(function(){if(LIVE===session)abortOnline('결과 동기화에 실패했습니다.');});
 }
@@ -897,8 +901,8 @@ function liveConfirm(){
 }
 function liveCheckpoint(decision){
   if(!LIVE||checkpointChoice!==null)return;var session=LIVE,roundNo=round,stage=revealStage;checkpointChoice=decision;
-  var input=Object.assign({},players[0].revealInput,decision==='STOP'?{exit:stage*30}:{});
-  if(!recordWallet(input,true,null,null,(decision==='GO'?stage+1:stage)*30))return;renderCtrl();
+  var id=players[0].state.id,picks={},decisions={};picks[id]=players[0].revealInput;decisions[id]=decision;var input=ArenaRules.checkpoint(picks,decisions,stage)[id];
+  if(!recordWallet(input,true,null,null,(decision==='STOP'?stage:stage+1)*30))return;renderCtrl();
   FB.runTransaction(function(tx){return tx.get(session.ref).then(function(s){var d=s.data();if(!d||d.round!==roundNo||d.phase!=='checkpoint'||d.stage!==stage||Date.now()>d.checkpointDeadline)throw Error('expired');var prior=(d.checkpointChoices||{})[myUid];if(prior&&prior.round===roundNo&&prior.stage===stage)return;var patch={};patch['checkpointChoices.'+myUid]={round:roundNo,stage:stage,decision:decision};tx.update(session.ref,patch);});}).catch(function(){if(LIVE===session)abortOnline('중간 결정 전송이 지연되어 경기를 종료합니다.');});
 }
 function publishContinuation(){
@@ -908,7 +912,7 @@ function publishContinuation(){
     if(Date.now()<d.checkpointDeadline&&!active.every(function(p){var c=choices[p.uid];return c&&c.round===roundNo&&c.stage===stage;}))return false;
     var decisions={};players.forEach(function(p){var c=choices[p.uid];decisions[p.state.id]=p.bot?botCheckpoint(p):c&&c.round===roundNo&&c.stage===stage?c.decision:'STOP';});
     tx.update(session.ref,{phase:'reveal',stage:stage+1,revealPicks:ArenaRules.checkpoint(picks,decisions,stage),revealAt:Date.now(),ping:Date.now()});return true;
-  });}).catch(function(){if(LIVE===session)abortOnline('GO/STOP 동기화에 실패했습니다.');}).finally(function(){if(LIVE===session)session.continuing=false;});
+  });}).catch(function(){if(LIVE===session)abortOnline('중간 결정 동기화에 실패했습니다.');}).finally(function(){if(LIVE===session)session.continuing=false;});
 }
 function abortOnline(message){if(!LIVE)return;closeWallet();stopBattle();liveLeave();LIVE=null;MODE='4p';phase='idle';$('verdict').classList.remove('show');showLobby();toast(message+' · 확정된 선택까지 정산했습니다.');}
 function liveLeave(){try{if(LIVE&&LIVE.gameUnsub)LIVE.gameUnsub();if(LIVE&&LIVE.watchdog)clearInterval(LIVE.watchdog);if(mmUnsub){mmUnsub();mmUnsub=null;}if(mmTimer){clearInterval(mmTimer);mmTimer=null;}if(LIVE&&LIVE.ref&&fbReady()&&LIVE.host)LIVE.ref.update({status:'done',ping:Date.now()}).catch(function(){});}catch(e){}}
