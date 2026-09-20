@@ -38,3 +38,4 @@ Fresh checks after this refinement:
 - Sample text/surface contrast: primary 16.36:1, muted 8.12:1, gold button darkest stop 5.87:1, room supporting text 10.45:1. These are representative palette checks, not a full accessibility certification.
 - 191 automated tests passed; build verification and diff whitespace checks passed.
 - Physical phones and live online multiplayer were not tested. This revision changes presentation only.
+- Additional 320x740 audit found a 326px header overflow and cramped hero text. A narrow-phone rule reduced logo/price sizes, removed the duplicate hero description, and kept 44px entry actions. Recheck: document scroll width 305px inside the 320px viewport, with the scrollbar accounting for the difference; all three prices and header currency values remain visible.

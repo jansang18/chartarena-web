@@ -82,6 +82,10 @@ html[data-page=home] .practice-entry{min-height:78px}.arena-records{padding:6px 
  .dm-lobby{gap:18px;padding:8px 0;min-height:0}.dm-entry{padding:12px}.dm-entry>.dm-kicker,.dm-rules{display:none}.dm-entry h2{margin:0;font-size:24px}.dm-bot-note{margin:4px 0 8px;font-size:10px}.dm-rate{padding:6px 12px;gap:3px 10px}.dm-rate strong{font-size:25px}.dm-rate>span:last-child{font-size:10px}.dm-fold-note{font-size:10px;line-height:1.5;margin:9px 0}.dm-wallet{padding:6px 0;font-size:11px}.dm-entry>.dm-primary{min-height:44px;font-size:14px}.dm-muted{font-size:9px;margin:8px 0 0}.dm-poster{height:calc(100dvh - 66px)}
 }
 @media(max-width:599px){.entry-heading .entry-format{display:none}.entry-heading h2{font-size:32px}html[data-page=home] .stake-room .room-enter{font-size:11px;padding:5px;min-height:44px}.room-description small{word-break:keep-all}}
+@media(max-width:359px){
+ html[data-page=home] .topbar{padding-inline:10px;column-gap:6px}.exchange-brand{font-size:15px;gap:5px}.exchange-brand:before{width:18px;height:20px}.exchange-brand .brand-accent{margin-left:3px}html[data-page=home] .topbar .pill{padding-inline:5px;font-size:10px}
+ .showcase-copy h1{font-size:22px}.showcase-copy p{font-size:9px}.showcase-caption>span{display:none}.showcase-caption h2{font-size:24px}.room-price strong{font-size:19px}.room-price i{font-size:8px}.room-coins{width:64px}.room-coins img{width:30px;height:30px}.room-coins img:nth-child(2){width:33px;height:33px;left:16px}.room-coins img:nth-child(3){left:33px}.room-description small{font-size:8px}.room-tier{font-size:18px}html[data-page=home] .stake-room .room-enter{font-size:10px;padding-inline:2px;gap:2px}
+}
 @media(min-width:1101px) and (min-height:551px){
  html[data-page=battle][data-playing] .scaler>.frame{grid-template-columns:minmax(170px,16vw) minmax(0,1fr) minmax(170px,16vw);grid-template-rows:52px minmax(0,1fr) minmax(0,1fr) 118px}
  html[data-page=battle][data-playing] .tv{grid-column:2;grid-row:2/4;margin:16px 7px}
