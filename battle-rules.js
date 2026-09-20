@@ -1,7 +1,7 @@
 /* Deterministic percentage-gold rules and atomic local-wallet transitions. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION=7,ROUNDS=5;
+const VERSION=8,ROUNDS=5,DECISION_SECONDS=15;
 const TABLES=Object.freeze({
  practice:Object.freeze({id:'practice',name:'연습방',rate:100,reserve:0,capital:2000,practice:true}),
  beginner:Object.freeze({id:'beginner',name:'입문방',rate:100,reserve:1,capital:2000}),
@@ -38,7 +38,11 @@ function profit(player,input,move,through){
   if(!Number.isSafeInteger(player.balance+delta))throw Error('Gold result exceeds range');
   if(player.balance+delta===0)break;from=to;dir=dir==='L'?'S':dir==='S'?'L':dir;
  }
- return {delta,pick,signedPct:Number(signedPct.toFixed(4)),rate:t.rate,capped,legs,lockedDelta,openDelta,currentDir:directionAt(pick,end)};
+ // Missing the entry deadline is a fixed fee, independent of leverage or candles.
+ // Preview each stage from the unsettled balance; settle() applies it once per round.
+ const missedPenalty=pick.dir==='N'?Math.min(player.balance,t.rate):0;
+ if(missedPenalty){delta=-missedPenalty;capped=missedPenalty<t.rate;lockedDelta=delta;openDelta=0;legs.length=0;}
+ return {delta,pick,signedPct:Number(signedPct.toFixed(4)),rate:t.rate,capped,legs,lockedDelta,openDelta,missedPenalty,currentDir:directionAt(pick,end)};
 }
 function settle(player,input,move,round,through){
  if(!Number.isInteger(round)||round<1||round>ROUNDS)throw Error('Invalid round');
@@ -69,5 +73,5 @@ function walletClose(game,id){
  const closed=(game.battleClosed||[]).concat(id).slice(-100);
  return Object.assign({},game,{balance:walletBalance(game)+returned,battleActive:null,battleClosed:closed,battleLast:{id,tableId:t.id,delta:t.practice?0:state.score,simulated:state.score,rounds:state.appliedRound}});
 }
-return {VERSION,ROUNDS,TABLES,table,create,choice,exitAt,directionAt,checkpoint,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
+return {VERSION,ROUNDS,DECISION_SECONDS,TABLES,table,create,choice,exitAt,directionAt,checkpoint,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
 });
