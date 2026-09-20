@@ -35,3 +35,25 @@ The source video and its original body movement are retained. No additional Drea
 Skin edges on shoulders and arms use a separate green-dominance matte, selected only near confident skin pixels. This avoids the stepped contours produced by aggressively tightening the hair matte. A narrow antialiasing transition keeps skin outlines defined without a wide translucent halo.
 
 V2 verification: 7,634,368 bytes, 768x1024, 134 encoded frames. Every frame decodes with transparent corners and an intact head. Dark/light head and shoulder composites were inspected at multiple poses. The 1440x900 and 844x390 home use the v2 animated asset without horizontal overflow. All 191 Node tests and build verification pass. No new credits were consumed.
+
+## v3 moving-hair correction
+
+The user reported that the hair changes unnaturally while moving. Comparing the native green-screen clip and the v2 matte showed curved strands becoming angular opaque edges. V2 eroded the hair silhouette and copied nearby solid pixels into the fringe separately for each frame.
+
+`scripts/refine-hyesu-video.py` reprocesses the existing video using relative green dominance, local foreground estimation and motion-compensated three-frame alpha filtering. It preserves the v2 body matte below the head overlap. The head is not frozen or geometrically warped. The static `hyesu-v2.png` reduced-motion fallback remains unchanged; the shared catalog now points to `hyesu-idle-v3.webp` for motion.
+
+Validation: 768x1024, 136 encoded frames, 9,112ms (same duration as v2), 10,163,822 bytes. All frames have transparent top corners and an intact opaque head region. The internal motion-compensated hair-edge residual decreased from 17.08 to 5.43 alpha levels within the new processing pass; this is a diagnostic metric, not a perceptual quality score or direct v2 comparison. Light/dark browser comparison and actual home loading of v3 were checked. All 191 Node tests, build reference checks and whitespace checks passed. No additional generation credits were used. This is local preview work; native-phone playback performance remains unmeasured.
+
+## Loading portrait proportions
+
+Hyesu's 768x1024 source is 3:4 while the other four loading portraits are 1024x1536 (2:3). Equal CSS widths previously produced a shorter Hyesu image. The shared loading image rule now uses a 2:3 aspect ratio with object-fit cover and top-centered alignment, preserving anatomy while normalizing the portrait window. Browser checks show equal rounded image heights for all five portraits: 588px at 1280x720, 297px at 844x390, and 264px at 390x844. Both phone viewports have no horizontal overflow. The shared stylesheet applies to the home splash, battle splash and loading preview. 191 tests and build verification pass.
+
+## Native HD replacement (2026-09-21)
+
+The user supplied `dreamina-2026-09-21-4730-Create a 5-second seamless idle animatio....mp4` and approved replacing Hyesu. Its verified native raster is 1176x1764 (2:3), duration 5.056009 seconds, 12,642,239 bytes. Source SHA256: `EA5895E82CA6CE84CD0D1CAC7FDBF2E49B6232D5FC8ADC6DAD32C37E3094CBC4`. The actual average frame rate is about 24.12fps; a 60fps container rate is not a claim of 60 unique frames per second.
+
+`scripts/build-hyesu-hd-motion.py` processes the supplied source without raster upscaling. It removes the opening 0.25-second white-to-green backing transition, uses source-adaptive green matting and local foreground estimation, and removes green contamination around edges and inside hair. Optical-flow-aligned neighboring alpha masks stabilize hair edges without freezing the head or adding camera zoom. Forward/reverse playback joins the poses without an abrupt end-to-start cut.
+
+Both `hyesu-idle-hd-v1.webp` and `hyesu-hd-v1.png` come from this same processed clip. The PNG uses the open-eyed pose at frame 6, after the initial blink. Home, collection, loading, battle lobby, deathmatch and login reference the new artwork. Existing character IDs, ownership and skills are unchanged; reduced-motion, data-saving and error fallbacks retain the matching still. No additional Dreamina credits were used. The supplied MP4 and processing receipt remain in ignored `exports/character-idle-regenerated` for local provenance. Historical assets remain available for rollback.
+
+HD validation: 1176x1764, 228 decoded frames, 9,500ms loop, 28,363,704 bytes. Every frame has transparent top corners and a preserved opaque head region. Dark/light composites were checked across start/middle/end poses. The actual local home, battle lobby and deathmatch load the HD animated asset at its native dimensions; the loading preview uses the HD static image and all five portrait boxes have equal heights. The 844x390 home has no horizontal overflow and keeps Hyesu's head visible. All 191 Node tests, build references, home parity and whitespace checks pass. This replacement is applied locally, not published in this turn. Physical-phone playback and network performance remain unmeasured; the full-resolution animation is about 28MB.

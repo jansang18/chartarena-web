@@ -2,7 +2,7 @@
 (function(root){
 'use strict';
 var list=[
-{id:'tr_seon',name:'혜수',en:'HYESU',role:'여유롭게 판을 지배하는 승부사',quote:'좋은 패보다, 흔들리지 않는 눈빛.',color:'#bd6877',image:'assets/traders/hyesu-v2.png',motion:'assets/traders/motion/hyesu-idle-v2.webp'},
+{id:'tr_seon',name:'혜수',en:'HYESU',role:'여유롭게 판을 지배하는 승부사',quote:'좋은 패보다, 흔들리지 않는 눈빛.',color:'#bd6877',image:'assets/traders/hyesu-hd-v1.png',motion:'assets/traders/motion/hyesu-idle-hd-v1.webp'},
 {id:'tr_yuna',name:'서온',en:'SEON',role:'직감을 믿는 승부사',quote:'기회는 기다려주지 않으니까.',color:'#d9b770',image:'assets/traders/seon-v1.png',motion:'assets/traders/motion/seon-idle-v6.webp'},
 {id:'tr_kai',name:'카이',en:'KAI',role:'흔들림 없는 도전자',quote:'내 판단에 승부를 건다.',color:'#c7747e',image:'assets/traders/kai-v1.png'},
 {id:'tr_rin',name:'린',en:'RIN',role:'판을 읽는 베테랑',quote:'끝까지 남는 사람이 이기는 거야.',color:'#a4b3c9',image:'assets/traders/rin-v1.png'},

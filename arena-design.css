@@ -171,7 +171,8 @@ html #splash.out{opacity:0;pointer-events:none}
 .loading-trader{position:relative;overflow:hidden;background:linear-gradient(160deg,#2c404c,#15222c);border-top:2px solid #617380;transform:skewY(-3deg)}
 .loading-trader:nth-child(3){border-color:var(--arena-coral);background:linear-gradient(160deg,#634c4c,#1c2a34)}
 .loading-trader>span{position:absolute;top:14px;left:12px;font-size:40px;font-weight:800;color:#f2f0e916}
-.loading-trader img{position:absolute;width:180%;max-width:none;height:auto;left:-40%;top:1%;transform:skewY(3deg);filter:drop-shadow(0 10px 20px #0004)}
+/* Keep every loading portrait in the same 2:3 window without stretching. */
+.loading-trader img{position:absolute;width:180%;max-width:none;height:auto;aspect-ratio:2/3;object-fit:cover;object-position:center top;left:-40%;top:1%;transform:skewY(3deg);filter:drop-shadow(0 10px 20px #0004)}
 .loading-bottom{display:flex;justify-content:space-between;align-items:center;gap:40px;position:relative;z-index:1}
 .loading-copy h1{font-size:clamp(22px,3vw,42px);line-height:1.2;letter-spacing:-.05em;margin:12px 0 8px}
 .loading-copy p{font-size:12px;margin:0;color:var(--arena-muted)}
