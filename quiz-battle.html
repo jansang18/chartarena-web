@@ -215,12 +215,13 @@
   .desk .stak{font-family:var(--mono); font-weight:900; font-size:15px; color:#FCE9A6}
   .desk.broke{opacity:.55; filter:grayscale(.4)}
 </style>
-<link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
+<link rel="stylesheet" href="app-shell.css?v=92966256deca">
 <link rel="stylesheet" href="battle-fx.css?v=0c6b672cbebb">
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
 <link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
 <link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8">
-<script src="arena-characters.js?v=34458f7f0b6b"></script>
+<script src="arena-characters.js?v=7ae6cc688cb7"></script>
+<script src="arena-motion.js?v=53209d467989" defer></script>
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -276,7 +277,7 @@
     <a class="lobbyback" href="index.html" aria-label="홈 화면으로 뒤로">← 로비로</a><span class="lobby-brand">CHART<span>ARENA</span></span>
     <div class="lmodes" id="lmodes">
       <div class="lcard"><div class="in">
-        <div class="lobby-feature"><span class="section-kicker">YOUR NEXT MATCH</span><h1 class="ln">당신의 판단을<br>보여줄 시간.</h1><p class="ld">같은 차트 위에서 펼쳐지는<br>네 명의 트레이딩 배틀.</p><img id="lobbyTrader" src="assets/traders/seon-v1.png" alt="선택한 트레이더"><div class="lobby-trader-caption"><small>YOUR TRADER</small><strong id="lobbyTraderName">서온</strong><span>4 PLAYERS / 5 ROUNDS · 3 DECISIONS</span></div></div>
+        <div class="lobby-feature"><button type="button" class="trader-motion-toggle" data-motion-toggle aria-pressed="false" aria-label="캐릭터 움직임 멈추기">Ⅱ 모션</button><span class="section-kicker">YOUR NEXT MATCH</span><h1 class="ln">당신의 판단을<br>보여줄 시간.</h1><p class="ld">같은 차트 위에서 펼쳐지는<br>네 명의 트레이딩 배틀.</p><img id="lobbyTrader" src="assets/traders/seon-v1.png" alt="선택한 트레이더"><div class="lobby-trader-caption"><small>YOUR TRADER</small><strong id="lobbyTraderName">서온</strong><span>4 PLAYERS / 5 ROUNDS · 3 DECISIONS</span></div></div>
         <div class="lobby-action"><div class="table-heading"><h2>테이블 선택</h2><span id="lobbyWallet"></span></div><div id="tableChoices" class="table-choices" role="group" aria-label="1%당 골드로 방 선택"></div><p class="table-note" id="tableNote"></p><p class="settlement-note" id="lastSettlement" role="status" hidden></p><button class="lgo" id="modeLive" type="button">매칭 시작</button><p>플레이 1회 사용 · 빈자리는 봇이 참여합니다.</p><a href="index.html" class="lobby-change">트레이더 변경 ↗</a></div>
       </div></div>
     </div>
@@ -514,6 +515,8 @@ function drawChart(){
 
 /* 단상 렌더 */
 function renderPods(){
+  // Preserve decoded portraits across the 100ms score updates so idle loops do not restart.
+  var portraits=Array.from($('podiums').querySelectorAll('.ava img.ch'));
   var estimated=['reveal','checkpoint','checkpoint-wait'].includes(phase), standings=players.map(function(p){return {id:p.state.id,score:p.state.score+(estimated?playerProfit(p).delta:0)};});
   $('podiums').innerHTML=players.map(function(p,i){
     var known=estimated||phase==='result'||phase==='final', pk=known?ArenaRules.directionAt(p.revealInput,Math.max(0,gRev-GD.vis)):(i===0&&mySel.dir), rank=ArenaRules.rank(standings,p.state.id);
@@ -524,11 +527,12 @@ function renderPods(){
     var reaction=phase==='result'?(p.dp>0?'win':p.dp<0?'loss':'steady'):ready?'ready':'';
     return '<div class="pod '+reaction+(phase==='final'&&rank===1?' champion':'')+'">'
 
-      +'<div class="ava">'+(p.chImg?'<img class="ch" src="'+p.chImg+'" alt="'+esc(p.name)+'">':'<span class="em">'+(p.em||'')+'</span>')+'</div>'
+      +'<div class="ava">'+(p.chImg?'<img class="ch" data-portrait="'+p.chImg+'" src="'+p.chImg+'" alt="'+esc(p.name)+'">':'<span class="em">'+(p.em||'')+'</span>')+'</div>'
       +'<div class="desk'+(i===0?' me':'')+(rank===1&&known?' lead':'')+'"><div class="crown">👑</div>'
       +'<div class="nm"><span class="arena-place" title="'+(estimated?'예상 순위':'순위')+'">'+rank+'위</span><span class="player-name">'+(i===0?'나 · ':p.bot?'봇 · ':'')+esc(p.name)+'</span></div><div class="player-result"><div class="led '+(value<0?'negative':value>0?'positive':'neutral')+'" aria-label="누적 손익 '+fmtLead(value)+' 골드">'+fmtLead(value)+'<small> G</small></div><span class="pick '+(known?pk:'Q')+' on">'+(label==='?'?'선택 중':label)+'</span></div>'
       +'<div class="power-label">'+(p.state.balance===0?'보유 골드 소진':multiplier||'선택 대기')+'</div><div class="delta" id="dl'+i+'"></div></div></div>';
   }).join('');
+  $('podiums').querySelectorAll('.ava img.ch').forEach(function(img,i){var old=portraits[i];if(old&&old.getAttribute('data-portrait')===img.getAttribute('data-portrait')&&old.alt===img.alt)img.replaceWith(old);});
   if(estimated){var estimate=playerProfit(players[0]);$('goldEquation').textContent=goldEquation(estimate)+(ArenaRules.exitAt(players[0].revealInput)<90?' · STOP 확정':' · 현재 손익');}
 }
 function playerMove(p){var offset=Math.min(Math.max(0,gRev-GD.vis),ArenaRules.exitAt(p.revealInput));return offset?finalMove(GD,offset):0;}

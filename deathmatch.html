@@ -1,13 +1,22 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1922"><title>1vs1 데스매치 · CHART ARENA</title>
-<link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15"><link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8"><link rel="stylesheet" href="deathmatch.css?v=635a04d6b775">
-<script src="app-shell.js?v=b3810da044e7"></script><script src="arena-characters.js?v=34458f7f0b6b"></script><script src="energy.js?v=d9b323b0c799"></script><script src="battle-charts.js?v=2945eb30ebba"></script><script src="battle-data.js?v=e970b5771900"></script><script src="deathmatch-rules.js?v=1d227bf9ebe8"></script><script src="arena-reactions.js?v=2ee78e94f486"></script><script src="deathmatch.js?v=9be7b39798a7" defer></script>
+<link rel="stylesheet" href="app-shell.css?v=92966256deca"><link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8"><link rel="stylesheet" href="deathmatch.css?v=36564c34904b">
+<script src="app-shell.js?v=b3810da044e7"></script><script src="arena-characters.js?v=7ae6cc688cb7"></script>
+<script src="arena-motion.js?v=53209d467989" defer></script><script src="energy.js?v=d9b323b0c799"></script><script src="battle-charts.js?v=2945eb30ebba"></script><script src="battle-data.js?v=e970b5771900"></script><script src="deathmatch-rules.js?v=1d227bf9ebe8"></script><script src="arena-reactions.js?v=2ee78e94f486"></script><script src="deathmatch.js?v=8036a74d8699" defer></script>
 <script src="arena-wallet.js?v=eaf8ae635ee5"></script>
 </head><body class="deathmatch-page">
 <main class="dm-shell">
  <header class="dm-top"><a href="index.html" id="homeLink" aria-label="홈으로">← 로비</a><img src="assets/arena-wordmark.svg" alt="CHART ARENA"><span class="dm-mode">1vs1 <b>DEATHMATCH</b></span><span id="roundLabel">5 ROUNDS</span><div id="emobar" class="emobar" hidden><button id="emobtn" class="emobtn" aria-label="리액션 보내기" aria-expanded="false">☺</button><div id="emopop" class="emopop"></div></div><button id="exitButton" hidden>종료</button></header>
  <section id="lobby" class="dm-lobby">
-  <div class="dm-poster"><div class="dm-poster-copy"><span class="dm-kicker">ONE CHART. TWO TRADERS.</span><h1>한 번 더 갈까,<br>여기서 멈출까.</h1><p>상대의 골드를 가져오는<br>일대일 차트 승부.</p></div><img id="lobbyPortrait" src="assets/traders/kai-v1.png" alt="카이"><span class="dm-poster-label">GO · RAISE · CALL · STOP</span></div>
+  <div class="dm-poster"><button type="button" class="trader-motion-toggle" data-motion-toggle aria-pressed="false" aria-label="캐릭터 움직임 멈추기">Ⅱ 모션</button>
+   <div class="dm-poster-copy"><span class="dm-kicker">ONE CHART. TWO TRADERS.</span><h1>같은 차트, 단 한 명의 승자.</h1></div>
+   <div class="dm-faceoff" aria-label="나와 봇의 일대일 대결">
+    <figure class="dm-contender dm-contender-me"><img id="lobbyPortrait" src="assets/traders/kai-v1.png" alt="카이"><figcaption><span>YOU</span><strong id="lobbyMeName">카이</strong></figcaption></figure>
+    <div class="dm-faceoff-vs" aria-hidden="true"><span>HEAD TO HEAD</span><b>VS</b><i>1 ON 1</i></div>
+    <figure class="dm-contender dm-contender-bot"><img id="lobbyOpponent" src="assets/traders/seon-v1.png" alt="서온"><figcaption><span>BOT</span><strong id="lobbyBotName">서온</strong></figcaption></figure>
+   </div>
+   <span class="dm-poster-label">GO · RAISE · CALL · STOP</span>
+  </div>
   <div class="dm-entry"><span class="dm-kicker">HEAD TO HEAD</span><h2>1vs1 데스매치</h2><p class="dm-bot-note">봇 상대 · 기기 내 가상 골드 대전</p><div class="dm-rate"><span>1%당</span><strong>20,000 <small>G</small></strong><span>합의 배율 <b>1 → 1.5 → 2 → 3배</b></span></div>
    <ol class="dm-rules"><li><b>방향을 정하고</b><span>210봉을 읽고 롱 또는 숏 선택</span></li><li><b>30봉마다 승부</b><span>GO 유지 · 레이즈 제안 · 상대는 콜 또는 포기</span></li><li><b>90봉에서 정산</b><span>등락률 × 20,000G × 합의 배율. 같은 방향은 무승부.</span></li></ol>
    <p class="dm-fold-note">STOP/포기 시 20,000G × 현재 합의 배율을 상대에게 줍니다. 손실·획득 상한은 양쪽 보유 골드 중 작은 금액입니다.</p>

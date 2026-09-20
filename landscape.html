@@ -442,10 +442,11 @@
   .gme{font-size:10px;font-weight:800;color:var(--gold);background:rgba(233,185,73,.14);border-radius:5px;padding:1px 5px;margin-left:3px}
   .gmc,.grv{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--gold);flex:0 0 auto}
 </style>
-<link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
+<link rel="stylesheet" href="app-shell.css?v=92966256deca">
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
 <link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
-<script src="arena-characters.js?v=34458f7f0b6b"></script>
+<script src="arena-characters.js?v=7ae6cc688cb7"></script>
+<script src="arena-motion.js?v=53209d467989" defer></script>
 <script src="terminal-home.js?v=3d1fe17433f5" defer></script>
 
 <div class="scaler" id="scaler"><div class="frame">
@@ -468,7 +469,7 @@
       <!-- Character-led lobby: roster and entry are the primary actions. -->
       <div class="view on" id="v-home">
         <section class="arena-showcase" aria-label="선택한 트레이더">
-          <div class="showcase-stage">
+          <div class="showcase-stage"><button type="button" class="trader-motion-toggle" data-motion-toggle aria-pressed="false" aria-label="캐릭터 움직임 멈추기">Ⅱ 모션</button>
             <div class="showcase-copy"><span class="section-kicker">THE CHART IS YOUR ARENA</span><h1>판을 읽고,<br>승부를 걸다.</h1><p>같은 차트. 서로 다른 선택.</p></div>
             <span class="showcase-index" id="arenaHeroIndex" aria-hidden="true">01</span>
             <span class="showcase-watermark" id="arenaHeroWord" aria-hidden="true">SEON</span>

@@ -12,10 +12,13 @@ const p=profile(),me=ArenaCharacters.get((p.equip||{}).ch),nick=String(p.nick||m
 let bot=ArenaCharacters.list.find(c=>c.id!==me.id);
 document.documentElement.dataset.page='battle';
 $('lobbyPortrait').src=me.image;$('lobbyPortrait').alt=me.name;
+$('lobbyMeName').textContent=me.name;
 function stopTimers(){clearTimeout(timer);clearInterval(animation);timer=animation=0;}
 function lobby(){
  stopTimers();state=null;closed=false;document.documentElement.removeAttribute('data-playing');$('game').hidden=true;$('lobby').hidden=false;$('exitButton').hidden=true;$('emobar').hidden=true;ArenaReactions.clear();
  const g=read(),active=g.deathmatchActive;$('roundLabel').textContent='5 ROUNDS';$('walletGold').textContent=fmt(R.balance(g))+' G';$('startButton').disabled=!!g.battleActive||(!active&&R.balance(g)<=0)||(!active&&!NRG.has());
+ bot=active?ArenaCharacters.get(active.botId):ArenaCharacters.list.find(c=>c.id!==me.id);
+ $('lobbyOpponent').src=bot.image;$('lobbyOpponent').alt=bot.name;$('lobbyBotName').textContent=bot.name;
  $('startButton').textContent=active?'진행 중인 데스매치 이어하기 →':R.balance(g)<=0?'골드가 필요합니다':!NRG.has()?'플레이 횟수가 부족합니다':'봇과 데스매치 시작 →';
  $('resumeLink').hidden=!g.battleActive;
  $('lobbyNotice').textContent=active?'경기에 보관 중인 내 골드 '+fmt(active.balances[0])+'G · 이어하기는 횟수를 사용하지 않습니다.':g.battleActive?'진행 중인 4인 배틀을 먼저 마쳐 주세요.':'5라운드 · 시작 시 플레이 1회 사용 · 현금 환전 불가';

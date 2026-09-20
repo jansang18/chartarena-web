@@ -8,6 +8,7 @@ var list=[
 {id:'tr_rin',name:'린',en:'RIN',role:'판을 읽는 베테랑',quote:'끝까지 남는 사람이 이기는 거야.',color:'#a4b3c9',image:'assets/traders/rin-v1.png'},
 {id:'tr_doyun',name:'도윤',en:'DOYUN',role:'한 수 앞을 보는 전략가',quote:'급할수록, 한 번 더 생각해.',color:'#8eaedd',image:'assets/traders/doyun-v1.png'}
 ];
+list.forEach(function(c){c.motion='assets/traders/motion/'+c.id.slice(3)+'-idle-v6.webp';});
 function get(id){var exact=list.find(function(c){return c.id===id;});if(exact)return exact;var legacy=/^hu(\d+)$/.exec(String(id||''));return list[legacy?Number(legacy[1])%list.length:0];}
 function register(images){list.forEach(function(c){images[c.id]=c.image;});}
 function selection(profile){var equip=(profile||{}).equip||{};return {ch:get(equip.ch).id,skin:'normal'};}
