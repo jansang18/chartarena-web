@@ -1,5 +1,7 @@
 # 차트아레나 (ChartArena) — 웹 디자인 작업 가이드 (for coding agents)
 
+> 2026-09-20: `deathmatch.html`에 명시적 봇 상대 1vs1 데스매치가 추가됐고 연습방 입구를 대체합니다. 예전 1v1 제거 지침은 구형 구현에만 적용됩니다. 가상 골드 지갑 쓰기는 `arena-wallet.js`의 `chartarena-wallet` 잠금을 공유하세요. 실제 이용자 간 이전은 서버 지갑 구현 전에는 제공하지 않습니다.
+
 > 2026-09-19 업데이트: 현재 화면은 `app-shell.css`/`app-shell.js`의 공통 반응형 UI (밝은 홈·컬러 배틀)를 사용합니다. 고정 프레임 축소와 1대1 대전은 제거되었습니다. 아래의 옛 프레임/라이트 테마 설명보다 `UPDATE-NOTES.md` 및 현재 코드를 우선하세요. localhost/file에서는 운영 Firebase를 초기화하지 않습니다.
 
 공유 CSS/JS 수정 후 반드시 `node scripts/version-assets.cjs`를 실행하세요. HTML의 콘텐츠 해시 버전과 실제 파일 일치는 `node --test tests/*.test.cjs`에서 검증합니다. 이전 energy.js가 캐시되면 createPass 오류로 매칭·연습 초기화가 중단될 수 있습니다.

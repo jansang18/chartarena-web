@@ -36,6 +36,7 @@ function rank(players,id){const me=players.find(p=>p.id===id);return me?1+player
 function walletBalance(game){return Number.isSafeInteger(game.balance)&&game.balance>=0?game.balance:25000;}
 function walletOpen(game,id,tableId,playerId){
  const t=table(tableId),balance=walletBalance(game);
+ if(game.deathmatchActive)throw Error('진행 중인 데스매치를 먼저 마쳐 주세요.');
  if(game.battleActive)throw Error('이미 진행 중인 경기가 있습니다.');
  if(!id||(game.battleClosed||[]).includes(id))throw Error('이미 정산한 경기입니다.');
  if(balance<t.reserve)throw Error('입장에 필요한 골드가 부족합니다.');

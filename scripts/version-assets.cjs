@@ -1,10 +1,10 @@
 const fs = require('node:fs');
 const crypto = require('node:crypto');
-const versions = Object.fromEntries(['arena-reactions.js', 'arena-reactions.css', 'battle-charts.js', 'battle-data.js', 'arena-design.css', 'arena-characters.js', 'terminal-home.css', 'terminal-home.js', 'exchange-theme.css', 'battle-fx.js', 'battle-fx.css', 'energy.js', 'app-shell.js', 'app-shell.css', 'battle-rules.js', 'gameplay.css', 'puzzle-rules.js', 'daily.js', 'daily-rules.js'].map(file =>
+const versions = Object.fromEntries(['arena-wallet.js', 'deathmatch.js', 'deathmatch.css', 'deathmatch-rules.js', 'arena-reactions.js', 'arena-reactions.css', 'battle-charts.js', 'battle-data.js', 'arena-design.css', 'arena-characters.js', 'terminal-home.css', 'terminal-home.js', 'exchange-theme.css', 'battle-fx.js', 'battle-fx.css', 'energy.js', 'app-shell.js', 'app-shell.css', 'battle-rules.js', 'gameplay.css', 'puzzle-rules.js', 'daily.js', 'daily-rules.js'].map(file =>
   [file, crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex').slice(0, 12)]));
 for (const page of fs.readdirSync('.').filter(p => p.endsWith('.html'))) {
   const html = fs.readFileSync(page, 'utf8');
-  const updated = html.replace(/((?:src|href)=")(arena-reactions\.js|arena-reactions\.css|battle-charts\.js|battle-data\.js|arena-design\.css|arena-characters\.js|terminal-home\.css|terminal-home\.js|exchange-theme\.css|battle-fx\.js|battle-fx\.css|energy\.js|app-shell\.js|app-shell\.css|battle-rules\.js|gameplay\.css|puzzle-rules\.js|daily\.js|daily-rules\.js)(?:\?[^\"]*)?"/g,
+  const updated = html.replace(/((?:src|href)=")(arena-wallet\.js|deathmatch\.js|deathmatch\.css|deathmatch-rules\.js|arena-reactions\.js|arena-reactions\.css|battle-charts\.js|battle-data\.js|arena-design\.css|arena-characters\.js|terminal-home\.css|terminal-home\.js|exchange-theme\.css|battle-fx\.js|battle-fx\.css|energy\.js|app-shell\.js|app-shell\.css|battle-rules\.js|gameplay\.css|puzzle-rules\.js|daily\.js|daily-rules\.js)(?:\?[^\"]*)?"/g,
     (_, prefix, file) => prefix + file + '?v=' + versions[file] + '"');
   if (updated !== html) fs.writeFileSync(page, updated.replace(/\r\n/g, '\n'));
 }

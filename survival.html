@@ -97,6 +97,7 @@
   @keyframes survivalEmoteFloat{0%{opacity:0;transform:translate(-50%,10px) scale(.5)}16%{opacity:1;transform:translate(-50%,-3px) scale(1.18)}34%{transform:translate(-50%,-13px) scale(1)}100%{opacity:0;transform:translate(-50%,-54px) scale(.84)}}
   @media (prefers-reduced-motion:reduce){.zav,.zav.fall,.svemote{animation:none!important;transition:none!important}}
 </style>
+<script src="arena-wallet.js?v=eaf8ae635ee5"></script>
 </head>
 <body>
 <div class="app" id="app">
@@ -310,10 +311,12 @@ function revealResult(){
   }, 1450);
 }
 
-function battleXp(survived){ if(!window.XP)return; var res=XP.award(survived?10:-5,'survival'); if(!res)return;
+function battleXp(survived){return ArenaWallet.run(function(){return awardSurvivalXp(survived);}).catch(function(e){toast(e.message);});}
+function awardSurvivalXp(survived){ if(!window.XP)return; var res=XP.award(survived?10:-5,'survival'); if(!res)return;
   if(res.leveledUp){ var lv=res.newLevel-res.oldLevel; setBal(getBal()+100000*lv); addGems(3*lv); XP.popup(res); } }
 
-function endGame(win){
+function endGame(win){return ArenaWallet.run(function(){return finishSurvival(win);}).catch(function(e){toast(e.message);});}
+function finishSurvival(win){
   phase='idle'; clearInterval(tmr); clearInterval(botTimer); if(revTimer)clearInterval(revTimer);
   var place = win ? 1 : aliveCount()+ (players[0].alive?0:1);
   var gold, gems;

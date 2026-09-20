@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e1922"><title>1vs1 데스매치 · CHART ARENA</title>
+<link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15"><link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8"><link rel="stylesheet" href="deathmatch.css?v=635a04d6b775">
+<script src="app-shell.js?v=b3810da044e7"></script><script src="arena-characters.js?v=34458f7f0b6b"></script><script src="energy.js?v=d9b323b0c799"></script><script src="battle-charts.js?v=2945eb30ebba"></script><script src="battle-data.js?v=e970b5771900"></script><script src="deathmatch-rules.js?v=1d227bf9ebe8"></script><script src="arena-reactions.js?v=2ee78e94f486"></script><script src="deathmatch.js?v=9be7b39798a7" defer></script>
+<script src="arena-wallet.js?v=eaf8ae635ee5"></script>
+</head><body class="deathmatch-page">
+<main class="dm-shell">
+ <header class="dm-top"><a href="index.html" id="homeLink" aria-label="홈으로">← 로비</a><img src="assets/arena-wordmark.svg" alt="CHART ARENA"><span class="dm-mode">1vs1 <b>DEATHMATCH</b></span><span id="roundLabel">5 ROUNDS</span><div id="emobar" class="emobar" hidden><button id="emobtn" class="emobtn" aria-label="리액션 보내기" aria-expanded="false">☺</button><div id="emopop" class="emopop"></div></div><button id="exitButton" hidden>종료</button></header>
+ <section id="lobby" class="dm-lobby">
+  <div class="dm-poster"><div class="dm-poster-copy"><span class="dm-kicker">ONE CHART. TWO TRADERS.</span><h1>한 번 더 갈까,<br>여기서 멈출까.</h1><p>상대의 골드를 가져오는<br>일대일 차트 승부.</p></div><img id="lobbyPortrait" src="assets/traders/kai-v1.png" alt="카이"><span class="dm-poster-label">GO · RAISE · CALL · STOP</span></div>
+  <div class="dm-entry"><span class="dm-kicker">HEAD TO HEAD</span><h2>1vs1 데스매치</h2><p class="dm-bot-note">봇 상대 · 기기 내 가상 골드 대전</p><div class="dm-rate"><span>1%당</span><strong>20,000 <small>G</small></strong><span>합의 배율 <b>1 → 1.5 → 2 → 3배</b></span></div>
+   <ol class="dm-rules"><li><b>방향을 정하고</b><span>210봉을 읽고 롱 또는 숏 선택</span></li><li><b>30봉마다 승부</b><span>GO 유지 · 레이즈 제안 · 상대는 콜 또는 포기</span></li><li><b>90봉에서 정산</b><span>등락률 × 20,000G × 합의 배율. 같은 방향은 무승부.</span></li></ol>
+   <p class="dm-fold-note">STOP/포기 시 20,000G × 현재 합의 배율을 상대에게 줍니다. 손실·획득 상한은 양쪽 보유 골드 중 작은 금액입니다.</p>
+   <div class="dm-wallet"><span>보유 골드</span><b id="walletGold">—</b></div><button id="startButton" class="dm-primary">봇과 데스매치 시작 →</button><a id="resumeLink" href="quiz-battle.html" hidden>진행 중인 4인 배틀로 돌아가기 →</a><p id="lobbyNotice" class="dm-muted">5라운드 · 시작 시 플레이 1회 사용 · 현금 환전 불가</p><p id="lastReceipt" class="dm-receipt" hidden></p>
+  </div>
+ </section>
+ <section id="game" class="dm-game" hidden>
+  <div id="podiums" class="dm-players"><article class="pod dm-player me"><img id="mePortrait" alt=""><div><span id="meName">나</span><strong id="meGold">—</strong><small id="mePick">선택 전</small></div></article><div class="dm-vs"><b>VS</b><span id="multiplier">×1</span></div><article class="pod dm-player opponent"><img id="botPortrait" alt=""><div><span id="botName">봇</span><strong id="botGold">—</strong><small id="botPick">선택 비공개</small></div></article></div>
+  <section class="dm-chart"><div class="dm-chart-head"><b id="chartTitle">차트 준비 중</b><div class="dm-legend"><span>MA 5</span><span>20</span><span>60</span></div><span id="revealLabel">210봉 분석</span></div><canvas id="chart" aria-label="가격 캔들 차트와 이동평균 5, 20, 60" role="img"></canvas><div class="dm-chart-foot"><span id="chartMove">진입 대비 —</span><span id="steps">방향 → 30봉 GO/STOP → 60봉 GO/STOP → 정산</span></div></section>
+  <section class="dm-controls"><div class="dm-decision"><strong id="statusText" role="status">방향을 선택하세요</strong><span id="countdown"></span></div><div id="actions" class="dm-actions"></div><div class="dm-risk"><span id="stakeText"></span><span id="riskText"></span></div></section>
+ </section>
+ <p id="error" role="alert" hidden></p>
+</main>
+<dialog id="exitDialog"><h2>이번 경기를 종료할까요?</h2><p id="exitCost"></p><div><button id="cancelExit">계속 플레이</button><button id="confirmExit" class="dm-danger">종료하기</button></div></dialog>
+</body></html>

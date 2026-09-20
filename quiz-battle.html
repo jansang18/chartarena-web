@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<script src="arena-wallet.js?v=eaf8ae635ee5"></script>
 <script src="app-shell.js?v=b3810da044e7"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
@@ -316,7 +317,7 @@
 <script src="arena-reactions.js?v=2ee78e94f486"></script>
 <script src="battle-data.js?v=e970b5771900"></script>
 <script src="battle-fx.js?v=632f079ca815"></script>
-<script src="battle-rules.js?v=789dd664e531"></script>
+<script src="battle-rules.js?v=abe2a125754f"></script>
 <script>
 (function(){
 "use strict";
@@ -362,8 +363,9 @@ function getBal(){return ArenaRules.walletBalance(ljg(GS));}
 function setBal(v){var g=ljg(GS);g.balance=Math.max(0,Math.round(v));localStorage.setItem(GS,JSON.stringify(g));}
 function fmtP(n){return Math.round(n).toLocaleString();}
 function fmtPct(n){return (n>=0?'+':'')+n.toFixed(4).replace(/0+$/,'').replace(/\.$/,'')+'%';}
-var selectedTable=getBal()>0?'standard':'practice';
+var selectedTable='standard';
 var linkedTable=new URLSearchParams(location.search).get('table');
+if(linkedTable==='practice'||linkedTable==='deathmatch')location.replace('deathmatch.html');
 if(Object.hasOwn(ArenaRules.TABLES,linkedTable))selectedTable=linkedTable;
 function currentTable(){return ArenaRules.table(selectedTable);}
 function saveWallet(game){localStorage.setItem(GS,JSON.stringify(game));}
@@ -373,7 +375,7 @@ function recordWallet(input,pending,seg,roundNo,through){
   try{saveWallet(ArenaRules.walletRound(ljg(GS),matchId,input,finalMove(seg,exit),roundNo||round,pending));return true;}
   catch(e){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();toast(e.message);return false;}
 }
-function closeWallet(){var g=ljg(GS);if(g.battleActive&&g.battleActive.id===matchId)saveWallet(ArenaRules.walletClose(g,matchId));}
+function closeWallet(){var g=ljg(GS);if(g.battleActive&&g.battleActive.id===matchId)saveWallet(ArenaRules.walletClose(g,matchId));if(window.ArenaWallet)ArenaWallet.release();}
 function recoverWallet(history){
   for(var e of history.slice().sort(function(a,b){return a.round-b.round;})){
     if(!recordWallet((e.picks||{})[players[0].state.id],false,pickSegByIdx(e.seg),e.round))return false;
@@ -383,14 +385,14 @@ function renderTables(){
   var last=ljg(GS).battleLast,receipt=$('lastSettlement');receipt.hidden=!last;if(last)receipt.textContent='최근 '+ArenaRules.table(last.tableId).name+' · '+last.rounds+'라운드 정산 '+fmtLead(last.delta)+' 골드'+(ArenaRules.table(last.tableId).practice?' (연습 손익 '+fmtLead(last.simulated)+')':'');
   if(window.ArenaCharacters&&$('lobbyTrader')){var character=ArenaCharacters.get(myCh);$('lobbyTrader').src=character.image;$('lobbyTrader').alt=character.name;$('lobbyTraderName').textContent=character.name;}
   var t=currentTable(),bal=getBal();$('lobbyWallet').textContent='보유 '+fmtP(bal)+' 골드';
-  $('tableChoices').innerHTML=Object.values(ArenaRules.TABLES).map(function(x){var enough=bal>=x.reserve;return '<button type="button" class="table-choice'+(x.id===selectedTable?' on':'')+'" data-table="'+x.id+'" aria-pressed="'+(x.id===selectedTable)+'"><strong>'+x.name+'</strong><b>'+ (x.practice?'골드 변동 없음':'1%당 '+fmtP(x.rate)+' 골드')+'</b><small>'+ (x.practice?'100골드 기준 모의 경기':(enough?'보유 골드 전체 사용':'골드가 필요합니다'))+'</small></button>';}).join('');
+  $('tableChoices').innerHTML=Object.values(ArenaRules.TABLES).filter(function(x){return !x.practice;}).map(function(x){var enough=bal>=x.reserve;return '<button type="button" class="table-choice'+(x.id===selectedTable?' on':'')+'" data-table="'+x.id+'" aria-pressed="'+(x.id===selectedTable)+'"><strong>'+x.name+'</strong><b>1%당 '+fmtP(x.rate)+' 골드</b><small>'+ (enough?'보유 골드 전체 사용':'골드가 필요합니다')+'</small></button>';}).join('')+'<button type="button" class="table-choice" data-deathmatch><strong>1vs1 데스매치</strong><b>1%당 20,000 골드</b><small>봇과 GO · 레이즈 · 콜</small></button>';
   $('tableNote').textContent=t.practice?'모의 골드로 연습합니다.\n보유 골드는 변하지 않습니다.':'보유 '+fmtP(bal)+' 골드로 플레이합니다.\n골드가 0이 되면 관전합니다.';
   $('modeLive').disabled=bal<t.reserve;
   $('modeLive').textContent=bal<t.reserve?'입장 골드 부족':t.name+' · 매칭 시작';
 }
-$('tableChoices').onclick=function(e){var b=e.target.closest('[data-table]');if(!b||mmActive)return;selectedTable=b.dataset.table;renderTables();var active=$('tableChoices').querySelector('[data-table="'+selectedTable+'"]');if(active)active.focus({preventScroll:true});};
+$('tableChoices').onclick=function(e){if(mmActive)return;if(e.target.closest('[data-deathmatch]')){location.href='deathmatch.html';return;}var b=e.target.closest('[data-table]');if(!b)return;selectedTable=b.dataset.table;renderTables();var active=$('tableChoices').querySelector('[data-table="'+selectedTable+'"]');if(active)active.focus({preventScroll:true});};
 // A previous document may have closed during a confirmed reveal. Recover once.
-var recoveredGame=ljg(GS);if(recoveredGame.battleActive){saveWallet(ArenaRules.walletClose(recoveredGame,recoveredGame.battleActive.id));setTimeout(function(){toast('이전 경기의 확정된 선택까지 골드 정산을 마쳤습니다.');},800);}
+ArenaWallet.run(function(){var recoveredGame=ljg(GS);if(recoveredGame.battleActive){saveWallet(ArenaRules.walletClose(recoveredGame,recoveredGame.battleActive.id));renderTables();setTimeout(function(){toast('이전 경기의 확정된 선택까지 골드 정산을 마쳤습니다.');},800);}},{ifAvailable:true}).catch(function(e){toast(e.message);});
 window.addEventListener('pagehide',function(){closeWallet();});
 window.addEventListener('pageshow',function(e){if(e.persisted){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();}});
 window.addEventListener('storage',function(e){if(e.key!==GS)return;var g=ljg(GS);if(matchId&&phase!=='idle'&&phase!=='final'&&(!g.battleActive||g.battleActive.id!==matchId)){stopBattle();if(LIVE)liveLeave();LIVE=null;MODE='4p';showLobby();toast('다른 창에서 경기를 정산하여 로비로 돌아왔습니다.');}else if(phase==='idle')renderTables();});
@@ -921,6 +923,11 @@ function battleXp(dp){ if(!window.XP) return; var amt = dp>0?10 : dp<0?-5 : 0; i
   } else { XP.toast((amt>0?'+':'')+amt+' XP'); } }
 function nrgGate(consume){ if(!battlePass)return true; if(consume?battlePass.consume():battlePass.available())return true;
   var ov=$('bNoNrg'); if(ov){ var m=$('bNrgMsg'); if(m)m.textContent=NRG.nextRefillText()+' 후 10판 충전 · 허브에서 보석으로 즉시 충전할 수 있어요.'; ov.classList.add('on'); } return false; }
+// Hold the shared wallet lock for the existing synchronous four-player engine.
+var unlocked4p=startMode4p,unlockedLive=beginLive,unlockedXp=battleXp;
+startMode4p=function(){return ArenaWallet.hold(function(){unlocked4p();var a=ljg(GS).battleActive;return !!a&&a.id===matchId;}).catch(function(e){showLobby();toast(e.message);});};
+beginLive=function(d){var session=LIVE;return ArenaWallet.hold(function(){if(!LIVE||LIVE!==session)return false;unlockedLive(d);var a=ljg(GS).battleActive;return !!a&&a.id===matchId;}).catch(function(e){if(LIVE){liveLeave();LIVE=null;}showLobby();toast(e.message);});};
+battleXp=function(dp){return ArenaWallet.run(function(){unlockedXp(dp);}).catch(function(e){toast(e.message);});};
 $('modeLive').onclick=function(){ if(getBal()>=currentTable().reserve&&nrgGate(false)) startModeLive(); };
 showLobby();
 })();
