@@ -30,7 +30,11 @@
       'auth/network-request-failed':'연결이 원활하지 않아요. 인터넷 연결을 확인하고 다시 시도해 주세요.',
       'auth/timeout':'서버 연결이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.',
       'auth/user-disabled':'이용이 제한된 계정입니다.',
-      'auth/already-signed-in':'이미 로그인되어 있습니다. 계정 화면에서 계속해 주세요.'
+      'auth/already-signed-in':'이미 로그인되어 있습니다. 계정 화면에서 계속해 주세요.',
+      'auth/popup-closed-by-user':'로그인 창을 닫았어요. 다시 시도하거나 게스트로 입장해 주세요.',
+      'auth/popup-blocked':'로그인 팝업이 차단됐어요. 팝업을 허용하거나 Chrome·Safari에서 다시 열어 주세요.',
+      'auth/account-exists-with-different-credential':'같은 이메일의 다른 로그인 계정이 있습니다. 기존 방법으로 로그인해 주세요.',
+      'auth/unauthorized-domain':'이 주소에서 소셜 로그인을 준비 중이에요. 게스트로 입장해 주세요.'
     };
     return messages[error&&error.code]||'로그인을 완료하지 못했어요. 잠시 후 다시 시도해 주세요.';
   }
@@ -75,6 +79,8 @@
       local:local,safeNext:safeNext,message:message,
       current:function(){return ready().then(function(auth){return auth.currentUser;});},
       session:session,
+      signInToken:function(token){return ready().then(function(auth){return auth.signInWithCustomToken(token);}).then(function(c){return c.user;});},
+      signInGoogle:function(){return ready().then(function(auth){var provider=new env.firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});return auth.signInWithPopup(provider);}).then(function(c){return c.user;});},
       connect:function(){return session().then(function(user){return load('firestore').then(function(){return {user:user,db:env.firebase.firestore()};});});},
       signIn:function(email,password){return ready().then(function(auth){return auth.signInWithEmailAndPassword(email.trim(),password);}).then(function(c){return c.user;});},
       register:function(email,password){return ready().then(function(auth){

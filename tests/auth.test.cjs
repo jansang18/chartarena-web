@@ -72,3 +72,16 @@ test('password reset and login only forward the trimmed email, never persist app
   await client.signOut();
   assert.deepEqual(e.calls,[['login','test@example.invalid',' keep password spaces '],['reset','test@example.invalid'],'logout']);
 });
+
+test('social identities use Firebase verification and local previews reject both paths',async()=>{
+  const e=environment(null);e.env.localStorage={setItem(){throw Error('no game-save mutation');}};
+  e.auth.signInWithCustomToken=async token=>{assert.equal(token,'verified-server-token');return {user:{uid:'kakao:subject'}};};
+  e.env.firebase.auth.GoogleAuthProvider=function(){this.setCustomParameters=p=>assert.equal(p.prompt,'select_account');};
+  e.auth.signInWithPopup=async provider=>{assert.ok(provider instanceof e.env.firebase.auth.GoogleAuthProvider);return {user:{uid:'google-subject'}};};
+  const c=api.createClient(e.env);
+  assert.equal((await c.signInToken('verified-server-token')).uid,'kakao:subject');
+  assert.equal((await c.signInGoogle()).uid,'google-subject');
+  e.env.location.hostname='localhost';const local=api.createClient(e.env);
+  await assert.rejects(local.signInToken('ignored'),{code:'auth/local-preview'});
+  await assert.rejects(local.signInGoogle(),{code:'auth/local-preview'});
+});

@@ -2,12 +2,12 @@
   'use strict';
   var auth=window.ArenaAuth,$=function(id){return document.getElementById(id);};
   if(!auth){$('authStatus').hidden=false;$('authStatus').textContent='로그인 화면을 불러오지 못했어요. 새로고침하거나 게스트로 입장해 주세요.';return;}
-  var mode='login',busy=false,next=auth.safeNext(new URLSearchParams(location.search).get('next'));
+  var mode='login',busy=false,social=window.ArenaSocial,next=auth.safeNext(new URLSearchParams(location.search).get('next'));
   $('guestEntry').href=next;$('memberEntry').href=next;
   $('previewNotice').hidden=!auth.local;
   function status(text,kind,target){var el=$(target||'authStatus');el.textContent=text||'';el.hidden=!text;el.dataset.kind=kind||'info';}
   function errors(){['email','password','confirm'].forEach(function(key){$(key+'Error').textContent='';$('auth'+key[0].toUpperCase()+key.slice(1)).removeAttribute('aria-invalid');});}
-  function setBusy(value){busy=value;$('authFields').disabled=value;$('authForm').setAttribute('aria-busy',String(value));$('authSubmit').setAttribute('aria-busy',String(value));document.querySelectorAll('[data-mode],#resetBack').forEach(function(el){el.disabled=value;});$('submitLabel').textContent=value?'연결 중…':mode==='register'?'계정 만들기':mode==='reset'?'재설정 메일 보내기':'로그인';}
+  function setBusy(value){busy=value;$('authFields').disabled=value;$('authForm').setAttribute('aria-busy',String(value));$('authSubmit').setAttribute('aria-busy',String(value));document.querySelectorAll('[data-mode],[data-provider],#resetBack').forEach(function(el){el.disabled=value;});$('submitLabel').textContent=value?'연결 중…':mode==='register'?'계정 만들기':mode==='reset'?'재설정 메일 보내기':'로그인';}
   function showMode(value){
     if(busy)return;mode=value;errors();status('');
     document.querySelectorAll('[data-mode]').forEach(function(el){el.setAttribute('aria-pressed',String(el.dataset.mode===value));});
@@ -26,8 +26,18 @@
   function account(user){
     var member=!!(user&&!user.isAnonymous);
     $('signedIn').hidden=!member;$('signedOut').hidden=member;
-    if(member){$('accountEmail').textContent=user.email||'내 계정';$('authTitle').textContent='입장할 준비가 됐어요.';$('authIntro').textContent='같은 차트 위에서 펼쳐지는 새로운 승부.';}
+    if(member){$('accountEmail').textContent=user.email||(/^kakao:/.test(user.uid)?'카카오 계정':/^naver:/.test(user.uid)?'네이버 계정':'내 계정');$('authTitle').textContent='입장할 준비가 됐어요.';$('authIntro').textContent='같은 차트 위에서 펼쳐지는 새로운 승부.';}
   }
+  document.querySelectorAll('[data-provider]').forEach(function(button){button.addEventListener('click',async function(){
+    if(busy)return;status('');setBusy(true);button.setAttribute('aria-busy','true');
+    try{
+      if(!social){status('소셜 로그인을 불러오지 못했어요. 새로고침해 주세요.','error');return;}
+      var result=await social.start(button.dataset.provider,next);
+      if(result){account(result.user);$('memberEntry').href=result.next;$('authTitle').focus();}
+      else status('인증 화면으로 이동 중이에요.');
+    }catch(error){status(social.message(error)||auth.message(error),'error');}
+    finally{setBusy(false);button.removeAttribute('aria-busy');}
+  });});
   document.querySelectorAll('[data-mode]').forEach(function(el){el.addEventListener('click',function(){showMode(el.dataset.mode);});});
   $('resetMode').addEventListener('click',function(){showMode('reset');$('authEmail').focus();});
   $('resetBack').addEventListener('click',function(){showMode('login');});
@@ -58,5 +68,10 @@
     finally{busy=false;this.disabled=false;}
   });
   setBusy(false);
-  if(!auth.local)auth.current().then(account).catch(function(error){status(auth.message(error),'error');});
+  if(social)social.availability().then(function(providers){document.querySelectorAll('[data-provider]').forEach(function(button){button.querySelector('[data-provider-state]').hidden=!!providers[button.dataset.provider];});}).catch(function(){});
+  if(social&&/^#social_(?:ticket|error)=/.test(location.hash)){
+    setBusy(true);status('로그인을 확인하고 있어요.');
+    social.resume().then(function(result){next=result.next;$('memberEntry').href=next;$('guestEntry').href=next;account(result.user);status('');$('authTitle').focus();})
+      .catch(function(error){status(social.message(error)||auth.message(error),'error');}).finally(function(){setBusy(false);});
+  }else if(!auth.local)auth.current().then(account).catch(function(error){status(auth.message(error),'error');});
 })();

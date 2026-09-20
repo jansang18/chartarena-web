@@ -1,3 +1,11 @@
 /exports/
 /assets/traders/motion/*-idle-v4.webp
 /assets/traders/motion/*-idle-v5.webp
+node_modules/
+.firebase/
+firebase-debug.log
+firestore-debug.log
+.env
+.env.*
+.secret*
+*.service-account.json

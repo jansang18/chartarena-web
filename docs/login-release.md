@@ -2,6 +2,8 @@
 
 `login.html` provides email sign-in, registration, password reset, guest entry, and an authenticated account/logout state. Home exposes the page through its navigation. The presentation uses the current Club Edition palette and shipped Seon motion asset with reduced-motion and data-saving still-image fallbacks.
 
+Social login UI and server/client code have now been added for Kakao, Naver and Google, with email modes under an expandable section. All social providers remain visibly in preparation until owner-side service configuration and real-account verification. See [social-login-setup.md](social-login-setup.md) for the exact remaining setup and separate backend deployment.
+
 ## Service configuration still required
 
 The production Firebase project is `chartarena-3051a`. A single sign-in readiness probe using a synthetic, reserved `.invalid` address returned `PASSWORD_LOGIN_DISABLED` on 2026-09-20. No account was created and no email was sent. The currently available Firebase Console session could not open the project's apps/settings. Email/password activation therefore remains an owner-controlled step:

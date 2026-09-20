@@ -1,0 +1,4 @@
+{
+  "functions": [{ "source": "functions/social-auth", "codebase": "social-auth", "ignore": ["node_modules", "*.log", ".env*", ".secret*", "*.local"] }],
+  "firestore": [{ "database": "chartarena-auth", "rules": "functions/social-auth/firestore.rules" }]
+}
