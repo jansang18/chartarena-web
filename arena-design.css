@@ -110,9 +110,9 @@ html[data-page=home] .sfoot{display:none}
 html[data-page=home] .view:not(#v-home){max-width:1480px;padding:8px 0;margin:0 auto;background:none;border:0;min-height:100%}
 html[data-page=home] .vh{font-size:24px;letter-spacing:-.04em;margin-bottom:18px;color:var(--arena-ink)}
 html[data-page=home] .gwrap{grid-template-columns:210px minmax(0,1fr);gap:24px}
-html[data-page=home] .gleft{display:flex;flex-direction:column;gap:16px}
-html[data-page=home] .gprev{background:#1c2e3b;border:1px solid var(--arena-line);border-radius:4px;box-shadow:none}
-html[data-page=home] .gprev .pv{height:220px;overflow:hidden;padding:0}
+html[data-page=home] .gleft{display:flex;flex-direction:column;align-items:stretch;min-width:0;gap:16px}
+html[data-page=home] .gprev{width:100%;min-width:0;max-width:100%;box-sizing:border-box;background:#1c2e3b;border:1px solid var(--arena-line);border-radius:4px;box-shadow:none}
+html[data-page=home] .gprev .pv{width:100%;max-width:178px;height:220px;aspect-ratio:auto;overflow:hidden;padding:0}
 html[data-page=home] .gprev .pv img{height:auto;width:100%;max-height:none;object-fit:contain;object-position:top}
 html[data-page=home] .cat{border-radius:3px;box-shadow:none;background:none;border:1px solid var(--arena-line);color:#b6c5cf;min-height:44px}
 html[data-page=home] .cat.on{background:var(--arena-gold);color:#1d2830;border-color:var(--arena-gold)}
@@ -571,3 +571,18 @@ html[data-page=home] .plevel .bar i{background:linear-gradient(#f5dda9,#b99457);
 @media(min-width:600px) and (max-height:550px){html[data-page=battle] .lobby-action .table-note{height:3.4em;min-height:3.4em}.stake-rooms{gap:8px}html[data-page=home] .stake-room .room-arrow{width:22px;height:22px;flex-basis:22px;font-size:12px}}
 @media(prefers-reduced-motion:reduce){html[data-page=battle] .table-choice,html[data-page=home] .stake-room,html[data-page=battle] .lcard .lgo,html[data-page=battle][data-playing] .go,html[data-page=battle][data-playing] .dir,html[data-page=battle][data-playing] .lev{transition:none}html[data-page=battle] .table-choice.on:before{animation:none}}
 @media(prefers-contrast:more){html[data-page=battle] .table-choice,html[data-page=home] .stake-room{border-color:#a4bccb}html[data-page=battle] .table-choice.on{outline:2px solid #ffe2a8;outline-offset:2px}}
+
+/* Collection controls become a normal row before the desktop sidebar gets tight. */
+@media(max-width:1100px){
+ html[data-page=home] #v-garage .gwrap{display:block}
+ html[data-page=home] #v-garage .gleft{display:block;width:100%;margin:0 0 14px}
+ html[data-page=home] #v-garage .gprev{display:none}
+ html[data-page=home] #v-garage .catcol{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;margin:0}
+ html[data-page=home] #v-garage .cat{width:auto;flex:0 0 auto;margin:0;min-height:44px;padding:8px 14px}
+}
+@media(min-width:600px) and (max-width:1100px) and (max-height:550px){
+ html[data-page=home] #v-garage .gwrap{display:grid;grid-template-columns:108px minmax(0,1fr);gap:14px}
+ html[data-page=home] #v-garage .gleft{margin:0}
+ html[data-page=home] #v-garage .catcol{flex-direction:column;align-items:stretch}
+ html[data-page=home] #v-garage .cat{width:100%;padding:8px}
+}
