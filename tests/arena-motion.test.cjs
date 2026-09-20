@@ -21,9 +21,9 @@ test('motion loads only on screen and returns to still when backgrounded or redu
 });
 test('character selection changes motion identity, failed assets stay on the selected PNG',()=>{
  const f=fixture(); f.visible(true);
- f.img.src='assets/traders/yuna-v1.png';f.changed();assert.match(f.img.src,/yuna-idle-v6.webp$/);
- f.listeners.error();assert.equal(f.img.src,'assets/traders/yuna-v1.png');
- f.visible(false);f.visible(true);assert.equal(f.img.src,'assets/traders/yuna-v1.png');
+ f.img.src='assets/traders/seon-v1.png';f.changed();assert.match(f.img.src,/seon-idle-v6.webp$/);
+ f.listeners.error();assert.equal(f.img.src,'assets/traders/seon-v1.png');
+ f.visible(false);f.visible(true);assert.equal(f.img.src,'assets/traders/seon-v1.png');
 });
 test('data saving does not request animated assets',()=>{
  const f=fixture();f.win.navigator.connection.saveData=true;f.visible(true);assert.match(f.img.src,/hyesu-v1.png$/);
