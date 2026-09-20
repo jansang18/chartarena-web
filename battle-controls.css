@@ -1,0 +1,118 @@
+/* One control height keeps every decision on the same baseline. */
+html[data-page=battle][data-playing] #battleControls{
+ --control-height:56px;
+ grid-template-columns:minmax(180px,1fr) minmax(188px,.84fr) minmax(160px,1fr);
+ grid-template-rows:var(--control-height) auto;
+ gap:9px 10px;padding:12px 14px 10px;align-items:stretch;
+ background:linear-gradient(180deg,#1b303e,#101f2b);
+ border-top:1px solid #66859880;box-shadow:inset 0 1px #d7edff12;
+}
+#battleControls .direction-group,#battleControls .leverage-group,#battleControls .levs{
+ height:var(--control-height);min-height:0;align-self:stretch;align-items:stretch;
+}
+html[data-page=battle][data-playing] #battleControls .direction-group{gap:7px}
+html[data-page=battle][data-playing] #battleControls .leverage-group{display:block;gap:0;justify-content:initial}
+html[data-page=battle][data-playing] #battleControls .levs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+#battleControls .control-meta{grid-column:1/-1;grid-row:2;display:flex;align-items:center;gap:12px;min-width:0;line-height:1.35}
+#battleControls #leverageLabel{flex:none;font-size:10px;font-weight:700;color:#d9e7ef;white-space:nowrap}
+html[data-page=battle][data-playing] #battleControls #goldEquation{flex:1;min-width:0;line-height:1.35;font-size:10px;color:#a9bdcb;text-align:right;overflow-wrap:anywhere}
+
+/* A lit upper edge, darker bevel and cast shadow make each key feel physical. */
+html[data-page=battle][data-playing] #battleControls :is(.dir,.lev,.go,.checkpoint-controls button){
+ --key-top:#3f596d;--key-bottom:#213543;--key-border:#7893a6;--key-ink:#edf7ff;--key-shadow:#08141e;--key-glow:139,191,219;
+ box-sizing:border-box;position:relative;isolation:isolate;overflow:hidden;
+ height:var(--control-height);min-height:var(--control-height);max-height:var(--control-height);
+ margin:0;padding:6px 8px;border:1px solid var(--key-border)!important;border-radius:10px;
+ background:linear-gradient(180deg,var(--key-top),var(--key-bottom))!important;color:var(--key-ink)!important;
+ box-shadow:inset 0 1px 0 #ffffff66,inset 0 -3px 0 #03101c4d,0 3px 0 var(--key-shadow),0 5px 12px #020b144d;
+ font-family:inherit;font-weight:800;line-height:1.15;text-shadow:0 1px 1px #0004;
+ transform:translateY(0);transition:transform 140ms cubic-bezier(.2,.8,.2,1),box-shadow 140ms ease-out,border-color 140ms ease-out;
+ cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+html[data-page=battle][data-playing] #battleControls :is(.dir,.checkpoint-controls button){display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;font-size:16px}
+html[data-page=battle][data-playing] #battleControls :is(.dir,.checkpoint-controls button) small{display:block;margin:0;font-size:10px;font-weight:600;line-height:1.15;opacity:.85}
+html[data-page=battle][data-playing] #battleControls .levs .lev{height:var(--control-height);min-height:var(--control-height);padding:0 3px;font-size:13px}
+html[data-page=battle][data-playing] #battleControls .go{font-size:13px;white-space:normal;line-height:1.3;padding-inline:12px}
+#battleControls :is(.dir,.lev,.go,.checkpoint-controls button)::before{
+ content:"";position:absolute;pointer-events:none;inset:2px;border-radius:7px;
+ border-top:1px solid #ffffff45;box-shadow:inset 0 0 12px rgba(var(--key-glow),.14);
+}
+#battleControls :is(.dir,.lev,.go,.checkpoint-controls button)::after{
+ content:"";position:absolute;pointer-events:none;inset:-65% -70%;
+ background:linear-gradient(112deg,transparent 40%,#ffffff08 44%,#ffffff72 50%,#ffffff08 56%,transparent 60%);
+ opacity:0;transform:translateX(-70%);
+}
+html[data-page=battle][data-playing] #battleControls .dir.long{--key-top:#743e47;--key-bottom:#3d2936;--key-border:#cb7d84;--key-ink:#ffe7e4;--key-glow:255,125,129}
+html[data-page=battle][data-playing] #battleControls .dir.short{--key-top:#315f88;--key-bottom:#233950;--key-border:#75a4cf;--key-ink:#e0f0ff;--key-glow:108,184,255}
+html[data-page=battle][data-playing] #battleControls .dir.watch{--key-top:#4a535b;--key-bottom:#2a3845;--key-border:#8494a0;--key-ink:#dbe6ee}
+html[data-page=battle][data-playing] #battleControls .dir.long.on{--key-top:#e89991;--key-bottom:#a33f50;--key-border:#ffd2c4;--key-ink:#fff9ef;--key-shadow:#5a2033}
+html[data-page=battle][data-playing] #battleControls .dir.short.on{--key-top:#75bbf0;--key-bottom:#315f9c;--key-border:#c5eaff;--key-ink:#fff;--key-shadow:#173c68}
+html[data-page=battle][data-playing] #battleControls :is(.lev.on,.dir.watch.on,.go:not(:disabled),#continueGo){
+ --key-top:#ffe5a0;--key-bottom:#d49b42;--key-border:#fff0ba;--key-ink:#292315;--key-shadow:#785321;--key-glow:255,200,91;text-shadow:0 1px #fff4c76b;
+}
+html[data-page=battle][data-playing] #battleControls .go.next{--key-top:#91d5ec;--key-bottom:#41879f;--key-border:#bfeeff;--key-ink:#112c3c;--key-shadow:#204858;--key-glow:115,210,243}
+html[data-page=battle][data-playing] #battleControls #stopHere{--key-top:#a1b5c6;--key-bottom:#526c80;--key-border:#c8dbe7;--key-ink:#fff;--key-shadow:#293f50;--key-glow:195,224,242}
+html[data-page=battle][data-playing] #battleControls #switchHere{--key-top:#8edfc6;--key-bottom:#3c8d86;--key-border:#c1ffeb;--key-ink:#103b39;--key-shadow:#235956;--key-glow:107,240,204;text-shadow:0 1px #c7ffed55}
+html[data-page=battle][data-playing] #battleControls :is(.dir.on,.lev.on,.go:not(:disabled),.checkpoint-controls button:not(:disabled)){
+ box-shadow:inset 0 1px 0 #fff9,inset 0 -3px 0 #17291c38,0 3px 0 var(--key-shadow),0 0 17px rgba(var(--key-glow),.2);
+}
+#battleControls :is(.dir.on,.lev.on,.go,.checkpoint-controls button):not(:disabled)::after{animation:decision-sheen 4.6s ease-in-out infinite}
+#battleControls #stopHere::after{animation-delay:.45s}
+#battleControls #switchHere::after{animation-delay:.9s}
+#battleControls .lev.on::after{animation-delay:.6s}
+@keyframes decision-sheen{
+ 0%,68%{transform:translateX(-70%);opacity:0}
+ 73%{opacity:.55}
+ 94%{transform:translateX(70%);opacity:.55}
+ 100%{transform:translateX(70%);opacity:0}
+}
+html[data-page=battle][data-playing] #battleControls :is(.dir,.lev,.go,.checkpoint-controls button):disabled{
+ opacity:1;cursor:default;color:#acbfcc!important;border-color:#506575!important;
+ background:linear-gradient(180deg,#304654,#233440)!important;
+ box-shadow:inset 0 1px #d5eaff17,inset 0 -2px #08131c4d,0 3px #0b1721;text-shadow:none;
+}
+html[data-page=battle][data-playing] #battleControls :is(.dir.on,.lev.on):disabled{border-color:var(--key-border)!important;color:var(--key-ink)!important;background:linear-gradient(180deg,var(--key-top),var(--key-bottom))!important}
+#battleControls :is(.dir,.lev,.go,.checkpoint-controls button):disabled::after{animation:none;opacity:0}
+#battleControls :is(.dir,.lev,.go,.checkpoint-controls button):disabled::before{opacity:.25}
+@media(hover:hover) and (pointer:fine){
+ html[data-page=battle][data-playing] #battleControls :is(.dir,.lev,.go,.checkpoint-controls button):not(:disabled):hover{
+  transform:translateY(-1px);border-color:#f4f6df!important;
+  box-shadow:inset 0 1px #fffb,inset 0 -3px #03101c4d,0 4px var(--key-shadow),0 0 22px rgba(var(--key-glow),.3);
+ }
+}
+html[data-page=battle][data-playing] #battleControls :is(.dir,.lev,.go,.checkpoint-controls button):not(:disabled):active{
+ transform:translateY(2px);box-shadow:inset 0 2px 8px #07131b66,0 1px var(--key-shadow);transition-duration:70ms;
+}
+#battleControls :is(.dir,.lev,.go,.checkpoint-controls button):focus-visible{outline:3px solid #fff0b8;outline-offset:3px}
+html[data-page=battle][data-playing] #battleControls .checkpoint-controls{
+ grid-template-columns:minmax(135px,.85fr) repeat(3,minmax(100px,1fr));grid-template-rows:var(--control-height);gap:9px;
+}
+#battleControls.at-checkpoint #leverageLabel{display:none}
+#battleControls.at-checkpoint #goldEquation{text-align:left}
+html[data-page=battle][data-playing] #battleControls.at-checkpoint>:is(.direction-group,.leverage-group,#go){display:none}
+#battleControls .checkpoint-copy{padding-right:5px}
+html[data-page=battle][data-playing] #battleControls .checkpoint-copy strong{font-size:13px;line-height:1.3}
+html[data-page=battle][data-playing] #battleControls .checkpoint-copy small{font-size:10px;line-height:1.3}
+@media(min-width:600px) and (max-height:550px){
+ html[data-page=battle][data-playing] #battleControls{--control-height:48px;gap:6px 8px;padding:6px 10px 7px}
+ html[data-page=battle][data-playing] #battleControls :is(.dir,.checkpoint-controls button){font-size:15px}
+ html[data-page=battle][data-playing] #battleControls .go{font-size:11px;padding-inline:7px}
+ #battleControls #leverageLabel,html[data-page=battle][data-playing] #battleControls #goldEquation{font-size:9px}
+}
+@media(max-width:599px){
+ html[data-page=battle][data-playing] #battleControls{--control-height:48px;grid-template-columns:minmax(191px,1.1fr) minmax(0,1fr);grid-template-rows:48px 48px auto;gap:7px;padding:8px 10px}
+ html[data-page=battle][data-playing] #battleControls .direction-group{grid-column:1/-1;grid-row:1;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+ html[data-page=battle][data-playing] #battleControls .dir.watch{grid-column:auto;flex-direction:column;gap:3px}
+ html[data-page=battle][data-playing] #battleControls .leverage-group{grid-column:1;grid-row:2}
+ html[data-page=battle][data-playing] #battleControls .go{grid-column:2;grid-row:2;font-size:11px;padding-inline:5px}
+ #battleControls .control-meta{grid-row:3;gap:6px;align-items:flex-start}
+ #battleControls #leverageLabel,html[data-page=battle][data-playing] #battleControls #goldEquation{font-size:9px}
+ html[data-page=battle][data-playing] #battleControls .checkpoint-controls{grid-row:1/3;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:48px 48px;gap:7px}
+ html[data-page=battle][data-playing] #battleControls .checkpoint-copy{grid-column:1/-1;grid-row:1}
+ html[data-page=battle][data-playing] #battleControls .checkpoint-controls button{font-size:15px;padding-inline:3px}
+ html[data-page=battle][data-playing] #battleControls .checkpoint-controls button small{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ #battleControls :is(.dir,.lev,.go,.checkpoint-controls button)::after{animation:none!important;opacity:0}
+ html[data-page=battle][data-playing] #battleControls :is(.dir,.lev,.go,.checkpoint-controls button){transition:none;transform:none!important}
+}

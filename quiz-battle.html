@@ -220,6 +220,7 @@
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
 <link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
 <link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8">
+<link rel="stylesheet" href="battle-controls.css?v=c6f6779d4c46">
 <script src="arena-characters.js?v=7ae6cc688cb7"></script>
 <script src="arena-motion.js?v=5a66aad0e096" defer></script>
 
@@ -264,8 +265,8 @@
       <button type="button" class="dir short" data-dir="S" id="dS">↘ 숏<small>하락</small></button>
       <button type="button" class="dir watch" data-dir="W" id="dW">◎ 패스<small>경기당 1회</small></button>
     </div>
-    <div class="cgrp leverage-group"><span class="clab" id="leverageLabel">레버리지 · 기본 1배</span><div class="levs" id="levs" role="group" aria-label="레버리지 배율, 선택한 배율을 다시 누르면 1배"></div></div>
-    <div class="gold-equation" id="goldEquation" aria-live="polite"></div>
+    <div class="cgrp leverage-group"><div class="levs" id="levs" role="group" aria-label="레버리지 배율, 선택한 배율을 다시 누르면 1배"></div></div>
+    <div class="control-meta"><span class="clab" id="leverageLabel">레버리지 · 기본 1배</span><div class="gold-equation" id="goldEquation" aria-live="polite"></div></div>
     <button class="go" id="go" type="button">확정 ▶</button>
   </div>
   <p class="battle-help" id="battleHelp" aria-live="polite"></p>
