@@ -28,3 +28,9 @@ Release target: https://jansang18.github.io/chartarena-web/ (GitHub Pages, main 
 Follow-up validation: a local practice match ended at ROUND 3 / 3 and retained the actual wallet. Browser checks confirmed only the five new traders in collection and the selected new portrait beside the level. Unit tests cover three-round wallet settlement, fourth-round rejection, old-client exclusion and legacy portrait rendering. Static intro preview: `loading-preview.html`.
 
 Edit `landscape.html` first, copy it to `index.html`, then run `node scripts/version-assets.cjs` whenever shared assets change.
+
+## Surface polish follow-up
+
+- Raised metallic edges, top lighting, lower bevels and press-state inset shadows unify home room cards, table choices and game controls. No hover/press translation; reduced-motion disables the brief selection highlight.
+- Table descriptions use a reserved two-line area. At 860×652, switching practice to expert previously moved the heading and CTA by about 10px; after the fix their bounds match exactly. The CTA also remains fixed at 390×844. The 844×390 home and lobby fit without horizontal overflow.
+- Selection restores keyboard focus without scrolling after the cards render again.

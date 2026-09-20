@@ -514,3 +514,60 @@ html[data-page=home] .dpday.cur{box-shadow:none;border-color:var(--arena-gold);b
 html[data-page=home] .dpreward{font-size:20px;margin:18px 0;text-shadow:none}
 html[data-page=home] .dpbtn{min-height:44px;background:var(--arena-coral);border-radius:2px;color:#19242e;box-shadow:none}
 @media(max-height:550px){html[data-page=home] .dpopcard{padding:16px 24px}html[data-page=home] .dptitle{font-size:20px}html[data-page=home] .dpreward{margin:12px 0}}
+
+/* Sculpted control surfaces. Lighting changes, geometry stays still. */
+html[data-page=battle] .lobby-action .table-note{height:3.4em;min-height:3.4em;flex:0 0 auto;white-space:pre-line;line-height:1.7}
+html[data-page=battle] .table-choice,html[data-page=home] .stake-room{
+ --surface-accent:#90b5cb;position:relative;isolation:isolate;overflow:hidden;
+ border:1px solid #526775;border-bottom-color:#1b2b36;border-radius:10px;
+ background:radial-gradient(ellipse at 100% 0%,#7eaac41c,transparent 65%),linear-gradient(175deg,#2d4251 0%,#1c2d3a 48%,#14232f 100%);
+ box-shadow:inset 0 1px 0 #e1f1ff24,inset 0 -2px 0 #08121b80,0 4px 0 #09151f,0 9px 16px -8px #000a;
+ transform:none;transition:border-color .18s,box-shadow .18s,background-color .18s;
+}
+html[data-page=home] .stake-room.entry-room,html[data-page=battle] .table-choice[data-table=beginner]{--surface-accent:#94ceba}
+html[data-page=home] .stake-room.expert-room,html[data-page=battle] .table-choice[data-table=expert]{--surface-accent:#ecc58a}
+html[data-page=battle] .table-choice[data-table=practice]{--surface-accent:#aaaecb}
+html[data-page=battle] .table-choice:before,html[data-page=home] .stake-room:before{
+ content:"";position:absolute;inset:0 0 auto;height:1px;z-index:1;
+ background:linear-gradient(90deg,transparent,var(--surface-accent),#fff6,transparent);opacity:.8;pointer-events:none;
+}
+html[data-page=battle] .table-choice:after,html[data-page=home] .stake-room:after{
+ content:"";position:absolute;left:0;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;
+ background:var(--surface-accent);box-shadow:0 0 14px color-mix(in srgb,var(--surface-accent) 35%,transparent);pointer-events:none;
+}
+html[data-page=home] .stake-room .room-price strong,html[data-page=battle] .table-choice b{color:var(--surface-accent);text-shadow:0 1px 2px #000a}
+html[data-page=home] .stake-room .room-tier,html[data-page=battle] .table-choice strong{text-shadow:0 2px 2px #0008}
+html[data-page=home] .stake-room .room-arrow{display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px;border:1px solid #b6d7ed25;border-radius:50%;background:linear-gradient(#54718335,#172a3780);box-shadow:inset 0 1px #cce8ff20;color:var(--surface-accent);font-size:16px}
+html[data-page=battle] .table-choice.on{
+ border-color:#dab87b;border-bottom-color:#8e6e3e;
+ background:radial-gradient(ellipse at 90% 0%,#e4c68624,transparent 70%),linear-gradient(175deg,#494b42,#2b3537 52%,#1b2a32);
+ box-shadow:inset 0 1px 0 #fff0c966,inset 0 -2px 0 #8b693d66,0 4px 0 #111b22,0 9px 22px -9px #d2a15255;
+}
+html[data-page=battle] .table-choice.on:before{height:2px;background:linear-gradient(90deg,#dab87b33,#ffdf9d,#dab87b33);animation:surface-select .5s ease-out both}
+html[data-page=battle] .table-choice.on:after{background:#f1cf90;box-shadow:0 0 15px #ecc48155}
+@media(hover:hover){
+ html[data-page=home] .stake-room:hover,html[data-page=battle] .table-choice:hover{border-color:var(--surface-accent);box-shadow:inset 0 1px 0 #e1f1ff40,inset 0 -2px 0 #08121b80,0 4px 0 #09151f,0 10px 24px -10px #8bb0c766;transform:none}
+}
+html[data-page=home] .stake-room:active,html[data-page=battle] .table-choice:active{box-shadow:inset 0 3px 9px #050b1277,inset 0 1px 0 #e1f1ff20,0 1px 0 #09151f;transform:none}
+html[data-page=battle] .lcard .lgo,html[data-page=battle][data-playing] .go:not(:disabled){
+ background:linear-gradient(180deg,#ffb2a3 0%,#f19689 45%,#d97970 100%)!important;border:1px solid #ffb8a6;border-bottom-color:#a35149;border-radius:9px;
+ box-shadow:inset 0 1px 0 #fff0da99,inset 0 -2px 0 #a4514980,0 4px 0 #673b3b,0 9px 20px -10px #f28f7570;
+ color:#28262b!important;text-shadow:0 1px 0 #ffc4b755;transform:none;transition:filter .15s,box-shadow .15s;
+}
+html[data-page=battle] .lcard .lgo:disabled{background:linear-gradient(#354652,#273640)!important;border-color:#4b5b65;color:#a5b2bd!important;box-shadow:inset 0 1px #d0e1ed18,0 3px #10202b;text-shadow:none}
+html[data-page=battle] .lcard .lgo:not(:disabled):active,html[data-page=battle][data-playing] .go:not(:disabled):active{box-shadow:inset 0 3px 7px #8b423d66,0 1px 0 #673b3b;filter:brightness(.96);transform:none}
+html[data-page=battle][data-playing] .dir,html[data-page=battle][data-playing] .lev{
+ border-radius:7px;border-color:#526b7b;border-bottom-color:#263d4b;background:linear-gradient(175deg,#334c5e,#1b2e3d);
+ box-shadow:inset 0 1px 0 #d9ecff25,inset 0 -2px 0 #07141d66,0 3px 0 #0a1721;transition:box-shadow .15s,border-color .15s;transform:none;
+}
+html[data-page=battle][data-playing] .dir.on,html[data-page=battle][data-playing] .lev.on{background:linear-gradient(160deg,#5e5543,#303f47);border-color:#d9b979;box-shadow:inset 0 1px #fce0a34d,inset 0 -2px #8d6d3a66,0 3px #15222b;transform:none}
+html[data-page=battle][data-playing] .dir:not(:disabled):active,html[data-page=battle][data-playing] .lev:not(:disabled):active{box-shadow:inset 0 2px 8px #0006,0 1px #09151f;transform:none}
+html[data-page=battle] .lobby-feature,html[data-page=home] .arena-showcase{border-radius:12px;border-color:#536b79;box-shadow:inset 0 1px 0 #d9edff24,0 12px 28px -16px #000c}
+html[data-page=battle] .settlement-note{border:1px solid #3b505f;border-left:2px solid #c6a66e;border-radius:7px;background:linear-gradient(120deg,#152734,#1b2c37);box-shadow:inset 0 2px 5px #07131c80,0 1px #b7d4e414}
+html[data-page=home] .practice-entry{border-radius:8px;background:linear-gradient(170deg,#223643,#132530);border:1px solid #3d5768;box-shadow:inset 0 1px #cce8ff18,0 3px #091823}
+html[data-page=home] .plevel .bar{box-shadow:inset 0 2px 3px #0008;border-color:#314858}
+html[data-page=home] .plevel .bar i{background:linear-gradient(#f5dda9,#b99457);box-shadow:inset 0 1px #fff8}
+@keyframes surface-select{from{opacity:.25}to{opacity:1}}
+@media(min-width:600px) and (max-height:550px){html[data-page=battle] .lobby-action .table-note{height:3.4em;min-height:3.4em}.stake-rooms{gap:8px}html[data-page=home] .stake-room .room-arrow{width:22px;height:22px;flex-basis:22px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){html[data-page=battle] .table-choice,html[data-page=home] .stake-room,html[data-page=battle] .lcard .lgo,html[data-page=battle][data-playing] .go,html[data-page=battle][data-playing] .dir,html[data-page=battle][data-playing] .lev{transition:none}html[data-page=battle] .table-choice.on:before{animation:none}}
+@media(prefers-contrast:more){html[data-page=battle] .table-choice,html[data-page=home] .stake-room{border-color:#a4bccb}html[data-page=battle] .table-choice.on{outline:2px solid #ffe2a8;outline-offset:2px}}

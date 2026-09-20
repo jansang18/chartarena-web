@@ -217,7 +217,7 @@
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
 <link rel="stylesheet" href="battle-fx.css?v=0c6b672cbebb">
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
-<link rel="stylesheet" href="arena-design.css?v=87a075461e4e">
+<link rel="stylesheet" href="arena-design.css?v=afc7b776668e">
 <script src="arena-characters.js?v=34458f7f0b6b"></script>
 
 <div class="scaler" id="scaler">
@@ -374,11 +374,11 @@ function renderTables(){
   if(window.ArenaCharacters&&$('lobbyTrader')){var character=ArenaCharacters.get(myCh);$('lobbyTrader').src=character.image;$('lobbyTrader').alt=character.name;$('lobbyTraderName').textContent=character.name;}
   var t=currentTable(),bal=getBal();$('lobbyWallet').textContent='보유 '+fmtP(bal)+' 골드';
   $('tableChoices').innerHTML=Object.values(ArenaRules.TABLES).map(function(x){var enough=bal>=x.reserve;return '<button type="button" class="table-choice'+(x.id===selectedTable?' on':'')+'" data-table="'+x.id+'" aria-pressed="'+(x.id===selectedTable)+'"><strong>'+x.name+'</strong><b>'+ (x.practice?'골드 변동 없음':'1%당 '+fmtP(x.rate)+' 골드')+'</b><small>'+ (x.practice?'100골드 기준 모의 경기':(enough?'보유 골드 전체 사용':'골드가 필요합니다'))+'</small></button>';}).join('');
-  $('tableNote').textContent=t.practice?'연습방은 모의 골드로 진행하며 보유 골드는 변하지 않습니다.':'보유 '+fmtP(bal)+' 골드 전체로 플레이합니다. 방은 1%당 단가만 정하며, 보유 골드가 0일 때만 관전합니다.';
+  $('tableNote').textContent=t.practice?'모의 골드로 연습합니다.\n보유 골드는 변하지 않습니다.':'보유 '+fmtP(bal)+' 골드로 플레이합니다.\n골드가 0이 되면 관전합니다.';
   $('modeLive').disabled=bal<t.reserve;
   $('modeLive').textContent=bal<t.reserve?'입장 골드 부족':t.name+' · 매칭 시작';
 }
-$('tableChoices').onclick=function(e){var b=e.target.closest('[data-table]');if(!b||mmActive)return;selectedTable=b.dataset.table;renderTables();};
+$('tableChoices').onclick=function(e){var b=e.target.closest('[data-table]');if(!b||mmActive)return;selectedTable=b.dataset.table;renderTables();var active=$('tableChoices').querySelector('[data-table="'+selectedTable+'"]');if(active)active.focus({preventScroll:true});};
 // A previous document may have closed during a confirmed reveal. Recover once.
 var recoveredGame=ljg(GS);if(recoveredGame.battleActive){saveWallet(ArenaRules.walletClose(recoveredGame,recoveredGame.battleActive.id));setTimeout(function(){toast('이전 경기의 확정된 선택까지 골드 정산을 마쳤습니다.');},800);}
 window.addEventListener('pagehide',function(){closeWallet();});
