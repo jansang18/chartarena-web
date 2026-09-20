@@ -27,3 +27,14 @@ assets/royal-gold/lounge-v1.png was generated for this implementation with the b
 - Existing local bot gameplay was used for visual checks. This is not physical-device or online multiplayer certification. Portrait pages intentionally allow vertical scrolling.
 
 The user approved public deployment on 2026-09-21 after reviewing the local implementation. Deployment uses the repository's existing GitHub Pages source, main at the repository root.
+
+## Dark-tone refinement and design audit
+
+The user subsequently requested less green and a darker overall tone. The large green surfaces in the home, roster, lobby, loading, login, battle and duel now use neutral charcoal. Home cards retain restrained slate and burgundy variation; brass frames and primary action buttons provide the gold accent. The lounge background uses a darker overlay so its lighting does not compete with labels.
+
+Fresh checks after this refinement:
+- Home: 390x844 portrait, 844x390 landscape, 912x768 unfolded-tablet viewport. No horizontal overflow; at 844x390 main client/scroll heights both equal 314px. Portrait room entry buttons are 44px high.
+- Live local bot battle: 1440x900 and 844x390. Player labels are unobstructed. At 844x390 the chart is within y111–299 and controls within y306–390. No browser console errors were observed on this test tab.
+- Sample text/surface contrast: primary 16.36:1, muted 8.12:1, gold button darkest stop 5.87:1, room supporting text 10.45:1. These are representative palette checks, not a full accessibility certification.
+- 191 automated tests passed; build verification and diff whitespace checks passed.
+- Physical phones and live online multiplayer were not tested. This revision changes presentation only.
