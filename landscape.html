@@ -30,19 +30,7 @@
   .logo{font-weight:900; font-size:22px; letter-spacing:-.5px; display:flex; align-items:center; gap:9px}
   .logo .g{color:var(--gold)} .logo .lm{font-size:20px}
   .brandlogo{height:38px; display:block; filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
-  #splash{position:fixed;inset:0;z-index:2147483000;overflow:hidden;background:#05070f;transition:opacity .55s ease}
-  #splash.out{opacity:0;pointer-events:none}
-  #splash .ldbg{position:absolute;inset:0;background:url(assets/loading_bg.jpg?v=2) center/contain no-repeat}
-  #splash .ldveil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,15,0) 0%,rgba(5,7,15,0) 50%,rgba(5,7,15,.55) 65%,rgba(5,7,15,.95) 80%,#05070f 86%,#05070f 100%)}
-  #splash .ldlogo{display:none}
-  #splash .ldtag{position:absolute;bottom:14.5%;left:0;right:0;text-align:center;font-weight:800;font-size:clamp(14px,2.3vw,23px);color:#eaf2ff;text-shadow:0 2px 14px rgba(0,0,0,.95),0 0 20px rgba(76,169,255,.4)}
-  #splash .ldbarwrap{position:absolute;bottom:8.5%;left:50%;transform:translateX(-50%);width:min(58%,640px)}
-  #splash .ldbar{height:17px;border-radius:999px;background:rgba(8,14,32,.72);border:1.5px solid rgba(120,180,255,.45);overflow:hidden;box-shadow:inset 0 1px 4px rgba(0,0,0,.6),0 0 20px rgba(60,140,255,.35)}
-  #splash .ldfill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#2a6fe0,#4CC3FF 55%,#9fe8ff);box-shadow:0 0 16px rgba(76,195,255,.85);transition:width .1s linear}
-  #splash .ldpct{position:absolute;bottom:3.8%;left:0;right:0;text-align:center;font-weight:900;font-size:clamp(12px,1.8vw,17px);letter-spacing:.16em;color:#c7e4ff;text-shadow:0 2px 8px rgba(0,0,0,.9)}
-  @keyframes ldZoom{from{transform:scale(1.04)}to{transform:scale(1)}}
   @keyframes splashPop{0%{transform:translateX(-50%) scale(.82);opacity:0}55%{opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
-  @media (prefers-reduced-motion:reduce){#splash .ldbg,#splash .ldlogo{animation:none}}
   /* 출석·보상 팝업 */
   .dpop{position:fixed;inset:0;z-index:11000;display:none;align-items:center;justify-content:center;background:rgba(4,7,15,.74)}
   .dpop.show{display:flex}
@@ -454,21 +442,21 @@
   .gmc,.grv{font-family:var(--mono);font-weight:900;font-size:14px;color:var(--gold);flex:0 0 auto}
 </style>
 <link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15">
-<link rel="stylesheet" href="gameplay.css?v=6b62afe2bbc8">
-<link rel="stylesheet" href="exchange-theme.css?v=44ef2c984b85">
-<link rel="stylesheet" href="terminal-home.css?v=e3f154c6f5ca">
+<link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
+<link rel="stylesheet" href="arena-design.css?v=87a075461e4e">
+<script src="arena-characters.js?v=34458f7f0b6b"></script>
 <script src="terminal-home.js?v=3d1fe17433f5" defer></script>
 
 <div class="scaler" id="scaler"><div class="frame">
 
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
-    <span class="exchange-brand" aria-label="차트아레나"><span>CHART ARENA<small>TRADE · COMPETE · WIN</small></span></span>
+    <span class="exchange-brand" aria-label="차트아레나"><span>CHART<span class="brand-accent">ARENA</span><small>READ THE CHART. OWN THE MOMENT.</small></span></span>
     <nav class="terminal-nav" aria-label="주요 메뉴"><button type="button" class="on" aria-current="page" data-go="home">홈</button><a href="quiz-battle.html">배틀</a><button type="button" data-go="rank">기록</button><button type="button" data-go="garage">상점</button></nav><div class="tsp"></div>
     <div class="curr">
       <div class="pill play" id="tbPlayWrap" data-go-play="1"><span class="pico">⚡</span><span id="tbPlay">10/10</span></div>
-      <div class="pill coin"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span></div>
-      <div class="pill gem"><img class="cico" src="assets/gem.png?v=1" alt=""><span id="tbGem">120</span></div>
+      <div class="pill coin" aria-label="보유 골드"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span></div>
+      <div class="pill gem" aria-label="보유 보석"><img class="cico" src="assets/gem.png?v=1" alt=""><span id="tbGem">120</span></div>
     </div>
   </div>
 
@@ -476,18 +464,33 @@
     <!-- ===== MAIN ===== -->
     <div class="main" id="mainScroll">
 
-      <!-- HOME: four-player battle is the primary destination. -->
+      <!-- Character-led lobby: roster and entry are the primary actions. -->
       <div class="view on" id="v-home">
-        <aside class="terminal-brief" aria-label="경기 안내"><p class="terminal-kicker">CHART ARENA</p><h2>차트로 겨루는<br>트레이딩 아레나</h2><p>같은 차트, 다른 판단.<br>당신의 다음 수를 보여주세요.</p><dl><div><dt>참가자</dt><dd>4명</dd></div><div><dt>경기</dt><dd>5라운드</dd></div><div><dt>레버리지</dt><dd>1–10배</dd></div></dl><div class="terminal-guide"><b>01</b><span>방 선택</span><b>02</b><span>롱·숏과 배율 선택</span><b>03</b><span>차트 공개 · 골드 정산</span></div><a href="quiz-battle.html?table=practice">골드 없이 체험 →</a><small>게임 재화는 현금으로 환전되지 않습니다.</small></aside><section class="table-lobby" aria-labelledby="arenaTitle">
-          <div class="table-lobby-heading"><h1 id="arenaTitle">배틀 터미널</h1><span class="table-rule-tag">4인 · 5라운드</span><span class="market-status">과거 차트 미리보기</span></div><div class="chart-toolbar"><div class="chart-symbols" role="group" aria-label="미리보기 종목"><button type="button" data-preview="0" aria-pressed="true">BTC</button><button type="button" data-preview="1" aria-pressed="false">ETH</button><button type="button" data-preview="2" aria-pressed="false">SOL</button></div><span id="previewMeta"></span></div><div class="terminal-chart"><canvas id="terminalChart" aria-label="실제 과거 데이터 차트 미리보기"></canvas><span>기준가 100으로 환산 · 실시간 시세 아님</span></div><div class="stake-rooms" aria-label="배틀 방 선택">
-            <a class="stake-room entry-room" href="quiz-battle.html?table=beginner" data-room-reserve="1"><span class="room-tier">입문방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>100<span>골드</span></strong><span class="stake-name">가볍게 한 판</span></div><span class="room-funds"><b>보유 골드 전체 사용</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
-            <a class="stake-room standard-room" href="quiz-battle.html?table=standard" data-room-reserve="1"><span class="room-tier">일반방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>1,000<span>골드</span></strong><span class="stake-name">본격적인 승부</span></div><span class="room-funds"><b>보유 골드 전체 사용</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
-            <a class="stake-room expert-room" href="quiz-battle.html?table=expert" data-room-reserve="1"><span class="room-tier">고수방</span><div class="stake-medallion"><span class="stake-unit">1%당</span><strong>10,000<span>골드</span></strong><span class="stake-name">더 큰 승부의 무대</span></div><span class="room-funds"><b>보유 골드 전체 사용</b></span><span class="room-enter">입장하기 <span aria-hidden="true">→</span></span></a>
+        <section class="arena-showcase" aria-label="선택한 트레이더">
+          <div class="showcase-stage">
+            <div class="showcase-copy"><span class="section-kicker">THE CHART IS YOUR ARENA</span><h1>판을 읽고,<br>승부를 걸다.</h1><p>같은 차트. 서로 다른 선택.</p></div>
+            <span class="showcase-index" id="arenaHeroIndex" aria-hidden="true">01</span>
+            <span class="showcase-watermark" id="arenaHeroWord" aria-hidden="true">SEON</span>
+            <img id="arenaHero" class="arena-hero-art" src="assets/traders/seon-v1.png" alt="서온">
+            <div class="showcase-caption"><span id="arenaHeroRole">직감을 믿는 승부사</span><h2 id="arenaHeroName">서온</h2><p id="arenaHeroQuote">기회는 기다려주지 않으니까.</p></div>
           </div>
-          <div class="table-lobby-foot"><p>방은 1%당 단가만 다릅니다. 보유 골드 전체로 플레이합니다.</p><a href="quiz-battle.html?table=practice">골드 없이 체험하기 →</a></div>
+          <div class="roster-label"><span>YOUR TRADER</span><span>트레이더 선택 <b>05</b></span></div>
+          <div class="trader-roster" id="traderRoster" role="group" aria-label="플레이할 트레이더 선택"></div>
         </section>
-        <div class="lobby-utility"><a href="quiz-battle.html?table=practice">연습 경기 <b aria-hidden="true">↗</b></a><p>차트 변동률 × 방 단가 × 레버리지</p><a class="quick-seat" id="quickSeat" href="quiz-battle.html?table=standard">바로 입장 <b aria-hidden="true">→</b></a></div>
-        <div class="lobby-record"><span>MY ARENA</span><h2>나의 전적</h2><div class="statrow" aria-label="내 플레이 기록"><div class="stat"><div class="l">플레이</div><div class="v" id="homePlayed">0회</div></div><div class="stat"><div class="l">승률</div><div class="v" id="homeWin">—</div></div><div class="stat"><div class="l">최고 수익</div><div class="v" id="homeBest">—</div></div></div><button type="button" data-go="rank">기록 보기 →</button><section class="preview-moves" aria-label="선택한 과거 차트의 최근 봉 등락"><h3>미리보기 등락 <small>최근 6봉</small></h3><div id="previewMoves"></div><p>종가 기준 봉별 변화 · 실제 과거 구간</p></section></div>
+        <section class="arena-entry" aria-labelledby="arenaTitle">
+          <header class="entry-heading"><div><span class="section-kicker">PLAY YOUR NEXT MOVE</span><h2 id="arenaTitle">대전 입장</h2></div><span class="entry-format">4인 · 3라운드</span></header>
+          <p class="entry-intro">당신에게 맞는 테이블을 선택하세요.</p>
+          <div class="stake-rooms" aria-label="배틀 방 선택">
+            <a class="stake-room entry-room" href="quiz-battle.html?table=beginner" data-room-reserve="1"><span class="room-number">01</span><span class="room-description"><b class="room-tier">입문 테이블</b><small>가볍게 시작하는 첫 승부</small></span><span class="room-price"><small>1%당</small><strong>100 <i>G</i></strong></span><span class="room-arrow" aria-hidden="true">↗</span></a>
+            <a class="stake-room standard-room" href="quiz-battle.html?table=standard" data-room-reserve="1"><span class="room-number">02</span><span class="room-description"><b class="room-tier">일반 테이블</b><small>판단이 실력이 되는 곳</small></span><span class="room-price"><small>1%당</small><strong>1,000 <i>G</i></strong></span><span class="room-arrow" aria-hidden="true">↗</span></a>
+            <a class="stake-room expert-room" href="quiz-battle.html?table=expert" data-room-reserve="1"><span class="room-number">03</span><span class="room-description"><b class="room-tier">고수 테이블</b><small>한 번의 선택, 더 큰 승부</small></span><span class="room-price"><small>1%당</small><strong>10,000 <i>G</i></strong></span><span class="room-arrow" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="entry-note"><span>변동률 × 테이블 단가 × 레버리지</span><span>보유 골드 내 정산</span></div>
+          <a class="practice-entry" href="quiz-battle.html?table=practice"><span><b>부담 없이 한 판</b><small>골드가 줄지 않는 모의 경기</small></span><span>연습 입장 →</span></a>
+          <div class="arena-records"><div class="records-heading"><span>MY RECORD</span><button type="button" data-go="rank">전체 기록 ↗</button></div><div class="statrow"><div class="stat"><span class="l">플레이</span><strong class="v" id="homePlayed">0회</strong></div><div class="stat"><span class="l">승률</span><strong class="v" id="homeWin">—</strong></div><div class="stat"><span class="l">최고 수익</span><strong class="v" id="homeBest">—</strong></div></div></div>
+          <details class="market-preview"><summary>과거 차트 살펴보기 <span>BTC / ETH / SOL</span></summary><div class="chart-toolbar"><div class="chart-symbols" role="group" aria-label="미리보기 종목"><button type="button" data-preview="0" aria-pressed="true">BTC</button><button type="button" data-preview="1" aria-pressed="false">ETH</button><button type="button" data-preview="2" aria-pressed="false">SOL</button></div><span id="previewMeta"></span></div><div class="terminal-chart"><canvas id="terminalChart" aria-label="실제 과거 데이터 차트 미리보기"></canvas><span>기준가 100 · 실시간 시세 아님</span></div></details>
+          <p class="virtual-note">교육용 모의 트레이딩 게임 · 모든 재화는 가상이며 환전되지 않습니다.</p>
+        </section>
       </div>
 
       <!-- RANKING -->
@@ -500,7 +503,7 @@
 
       <!-- GARAGE / SHOP -->
       <div class="view" id="v-garage">
-        <div class="vh">🛒 상점 · 꾸미기</div>
+        <div class="vh">트레이더 & 컬렉션</div>
         <div class="gwrap">
           <div class="gleft">
             <div class="gprev"><div class="pv" id="gpv"></div><div class="nm" id="gpNick">차트고수</div><div class="tt" id="gpTitle"></div></div>
@@ -521,12 +524,12 @@
     <!-- ===== SIDEBAR ===== -->
     <div class="side">
       <div class="charshow" id="charShow"></div>
-      <div class="csname"><span class="pname" id="pName">차트고수</span><span class="edit" id="pEdit">✏️</span></div>
+      <div class="csname"><span class="pname" id="pName">차트고수</span><button type="button" class="edit" id="pEdit" aria-label="닉네임 변경">수정</button></div>
       <div class="plevel"><span class="lv" id="pLv">Lv.1</span><div class="bar"><i id="pBar"></i></div><span class="pct" id="pPct">0%</span></div>
       <nav class="nav" aria-label="내 계정 메뉴">
-        <a data-go="home">대시보드</a><a data-go="rank">내 기록</a>
-        <a data-go="garage">상점</a>
-        <a data-go="guild">길드</a>
+        <button type="button" data-go="home">로비</button><button type="button" data-go="rank">내 기록</button>
+        <button type="button" data-go="garage">상점</button>
+        <button type="button" data-go="guild">길드</button>
       </nav>
       <div class="sfoot">본 앱은 교육용 모의 트레이딩 게임입니다. 포인트·자산은 가상 재화이며 환전되지 않습니다.</div>
     </div>
@@ -535,31 +538,35 @@
 
 </div></div>
 <div class="toast" id="toast"></div>
-<div id="splash"><div class="ldbg"></div><div class="ldveil"></div><img class="ldlogo" src="assets/logo.png?v=3" alt="차트아레나"><div class="ldtag">차트로 승부하라! 지식으로 이겨라!</div><div class="ldbarwrap"><div class="ldbar"><div class="ldfill" id="ldfill"></div></div></div><div class="ldpct" id="ldpct">LOADING… 0%</div></div>
-<div id="dpop" class="dpop"><div class="dpopcard">
-  <div class="dpicon" id="dpIcon">🎁</div>
+<div id="splash" class="arena-loading" role="status" aria-label="차트아레나 준비 중">
+  <div class="loading-top"><img src="assets/arena-wordmark.svg" alt="CHART ARENA"><span>READ THE CHART. OWN THE MOMENT.</span></div>
+  <div class="loading-cast" aria-hidden="true"><div class="loading-trader trader-0"><span>01</span><img src="assets/traders/kai-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-1"><span>02</span><img src="assets/traders/yuna-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-2"><span>03</span><img src="assets/traders/seon-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-3"><span>04</span><img src="assets/traders/doyun-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-4"><span>05</span><img src="assets/traders/rin-v1.png" alt="" fetchpriority="high"></div></div>
+  <div class="loading-bottom"><div class="loading-copy"><span class="section-kicker">YOUR NEXT MOVE</span><h1>판을 읽고, 승부를 걸다.</h1><p>같은 차트. 서로 다른 선택.</p></div><div class="loading-state"><span id="ldpct">아레나를 준비하고 있어요</span><div class="ldbar" aria-hidden="true"><div class="ldfill" id="ldfill"></div></div><small>CHART ARENA / TRADER SERIES 01</small></div></div>
+</div>
+<div id="dpop" class="dpop" role="dialog" aria-modal="true" aria-labelledby="dpTitle"><div class="dpopcard">
+  <div class="dpicon" id="dpIcon">DAILY REWARD</div>
   <div class="dptitle" id="dpTitle">출석 보상</div>
   <div class="dpsub" id="dpSub">7일 연속 출석하면 더 큰 보상!</div>
   <div class="dpweek" id="dpWeek"></div>
-  <div class="dpreward" id="dpReward">+10,000 P</div>
+  <div class="dpreward" id="dpReward">+10,000 골드</div>
   <button class="dpbtn" id="dpBtn" type="button">받기</button>
 </div></div>
-<div id="setup"><div class="ssc"><div class="setup2">
+<div id="setup" role="dialog" aria-modal="true" aria-labelledby="setupTitle"><div class="ssc"><div class="setup2">
   <button class="sback" id="sback" type="button" aria-label="이전 캐릭터">‹</button>
   <div class="sleft">
     <div class="shero"><div class="emblem"></div><img id="heroImg" src="" alt=""><div class="podium"></div></div>
     <div class="heroname" id="heroName">에이미</div>
   </div>
   <div class="sright">
-    <img class="slogo" src="assets/logo_wordmark.png?v=3" alt="차트아레나">
-    <h2>캐릭터를 선택하세요</h2>
+    <img class="slogo" src="assets/arena-wordmark.svg" alt="차트아레나">
+    <span class="section-kicker">WELCOME TO CHART ARENA</span><h2 id="setupTitle">당신의 트레이더는?</h2>
     <div class="sh">마음에 드는 캐릭터를 고르고 닉네임을 정해주세요.</div>
     <div class="carwrap">
       <button class="carbtn" id="carL" type="button" aria-label="이전">‹</button>
       <div class="carousel" id="carousel"><div class="cartrack" id="cartrack"></div></div>
       <button class="carbtn" id="carR" type="button" aria-label="다음">›</button>
     </div>
-    <div class="nickrow2"><span class="nicon">👤</span><input id="nickin" maxlength="10" placeholder="닉네임 입력 (최대 10자)" autocomplete="off" spellcheck="false"><span class="ncount" id="ncount">0/10</span></div>
+    <div class="nickrow2"><span class="nicon">👤</span><input aria-label="닉네임" id="nickin" maxlength="10" placeholder="닉네임 입력 (최대 10자)" autocomplete="off" spellcheck="false"><span class="ncount" id="ncount">0/10</span></div>
     <button class="startbtn2" id="startbtn" type="button" disabled>시작하기 ›</button>
   </div>
 </div></div></div>
@@ -578,14 +585,14 @@ var FB=null, myUid=null, LB=null;
 var $=function(id){return document.getElementById(id);};
 /* Responsive layout is owned by app-shell.css. */
 /* 인트로 스플래시 (세션당 1회) */
-(function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_splash');}catch(e){}
+(function(){var s=$('splash');if(!s)return;var seen;try{seen=sessionStorage.getItem('ca_club_intro_v2');}catch(e){}
   if(seen){if(s.parentNode)s.parentNode.removeChild(s);return;}
-  try{sessionStorage.setItem('ca_splash','1');}catch(e){}
+  try{sessionStorage.setItem('ca_club_intro_v2','1');}catch(e){}
   var reduce=false;try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
   var fill=$('ldfill'),pct=$('ldpct'),dur=reduce?400:2200,t0=null;
   function done(){s.classList.add('out');setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},560);}
-  function step(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/dur);var v=Math.round(k*100);if(fill)fill.style.width=v+'%';if(pct)pct.textContent='LOADING… '+v+'%';if(k<1){requestAnimationFrame(step);}else{setTimeout(done,300);}}
-  if(window.requestAnimationFrame){requestAnimationFrame(step);}else{if(fill)fill.style.width='100%';if(pct)pct.textContent='LOADING… 100%';setTimeout(done,dur);}})();
+  function step(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/dur);var v=Math.round(k*100);if(fill)fill.style.width=v+'%';if(pct)pct.textContent=k<1?'아레나를 준비하고 있어요':'준비 완료';if(k<1){requestAnimationFrame(step);}else{setTimeout(done,300);}}
+  if(window.requestAnimationFrame){requestAnimationFrame(step);}else{if(fill)fill.style.width='100%';if(pct)pct.textContent='준비 완료';setTimeout(done,dur);}})();
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1300);}
 var fmt=function(n){return Math.round(n).toLocaleString();};
 
@@ -613,8 +620,8 @@ function checkAttendance(){ var d=dget(); if(d.att)return;
 function claimAttend(){ if(_pendAtt){ var d=dget(); d.att=1; d.streak=_pendAtt.streak; d.lastAtt=_today(); dset(d); setBal(getBal()+_pendAtt.R); st.gems+=3; saveHS(); refreshProfile(); toast('출석 보상 +'+fmt(_pendAtt.R)+'골드 · 💎+3'); _pendAtt=null; } $('dpop').classList.remove('show'); }
 function showAttend(streak,R){ var p=$('dpop'); if(!p)return;
   var wk=$('dpWeek'); if(wk){ var h=''; for(var i=1;i<=7;i++){ var cls=i<streak?'done':(i===streak?'cur':'fut'); h+='<div class="dpday '+cls+'"><span class="dd">'+i+'일</span><span class="dr">'+(ATTEND_TABLE[i-1]/10000)+'만</span></div>'; } wk.innerHTML=h; }
-  if($('dpSub'))$('dpSub').textContent=(streak>=7)?'7일 연속 달성! 최대 보상 🎉':(streak+'일 연속 출석 중 · 7일차엔 3만P!');
-  if($('dpReward'))$('dpReward').textContent='+'+fmt(R)+' P';
+  if($('dpSub'))$('dpSub').textContent=(streak>=7)?'7일 연속 달성! 최대 보상':(streak+'일 연속 출석 중 · 7일차엔 3만 골드');
+  if($('dpReward'))$('dpReward').textContent='+'+fmt(R)+' 골드 · 보석 3개';
   p.classList.add('show'); }
 document.addEventListener('DOMContentLoaded',function(){ var db=$('dpBtn'); if(db)db.onclick=claimAttend; });
 if($('dpBtn'))$('dpBtn').onclick=claimAttend;
@@ -628,6 +635,8 @@ for(var _hi=0;_hi<17;_hi++)IMG['hu'+_hi]='assets/hu'+_hi+'.png?v=7';
 var HU=[['hu0','제이드'],['hu1','미나'],['hu2','핑키'],['hu3','카이'],['hu4','조던'],['hu5','수아'],['hu6','에이미'],['hu7','릴리'],['hu8','노아'],
   ['hu9','헨리'],['hu10','레온'],['hu11','대표님'],['hu12','모모'],['hu13','아이샤'],['hu14','토니'],['hu15','로사'],['hu16','유리']];
 var NORMAL_CHAR_COST=100000,LUX_CHAR_COST=10000000;
+
+if(window.ArenaCharacters){ArenaCharacters.register(IMG);HU=ArenaCharacters.list.map(function(c){return [c.id,c.name];});}
 /* 악세사리(상점 판매) : id, 이름, 가격, 이모지 */
 var ACC=[['none','없음',0,''],['glasses','동그란 안경',1500,'👓'],['cap','볼캡',2500,'🧢'],['shades','선글라스',3500,'🕶️'],['scarf','머플러',4500,'🧣'],['phones','헤드폰',7000,'🎧'],['watch','골드시계',20000,'⌚'],['bag','명품백',35000,'👜'],['tophat','실크햇',12000,'🎩'],['crown','왕관',60000,'👑'],['ring','다이아 반지',90000,'💍']];
 var ACCEMO={}; ACC.forEach(function(a){ACCEMO[a[0]]=a[3];});
@@ -635,13 +644,14 @@ var st={nick:hs.nick||'', ch:(hs.equip&&hs.equip.ch)||'hu0', skin:(hs.equip&&hs.
   pet:(hs.equip&&hs.equip.pet)||'', petEq:Object.assign({head:'',neck:'',face:''},(hs.equip&&hs.equip.petEq)||{}), setup:!!hs.setup,
   owned:{title:new Set((hs.owned&&hs.owned.title)||['']), acc:new Set((hs.owned&&hs.owned.acc)||['none']), pet:new Set((hs.owned&&hs.owned.pet)||[]), pi:new Set((hs.owned&&hs.owned.pi)||[]), upg:new Set((hs.owned&&hs.owned.upg)||[]), char:new Set((hs.owned&&hs.owned.char)||[(hs.equip&&hs.equip.ch)||'hu0'])},
   gems:(typeof hs.gems==='number'?hs.gems:120)};   // 보석 = 가상 프리미엄 화폐(인게임 획득), 초기 120
+if(window.ArenaCharacters){var initialTrader=ArenaCharacters.selection(hs);st.ch=initialTrader.ch;st.skin=initialTrader.skin;ArenaCharacters.list.forEach(function(c){st.owned.char.add(c.id);});}
 if(!IMG[st.ch]){st.ch='hu0';}
 for(var _lx=0;_lx<17;_lx++)IMG['hux'+_lx]='assets/hux'+_lx+'.png?v=3';   // 럭셔리 스킨
 if(st.skin==='lux'&&!st.owned.upg.has(st.ch))st.skin='normal';
 var jstars = hs.jstars || {c0n0:3, c0n1:2};
-function saveHS(){localStorage.setItem(HS,JSON.stringify({nick:st.nick,setup:st.setup,gems:st.gems,equip:{ch:st.ch,skin:st.skin,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi],upg:[...st.owned.upg],char:[...st.owned.char]},jstars:jstars}));}
+function saveHS(){localStorage.setItem(HS,JSON.stringify({rosterVersion:2,nick:st.nick,setup:st.setup,gems:st.gems,equip:{ch:st.ch,skin:st.skin,title:st.title,acc:st.acc,pet:st.pet,petEq:st.petEq},owned:{title:[...st.owned.title],acc:[...st.owned.acc],pet:[...st.owned.pet],pi:[...st.owned.pi],upg:[...st.owned.upg],char:[...st.owned.char]},jstars:jstars}));}
 // 캐릭터 이미지: 고급형을 보유하고 실제로 선택했을 때만 hux 스킨
-function charImg(id,skin){ var useSkin=skin||(id===st.ch?st.skin:'normal'); if(useSkin==='lux'&&st.owned.upg.has(id)){ return IMG['hux'+String(id).replace('hu','')]||IMG[id]; } return IMG[id]||IMG.hu0; }
+function charImg(id,skin){return ArenaCharacters.get(id).image;}
 
 var PV={cat:'',id:''};   // 상점 미리보기(구매 전 착용) — 사이드바 아바타엔 미적용
 function avaHTML(pv){ var ch=(pv&&PV.cat==='char'&&PV.id)?PV.id:st.ch;
@@ -664,7 +674,7 @@ function charShowHTML(){
   return h;
 }
 function refreshProfile(){
-  document.querySelectorAll('[data-room-reserve]').forEach(function(el){var low=getBal()<Number(el.dataset.roomReserve);el.classList.toggle('funds-low',low);el.querySelector('.room-enter').innerHTML=(low?'골드 부족':'입장하기')+' <span aria-hidden="true">→</span>';});
+  document.querySelectorAll('[data-room-reserve]').forEach(function(el){var low=getBal()<Number(el.dataset.roomReserve);el.classList.toggle('funds-low',low);var enter=el.querySelector('.room-enter');if(enter)enter.innerHTML=(low?'골드 부족':'입장하기')+' <span aria-hidden="true">→</span>';el.setAttribute('aria-label',(el.querySelector('.room-tier')?.textContent||'테이블')+(low?' · 골드 부족':' · 입장하기')); });
   var quick=$('quickSeat');if(quick)quick.href='quiz-battle.html?table='+(getBal()>0?'standard':'practice');
   var a=$('pAva'); if(a)a.innerHTML=avaHTML();
   var cs=$('charShow'); if(cs)cs.innerHTML=charShowHTML();
@@ -673,14 +683,36 @@ function refreshProfile(){
   var tg=$('tbGem'); if(tg)tg.textContent=fmt(st.gems);
   var tp=$('tbPlay'); if(tp&&window.NRG){ var pl=NRG.plays(); tp.textContent=pl+'/'+NRG.MAX; var pw=$('tbPlayWrap'); if(pw)pw.classList.toggle('empty',pl<=0); }
   var n=$('pName'); if(n)n.textContent=st.nick;
+  renderArenaHero();
   if(window.XP){ var lv=XP.level(), pg=Math.round(XP.progress()*100);
     var lvE=$('pLv'); if(lvE)lvE.textContent='Lv.'+lv;
     var bE=$('pBar'); if(bE)bE.style.width=pg+'%';
     var pE=$('pPct'); if(pE)pE.textContent=pg+'%'; }
 }
+
+function renderArenaHero(){
+  if(!window.ArenaCharacters||!$('traderRoster'))return;
+  var list=ArenaCharacters.list,c=ArenaCharacters.get(st.ch);
+  $('arenaHero').src=c.image;$('arenaHero').alt=c.name;
+  $('arenaHeroName').textContent=c.name;$('arenaHeroRole').textContent=c.role;
+  $('arenaHeroQuote').textContent=c.quote;$('arenaHeroWord').textContent=c.en;
+  $('arenaHeroIndex').textContent=String(list.indexOf(c)+1).padStart(2,'0');
+  document.querySelector('.arena-showcase').style.setProperty('--trader-accent',c.color);
+  $('traderRoster').innerHTML=list.map(function(t){return '<button type="button" class="trader-choice'+(t.id===c.id?' on':'')+'" data-trader="'+t.id+'" aria-pressed="'+(t.id===c.id)+'" aria-label="'+t.name+' 선택"><span><img src="'+t.image+'" alt=""></span><b>'+t.name+'</b></button>';}).join('');
+}
+document.addEventListener('click',function(e){
+  var pick=e.target.closest('[data-trader]');if(!pick||!window.ArenaCharacters)return;
+  var c=ArenaCharacters.list.find(function(t){return t.id===pick.dataset.trader;});if(!c)return;
+  var selectionRoot=pick.closest('#shop')?$('shop'):$('traderRoster');
+  st.ch=c.id;st.skin='normal';st.owned.char.add(c.id);saveHS();refreshProfile();
+  if($('v-garage').classList.contains('on'))renderGarage();
+  var current=selectionRoot.querySelector('[data-trader="'+c.id+'"]');if(current)current.focus({preventScroll:true});
+});
+
 function renderHome(){
   refreshProfile();
   var s=myStats();
+  renderArenaHero();
   $('homePlayed').textContent=s.played+'회';
   $('homeWin').textContent=(s.played>0?s.win+'%':'—');
   $('homeBest').textContent=s.best>0?'+'+fmt(s.best)+' G':'—';
@@ -765,26 +797,10 @@ function equipCur(id){ if(gcat==='pet')st.pet=id; else if(gcat==='pi'){var sl=sl
 function renderGarage(){ refreshProfile();
   $('gpv').innerHTML=(gcat==='pet'||gcat==='pi')?petHTML(true):avaHTML(true); var _gp=$('gpv'); if(_gp&&_gp.parentNode)_gp.parentNode.classList.toggle('previewing', !!PV.id);
   $('gpNick').textContent=st.nick; $('gpTitle').textContent=st.title?('👑 '+st.title):'';
-  var CN=[['char','캐릭터'],['exch','보석교환'],['title','칭호']];
+  var CN=[['char','트레이더'],['exch','보석 교환'],['title','칭호']];
   $('catbar').innerHTML=CN.map(function(c){return '<button type="button" class="cat'+(gcat===c[0]?' on':'')+'" data-cat="'+c[0]+'">'+c[1]+'</button>';}).join('');
-  if(gcat==='char'){
-    var tierBar='<div class="chartiers"><button class="chartier'+(charTier==='normal'?' on':'')+'" data-char-tier="normal" type="button">기본 캐릭터</button><button class="chartier lux'+(charTier==='lux'?' on':'')+'" data-char-tier="lux" type="button">✦ 럭셔리 캐릭터</button></div>';
-    $('shop').innerHTML=tierBar+HU.map(function(h){var id=h[0],nm=h[1];
-      var own=st.owned.char.has(id), up=st.owned.upg.has(id), eq=st.ch===id;
-      var isLux=charTier==='lux', equipped=eq&&st.skin===charTier;
-      var cardImg=isLux?(IMG['hux'+String(id).replace('hu','')]||IMG[id]):IMG[id];
-      var foot,badge='';
-      if(isLux){
-        if(up){ foot='<div class="skinbtn'+(equipped?' on':'')+'" data-equip-skin="lux" data-char="'+id+'">'+(equipped?'장착중':'럭셔리 장착')+'</div>'; badge='<div class="st" style="background:var(--gold);color:#111">보유중</div>'; }
-        else { foot='<div class="upgb" data-upg="'+id+'">✦ 구매 '+fmt(LUX_CHAR_COST)+'</div>'; }
-      }else{
-        if(own){ foot='<div class="skinbtn'+(equipped?' on':'')+'" data-equip-skin="normal" data-char="'+id+'">'+(equipped?'장착중':'기본형 장착')+'</div>'; badge='<div class="st" style="background:'+(equipped?'var(--green)':'rgba(53,208,122,.2)')+';color:#052">보유중</div>'; }
-        else { foot='<div class="buyb" data-buychar="'+id+'">🛒 기본형 '+fmt(NORMAL_CHAR_COST)+'</div>'; }
-      }
-      return '<div class="item'+(isLux?' islux':'')+((isLux?!up:!own)?' locked':'')+'" data-id="'+id+'" style="border-color:'+(equipped?'var(--gold)':isLux?'rgba(245,196,81,.4)':'var(--line)')+';box-shadow:'+(equipped?'0 0 16px -6px var(--gold)':'none')+'">'
-        +badge+(isLux?'<div class="luxtag">✦</div>':'')
-        +'<div class="pic"><img src="'+cardImg+'" alt="'+nm+(isLux?' 럭셔리':' 기본형')+'"></div><div class="nm">'+nm+(isLux?' · 럭셔리':'')+'</div>'+foot+'</div>';
-    }).join('');
+  if(gcat==='char'&&window.ArenaCharacters){
+    $('shop').innerHTML='<div class="trader-collection-heading"><h2>당신의 트레이더</h2><p>다섯 가지 개성. 마음에 드는 트레이더를 선택하세요.</p></div>'+ArenaCharacters.list.map(function(c){return '<button type="button" class="collection-trader'+(st.ch===c.id?' on':'')+'" data-trader="'+c.id+'" aria-pressed="'+(st.ch===c.id)+'"><div><img src="'+c.image+'" alt=""></div><span><b>'+c.name+'</b><small>'+c.role+'</small></span><em>'+(st.ch===c.id?'선택 중':'선택하기')+'</em></button>';}).join('');
     return;
   }
   if(gcat==='exch'){ renderExchange(); return; }
@@ -811,7 +827,7 @@ document.addEventListener('click',function(e){
   var bb=e.target.closest('[data-buy]'); if(bb){ buyItem(bb.dataset.buy); return; }
   var sb=e.target.closest('[data-sell]'); if(sb){ sellItem(sb.dataset.sell); return; }
   var it=e.target.closest('#shop .item'); if(!it)return; var id=it.dataset.id;
-  if(gcat==='char'){ if(charTier==='lux'){ if(!st.owned.upg.has(id)){buyUpgrade(id);return;} st.ch=id;st.skin='lux'; } else { if(!st.owned.char.has(id)){buyChar(id);return;} st.ch=id;st.skin='normal'; } PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
+  if(gcat==='char'||gcat==='legacy'){ if(charTier==='lux'){ if(!st.owned.upg.has(id)){buyUpgrade(id);return;} st.ch=id;st.skin='lux'; } else { if(!st.owned.char.has(id)){buyChar(id);return;} st.ch=id;st.skin='normal'; } PV={cat:'',id:''}; saveHS(); refreshProfile(); renderGarage(); toast('캐릭터 선택!'); return; }
   var row=ITEMS[gcat].find(function(x){return x[0]===id;}); var own=ownSet().has(id);
   if(own){ PV={cat:'',id:''}; equipCur(id); saveHS(); refreshProfile(); renderGarage(); toast(row[1]+(isEq(id)?' 장착!':' 해제')); }
   else { if(PV.cat===gcat&&PV.id===id){ PV={cat:'',id:''}; } else { PV={cat:gcat,id:id}; toast('👀 미리보기 — [구매하기]로 확정'); } renderGarage(); }   // 구매 전 착용 미리보기(토글)
@@ -849,15 +865,15 @@ function doExchange(kind){
 /* 첫 실행: 캐릭터 선택 (히어로 + 캐러셀 + 닉네임, 한 번만) */
 (function(){ var ov=$('setup'); if(!ov)return;
   if(st.setup){ if(ov.parentNode)ov.parentNode.removeChild(ov); return; }
-  ov.classList.add('show');
+  ov.classList.add('show');document.querySelector('.scaler').inert=true;
   var track=$('cartrack'), heroImg=$('heroImg'), heroName=$('heroName'), nick=$('nickin'), btn=$('startbtn'), ncount=$('ncount');
   var idx=HU.findIndex(function(h){return h[0]===((st.ch&&IMG[st.ch])?st.ch:'hu0');}); if(idx<0)idx=0;
-  track.innerHTML=HU.map(function(h,i){return '<div class="ccard" data-i="'+i+'"><div class="cpic"><img src="'+IMG[h[0]]+'" alt=""></div><span>'+h[1]+'</span></div>';}).join('');
+  track.innerHTML=HU.map(function(h,i){return '<button type="button" class="ccard" data-i="'+i+'" aria-label="'+h[1]+' 선택"><div class="cpic"><img src="'+IMG[h[0]]+'" alt=""></div><span>'+h[1]+'</span></button>';}).join('');
   var cards=track.querySelectorAll('.ccard');
   function upd(){ ncount.textContent=nick.value.length+'/10'; btn.disabled=!(nick.value.trim().length>0); }
   function sel(i){ idx=Math.max(0,Math.min(i,HU.length-1)); var h=HU[idx];
     heroImg.src=IMG[h[0]]; heroName.textContent=h[1];
-    for(var k=0;k<cards.length;k++)cards[k].classList.toggle('on',k===idx);
+    for(var k=0;k<cards.length;k++){cards[k].classList.toggle('on',k===idx);cards[k].setAttribute('aria-pressed',String(k===idx));}
     if(cards[idx])cards[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
     upd(); }
   track.addEventListener('click',function(e){ var c=e.target.closest('[data-i]'); if(c)sel(+c.dataset.i); });
@@ -869,7 +885,8 @@ function doExchange(kind){
     if(isBad(nick.value)){ toast('닉네임에 부적절한 표현은 사용할 수 없어요'); nick.focus(); return; }
     st.ch=HU[idx][0]; st.skin='normal'; st.owned.char.add(st.ch); st.nick=nick.value.trim().slice(0,10); st.setup=true; saveHS(); refreshProfile();
     var vg=$('v-garage'); if(vg&&vg.classList.contains('on'))renderGarage();
-    ov.classList.add('out'); setTimeout(function(){ if(ov.parentNode)ov.parentNode.removeChild(ov); },420); });
+    document.querySelector('.scaler').inert=false;ov.classList.add('out'); setTimeout(function(){ if(ov.parentNode)ov.parentNode.removeChild(ov); },420); });
+  ov.addEventListener('keydown',function(e){if(e.key!=='Tab')return;var all=Array.from(ov.querySelectorAll('button:not(:disabled),input')).filter(function(x){return x.offsetParent!==null;});if(!all.length)return;if(e.shiftKey&&document.activeElement===all[0]){e.preventDefault();all[all.length-1].focus();}else if(!e.shiftKey&&document.activeElement===all[all.length-1]){e.preventDefault();all[0].focus();}});
   sel(idx);
 })();
 
@@ -916,7 +933,7 @@ function myContrib(){ return getBal(); }
 function gTotal(g){ if(!g)return 0; if(typeof g.totalPoints==='number')return g.totalPoints; var s=0,m=g.members||{}; for(var k in m)s+=(m[k].contrib||0); return s; }
 function gMembersArr(g){ var m=(g&&g.members)||{}, a=[]; for(var k in m)a.push(Object.assign({uid:k},m[k])); a.sort(function(x,y){return (y.contrib||0)-(x.contrib||0);}); return a; }
 function gMissionTarget(g){ return Math.max(100000, Math.ceil((gTotal(g)+1)/100000)*100000); }
-function gAva(ch){ return IMG[ch]?'<img src="'+IMG[ch]+'" alt="">':'<span class="ge">'+(EMO[ch]||'🧑')+'</span>'; }
+function gAva(ch){return '<img src="'+ArenaCharacters.get(ch).image+'" alt="">';}
 function meMember(role){ return {nick:(st.nick||'익명').slice(0,12), ch:st.ch, role:role, contrib:myContrib(), joinedAt:Date.now()}; }
 /* 데모 길드 */
 function mkDemo(id,name,em,color,nicks,chs,pts){ var mem={}; nicks.forEach(function(n,i){ mem['d_'+id+'_'+i]={nick:n,ch:chs[i]||'bull',role:i===0?'owner':(i<3?'officer':'member'),contrib:pts[i]||10000,joinedAt:0}; });

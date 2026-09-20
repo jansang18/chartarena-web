@@ -1,7 +1,7 @@
 /* Deterministic percentage-gold rules and atomic local-wallet transitions. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION=4,ROUNDS=5;
+const VERSION=5,ROUNDS=3;
 const TABLES=Object.freeze({
  practice:Object.freeze({id:'practice',name:'연습방',rate:100,reserve:0,capital:2000,practice:true}),
  beginner:Object.freeze({id:'beginner',name:'입문방',rate:100,reserve:1,capital:2000}),
