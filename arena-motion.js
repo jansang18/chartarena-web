@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 if(!window.ArenaCharacters || typeof IntersectionObserver==='undefined')return;
-var selector='#arenaHero,#lobbyTrader,#lobbyPortrait,#lobbyOpponent,#mePortrait,#botPortrait,.pod .ava img.ch,.result-trader,.collection-trader.on img';
+var selector='#arenaHero,#lobbyTrader,#lobbyPortrait,#lobbyOpponent,#mePortrait,#botPortrait,.pod .ava img.ch,.result-trader,.collection-trader.on img,.login-trader';
 var records=new Map(),failed=new Set(),reduce=window.matchMedia('(prefers-reduced-motion: reduce)');
 var catalog=window.ArenaCharacters.list;
 function character(src){return catalog.find(function(c){return src.split('?')[0].endsWith(c.image)||src.split('?')[0].endsWith(c.motion);});}

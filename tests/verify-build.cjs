@@ -1,7 +1,7 @@
 const fs=require('node:fs');
 const vm=require('node:vm');
 const assert=require('node:assert/strict');
-const files=['index.html','landscape.html','game.html','quiz-battle.html','deathmatch.html','puzzle.html','learn.html','daily.html'];
+const files=['index.html','landscape.html','game.html','quiz-battle.html','deathmatch.html','puzzle.html','learn.html','daily.html','login.html'];
 let count=0;
 for(const file of files){
   const html=fs.readFileSync(file,'utf8');
@@ -12,7 +12,8 @@ for(const file of files){
   for(const m of markup.matchAll(/(?:src|href)="((?:assets\/)[^"<>]+)"/g)){
     assert.ok(fs.existsSync(m[1].split('?')[0]),`${file}: missing ${m[1]}`);
   }
-  assert.ok(html.includes('app-shell.css?v=')&&html.includes('app-shell.js?v='),file+' missing common shell');
+  if(file==='login.html')assert.ok(html.includes('arena-auth.js?v=')&&html.includes('arena-design.css?v='),file+' missing shared identity or design');
+  else assert.ok(html.includes('app-shell.css?v=')&&html.includes('app-shell.js?v='),file+' missing common shell');
 }
 assert.equal(fs.readFileSync('index.html','utf8'),fs.readFileSync('landscape.html','utf8'));
 const battle=fs.readFileSync('quiz-battle.html','utf8');

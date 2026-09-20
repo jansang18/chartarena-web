@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <script src="arena-wallet.js?v=eaf8ae635ee5"></script>
 <script src="app-shell.js?v=b3810da044e7"></script>
+<script src="arena-auth.js?v=a3ac03f45e92"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트아레나 — 차트로 배틀하는 트레이딩 게임">
@@ -446,7 +447,7 @@
 <link rel="stylesheet" href="gameplay.css?v=1de081b304d0">
 <link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
 <script src="arena-characters.js?v=7ae6cc688cb7"></script>
-<script src="arena-motion.js?v=5a66aad0e096" defer></script>
+<script src="arena-motion.js?v=0f5c18738ddc" defer></script>
 <script src="terminal-home.js?v=3d1fe17433f5" defer></script>
 
 <div class="scaler" id="scaler"><div class="frame">
@@ -454,7 +455,7 @@
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
     <span class="exchange-brand" aria-label="차트아레나"><span>CHART<span class="brand-accent">ARENA</span><small>READ THE CHART. OWN THE MOMENT.</small></span></span>
-    <nav class="terminal-nav" aria-label="주요 메뉴"><button type="button" class="on" aria-current="page" data-go="home">홈</button><a href="quiz-battle.html">배틀</a><button type="button" data-go="rank">기록</button><button type="button" data-go="garage">상점</button></nav><div class="tsp"></div>
+    <nav class="terminal-nav" aria-label="주요 메뉴"><button type="button" class="on" aria-current="page" data-go="home">홈</button><a href="quiz-battle.html">배틀</a><button type="button" data-go="rank">기록</button><button type="button" data-go="garage">상점</button><a class="account-entry" id="accountEntry" href="login.html">로그인</a></nav><div class="tsp"></div>
     <div class="curr">
       <div class="pill play" id="tbPlayWrap" data-go-play="1"><span class="pico">⚡</span><span id="tbPlay">10/10</span></div>
       <div class="pill coin" aria-label="보유 골드"><img class="cico" src="assets/coin.png?v=1" alt=""><span id="tbCoin">12,450</span></div>
@@ -578,10 +579,7 @@
 <script>
 (function(){
 "use strict";
-/* ═══════════════ 실시간 랭킹 (Firebase) ═══════════════
-   아래 FB_CONFIG 를 Firebase 콘솔의 웹앱 설정값으로 채우면 실시간 랭킹이 켜집니다.
-   비워두면 데모(가상 참가자) 랭킹으로 안전하게 작동합니다. 설정법: FIREBASE_SETUP.md */
-var FB_CONFIG = { apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"chartarena-3051a.firebaseapp.com", projectId:"chartarena-3051a", storageBucket:"chartarena-3051a.firebasestorage.app", messagingSenderId:"44830019146", appId:"1:44830019146:web:76089575110b3107e460b3", measurementId:"G-WS5EE5TF5N" };
+/* Firebase identity is shared with login.html through arena-auth.js. */
 var FB=null, myUid=null, LB=null;
 /* ══════════════════════════════════════════════════════ */
 var $=function(id){return document.getElementById(id);};
@@ -741,17 +739,16 @@ var MET=[['points','자산'],['win','승률'],['best','최고']];
 var rm='points';
 function myStats(){ var g=lj(GS),w=g.wins||0,l=g.losses||0,tt=w+l; return {points:getBal(),win:tt?Math.round(w/tt*100):0,best:g.best||0,played:g.played||0}; }
 /* Firebase 실시간 랭킹 (설정 없으면 데모로 폴백) */
-function loadFB(cb){ var mods=['app','auth','firestore'],i=0; (function nx(){ if(i>=mods.length){cb();return;} var s=document.createElement('script'); s.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-'+mods[i++]+'-compat.js'; s.onload=nx; s.onerror=function(){cb();}; document.head.appendChild(s); })(); }
 function submitScore(){ if(!FB||!myUid)return; var s=myStats();
   if((s.best||0)<=0 && (s.played||0)<=0) return;   // 실제로 플레이한 유저만 랭킹 제출 (신규 방문자·테스트 오염 방지)
   FB.collection('scores').doc(myUid).set({nick:(st.nick||'익명').slice(0,12),ch:st.ch,points:s.points,win:s.win,best:s.best,played:s.played,at:Date.now()},{merge:true}).catch(function(){}); }
 function fetchLB(cb){ if(!FB){cb(null);return;} FB.collection('scores').orderBy('points','desc').limit(50).get()
   .then(function(qs){ var a=[]; qs.forEach(function(d){var x=d.data();x._id=d.id;a.push(x);}); cb(a); }).catch(function(){cb(null);}); }
-(function(){ try{ if(!FB_CONFIG.apiKey||window.CA_LOCAL_PREVIEW)return; loadFB(function(){ try{ if(typeof firebase==='undefined')return;
-  firebase.initializeApp(FB_CONFIG); FB=firebase.firestore();
-  firebase.auth().signInAnonymously().then(function(c){ myUid=c.user.uid; submitScore();
+(function(){ if(!window.ArenaAuth||ArenaAuth.local)return;
+  ArenaAuth.current().then(function(user){if(user&&!user.isAnonymous)$('accountEntry').textContent='내 계정';}).catch(function(){});
+  ArenaAuth.connect().then(function(c){ FB=c.db; myUid=c.user.uid; submitScore();
     var vr=$('v-rank'); if(vr&&vr.classList.contains('on'))renderRank();
-    var vg=$('v-guild'); if(vg&&vg.classList.contains('on'))guildEnter(); else if(GLD.gid&&!GLD.local)guildLoad(); }).catch(function(){}); }catch(e){FB=null;} }); }catch(e){} })();
+    var vg=$('v-guild'); if(vg&&vg.classList.contains('on'))guildEnter(); else if(GLD.gid&&!GLD.local)guildLoad(); }).catch(function(){FB=null;}); })();
 function kf(v){return v>=100000?Math.round(v/1000)+'K':v>=10000?(v/1000).toFixed(1)+'K':Math.round(v).toLocaleString();}
 function mval(e){return rm==='points'?e.points:rm==='win'?e.win:e.best;}
 function mv(e){return rm==='points'?kf(e.points)+'P':rm==='win'?e.win+'%':'+'+kf(e.best);}

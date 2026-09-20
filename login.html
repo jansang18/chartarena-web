@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko" data-page="login">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101a23">
+  <title>로그인 · 차트아레나</title>
+  <meta name="description" content="같은 차트, 서로 다른 선택. 차트아레나에 입장하세요.">
+  <link rel="stylesheet" href="arena-design.css?v=274ed0c2b8aa">
+  <link rel="stylesheet" href="login.css?v=751a03daa2ce">
+  <script src="arena-auth.js?v=a3ac03f45e92" defer></script>
+  <script src="arena-characters.js?v=7ae6cc688cb7" defer></script>
+  <script src="arena-motion.js?v=0f5c18738ddc" defer></script>
+  <script src="login.js?v=2959e82cb7e2" defer></script>
+</head>
+<body class="login-page">
+  <a class="skip-link" href="#authTitle">로그인으로 건너뛰기</a>
+  <header class="login-header">
+    <a class="exchange-brand" href="index.html" aria-label="차트아레나 홈"><span>CHART<span class="brand-accent">ARENA</span><small>READ THE CHART. OWN THE MOMENT.</small></span></a>
+    <a class="back-link" href="index.html"><span aria-hidden="true">←</span> 로비로</a>
+  </header>
+  <main class="login-layout">
+    <section class="login-stage" aria-label="차트아레나 트레이더 서온">
+      <div class="stage-grid" aria-hidden="true"></div>
+      <div class="stage-heading"><span class="section-kicker">YOUR NEXT MOVE</span><h1>판을 읽는 순간,<br><em>승부는 시작된다.</em></h1><p>같은 차트. 서로 다른 선택.</p></div>
+      <span class="stage-word" aria-hidden="true">ARENA</span>
+      <div class="stage-ring" aria-hidden="true"></div>
+      <img class="login-trader" src="assets/traders/seon-v1.png" alt="" width="768" height="1024" fetchpriority="high">
+      <div class="stage-caption"><div><span class="section-kicker">MEET YOUR TRADER</span><strong>서온 <span>SEON</span></strong><p>“기회는 기다려주지 않으니까.”</p></div><span class="stage-number" aria-hidden="true">01 / 05</span></div>
+      <div class="stage-footer"><span>4인 차트 배틀</span><i aria-hidden="true"></i><span>1:1 데스매치</span></div>
+    </section>
+    <section class="login-panel" aria-labelledby="authTitle">
+      <div class="auth-content">
+        <span class="section-kicker auth-kicker">WELCOME TO THE ARENA</span>
+        <h2 id="authTitle" tabindex="-1">다시, 아레나로.</h2>
+        <p class="auth-intro" id="authIntro">당신의 다음 판단을 기다리고 있어요.</p>
+        <p class="preview-notice" id="previewNotice" hidden>로컬 미리보기 · 계정 연결 없이 화면을 확인할 수 있어요.</p>
+        <div id="signedOut">
+          <div class="auth-modes" role="group" aria-label="계정 메뉴"><button type="button" data-mode="login" aria-pressed="true">로그인</button><button type="button" data-mode="register" aria-pressed="false">회원가입</button></div>
+          <form id="authForm" method="post" novalidate>
+            <fieldset id="authFields" disabled>
+              <div class="auth-field"><label for="authEmail">이메일</label><input id="authEmail" name="email" type="email" placeholder="이메일 주소" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="none" maxlength="254" required aria-describedby="emailError"><span class="field-error" id="emailError"></span></div>
+              <div class="auth-field" id="passwordField"><div class="label-row"><label for="authPassword">비밀번호</label><button class="text-button" id="resetMode" type="button">비밀번호 찾기</button></div><div class="password-wrap"><input id="authPassword" name="password" type="password" placeholder="비밀번호" autocomplete="current-password" maxlength="128" required aria-describedby="passwordError"><button class="password-toggle" id="passwordToggle" type="button" aria-label="비밀번호 표시" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="m4 3 16 18"/></svg></button></div><span class="field-error" id="passwordError"></span></div>
+              <div class="auth-field" id="confirmField" hidden><label for="authConfirm">비밀번호 확인</label><input id="authConfirm" name="confirmPassword" type="password" placeholder="비밀번호를 한 번 더 입력" autocomplete="new-password" maxlength="128" aria-describedby="confirmError"><span class="field-error" id="confirmError"></span></div>
+              <button class="auth-primary" id="authSubmit" type="submit"><span id="submitLabel">로그인</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+            </fieldset>
+          </form>
+          <p class="auth-status" id="authStatus" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+          <button class="reset-back text-button" id="resetBack" type="button" hidden>← 로그인으로 돌아가기</button>
+          <div class="guest-divider"><span>먼저 둘러보고 싶다면</span></div>
+          <a class="auth-guest" id="guestEntry" href="index.html">게스트로 입장 <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="account-state" id="signedIn" hidden>
+          <div class="account-icon" aria-hidden="true">✓</div><p class="account-email" id="accountEmail"></p><p class="account-copy">로그인되었습니다. 아레나에서 만나요.</p>
+          <a class="auth-primary" id="memberEntry" href="index.html">아레나 입장 <span aria-hidden="true">↗</span></a>
+          <button class="text-button account-logout" id="logout" type="button">로그아웃</button>
+          <p class="auth-status" id="accountStatus" role="status" hidden></p>
+        </div>
+        <p class="save-note">게임 재화와 플레이 기록은 현재 기기에 저장됩니다.<br>로그인해도 다른 기기로 자동 이전되지 않습니다.</p>
+        <details class="auth-info"><summary>로그인 정보 안내</summary><p>이메일과 비밀번호는 Firebase Authentication으로 인증합니다. 비밀번호를 게임 저장 데이터에 별도로 보관하지 않습니다. 로그아웃해도 이 기기의 게임 기록은 유지됩니다. 공용 기기에서는 이용 후 로그아웃해 주세요.</p></details>
+      </div>
+    </section>
+  </main>
+  <footer class="login-footer"><span>CHART ARENA</span><span>가상 골드로 즐기는 차트 배틀</span></footer>
+  <noscript><p class="noscript-note">로그인에는 JavaScript가 필요합니다. 브라우저 설정에서 허용한 뒤 다시 열어 주세요.</p></noscript>
+</body>
+</html>

@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <script src="arena-wallet.js?v=eaf8ae635ee5"></script>
 <script src="app-shell.js?v=b3810da044e7"></script>
+<script src="arena-auth.js?v=a3ac03f45e92"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:type" content="website">
 <meta property="og:title" content="차트아레나 — 차트로 배틀하는 트레이딩 게임">
@@ -222,7 +223,7 @@
 <link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8">
 <link rel="stylesheet" href="battle-controls.css?v=c6f6779d4c46">
 <script src="arena-characters.js?v=7ae6cc688cb7"></script>
-<script src="arena-motion.js?v=5a66aad0e096" defer></script>
+<script src="arena-motion.js?v=0f5c18738ddc" defer></script>
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -352,12 +353,7 @@ if(window.ArenaCharacters){var initialTrader=ArenaCharacters.selection(hub);myCh
 var myChImg=ArenaCharacters.get(myCh).image;
 /* ===== Firebase (실시간 대결 매칭용 — 랭킹과 같은 프로젝트) ===== */
 var FB=null, myUid=null;
-var FB_CONFIG={ apiKey:"AIzaSyCRGFwkDNEIkTc7mnPPqiubFDaTjWf87iA", authDomain:"chartarena-3051a.firebaseapp.com", projectId:"chartarena-3051a", storageBucket:"chartarena-3051a.firebasestorage.app", messagingSenderId:"44830019146", appId:"1:44830019146:web:76089575110b3107e460b3", measurementId:"G-WS5EE5TF5N" };
-(function(){ try{ if(!FB_CONFIG.apiKey)return; var mods=['app','auth','firestore'],i=0;
-  (function nx(){ if(i>=mods.length){ try{ if(typeof firebase==='undefined')return; if(window.CA_LOCAL_PREVIEW)return; firebase.initializeApp(FB_CONFIG); FB=firebase.firestore();
-      firebase.auth().signInAnonymously().then(function(c){ myUid=c.user.uid; }).catch(function(){ FB=null; }); }catch(e){ FB=null; } return; }
-    var s=document.createElement('script'); s.src='https://www.gstatic.com/firebasejs/10.12.2/firebase-'+mods[i++]+'-compat.js'; s.onload=nx; s.onerror=function(){}; document.head.appendChild(s); })();
-}catch(e){} })();
+(function(){if(!window.ArenaAuth||ArenaAuth.local)return;ArenaAuth.connect().then(function(c){FB=c.db;myUid=c.user.uid;}).catch(function(){FB=null;});})();
 function fbReady(){ return !!(FB && myUid); }
 /* 보유 포인트(전 앱 공유) — 배팅/배당에 실제로 사용 */
 var GS='chartarena_web_v1';
