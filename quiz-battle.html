@@ -802,6 +802,7 @@ function decisiveSummary(){
       for(var at of [30,60]){if(ArenaRules.exitAt(pick)<at)continue;
         var action=ArenaRules.exitAt(pick)===at?'STOP':(pick.switches||[]).includes(at)?'SWITCH':'GO';
         var alternative=Object.assign({},pick,{exit:action==='GO'?at:90,switches:(pick.switches||[]).filter(function(x){return x<at;})});
+        if(pick.leverageChanges)alternative.leverageChanges=pick.leverageChanges.filter(function(change){return change.at<at;});
         if(alternative.skill&&alternative.skill.at>=at)delete alternative.skill;
         var actual=ArenaRules.profit(state,pick,move,at+30).delta,other=ArenaRules.profit(state,alternative,move,at+30).delta;
         moments.push({round:row.round,at:at,action:action,swing:actual-other,comparison:action==='GO'?'STOP':'GO 유지'});
