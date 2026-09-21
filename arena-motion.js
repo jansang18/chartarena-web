@@ -5,7 +5,7 @@ if(!window.ArenaCharacters || typeof IntersectionObserver==='undefined')return;
 var selector='#arenaHero,#lobbyTrader,#lobbyPortrait,#lobbyOpponent,#mePortrait,#botPortrait,.pod .ava img.ch,.result-trader,.collection-trader.on img,.login-trader';
 var records=new Map(),failed=new Set(),reduce=window.matchMedia('(prefers-reduced-motion: reduce)');
 var catalog=window.ArenaCharacters.list;
-function character(src){return catalog.find(function(c){return src.split('?')[0].endsWith(c.image)||src.split('?')[0].endsWith(c.motion);});}
+function character(src){return catalog.find(function(c){return src.split('?')[0].endsWith(c.image)||(c.motion&&src.split('?')[0].endsWith(c.motion));});}
 function blocked(){return document.hidden||reduce.matches||!!(window.navigator.connection&&window.navigator.connection.saveData);}
 function render(img,r){
  var desired=r.visible&&!blocked()&&!failed.has(r.character.id)?r.character.motion:r.character.image;
@@ -19,7 +19,8 @@ function sync(){
  var eligible=new Set(document.querySelectorAll(selector));
  records.forEach(function(r,img){if(!img.isConnected||!eligible.has(img)){observer.unobserve(img);records.delete(img);if(img.isConnected)img.setAttribute('src',r.character.image);}});
  eligible.forEach(function(img){
-  var c=character(img.getAttribute('src')||'');if(!c||!c.motion)return;
+  var c=character(img.getAttribute('src')||'');
+  if(!c||!c.motion){if(records.has(img)){observer.unobserve(img);records.delete(img);}return;}
   var r=records.get(img);
   if(r){r.character=c;render(img,r);return;}
   r={character:c,visible:false};records.set(img,r);

@@ -101,3 +101,34 @@ html[data-page=home] .practice-entry{min-height:78px}.arena-records{padding:6px 
  html[data-page=battle][data-playing] .pod .desk{z-index:2;width:100%;background:linear-gradient(transparent,#18181ae6 32%);padding-top:12px}
  html[data-page=battle][data-playing] .ctrl{grid-column:1/-1;grid-row:4}
 }
+/* Ten original full-height portraits share top-aligned, undistorted crop windows. */
+.trader-roster{display:flex;flex:none;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:#a48754 #171719;overscroll-behavior-x:contain;gap:6px;padding-bottom:10px}
+.trader-roster .trader-choice{flex:0 0 calc((100% - 30px)/5.4);min-width:48px;scroll-snap-align:center}
+.trader-choice>span{position:relative}
+.trader-choice img[src*="/royal/"]{width:180%;height:auto;margin-left:-40%;object-fit:contain;object-position:top}
+.arena-hero-art[src*="/royal/"]{height:190%;width:110%;right:-22%;top:2%;object-position:center top}
+.collection-trader img[src*="/royal/"]{display:block;width:150%;height:auto;margin-left:-25%;object-fit:contain;object-position:center top}
+html[data-page=home] .gprev .pv img[src*="/royal/"]{display:block;width:150%;height:auto;max-width:none;margin-left:-25%;object-position:center top;transform:none}
+html[data-page=home] .charshow .csch[src*="/royal/"]{width:62px;height:auto;margin-left:-17px}
+html .ccard .cpic img[src*="/royal/"]{width:180%;height:auto;flex:none;margin:0 -40%;object-position:center top}
+.loading-trader img[src*="/royal/"]{aspect-ratio:2/3;object-fit:contain;top:1%}
+.lobby-feature>img[src*="/royal/"]{height:195%;width:120%;right:-25%;top:4%;object-position:center top}
+html[data-page=battle][data-playing] .pod .ava .ch[src*="/royal/"]{width:165%;height:auto;max-width:none;margin-left:-32.5%;object-position:center top}
+html[data-page=battle] .lwp img[src*="/royal/"]{width:170%;height:auto;margin-left:-35%;object-position:center top}
+.dm-poster .dm-contender img[src*="/royal/"]{inset:0 auto auto -35%;width:170%;height:auto;object-fit:contain;object-position:center top}
+.dm-player img[src*="/royal/"]{object-position:center top}
+.login-trader[src*="/royal/"]{object-position:center top}
+@media(min-width:600px) and (max-height:550px){
+ .trader-roster{padding-bottom:5px;gap:4px}.trader-roster .trader-choice{flex-basis:calc((100% - 20px)/4.4)}
+ .trader-choice>span{height:36px}.trader-choice img[src*="/royal/"]{width:165%;margin-left:-32.5%}
+ .lobby-feature>img[src*="/royal/"]{width:86%;height:275%;right:-9%;top:0}
+}
+@media(max-width:599px){
+ .arena-hero-art[src*="/royal/"]{height:180%;right:-22%;top:2%}
+ .trader-roster .trader-choice{flex-basis:calc((100% - 24px)/5.2)}
+ .collection-trader img[src*="/royal/"]{width:170%;margin-left:-35%}
+}
+
+.loading-cast{grid-template-rows:repeat(2,minmax(0,1fr));gap:10px 8px}
+.loading-cast:after{display:none}
+.loading-trader:after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#101012);pointer-events:none}

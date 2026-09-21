@@ -7,7 +7,11 @@ function fixture(paused='0'){
  const img={src:'assets/traders/hyesu-hd-v2.png',isConnected:true,addEventListener:(n,f)=>listeners[n]=f,getAttribute(){return this.src;},setAttribute(n,v){this[n]=v;}};
  const doc={hidden:false,readyState:'complete',body:{},querySelectorAll:()=>[img],addEventListener:(n,f)=>listeners[n]=f};
  let intersect,mutate;
- const win={ArenaCharacters:require('../arena-characters.js'),matchMedia:()=>media,navigator:{connection:{saveData:false}},localStorage:{getItem:key=>key==='chartarena-motion-paused'?paused:null},addEventListener(){},requestAnimationFrame:f=>{f();return 1;}};
+ const win={ArenaCharacters:{list:[
+  {id:'animated-a',image:'assets/traders/hyesu-hd-v2.png',motion:'assets/traders/motion/hyesu-idle-hd-v2.webp'},
+  {id:'animated-b',image:'assets/traders/seon-v1.png',motion:'assets/traders/motion/seon-idle-v6.webp'},
+  {id:'tr_sera',image:'assets/traders/royal/sera-v1.png'}
+ ]},matchMedia:()=>media,navigator:{connection:{saveData:false}},localStorage:{getItem:key=>key==='chartarena-motion-paused'?paused:null},addEventListener(){},requestAnimationFrame:f=>{f();return 1;}};
  const context={window:win,document:doc,URL,Map,Set,IntersectionObserver:class{constructor(f){intersect=f;}observe(){}unobserve(){}},MutationObserver:class{constructor(f){mutate=f;}observe(){}}};
  vm.runInNewContext(fs.readFileSync('arena-motion.js','utf8'),context);
  return {img,doc,media,win,listeners,visible:(value)=>intersect([{target:img,isIntersecting:value}]),changed:()=>mutate([{type:'attributes',target:img,attributeName:'src'}])};
@@ -27,6 +31,13 @@ test('character selection changes motion identity, failed assets stay on the sel
 });
 test('data saving does not request animated assets',()=>{
  const f=fixture();f.win.navigator.connection.saveData=true;f.visible(true);assert.match(f.img.src,/hyesu-hd-v2.png$/);
+});
+test('selecting a still portrait detaches the previous motion and never restores a retired character',()=>{
+ const f=fixture();f.visible(true);
+ f.img.src='assets/traders/royal/sera-v1.png';f.changed();
+ f.visible(false);f.visible(true);f.doc.hidden=true;f.listeners.visibilitychange();
+ f.doc.hidden=false;f.listeners.visibilitychange();f.changed();
+ assert.equal(f.img.src,'assets/traders/royal/sera-v1.png');
 });
 test('legacy manual pause cannot prevent default motion after returning to the page',()=>{
  const f=fixture('1');f.visible(true);assert.match(f.img.src,/hyesu-idle-hd-v2.webp$/);

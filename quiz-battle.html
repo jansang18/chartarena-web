@@ -222,8 +222,8 @@
 <link rel="stylesheet" href="arena-design.css?v=ae157cb39833">
 <link rel="stylesheet" href="arena-reactions.css?v=04056455b4d8">
 <link rel="stylesheet" href="battle-controls.css?v=c6f6779d4c46">
-<script src="arena-characters.js?v=df5d300ccb03"></script>
-<script src="arena-motion.js?v=0f5c18738ddc" defer></script>
+<script src="arena-characters.js?v=36ff25f4dc6d"></script>
+<script src="arena-motion.js?v=c8fb144e84bb" defer></script>
 
 <div class="scaler" id="scaler">
 <div class="frame">
@@ -284,7 +284,7 @@
     <a class="lobbyback" href="index.html" aria-label="홈 화면으로 뒤로">← 로비로</a><span class="lobby-brand">CHART<span>ARENA</span></span>
     <div class="lmodes" id="lmodes">
       <div class="lcard"><div class="in">
-        <div class="lobby-feature"><span class="section-kicker">YOUR NEXT MATCH</span><h1 class="ln">당신의 판단을<br>보여줄 시간.</h1><p class="ld">같은 차트 위에서 펼쳐지는<br>네 명의 트레이딩 배틀.</p><img id="lobbyTrader" src="assets/traders/hyesu-hd-v2.png" alt="선택한 트레이더"><div class="lobby-trader-caption"><small>YOUR TRADER</small><strong id="lobbyTraderName">혜수</strong><span>4 PLAYERS / 5 ROUNDS · 3 DECISIONS</span></div></div>
+        <div class="lobby-feature"><span class="section-kicker">YOUR NEXT MATCH</span><h1 class="ln">당신의 판단을<br>보여줄 시간.</h1><p class="ld">같은 차트 위에서 펼쳐지는<br>네 명의 트레이딩 배틀.</p><img id="lobbyTrader" src="assets/traders/royal/sera-v2.png" alt="선택한 트레이더"><div class="lobby-trader-caption"><small>YOUR TRADER</small><strong id="lobbyTraderName">세라</strong><span>4 PLAYERS / 5 ROUNDS · 3 DECISIONS</span></div></div>
         <div class="lobby-action"><div class="table-heading"><h2>테이블 선택</h2><span id="lobbyWallet"></span></div><div id="tableChoices" class="table-choices" role="group" aria-label="1%당 골드로 방 선택"></div><p class="table-note" id="tableNote"></p><p class="settlement-note" id="lastSettlement" role="status" hidden></p><button class="lgo" id="modeLive" type="button">매칭 시작</button><p>플레이 1회 사용 · 빈자리는 봇이 참여합니다.</p><a href="index.html" class="lobby-change">트레이더 변경 ↗</a></div>
       </div></div>
     </div>
@@ -302,7 +302,7 @@
 
 <div id="splash" class="arena-loading" role="status" aria-label="차트아레나 준비 중">
   <div class="loading-top"><img src="assets/royal-gold/wordmark-v1.svg" alt="CHART ARENA"><span>READ THE CHART. OWN THE MOMENT.</span></div>
-  <div class="loading-cast" aria-hidden="true"><div class="loading-trader trader-0"><span>01</span><img src="assets/traders/kai-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-1"><span>02</span><img src="assets/traders/seon-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-2"><span>03</span><img src="assets/traders/hyesu-hd-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-3"><span>04</span><img src="assets/traders/doyun-v1.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-4"><span>05</span><img src="assets/traders/rin-v1.png" alt="" fetchpriority="high"></div></div>
+  <div class="loading-cast" aria-hidden="true"><div class="loading-trader trader-0"><span>01</span><img src="assets/traders/royal/sera-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-1"><span>02</span><img src="assets/traders/royal/narin-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-2"><span>03</span><img src="assets/traders/royal/chaerin-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-3"><span>04</span><img src="assets/traders/royal/sia-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-4"><span>05</span><img src="assets/traders/royal/arin-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-5"><span>06</span><img src="assets/traders/royal/taeo-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-6"><span>07</span><img src="assets/traders/royal/ijun-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-7"><span>08</span><img src="assets/traders/royal/jihan-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-8"><span>09</span><img src="assets/traders/royal/ryujin-v2.png" alt="" fetchpriority="high"></div><div class="loading-trader trader-9"><span>10</span><img src="assets/traders/royal/mujin-v2.png" alt="" fetchpriority="high"></div></div>
   <div class="loading-bottom"><div class="loading-copy"><span class="section-kicker">YOUR NEXT MOVE</span><h1>판을 읽고, 승부를 걸다.</h1><p>같은 차트. 서로 다른 선택.</p></div><div class="loading-state"><span id="ldpct">아레나를 준비하고 있어요</span><div class="ldbar" aria-hidden="true"><div class="ldfill" id="ldfill"></div></div><small>CHART ARENA / TRADER SERIES 01</small></div></div>
 </div>
 <div id="bNoNrg" class="bnonrg"><div class="bnonrgcard">
@@ -328,9 +328,9 @@
 <script src="battle-rivals.js?v=bd1bd54581ad"></script>
 <script src="battle-presentation.js?v=98b1a555fb04"></script>
 <link rel="stylesheet" href="battle-presentation.css?v=e578127f352b">
-<link rel="stylesheet" href="royal-gold.css?v=abd09a7a0d16">
+<link rel="stylesheet" href="royal-gold.css?v=b985d60826b8">
 <script src="battle-fx.js?v=632f079ca815"></script>
-<script src="battle-rules.js?v=523c47da1558"></script>
+<script src="battle-rules.js?v=a19fc2549f5d"></script>
 <script>
 (function(){
 "use strict";
@@ -880,7 +880,7 @@ function _battleCard(){ var me=players[0]; if(!me||!GD)return;
   var pctS=me.pick==='W'?'관망':((ret>=0?'+':'')+ret.toFixed(2)+'%');
   var dirKo=me.revealInput.switches&&me.revealInput.switches.length?'전환 '+me.revealInput.switches.length+'회':({L:'롱',S:'숏',W:'관망'}[me.pick]||'관망'), w0=Math.max(0,vis-1-40);
   _cardData={ kind:kind, pct:pctS, dirKo:dirKo, lev:me.lev, sym:GD.sym||'', tf:GD.tf||'',
-    entry:(Math.round(entry*100)/100), exit:(Math.round(exit*100)/100), nick:myNick||'트레이더', chImg:me.chImg||'assets/traders/hyesu-hd-v2.png',
+    entry:(Math.round(entry*100)/100), exit:(Math.round(exit*100)/100), nick:myNick||'트레이더', chImg:me.chImg||'assets/traders/royal/sera-v2.png',
     badge:kind==='liq'?'💥 청산':kind==='profit'?(ret>=50?'🚀 떡상':'👍 익절'):kind==='loss'?'💧 손실':'◎ 관망',
     meme:kind==='liq'?'다음 판단으로 다시 도전':kind==='profit'?(ret>=50?'떡상! 이번 판 접수 🚀':'배틀 익절 👍'):kind==='loss'?'물렸다… 다음 판 복수 💧':'관망도 전략 ◎',
     cs:cs.slice(w0,vis+ArenaRules.exitAt(me.revealInput)), entryIdx:Math.min(40,vis-1),
@@ -944,10 +944,10 @@ function liveFallback(msg,attempt){
 }
 function mmFindOrCreate(attempt){
   if(!mmCurrent(attempt))return;var me={nick:(myNick||'플레이어').slice(0,12),ch:myCh,bot:false,startingGold:getBal(),joinAt:Date.now(),matchAttempt:mmTag(attempt)};
-  FB.collection('rooms').where('status','==','wait_v9').orderBy('createdAt','desc').limit(8).get().then(function(qs){
-    if(!mmCurrent(attempt))return;var joinRef=null;qs.forEach(function(dd){if(joinRef)return;var x=dd.data();if(!x||x.status!=='wait_v9'||x.rulesVersion!==9||x.tableId!==selectedTable||!x.players||!x.players[x.host])return;if(Date.now()-(x.createdAt||0)>22000)return;if(Object.keys(x.players).length<(x.cap||4))joinRef=dd.ref;});
+  FB.collection('rooms').where('status','==','wait_v10').orderBy('createdAt','desc').limit(8).get().then(function(qs){
+    if(!mmCurrent(attempt))return;var joinRef=null;qs.forEach(function(dd){if(joinRef)return;var x=dd.data();if(!x||x.status!=='wait_v10'||x.rulesVersion!==10||x.tableId!==selectedTable||!x.players||!x.players[x.host])return;if(Date.now()-(x.createdAt||0)>22000)return;if(Object.keys(x.players).length<(x.cap||4))joinRef=dd.ref;});
     if(joinRef){FB.runTransaction(function(tx){return tx.get(joinRef).then(function(s){
-      if(!mmCurrent(attempt))return false;var x=s.data();if(!x||x.status!=='wait_v9'||x.rulesVersion!==9||x.tableId!==selectedTable||!x.players||!x.players[x.host])throw Error('closed');if(Object.keys(x.players).length>=(x.cap||4))throw Error('full');
+      if(!mmCurrent(attempt))return false;var x=s.data();if(!x||x.status!=='wait_v10'||x.rulesVersion!==10||x.tableId!==selectedTable||!x.players||!x.players[x.host])throw Error('closed');if(Object.keys(x.players).length>=(x.cap||4))throw Error('full');
       var u={};u['players.'+myUid]=me;u['scores.'+myUid]=0;tx.update(joinRef,u);return true;
     });}).then(function(joined){if(!joined)return;if(!mmCurrent(attempt)){cleanupMatchMembership(joinRef,false,attempt);return;}enterRoom(joinRef,false,attempt);}).catch(function(){if(mmCurrent(attempt))mmCreate(me,attempt);});}
     else mmCreate(me,attempt);
@@ -955,7 +955,7 @@ function mmFindOrCreate(attempt){
 }
 function mmCreate(me,attempt){
   if(!mmCurrent(attempt))return;var pl={};pl[myUid]=me;var sc={};sc[myUid]=0;
-  FB.collection('rooms').add({status:'wait_v9',rulesVersion:9,tableId:selectedTable,host:myUid,cap:4,createdAt:Date.now(),players:pl,scores:sc,round:0,phase:'pick',ping:Date.now()})
+  FB.collection('rooms').add({status:'wait_v10',rulesVersion:10,tableId:selectedTable,host:myUid,cap:4,createdAt:Date.now(),players:pl,scores:sc,round:0,phase:'pick',ping:Date.now()})
     .then(function(ref){if(!mmCurrent(attempt)){cleanupMatchMembership(ref,true,attempt);return;}enterRoom(ref,true,attempt);}).catch(function(){if(mmCurrent(attempt))liveFallback('매칭 방 생성 실패 — 봇과 대결',attempt);});
 }
 function enterRoom(ref,host,attempt){
@@ -972,17 +972,17 @@ function enterRoom(ref,host,attempt){
   },function(){if(mmCurrent(attempt)&&LIVE===session)liveFallback('매칭 오류 — 봇과 대결',attempt);});
   if(host){mmTimer=setInterval(function(){
     if(!mmCurrent(attempt)||LIVE!==session||session.started)return;
-    ref.get().then(function(s){if(!mmCurrent(attempt)||LIVE!==session||session.started||!s.exists)return;var d=s.data();if(d.status!=='wait_v9')return;var humans=Object.keys(d.players||{}).filter(function(u){return !d.players[u].bot;}).length;
+    ref.get().then(function(s){if(!mmCurrent(attempt)||LIVE!==session||session.started||!s.exists)return;var d=s.data();if(d.status!=='wait_v10')return;var humans=Object.keys(d.players||{}).filter(function(u){return !d.players[u].bot;}).length;
       if(humans>=(d.cap||4)||Date.now()>=startAt)hostStart(ref,d);
     }).catch(function(){});
   },1200);}else mmTimer=setTimeout(function(){if(mmCurrent(attempt)&&LIVE===session&&!session.started)liveFallback('매칭 대기 시간이 초과됐어요',attempt);},25000);
 }
 function hostStart(ref,d){
   if(!LIVE||LIVE.starting)return;LIVE.starting=true;var session=LIVE;
-  FB.runTransaction(function(tx){return tx.get(ref).then(function(s){var fresh=s.data();if(LIVE!==session||!mmCurrent(session.attempt)||!fresh||fresh.status!=='wait_v9'||fresh.rulesVersion!==9||fresh.tableId!==selectedTable||!fresh.players||!fresh.players[fresh.host])return;var cap=fresh.cap||4,playersMap=Object.assign({},fresh.players),count=Object.keys(playersMap).length,b=0;while(count<cap){var bid='bot_'+b++;if(playersMap[bid])continue;playersMap[bid]={nick:ArenaRivals.type(Object.keys(ArenaRivals.TYPES)[(b-1)%4]).name,persona:Object.keys(ArenaRivals.TYPES)[(b-1)%4],ch:(typeof window!=='undefined'&&window.ArenaCharacters?ArenaCharacters.list[b%ArenaCharacters.list.length].id:'hu'+((b*5)%17)),bot:true};count++;}tx.update(ref,{status:'play',players:playersMap,round:0,phase:'pick',history:[],ping:Date.now()});});}).catch(function(){if(LIVE===session)liveFallback('시작 실패 — 봇과 대결');}).finally(function(){if(LIVE===session)session.starting=false;});
+  FB.runTransaction(function(tx){return tx.get(ref).then(function(s){var fresh=s.data();if(LIVE!==session||!mmCurrent(session.attempt)||!fresh||fresh.status!=='wait_v10'||fresh.rulesVersion!==10||fresh.tableId!==selectedTable||!fresh.players||!fresh.players[fresh.host])return;var cap=fresh.cap||4,playersMap=Object.assign({},fresh.players),count=Object.keys(playersMap).length,b=0;while(count<cap){var bid='bot_'+b++;if(playersMap[bid])continue;playersMap[bid]={nick:ArenaRivals.type(Object.keys(ArenaRivals.TYPES)[(b-1)%4]).name,persona:Object.keys(ArenaRivals.TYPES)[(b-1)%4],ch:(typeof window!=='undefined'&&window.ArenaCharacters?ArenaCharacters.list[b%ArenaCharacters.list.length].id:'hu'+((b*5)%17)),bot:true};count++;}tx.update(ref,{status:'play',players:playersMap,round:0,phase:'pick',history:[],ping:Date.now()});});}).catch(function(){if(LIVE===session)liveFallback('시작 실패 — 봇과 대결');}).finally(function(){if(LIVE===session)session.starting=false;});
 }
 function beginLive(d){
-  if(d.rulesVersion!==9||d.tableId!==selectedTable||!nrgGate(false)||getBal()<currentTable().reserve){liveCancel();backToModes();toast('방 규칙이나 입장 골드를 확인해 주세요.');return;}MODE='live';round=1;LIVE.playing=true;LIVE.seq=d.rematchSeq||0;
+  if(d.rulesVersion!==10||d.tableId!==selectedTable||!nrgGate(false)||getBal()<currentTable().reserve){liveCancel();backToModes();toast('방 규칙이나 입장 골드를 확인해 주세요.');return;}MODE='live';round=1;LIVE.playing=true;LIVE.seq=d.rematchSeq||0;
   if(Object.values(d.players||{}).some(function(p){return !p.bot&&(!Number.isSafeInteger(p.startingGold)||p.startingGold<0);})||!d.players[myUid]||d.players[myUid].startingGold!==getBal()){liveCancel();backToModes();toast('보유 골드가 변경됐습니다. 다시 매칭해 주세요.');return;}
   var ids=Object.keys(d.players||{}).sort(function(a,b){if(a===myUid)return -1;if(b===myUid)return 1;return a.localeCompare(b);});
   players=ids.map(function(u){var p=d.players[u];return {uid:u,name:p.nick||'유저',ch:p.ch,persona:p.persona||'holder',chImg:u===myUid?myChImg:ArenaCharacters.get(p.ch).image,bot:!!p.bot,startingGold:p.startingGold,strat:p.bot?'trend':'live',pick:null,score:0,dp:0};});

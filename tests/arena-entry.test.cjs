@@ -9,12 +9,12 @@ test('old equipped ids render new artwork in footer, guild and matchmaking witho
  vm.runInContext(battle.slice(from,to),ctx);
  ctx.renderWait([{ch:'hu13',nick:'old'},{ch:'hu0',nick:'me',me:true}],4,'매칭');
  assert.equal(ctx.charImg('hu13','lux'),C.get('tr_rin').image);
- assert.match(ctx.gAva('hu13'),/assets\/traders\/rin-v1.png/);
+ assert.match(ctx.gAva('hu13'),/assets\/traders\/royal\/narin-v2.png/);
  assert.equal((nodes.lwplayers.innerHTML.match(/assets\/traders\//g)||[]).length,4);
  assert.doesNotMatch(nodes.lwplayers.innerHTML,/assets\/hux?\d/);
  assert.doesNotMatch(home,/기존 컬렉션/);
 });
-test('home and battle entry use the same five new loading portraits with no old background',()=>{
+test('home and battle entry use the same ten current loading portraits with no old background',()=>{
  for(const page of [home,battle]){
   const intro=page.slice(page.indexOf('<div id="splash"'),page.indexOf('</div>\n</div>',page.indexOf('<div id="splash"')));
   for(const c of C.list)assert.ok(intro.includes(c.image));
