@@ -74,6 +74,7 @@ async function action(type,extra={}){
   });
   if(loaded){segment=loaded;remember(state.segment);}
   if(type==='EXIT'){lobby();return;}
+  if(window.ArenaFeedback&&['LOCK','GO','CALL','RAISE','FOLD'].includes(type))ArenaFeedback.pulse(document.querySelector('.dm-chart'),'confirm');
   render();
  }catch(e){error(e);lobby();}finally{busy=false;}
 }
@@ -111,6 +112,7 @@ function render(){
   $('stakeText').textContent=r.reason==='chart'?'진입 대비 '+r.move.toFixed(4)+'% × 20,000G × '+r.multiple+'배':'합의 판돈 '+fmt(R.RATE*r.multiple)+'G'+(r.capped?' · 보유 골드 상한 적용':'');
   $('riskText').textContent=R.finished(s)?'경기 총 손익 '+sign(s.balances[0]-s.initial)+'G · 지갑 반영 완료':'누적 손익 '+sign(s.balances[0]-s.initial)+'G';
   controls=R.finished(s)?button('경기 완료 · 로비로','LOBBY','','dm-primary'):button('다음 라운드 →','NEXT','','dm-primary');
+  if(R.finished(s)&&window.ArenaMastery)ArenaMastery.record({id:'deathmatch:'+s.id,character:me.id,won:s.balances[0]>s.initial,comeback:false,escape:false}).catch(()=>{});
  }
  $('actions').innerHTML=controls;$('exitButton').textContent=closed?'로비':'종료';draw();
 }

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#121214"><title>클럽 투어 · CHART ARENA</title>
+<link rel="stylesheet" href="app-shell.css?v=b71e4d48ab15"><link rel="stylesheet" href="royal-gold.css?v=5b799437b829"><link rel="stylesheet" href="royal-play.css?v=f3282c13b90a"><link rel="stylesheet" href="battle-review.css?v=d39cdc4da829"><link rel="stylesheet" href="club-tour.css?v=03d379007507">
+<script src="app-shell.js?v=b3810da044e7"></script><script src="arena-characters.js?v=36ff25f4dc6d"></script><script src="battle-rules.js?v=63776ebb776a"></script><script src="battle-charts.js?v=2945eb30ebba"></script><script src="battle-data.js?v=e970b5771900"></script><script src="battle-rivals.js?v=bd1bd54581ad"></script><script src="battle-presentation.js?v=98b1a555fb04"></script><script src="battle-review.js?v=f1d7116d53e2"></script><script src="character-mastery.js?v=484d00983d09"></script><script src="arena-feedback.js?v=2d484b9ea66a"></script><script src="club-tour-rules.js?v=b16196373f61"></script><script src="club-tour.js?v=461a839e35e5" defer></script>
+</head><body class="tour-page">
+<main class="tour-shell">
+ <header class="tour-top"><a href="index.html" aria-label="차트아레나 로비">← 로비</a><img src="assets/royal-gold/wordmark-v1.svg" alt="CHART ARENA"><span>CLUB TOUR <small>SOLO · 3 TABLES</small></span></header>
+ <p id="tourNotice" class="tour-notice" role="status" hidden></p>
+ <section id="tourLobby" class="tour-lobby">
+  <div class="tour-poster"><span class="tour-poster-label">THE ROYAL CIRCUIT / 01</span><span class="tour-watermark" aria-hidden="true" id="tourWord">SERA</span><img id="tourHero" src="assets/traders/royal/sera-v2.png" alt="세라"><div class="tour-poster-caption"><span>YOUR SIGNATURE</span><h2 id="tourHeroName">세라</h2><p id="tourHeroQuote">승부는, 내가 정하는 순간에.</p></div></div>
+  <div class="tour-invitation"><span class="section-kicker">A STRATEGY OF YOUR OWN</span><h1>끝까지 남는,<br>나만의 한 수.</h1><p class="tour-intro">서로 다른 세 명의 상대. 이길 때마다 전술을 고르고,<br class="wide-only"> 마지막 테이블에서 완성한 전략을 증명하세요.</p>
+   <div id="tourRoster" class="tour-roster" role="group" aria-label="투어 캐릭터 선택"></div>
+   <div class="tour-signature-info"><span id="tourStyle">추세 유지</span><h3 id="tourSkillName">흐름 장악</h3><p id="tourSkillDescription"></p><small>각 테이블 1회 · 클럽 투어 전용 전략</small></div>
+   <div class="tour-route" id="tourRoute"></div>
+   <p id="tourResumeNote" class="tour-resume-note" hidden></p>
+   <div class="tour-start-actions"><button id="tourResume" class="tour-primary" hidden>진행 중인 투어 이어하기</button><button id="tourStart" class="tour-primary">클럽 투어 시작 →</button></div>
+   <p class="tour-entry-note">골드·플레이 소모 없음 · 투어 점수는 지갑과 별도<br>각 선택 15초 · 진입 미제출 −1,000점 · 중간 미제출은 STOP<br>같거나 높은 점수면 다음 테이블로 · 전용 전략은 세 캐릭터부터 시작합니다.</p>
+  </div>
+ </section>
+ <section id="tourGame" hidden>
+  <nav class="tour-game-route" id="tourGameRoute" aria-label="투어 진행"></nav>
+  <div class="tour-table">
+   <aside class="tour-portraits"><article class="tour-contender"><img id="tourMePortrait" alt=""><div><span id="tourMeName"></span><strong id="tourMeScore">0</strong><small>TOUR POINTS</small></div></article><article class="tour-contender tour-opponent"><img id="tourBotPortrait" alt=""><div><span id="tourBotName"></span><strong id="tourBotScore">0</strong><small id="tourBotStyle"></small></div></article></aside>
+   <div class="tour-play-area"><section class="tour-chart-box"><header><span id="tourChartLabel">210봉 분석</span><b id="tourClock" aria-label="남은 선택 시간">15</b></header><div id="tourChart" class="tour-chart"></div><footer><span id="tourPosition">포지션을 선택하세요</span><span id="tourGap">같은 차트, 다른 선택</span></footer></section>
+    <section class="tour-controls" id="tourControls"><div class="tour-control-heading"><h2 id="tourStatus" aria-live="polite">첫 방향을 정하세요.</h2><span id="tourStageNote">각 선택 15초</span></div>
+     <div id="tourDirection" class="tour-direction" role="group" aria-label="진입 방향"><button type="button" data-tour-dir="L">롱 <small>상승</small></button><button type="button" data-tour-dir="S">숏 <small>하락</small></button></div>
+     <div id="tourDecisions" class="tour-decisions" role="group" aria-label="다음 구간 결정" hidden><button type="button" data-tour-action="GO">GO <small>방향 유지</small></button><button type="button" data-tour-action="STOP">STOP <small>손익 확정</small></button><button type="button" data-tour-action="SWITCH">SWITCH <small>방향 전환</small></button></div>
+     <div class="tour-leverage-row"><span id="tourLeverageLabel">레버리지</span><div id="tourLeverages" role="group" aria-label="투어 배율"><button type="button" data-tour-lev="1">1배</button><button type="button" data-tour-lev="2">2배</button><button type="button" data-tour-lev="3">3배</button><button type="button" data-tour-lev="5">5배</button><button type="button" data-tour-lev="10">10배</button></div></div>
+     <label class="tour-signature-control"><input type="checkbox" id="tourSignature"><span><b id="tourSignatureTitle">전용 전략</b><small id="tourSignatureHint"></small></span></label>
+     <button id="tourConfirm" class="tour-primary">선택 확정</button>
+    </section>
+    <section id="tourOutcome" class="tour-outcome" aria-live="polite" hidden></section>
+    <div class="tour-build"><span>MY TACTICS</span><p id="tourBuild">아직 선택한 전술이 없습니다. 첫 승리 뒤에 고르세요.</p></div>
+   </div>
+  </div>
+  <p class="tour-save-note">기기에 자동 저장 · 페이지를 나가도 결정 시간은 계속 흐릅니다. 상대는 이미 공개된 캔들만 보고 결정합니다.</p>
+ </section>
+ <footer class="tour-footer">과거 차트로 즐기는 교육용 게임 · 모든 점수와 재화는 가상이며 환전되지 않습니다.</footer>
+</main>
+<dialog id="tourRestart"><h2>새 투어를 시작할까요?</h2><p>현재 투어의 진행과 선택한 전술이 초기화됩니다. 캐릭터 숙련도는 유지됩니다.</p><div><button type="button" id="tourKeep">이어 하기</button><button type="button" id="tourReplace" class="tour-primary">새 투어 시작</button></div></dialog>
+</body></html>

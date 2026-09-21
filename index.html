@@ -448,6 +448,10 @@
 <link rel="stylesheet" href="arena-design.css?v=de63d130b359">
 <link rel="stylesheet" href="royal-gold.css?v=5b799437b829">
 <link rel="stylesheet" href="room-cards.css?v=9f333bfb0ac1">
+<link rel="stylesheet" href="royal-play.css?v=f3282c13b90a">
+<script src="character-mastery.js?v=484d00983d09"></script>
+<script src="arena-feedback.js?v=2d484b9ea66a"></script>
+<script src="royal-experience.js?v=3f337849e995"></script>
 <script src="battle-rules.js?v=63776ebb776a"></script>
 <script src="arena-characters.js?v=36ff25f4dc6d"></script>
 <script src="arena-motion.js?v=c8fb144e84bb" defer></script>
@@ -482,6 +486,7 @@
           </div>
           <div class="roster-label"><span>YOUR TRADER</span><span>좌우로 넘겨 선택 <b>10명</b></span></div>
           <div class="trader-roster" id="traderRoster" role="group" aria-label="트레이더 10명 · 좌우로 넘겨 선택"></div>
+          <div id="characterMastery" aria-label="선택한 캐릭터 숙련도"></div>
         </section>
         <section class="arena-entry" aria-labelledby="arenaTitle">
           <header class="entry-heading"><div><span class="section-kicker">PREDICT · BATTLE · RISE</span><h2 id="arenaTitle" aria-label="차트아레나 대전 입장">CHART ARENA</h2></div><span class="entry-format">5라운드 · 최대 15번 결정</span></header>
@@ -511,6 +516,7 @@
           </div>
           <div class="entry-note"><span>변동률 × 테이블 단가 × 레버리지</span><span>보유 골드 내 정산</span></div>
           <a class="practice-entry deathmatch-entry" href="deathmatch.html"><span class="duel-art" aria-hidden="true"><img src="assets/traders/royal/chaerin-v2.png" alt=""><img src="assets/traders/royal/taeo-v2.png" alt=""></span><span><b>1vs1 데스매치</b><small id="deathmatchHomeNote">봇과 골드 쟁탈전 · 1%당 20,000G</small></span><span>승부하기 →</span></a>
+          <a class="tour-entry" href="club-tour.html"><span aria-hidden="true">CLUB<br>TOUR</span><span><b>세 개의 테이블, 나만의 전략.</b><small>1인 봇 3연전 · 세라·채린·태오 전용 전략 · 전술 선택</small></span><span aria-hidden="true">↗</span></a>
           <div class="arena-records"><div class="records-heading"><span>MY RECORD</span><button type="button" data-go="rank">전체 기록 ↗</button></div><div class="statrow"><div class="stat"><span class="l">플레이</span><strong class="v" id="homePlayed">0회</strong></div><div class="stat"><span class="l">승률</span><strong class="v" id="homeWin">—</strong></div><div class="stat"><span class="l">최고 수익</span><strong class="v" id="homeBest">—</strong></div></div></div>
           <details class="market-preview"><summary>과거 차트 살펴보기 <span>BTC / ETH / SOL</span></summary><div class="chart-toolbar"><div class="chart-symbols" role="group" aria-label="미리보기 종목"><button type="button" data-preview="0" aria-pressed="true">BTC</button><button type="button" data-preview="1" aria-pressed="false">ETH</button><button type="button" data-preview="2" aria-pressed="false">SOL</button></div><span id="previewMeta"></span></div><div class="terminal-chart"><canvas id="terminalChart" aria-label="실제 과거 데이터 차트 미리보기"></canvas><span>기준가 100 · 실시간 시세 아님</span></div></details>
           <p class="virtual-note">교육용 모의 트레이딩 게임 · 모든 재화는 가상이며 환전되지 않습니다.</p>
@@ -719,6 +725,7 @@ function renderArenaHero(){
   $('arenaHeroName').textContent=c.name;$('arenaHeroRole').textContent=c.role+' · '+ArenaRules.skillFor(c.id).name;
   $('arenaHeroQuote').textContent=ArenaRules.skillFor(c.id).description+' · 경기당 1회';$('arenaHeroWord').textContent=c.en;
   $('arenaHeroIndex').textContent=String(list.indexOf(c)+1).padStart(2,'0');
+  if(window.ArenaMastery){ArenaMastery.render($('characterMastery'),c.id);document.querySelector('.arena-showcase').dataset.masteryFrame=ArenaMastery.summary(c.id).unlocked.includes('frame')?'gold':'none';}
   document.querySelector('.arena-showcase').style.setProperty('--trader-accent',c.color);
   $('traderRoster').innerHTML=list.map(function(t){return '<button type="button" class="trader-choice'+(t.id===c.id?' on':'')+'" data-trader="'+t.id+'" aria-pressed="'+(t.id===c.id)+'" aria-label="'+t.name+' 선택"><span><img src="'+t.image+'" alt=""></span><b>'+t.name+'</b></button>';}).join('');
   roster.scrollLeft=scroll;

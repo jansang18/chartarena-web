@@ -343,6 +343,12 @@
 <link rel="stylesheet" href="royal-gold.css?v=5b799437b829">
 <script src="battle-fx.js?v=632f079ca815"></script>
 <script src="battle-rules.js?v=63776ebb776a"></script>
+<link rel="stylesheet" href="royal-play.css?v=f3282c13b90a">
+<link rel="stylesheet" href="battle-review.css?v=d39cdc4da829">
+<script src="battle-review.js?v=f1d7116d53e2"></script>
+<script src="character-mastery.js?v=484d00983d09"></script>
+<script src="arena-feedback.js?v=2d484b9ea66a"></script>
+<script src="royal-experience.js?v=3f337849e995"></script>
 <script>
 (function(){
 "use strict";
@@ -563,6 +569,7 @@ function renderRace(scores,estimated){
     raceRound=round;racePrevious=null;raceCandle=-1;raceLastEventAt=-Infinity;raceEventUntil=0;racePulses={};$('raceEvent').hidden=true;
   }
   var known=estimated||phase==='result'||phase==='final';
+  if(known&&typeof window!=='undefined'&&window.ArenaExperience)ArenaExperience.observeRank(matchId,me.rank,players.length);
   $('raceHud').hidden=phase==='result'||phase==='final';
   $('raceHud').dataset.live=estimated?'true':'false';
   $('racePlace').textContent=known?(estimated?'LIVE · ':'확정 · ')+(me.tied?'공동 ':'')+me.rank+'위':'선택 대기';
@@ -736,13 +743,14 @@ function beginReveal(picks,at,stage){
   if(!recordWallet(players[0].revealInput,true,null,null,stage*30))return;
   skillArmed=false;$('skillPanel').hidden=true;renderCtrl();var base=GD.vis+(stage-1)*30,target=base+30,started=at||Date.now(),fxLast=0;
   gRev=base;showDecisionReveal(stage);renderPods();drawChart();
+  if(typeof window!=='undefined'&&window.ArenaFeedback)ArenaFeedback.pulse($('chart').parentElement,stage>1&&(players[0].revealInput.switches||[]).includes((stage-1)*30)?'switch':'confirm');
   $('tvtag').textContent=currentTable().name+' · 공개 '+stage+'/3';
   function step(){if(phase!=='reveal')return;var elapsed=Date.now()-started,intro=elapsed<ArenaPresentation.INTRO_MS;
     $('decisionReveal').hidden=!intro;
     var count=ArenaPresentation.revealFrame(elapsed).count;
     gRev=Math.min(target,base+Math.max(0,count));if(gRev>view.start+view.count-10)view.start=Math.min(GD.n-view.count,gRev-view.count+10);drawChart();renderPods();var left=target-gRev;
     $('tnum').textContent=intro?'공개':left;$('tbar').style.width=((30-left)/30*100)+'%';
-    if(!reduce&&!intro&&left>0&&left<=3&&left!==fxLast){fxLast=left;if(typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.last({anchor:$("chart"),count:left});}
+    if(!intro&&left>0&&left<=3&&left!==fxLast){fxLast=left;if(typeof window!=="undefined"&&window.ArenaFeedback)ArenaFeedback.play('last');if(!reduce&&typeof window!=="undefined"&&window.ArenaFX)window.ArenaFX.last({anchor:$("chart"),count:left});}
     if(gRev>=target){revTimer=null;if(stage===3)finishRound();else openCheckpoint();return;}revTimer=setTimeout(step,100);
   }
   step();
@@ -855,6 +863,7 @@ function finalResult(){
   $('battleHelp').textContent=highlight?'이번 경기 최고의 역전: '+highlight.name+' · '+highlight.round+'라운드 '+highlight.from+'위 → '+highlight.to+'위':'5라운드 완료 · '+(currentTable().practice?'보유 골드 변동 없음':'경기 손익을 보유 골드에 반영했습니다.');
   if(typeof window!=="undefined"&&window.ArenaFX&&place===1)window.ArenaFX.victory({anchor:$('chart')});
   $('battleHelp').textContent=decisiveSummary();setupRematch();
+  if(typeof window!=='undefined'&&window.ArenaExperience)ArenaExperience.finish({id:matchId,character:myCh,place:place,initial:ArenaRules.create(players[0].state.id,selectedTable,matchStartGold,myCh),history:matchHistory,segment:pickSegByIdx,delta:players[0].score,balance:getBal(),practice:currentTable().practice});
 }
 
 (function(){ var cv=$('chart'); if(!cv)return; cv.style.touchAction='none'; cv.style.cursor='grab'; var drag=null;
