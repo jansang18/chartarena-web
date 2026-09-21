@@ -133,3 +133,7 @@ html[data-page=battle] .lwp img[src*="/royal/"]{width:170%;height:auto;margin:0;
 .loading-cast{grid-template-rows:repeat(2,minmax(0,1fr));gap:10px 8px}
 .loading-cast:after{display:none}
 .loading-trader:after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#101012);pointer-events:none}
+@media(min-width:600px) and (max-width:740px){
+ html[data-page=home] .topbar .pill{gap:5px}
+ html[data-page=home] .topbar .pill span:not(.pico){font-size:12px}
+}
