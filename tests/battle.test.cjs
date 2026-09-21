@@ -7,7 +7,7 @@ function play(input,moves,reduced=false,decisions=['GO','GO']){
  const c={ArenaRivals:require('../battle-rivals.js'),armedSkill:p=>p,botSkill:(p,pick)=>pick,ArenaPresentation:require('../battle-presentation.js'),ArenaRules:R,players,matchHistory:[],MODE:'4p',LIVE:null,phase:'pick',tmr:null,revTimer:null,checkpointTimer:null,checkpointChoice:null,checkpointDeadline:0,revealStage:0,reduce:reduced,round:1,highlight:null,
   GD:{vis:210,n:300,cs:Array.from({length:300},(_,i)=>[100,210,1,i<210?100:100+moves[Math.floor((i-210)/30)]]),sym:'TEST',tf:'1h'},gRev:210,view:{count:170,start:80},Date:{now:()=>now},
   botInput:()=>({dir:'L'}),recordWallet(){return true;},currentTable:()=>R.table(),goldEquation:()=>"formula",fmtPct:String,fmtLead:String,renderPods(){},drawChart(){draws++;},
-  renderCtrl(){if(c.phase==='checkpoint'){checkpoints.push(c.revealStage);const d=decisions[c.revealStage-1];if(d)c.setTimeout(()=>c.decideCheckpoint(d),1);}},
+  renderCtrl(){if(c.phase==='checkpoint'){checkpoints.push(c.revealStage);const d=decisions[c.revealStage-1];if(d)c.setTimeout(()=>c.decideCheckpoint(typeof d==='string'?d:d.decision,d.lev),1);}},
   currentMove(){return(c.GD.cs[c.gRev-1][3]/100-1)*100;},
   finalMove(seg,exit=90){return(seg.cs[seg.vis+exit-1][3]/seg.cs[seg.vis-1][3]-1)*100;},
   playerMove(p){return c.finalMove(c.GD,Math.min(c.gRev-c.GD.vis,R.exitAt(p.revealInput)));},
@@ -30,4 +30,9 @@ test('duplicate finish callbacks cannot apply a second result',()=>{const r=play
 
 test('actual engine SWITCH then STOP preserves old loss and new profit',()=>{const r=play({dir:'L'},[-2,-4.94,20],false,['SWITCH','STOP']);const p=r.c.players[0];assert.equal(p.state.score,1000);assert.equal(p.pick,'S');assert.equal(p.state.lockedDelta,-2000);assert.equal(p.state.openDelta,3000);assert.equal(p.state.pick.exit,60);});
 test('actual engine supports two switches with fixed leverage and settles once',()=>{const r=play({dir:'L',lev:2},[-2,-4.94,-3.0388],false,['SWITCH','SWITCH']);const p=r.c.players[0];assert.equal(p.state.score,6000);assert.equal(p.pick,'L');assert.equal(p.state.pick.lev,2);assert.equal(p.state.pick.switches.join(','),'30,60');assert.equal(r.next,1);});
+test('actual engine settles two SWITCH choices with independently selected leverage',()=>{
+ const r=play({dir:'L',lev:2},[-2,-4.94,-3.0388],false,[{decision:'SWITCH',lev:5},{decision:'SWITCH',lev:3}]);
+ const p=r.c.players[0];assert.equal(p.state.score,17000);assert.equal(p.state.balance,37000);
+ assert.equal(p.state.pick.lev,2);assert.equal(p.state.legs.map(leg=>leg.lev).join(','),'2,5,3');assert.equal(r.next,1);
+});
 test('actual engine cannot SWITCH or recover after losing all capital at checkpoint',()=>{const r=play({dir:'L',lev:10},[-3,5,10],false,['SWITCH','GO']);const p=r.c.players[0];assert.equal(p.state.balance,0);assert.equal(p.state.pick.exit,30);assert.equal(p.state.pick.switches,undefined);});

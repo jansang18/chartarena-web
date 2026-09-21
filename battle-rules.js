@@ -1,25 +1,33 @@
 /* Deterministic percentage-gold rules and atomic local-wallet transitions. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.ArenaRules=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
-const VERSION=10,ROUNDS=5,DECISION_SECONDS=15;
+const VERSION=11,ROUNDS=5,DECISION_SECONDS=15,LEVERAGES=Object.freeze([1,2,3,5,10]);
 const SKILLS=Object.freeze({
  tr_seon:{kind:'boost',name:'승부수',description:'다음 30봉 배율 한 단계 상승 · 손익 모두 적용'},
- tr_yuna:{kind:'redesign',name:'재설계',description:'30·60봉 결정에서 남은 구간의 배율 재선택'},
+ tr_yuna:{kind:'redesign',name:'재설계',description:'방향을 유지하며 남은 구간의 배율 재선택'},
  tr_kai:{kind:'defense',name:'방어',description:'다음 30봉 이익과 손실 모두 절반'},
  tr_rin:{kind:'steady',name:'안전운전',description:'다음 30봉만 1배로 운용 후 원래 배율 복귀'},
  tr_doyun:{kind:'neutral',name:'중립',description:'다음 30봉 손익 0 · 이후 기존 포지션 재개'}
 });
 const CHARACTER_SKILLS=Object.freeze({tr_sera:'tr_seon',tr_narin:'tr_rin',tr_chaerin:'tr_yuna',tr_sia:'tr_doyun',tr_arin:'tr_kai',tr_taeo:'tr_kai',tr_ijun:'tr_yuna',tr_jihan:'tr_doyun',tr_ryujin:'tr_seon',tr_mujin:'tr_rin'});
 function skillFor(character){return SKILLS[CHARACTER_SKILLS[character]]||SKILLS[character]||SKILLS.tr_seon;}
+function baseLeverageAt(pick,at){
+ pick=pick||{};let lev=pick.lev||1,changedAt=-1;
+ for(const change of pick.leverageChanges||[])if(change.at<=at){lev=change.lev;changedAt=change.at;}
+ const skill=pick.skill;
+ // A redesign persists until a later explicit SWITCH leverage selection.
+ if(skill&&skill.kind==='redesign'&&skill.at<=at&&skill.at>=changedAt)lev=skill.lev;
+ return lev;
+}
 function leverageAt(pick,at){
- const s=pick.skill,lev=pick.lev||1;if(!s||at<s.at)return lev;
- if(s.kind==='redesign')return s.lev;if(at>=s.at+30)return lev;
- return s.kind==='boost'?[1,2,3,5,10][Math.min(4,[1,2,3,5,10].indexOf(lev)+1)]:s.kind==='defense'?lev/2:s.kind==='steady'?1:s.kind==='neutral'?0:lev;
+ const s=pick.skill,lev=baseLeverageAt(pick,at);if(!s||at<s.at||s.kind==='redesign'||at>=s.at+30)return lev;
+ return s.kind==='boost'?LEVERAGES[Math.min(4,LEVERAGES.indexOf(lev)+1)]:s.kind==='defense'?lev/2:s.kind==='steady'?1:s.kind==='neutral'?0:lev;
 }
 function activateSkill(player,input,at,round,lev){
  const pick=choice(player,input),s=skillFor(player.character);
  if(player.skillUsedRound||pick.skill||!['L','S'].includes(pick.dir)||![0,30,60].includes(at)||exitAt(pick)<=at||!Number.isInteger(round)||round!==player.appliedRound+1||round>ROUNDS)throw Error('Skill unavailable');
- if((s.kind==='boost'&&pick.lev===10)||(s.kind==='steady'&&pick.lev===1)||(s.kind==='redesign'&&(at===0||![1,2,3,5,10].includes(lev)||lev===pick.lev)))throw Error('Skill has no valid effect');
+ const currentLev=baseLeverageAt(pick,at);
+ if((s.kind==='boost'&&currentLev===10)||(s.kind==='steady'&&currentLev===1)||(s.kind==='redesign'&&(at===0||!LEVERAGES.includes(lev)||lev===currentLev)))throw Error('Skill has no valid effect');
  return Object.assign({},pick,{skill:Object.assign({kind:s.kind,at,round},s.kind==='redesign'?{lev}:{})});
 }
 function entryChoice(player,raw,round){
@@ -29,7 +37,8 @@ function entryChoice(player,raw,round){
 }
 function checkpointChoice(player,pick,decision,stage,round,skill){
  const next=checkpoint({me:pick},{me:decision},stage).me;
- if(skill&&decision!=='STOP'&&skill.at===stage*30&&skill.round===round){try{return activateSkill(player,next,stage*30,round,skill.lev);}catch(_){}}
+ const action=typeof decision==='string'?decision:decision&&decision.decision;
+ if(skill&&['GO','SWITCH'].includes(action)&&skill.at===stage*30&&skill.round===round){try{return activateSkill(player,next,stage*30,round,skill.lev);}catch(_){}}
  return next;
 }
 const TABLES=Object.freeze({
@@ -42,15 +51,23 @@ function table(id){id=id||'standard';if(!Object.hasOwn(TABLES,id))throw Error('U
 function create(id,tableId,capital,character){const t=table(tableId);if(capital!==undefined&&(!Number.isSafeInteger(capital)||capital<0))throw Error('Invalid starting gold');return {id:String(id),tableId:t.id,balance:t.practice||capital===undefined?t.capital:capital,score:0,delta:0,passUsed:false,appliedRound:0,character:Object.hasOwn(SKILLS,character)||Object.hasOwn(CHARACTER_SKILLS,character)?character:'tr_sera',skillUsedRound:0};}
 function choice(player,input){input=input||{};let dir=['L','S','W'].includes(input.dir)?input.dir:'N';if((dir==='W'&&player.passUsed)||player.balance<=0)dir='N';const pick={dir,lev:[1,2,3,5,10].includes(input.lev)?input.lev:1};if([30,60,90].includes(input.exit))pick.exit=input.exit;
  if(input.switches!==undefined){if(!Array.isArray(input.switches)||input.switches.length>2||input.switches.some((at,i)=>![30,60].includes(at)||at>exitAt(pick)||(i&&at<=input.switches[i-1])))throw Error('Invalid switch path');if(['L','S'].includes(dir)&&input.switches.length)pick.switches=input.switches.slice();}
+ if(input.leverageChanges!==undefined){
+  const changes=input.leverageChanges;
+  if(!Array.isArray(changes)||changes.length>2||changes.some((change,i)=>!change||!LEVERAGES.includes(change.lev)||!(pick.switches||[]).includes(change.at)||change.at>=exitAt(pick)||(i&&change.at<=changes[i-1].at)))throw Error('Invalid leverage path');
+  if(changes.length)pick.leverageChanges=changes.map(change=>({at:change.at,lev:change.lev}));
+ }
  if(input.skill){const s=input.skill;if(s.kind!==skillFor(player.character).kind||![0,30,60].includes(s.at)||!Number.isInteger(s.round)||s.round<1||s.round>ROUNDS||s.at>=exitAt(pick)||(player.skillUsedRound&&player.skillUsedRound!==s.round)||!['L','S'].includes(dir)||(s.kind==='redesign'&&(s.at===0||![1,2,3,5,10].includes(s.lev))))throw Error('Invalid character skill');pick.skill={kind:s.kind,at:s.at,round:s.round};if(s.kind==='redesign')pick.skill.lev=s.lev;}
  return pick;}
 function exitAt(input){return input&&[30,60,90].includes(input.exit)?input.exit:90;}
 function directionAt(input,through=90){let dir=(input||{}).dir;for(const at of (input||{}).switches||[])if(at<=Math.min(through,exitAt(input)))dir=dir==='L'?'S':dir==='S'?'L':dir;return dir;}
 function checkpoint(picks,decisions,stage){
  if(![1,2].includes(stage))throw Error('Invalid checkpoint');
- const next={};for(const [id,pick] of Object.entries(picks)){next[id]=Object.assign({},pick);if(pick.switches)next[id].switches=pick.switches.slice();if(!['L','S'].includes(pick.dir)||exitAt(pick)<=stage*30)continue;
-  if(decisions[id]==='SWITCH'){if(!(pick.switches||[]).some(at=>at>=stage*30))next[id].switches=(pick.switches||[]).concat(stage*30);}
-  else if(decisions[id]!=='GO')next[id].exit=stage*30;
+ const next={};for(const [id,pick] of Object.entries(picks)){next[id]=Object.assign({},pick);if(pick.switches)next[id].switches=pick.switches.slice();if(pick.leverageChanges)next[id].leverageChanges=pick.leverageChanges.map(change=>Object.assign({},change));if(!['L','S'].includes(pick.dir)||exitAt(pick)<=stage*30)continue;
+  const vote=decisions[id],action=typeof vote==='string'?vote:vote&&vote.decision;
+  if(action==='SWITCH'){if(!(pick.switches||[]).some(at=>at>=stage*30)){
+   next[id].switches=(pick.switches||[]).concat(stage*30);
+   if(vote&&LEVERAGES.includes(vote.lev))next[id].leverageChanges=(next[id].leverageChanges||[]).concat({at:stage*30,lev:vote.lev});
+  }}else if(action!=='GO')next[id].exit=stage*30;
  }return next;
 }
 function goldRound(v){return Math.sign(v)*Math.round(Math.abs(v)+1e-8)||0;}
@@ -108,5 +125,5 @@ function walletClose(game,id){
  const closed=(game.battleClosed||[]).concat(id).slice(-100);
  return Object.assign({},game,{balance:walletBalance(game)+returned,battleActive:null,battleClosed:closed,battleLast:{id,tableId:t.id,delta:t.practice?0:state.score,simulated:state.score,rounds:state.appliedRound}});
 }
-return {VERSION,ROUNDS,DECISION_SECONDS,SKILLS,skillFor,activateSkill,leverageAt,entryChoice,checkpointChoice,TABLES,table,create,choice,exitAt,directionAt,checkpoint,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
+return {VERSION,ROUNDS,DECISION_SECONDS,SKILLS,skillFor,activateSkill,baseLeverageAt,leverageAt,entryChoice,checkpointChoice,TABLES,table,create,choice,exitAt,directionAt,checkpoint,profit,settle,recover,rank,walletBalance,walletOpen,walletRound,walletClose};
 });
