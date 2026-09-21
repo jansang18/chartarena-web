@@ -113,8 +113,9 @@ html[data-page=home] .charshow .csch[src*="/royal/"]{width:62px;height:auto;marg
 html .ccard .cpic img[src*="/royal/"]{width:180%;height:auto;flex:none;margin:0 -40%;object-position:center top}
 .loading-trader img[src*="/royal/"]{aspect-ratio:2/3;object-fit:contain;top:1%}
 .lobby-feature>img[src*="/royal/"]{height:195%;width:120%;right:-25%;top:4%;object-position:center top}
-html[data-page=battle][data-playing] .pod .ava .ch[src*="/royal/"]{width:165%;height:auto;max-width:none;margin-left:-32.5%;object-position:center top}
-html[data-page=battle] .lwp img[src*="/royal/"]{width:170%;height:auto;margin-left:-35%;object-position:center top}
+/* These flex containers already center oversized portraits; keep margins symmetric. */
+html[data-page=battle][data-playing] .pod .ava .ch[src*="/royal/"]{width:165%;height:auto;max-width:none;margin:0;object-position:center top}
+html[data-page=battle] .lwp img[src*="/royal/"]{width:170%;height:auto;margin:0;object-position:center top}
 .dm-poster .dm-contender img[src*="/royal/"]{inset:0 auto auto -35%;width:170%;height:auto;object-fit:contain;object-position:center top}
 .dm-player img[src*="/royal/"]{object-position:center top}
 .login-trader[src*="/royal/"]{object-position:center top}

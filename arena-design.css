@@ -290,7 +290,7 @@ html[data-page=battle][data-playing] .verdict .pl{font-size:12px;color:#b6c9d6;l
 html[data-page=battle][data-playing] .verdict .bl{font-size:15px;color:var(--arena-gold);line-height:1.7;margin-top:10px}
 html[data-page=battle][data-playing] .verdict.final-result{display:none;inset:64px 16px 32px;transform:none;width:auto;max-width:none;min-width:0;padding:24px;align-items:center;justify-content:center;overflow:hidden;text-align:left;background:#172f40f5;border-color:#7e8c81}
 html[data-page=battle][data-playing] .verdict.final-result.show{display:flex}
-.result-trader{width:45%;height:135%;object-fit:contain;object-position:center top;align-self:start;position:relative;margin-top:-4%}
+.result-trader{width:45%;height:100%;object-fit:contain;object-position:center;align-self:center;position:relative;margin:0}
 .result-caption{flex:1;min-width:0;z-index:1;position:relative}.result-caption .section-kicker{margin-bottom:14px}
 html[data-page=battle][data-playing] .final-result .mv{font-size:clamp(22px,3vw,40px);letter-spacing:-.045em;line-height:1.3}
 .arena-fx-badge strong{background:none!important;-webkit-text-fill-color:currentColor;color:#f9dfac;filter:drop-shadow(0 3px 2px #0008);text-shadow:none}
@@ -383,7 +383,7 @@ html[data-page=battle][data-playing] .final-result .mv{font-size:clamp(22px,3vw,
  html[data-page=battle][data-playing] .verdict{padding:12px 14px;min-width:200px}
  html[data-page=battle][data-playing] .verdict .mv{font-size:22px}
  html[data-page=battle][data-playing] .verdict.final-result{inset:64px 6px 12px;padding:14px;text-align:center}
- .result-trader{position:absolute;right:-18%;top:0;width:80%;height:135%;opacity:.22;margin:0}
+ .result-trader{position:absolute;right:0;top:50%;width:100%;height:calc(100% - 28px);transform:translateY(-50%);opacity:.22;margin:0}
  .result-caption{flex:1}.result-caption .section-kicker{font-size:8px}
  html[data-page=battle][data-playing] .final-result .mv{font-size:25px}
  html[data-page=battle][data-playing] .bshare{display:none!important}
@@ -449,7 +449,7 @@ html[data-page=battle][data-playing] .final-result .mv{font-size:clamp(22px,3vw,
  html[data-page=battle][data-playing] .verdict{padding:8px 18px;top:58%}
  html[data-page=battle][data-playing] .verdict .mv{font-size:20px}html[data-page=battle][data-playing] .verdict .pl{font-size:10px}html[data-page=battle][data-playing] .verdict .bl{font-size:12px;margin-top:4px}
  html[data-page=battle][data-playing] .verdict.final-result{inset:36px 12px 6px;padding:10px 24px;min-height:0;top:36px}
- html[data-page=battle][data-playing] .final-result .mv{font-size:24px}.result-caption .section-kicker{margin-bottom:4px;font-size:8px}.result-trader{height:160%;width:35%;margin:0 8px 0 0}
+ html[data-page=battle][data-playing] .final-result .mv{font-size:24px}.result-caption .section-kicker{margin-bottom:4px;font-size:8px}.result-trader{height:100%;width:35%;margin:0 8px 0 0}
  html #setup{padding:10px}html .setup2{min-height:0;height:calc(100dvh - 24px);flex-direction:row}html .sleft{display:flex;padding:10px;flex:.8}html .shero{height:calc(100dvh - 80px)}html .shero img{height:calc(160dvh - 100px)}
  html .heroname{font-size:22px;margin:4px}html .sright{margin:0;padding:16px 24px;gap:10px;flex:1.2}
  html .slogo{width:140px}html .sright h2{font-size:22px}html .sright .section-kicker{display:none}html .sright .sh{font-size:10px}
