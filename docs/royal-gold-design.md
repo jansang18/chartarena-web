@@ -39,3 +39,19 @@ Fresh checks after this refinement:
 - 191 automated tests passed; build verification and diff whitespace checks passed.
 - Physical phones and live online multiplayer were not tested. This revision changes presentation only.
 - Additional 320x740 audit found a 326px header overflow and cramped hero text. A narrow-phone rule reduced logo/price sizes, removed the duplicate hero description, and kept 44px entry actions. Recheck: document scroll width 305px inside the 320px viewport, with the scrollbar accounting for the difference; all three prices and header currency values remain visible.
+
+## Table card typography and gold artwork
+
+The home room selector now uses the existing 1254x1254 `assets/fx-gold-token-v2.png` in place of the 128x128 legacy coin. One, two and three coins distinguish the three tables. The card surfaces use dark charcoal, restrained warm metal borders and a single light sweep on hover or keyboard focus. Reduced-motion mode removes the sweep.
+
+`room-cards.css` is a home-only component stylesheet, loaded after the shared theme and included in content-hash versioning. It bundles SUIT Variable for the card labels and tabular amounts. The font comes from the existing local SUIT asset; the upstream license is included at `assets/fonts/SUIT-LICENSE.txt`. Upstream project: https://github.com/sun-typeface/SUIT (SIL Open Font License 1.1).
+
+Portrait phones use three horizontal cards with full-width entry actions inside each card. Desktop and landscape retain the three-column comparison. Coin artwork fits the available vertical space without overlapping prices or titles. Table URLs, rates and entry checks are unchanged.
+
+Verification for this change:
+
+- 194 Node tests passed; `node tests/verify-build.cjs` and `git diff --check` passed.
+- Isolated Chromium at 2x pixel density: 1440x900, 1280x720, 960x720, 768x1024, 844x390, 667x375, 390x844 and 320x650.
+- All card heights align, font and high-resolution images load, no clipped labels or horizontal overflow, and no browser runtime or failed-request errors.
+- Tab navigation, visible focus and Enter navigation to the expert table work. Reduced-motion mode suppresses the decorative sweep.
+- Local screenshots and detailed measurements are in the ignored `exports/room-cards-*` files. This is browser viewport QA, not physical-device or online multiplayer verification.
